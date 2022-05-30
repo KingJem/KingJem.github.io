@@ -16,22 +16,22 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="Spider python go java Android">
   
-    <meta name="description" content="问题的引出Selenium 做模拟滑块的时候能感觉到明显的卡顿 查找原因这个博文中有个测试,我自己写了下确实是这样,但是他的解决方式我不能接受,直接修改源代码的话机器多了根本不行的. 然后在这个issues上看到了作者的相关回答,可以在行为链的时候赋值一个参数做到这样,然后在去看ActionChains的定义的话确实有这可以这样初始化. 12345678910111213class ActionC">
+    <meta name="description" content="卡兄卡弟 一个做卡车垂直领域的APP,用户的话是卡车司机,修理站,汽修站之类的.官网在这里 想要爬取附近补胎,修理,等首页上的六个分类 只有APP页面无其他客户端 我在官网下的APP是加了爱加密商业版的壳,这个是一个二代壳,frida-dexdump 对这个无效 然后在网上找了几个下 发现这个APP 之前叫 拉那儿  用手机号验证码注册成为卡车司机,然后点击页面,抓包分析的话能抓到包 然后使用mi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="selenium行为链">
-<meta property="og:url" content="https://kingjem.github.io/2022/05/29/selenium%E8%A1%8C%E4%B8%BA%E9%93%BE%E5%88%9D%E5%A7%8B%E5%8C%96-%E8%A7%A3%E5%86%B3%E5%8D%A1%E9%A1%BF%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:title" content="卡兄卡弟APP抓包和分析">
+<meta property="og:url" content="https://kingjem.github.io/2022/05/30/%E5%8D%A1%E5%85%84%E5%8D%A1%E5%BC%9FAPP%E6%8A%93%E5%8C%85%E5%92%8C%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="问题的引出Selenium 做模拟滑块的时候能感觉到明显的卡顿 查找原因这个博文中有个测试,我自己写了下确实是这样,但是他的解决方式我不能接受,直接修改源代码的话机器多了根本不行的. 然后在这个issues上看到了作者的相关回答,可以在行为链的时候赋值一个参数做到这样,然后在去看ActionChains的定义的话确实有这可以这样初始化. 12345678910111213class ActionC">
+<meta property="og:description" content="卡兄卡弟 一个做卡车垂直领域的APP,用户的话是卡车司机,修理站,汽修站之类的.官网在这里 想要爬取附近补胎,修理,等首页上的六个分类 只有APP页面无其他客户端 我在官网下的APP是加了爱加密商业版的壳,这个是一个二代壳,frida-dexdump 对这个无效 然后在网上找了几个下 发现这个APP 之前叫 拉那儿  用手机号验证码注册成为卡车司机,然后点击页面,抓包分析的话能抓到包 然后使用mi">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-05-29T03:59:22.000Z">
-<meta property="article:modified_time" content="2022-05-30T03:28:22.000Z">
+<meta property="article:published_time" content="2022-05-30T08:33:40.000Z">
+<meta property="article:modified_time" content="2022-05-30T09:34:54.000Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="selenium">
 <meta property="article:tag" content="spider">
+<meta property="article:tag" content="APP">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>selenium行为链 - Ruhai&#39;s blogs</title>
+  <title>卡兄卡弟APP抓包和分析 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -188,7 +188,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="selenium行为链"></span>
+            <span id="subtitle" data-typed-text="卡兄卡弟APP抓包和分析"></span>
           
         </div>
 
@@ -199,8 +199,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-05-29 11:59" pubdate>
-          2022年5月29日 中午
+        <time datetime="2022-05-30 16:33" pubdate>
+          2022年5月30日 下午
         </time>
       </span>
     
@@ -211,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3k 字
+          2.3k 字
         
       </span>
     
@@ -222,7 +222,7 @@
         
         
         
-          25 分钟
+          19 分钟
         
       </span>
     
@@ -268,39 +268,37 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">selenium行为链</h1>
+            <h1 style="display: none">卡兄卡弟APP抓包和分析</h1>
             
             <div class="markdown-body">
               
-              <h1 id="问题的引出"><a href="#问题的引出" class="headerlink" title="问题的引出"></a>问题的引出</h1><p>Selenium 做模拟滑块的时候能感觉到明显的卡顿</p>
-<h1 id="查找原因"><a href="#查找原因" class="headerlink" title="查找原因"></a>查找原因</h1><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiyu-hlzy/p/12149641.html">这个博文</a>中有个测试,我自己写了下确实是这样,但是他的解决方式我不能接受,直接修改源代码的话机器多了根本不行的.</p>
-<p>然后在这个<a target="_blank" rel="noopener" href="https://github.com/ultrafunkamsterdam/undetected-chromedriver/issues/541">issues</a>上看到了作者的相关回答,可以在行为链的时候赋值一个参数做到这样,然后在去看<code>ActionChains</code>的定义的话确实有这可以这样初始化.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ActionChains</span>:<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, driver, duration=<span class="hljs-number">250</span></span>):<br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        Creates a new ActionChains.</span><br><span class="hljs-string"></span><br><span class="hljs-string">        :Args:</span><br><span class="hljs-string">         - driver: The WebDriver instance which performs user actions.</span><br><span class="hljs-string">         - duration: override the default 250 msecs of DEFAULT_MOVE_DURATION in PointerInput</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        self._driver = driver<br>        self._actions = []<br>        self.w3c_actions = ActionBuilder(driver, duration=duration)<br></code></pre></td></tr></table></figure>
+              <p>卡兄卡弟 一个做卡车垂直领域的APP,用户的话是卡车司机,修理站,汽修站之类的.<a target="_blank" rel="noopener" href="https://www.wlnl504.com/">官网在这里</a></p>
+<p>想要爬取附近补胎,修理,等首页上的六个分类</p>
+<p>只有APP页面无其他客户端</p>
+<p>我在官网下的APP是加了爱加密商业版的壳,这个是一个二代壳,frida-dexdump 对这个无效</p>
+<p>然后在网上找了几个下 发现这个APP 之前叫 <code>拉那儿</code> </p>
+<p>用手机号验证码注册成为卡车司机,然后点击页面,抓包分析的话能抓到包 然后使用mitmproxy 把复制curl请求,使用工具转为requests</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>headers = &#123;<br>    <span class="hljs-string">&#x27;Host&#x27;</span>: <span class="hljs-string">&#x27;47.106.123.30:8070&#x27;</span>,<br>    <span class="hljs-string">&#x27;Connection&#x27;</span>: <span class="hljs-string">&#x27;Keep-Alive&#x27;</span>,<br>    <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;okhttp/3.12.0&#x27;</span>,<br>&#125;<br><br>data = &#123;<br>    <span class="hljs-string">&#x27;oneselfType&#x27;</span>: <span class="hljs-string">&#x27;1&#x27;</span>,<br>    <span class="hljs-string">&#x27;key&#x27;</span>: <span class="hljs-string">&#x27;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJBUFAiLCJpc3MiOiJTZXJ2aWNlIiwiZXhwIjoxNzE2OTYyMzcxLCJ1c2VySWQiOiI1N2VjNjI3ZS05ZWRhLTRiMTgtOGJmMS1lN2MxNmVmMjhmOTYiLCJpYXQiOjE2NTM4MDM5NzEsInRva2VuIjoiMTY1MzgwMzk3MDg4NiJ9.JLHyQkDp4iowlrVhKkvTTJ3us7LoPyBY3ISMBZzJbiQ&#x27;</span>,<br>    <span class="hljs-string">&#x27;friendRelationId&#x27;</span>: <span class="hljs-string">&#x27;null&#x27;</span>,<br>    <span class="hljs-string">&#x27;locationX&#x27;</span>: <span class="hljs-string">&#x27;121.516538&#x27;</span>,<br>    <span class="hljs-string">&#x27;locationY&#x27;</span>: <span class="hljs-string">&#x27;31.123457&#x27;</span>,<br>    <span class="hljs-string">&#x27;userType&#x27;</span>: <span class="hljs-string">&#x27;4&#x27;</span>,<br>    <span class="hljs-string">&quot;pageId&quot;</span>: <span class="hljs-number">1</span><br>&#125;<br><br><span class="hljs-comment"># 附近补胎  usertype:4</span><br><span class="hljs-comment"># 找修理 usertype:3</span><br><span class="hljs-comment"># 油罐车 usertype:6</span><br><span class="hljs-comment"># 配件店 2</span><br><span class="hljs-comment"># 审车 5</span><br><span class="hljs-comment"># 吊车 7</span><br>response = requests.post(<span class="hljs-string">&#x27;http://47.106.123.30:8070/app/api/usercompany/finsCompanyListAndVipCompany&#x27;</span>, headers=headers,<br>                         data=data)<br><span class="hljs-built_in">print</span>(response.json()[<span class="hljs-string">&#x27;data&#x27;</span>])<br><br></code></pre></td></tr></table></figure>
 
-<p><strong>那思路就明确可以不用修改源文件直接在初始化的时候传参数就可以了</strong></p>
-<h1 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h1><p>action_chains 动作可以不附加在元素上执行 而且不会报错,这里我就打开百度跑下看看效果</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> selenium <span class="hljs-keyword">import</span> webdriver<br><span class="hljs-keyword">from</span> selenium.webdriver.chrome.service <span class="hljs-keyword">import</span> Service<br><span class="hljs-keyword">from</span> selenium.webdriver.common.action_chains <span class="hljs-keyword">import</span> ActionChains<br><span class="hljs-keyword">from</span> selenium.webdriver.support.ui <span class="hljs-keyword">import</span> WebDriverWait<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Search</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        option = webdriver.ChromeOptions()<br>        option.add_argument(<span class="hljs-string">&#x27;--disable-dev-shm-usage&#x27;</span>)<br>        option.add_argument(<span class="hljs-string">&#x27;--disable-gpu&#x27;</span>)<br>        option.add_argument(<span class="hljs-string">&#x27;--incognito&#x27;</span>)  <span class="hljs-comment"># 隐身模式</span><br>        option.add_argument(<span class="hljs-string">&#x27;--no-sandbox&#x27;</span>)  <span class="hljs-comment"># root用户不加这条会无法运行</span><br>        option.add_argument(<span class="hljs-string">&#x27;headless&#x27;</span>)  <span class="hljs-comment"># root用户不加这条会无法运行</span><br>        option.binary_location = <span class="hljs-string">r&#x27;/Applications/Chrome.app/Contents/MacOS/Google Chrome&#x27;</span>  <span class="hljs-comment"># mac 下的谷歌路径</span><br>        <span class="hljs-comment"># option.add_argument(f&#x27;--proxy-server=https://&#123;proxy&#125;&#x27;)</span><br>        option.add_argument(<br>            <span class="hljs-string">&#x27;User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36&#x27;</span>)<br>        option.add_experimental_option(<span class="hljs-string">&#x27;excludeSwitches&#x27;</span>, [<span class="hljs-string">&#x27;enable-automation&#x27;</span>])<br><br>        service = Service(DRIVER_PATH)<br>        self.driver = webdriver.Chrome(service=service, options=option)<br>        self.wait = WebDriverWait(self.driver, <span class="hljs-number">10</span>)<br>        self.action_chains = ActionChains(self.driver, duration=<span class="hljs-number">1</span>)<br>        self.url = <span class="hljs-string">&quot;https://www.baidu.com&quot;</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__del__</span>(<span class="hljs-params">self</span>):<br>        self.driver.close()<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>(<span class="hljs-params">self</span>)<br>        self.driver.get(self.url)<br>        self.driver.set_window_size(<span class="hljs-number">1907</span>, <span class="hljs-number">1035</span>)<br><br>        start_time = time.time()<br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">21</span>):<br>            self.action_chains.move_by_offset(xoffset=<span class="hljs-number">0</span>, yoffset=<span class="hljs-number">0</span>).perform()<br>            now_time = time.time()<br>            hs = <span class="hljs-built_in">round</span>((now_time - start_time), <span class="hljs-number">3</span>)<br>            start_time = now_time<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;i&#125;</span> ,<span class="hljs-subst">&#123;hs&#125;</span>&#x27;</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    s = Search()<br>    s.main()<br>    <span class="hljs-keyword">del</span> s<br><br></code></pre></td></tr></table></figure>
+<p>key的话我看着好像是jwt 的签名</p>
+<p>key的第一部分使用base64 解密工具的解密为<code>&#123;&quot;typ&quot;:&quot;JWT&quot;,&quot;alg&quot;:&quot;HS256&quot;&#125;</code></p>
+<p>第二部分的解密为</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;aud&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;APP&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;iss&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Service&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;exp&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1716962371</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;userId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;57ec627e-9eda-4b18-8bf1-e7c16ef28f96&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;iat&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1653803971</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;token&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;1653803970886&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
 
-
-
-<p>结果的话确实比之前的间隔短</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs text">1 ,0.046<br>2 ,0.037<br>3 ,0.077<br>4 ,0.007<br>5 ,0.019<br>6 ,0.015<br>7 ,0.017<br>8 ,0.017<br>9 ,0.017<br>10 ,0.016<br>11 ,0.018<br>12 ,0.015<br>13 ,0.017<br>14 ,0.018<br>15 ,0.015<br>16 ,0.016<br>17 ,0.019<br>18 ,0.017<br>19 ,0.015<br>20 ,0.017<br></code></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-<p>这个库的作者也贴了一段代码,大致思路就是把move_by_offset 通过更多的step 来让滑块更精细</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> selenium.webdriver.common.action_chains <span class="hljs-keyword">import</span> ActionChains<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">EnhancedActionChains</span>(<span class="hljs-title class_ inherited__">ActionChains</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">smooth_move_by_offset</span>(<span class="hljs-params">self, dx, dy, n_step=<span class="hljs-number">50</span></span>):<br>        <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_displacements</span>():<br>            step_x = dx / n_step<br>            step_y = dy / n_step<br>            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_step):<br>                <span class="hljs-keyword">yield</span> (<br>                    <span class="hljs-built_in">round</span>((i + <span class="hljs-number">1</span>) * step_x) - <span class="hljs-built_in">round</span>(i * step_x),<br>                    <span class="hljs-built_in">round</span>((i + <span class="hljs-number">1</span>) * step_y) - <span class="hljs-built_in">round</span>(i * step_y),<br>                )<br><br>        <span class="hljs-comment"># pylint: disable=protected-access</span><br>        self.w3c_actions.pointer_action._duration = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">for</span> ddx, ddy <span class="hljs-keyword">in</span> get_displacements():<br>            self.w3c_actions.pointer_action.move_by(ddx, ddy)<br><br>        <span class="hljs-keyword">return</span> self<br></code></pre></td></tr></table></figure>
+<p><code>exp</code> 为过期时间</p>
+<p>看<code>userID</code>后端的数据局应该是非关系型数据库 </p>
+<p>在token 没有重新签发和过期之前该请求都是可以重放的.</p>
+<p>难道说这个APP这么简单?</p>
+<p>APP 每一分钟会往下面的<code>/app/api/location/set</code>网址发送一个本机定位其中参数为</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">key</span>:       eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJBUFAiLCJpc3MiOiJTZXJ2aWNlIiwiZXhwIjoxNzE2OTYyMzcxLCJ1c2VySWQiOiI1N2VjNjI3ZS05ZWRhLTRiMTgtOGJmMS1lN2MxNmVmMjhmOTYiLCJpYXQiOjE2NTM4MDM5NzEsInRva2VuIjoiMTY1MzgwMzk3MDg4NiJ9.JLHyQkDp4iowlrVhKkvTTJ3us7LoPyBY3ISMBZzJbiQ<br><span class="hljs-attribute">locationX</span>: <span class="hljs-number">121</span>.<span class="hljs-number">51653</span><br><span class="hljs-attribute">locationY</span>: <span class="hljs-number">31</span>.<span class="hljs-number">123457</span><br><span class="hljs-attribute">source</span>:    <span class="hljs-number">1</span><br><span class="hljs-attribute">address</span>:   xxxxx<br></code></pre></td></tr></table></figure>
 
 
 
-
-
-
-
+<p>就是手机定位的经纬度,着验证的频率是1分钟1次可以有网络波动的error发生,但是阈值多少没有测试出来.</p>
+<p>APP没有明显的列表页,请求的内容是根据经纬度参数来决定的,要抓数据就要遍历整个中国的经纬度地址.</p>
+<p>数据返回结果有个界限,和本机相距40-50公里的样子就不返回数据了,要请求的话就只有换定位.</p>
+<p>数据重复的话就直接吧距离定的小一些返回的数据根据数据库中的id去重</p>
+<p>那也就有另一个问题就是手机移动定位改的太快,太频繁会导致当前登录的用户成为可疑用户.</p>
 
               
             </div>
@@ -312,9 +310,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/selenium/">#selenium</a>
-      
         <a href="/tags/spider/">#spider</a>
+      
+        <a href="/tags/APP/">#APP</a>
       
     </div>
   
@@ -326,8 +324,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>selenium行为链</div>
-      <div>https://kingjem.github.io/2022/05/29/selenium行为链初始化-解决卡顿的问题/</div>
+      <div>卡兄卡弟APP抓包和分析</div>
+      <div>https://kingjem.github.io/2022/05/30/卡兄卡弟APP抓包和分析/</div>
     </div>
     <div class="license-meta">
       
@@ -339,7 +337,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年5月29日</div>
+          <div>2022年5月30日</div>
         </div>
       
       
@@ -369,18 +367,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/05/30/%E5%8D%A1%E5%85%84%E5%8D%A1%E5%BC%9FAPP%E6%8A%93%E5%8C%85%E5%92%8C%E5%88%86%E6%9E%90/" title="卡兄卡弟APP抓包和分析">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">卡兄卡弟APP抓包和分析</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/05/25/%E5%A4%A9%E6%9F%90%E6%9F%A5%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3/" title="天某查数据接口">
-                        <span class="hidden-mobile">天某查数据接口</span>
+                      <a href="/2022/05/29/selenium%E8%A1%8C%E4%B8%BA%E9%93%BE%E5%88%9D%E5%A7%8B%E5%8C%96-%E8%A7%A3%E5%86%B3%E5%8D%A1%E9%A1%BF%E7%9A%84%E9%97%AE%E9%A2%98/" title="selenium行为链">
+                        <span class="hidden-mobile">selenium行为链</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
