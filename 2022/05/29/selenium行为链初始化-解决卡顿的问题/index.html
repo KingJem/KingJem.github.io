@@ -24,7 +24,7 @@
 <meta property="og:description" content="问题的引出Selenium 做模拟滑块的时候能感觉到明显的卡顿 查找原因这个博文中有个测试,我自己写了下确实是这样,但是他的解决方式我不能接受,直接修改源代码的话机器多了根本不行的. 然后在这个issues上看到了作者的相关回答,可以在行为链的时候赋值一个参数做到这样,然后在去看ActionChains的定义的话确实有这可以这样初始化. 12345678910111213class ActionC">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-29T03:59:22.000Z">
-<meta property="article:modified_time" content="2022-05-29T13:45:55.000Z">
+<meta property="article:modified_time" content="2022-05-30T03:28:22.000Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="selenium">
 <meta property="article:tag" content="spider">
@@ -222,7 +222,7 @@
         
         
         
-          26 分钟
+          25 分钟
         
       </span>
     
@@ -292,14 +292,14 @@
 
 
 
-<p>这个库的作者也贴了一段代码,大致思路就是把move_by_offset 通过更多的step </p>
+<p>这个库的作者也贴了一段代码,大致思路就是把move_by_offset 通过更多的step 来让滑块更精细</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> selenium.webdriver.common.action_chains <span class="hljs-keyword">import</span> ActionChains<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">EnhancedActionChains</span>(<span class="hljs-title class_ inherited__">ActionChains</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">smooth_move_by_offset</span>(<span class="hljs-params">self, dx, dy, n_step=<span class="hljs-number">50</span></span>):<br>        <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_displacements</span>():<br>            step_x = dx / n_step<br>            step_y = dy / n_step<br>            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_step):<br>                <span class="hljs-keyword">yield</span> (<br>                    <span class="hljs-built_in">round</span>((i + <span class="hljs-number">1</span>) * step_x) - <span class="hljs-built_in">round</span>(i * step_x),<br>                    <span class="hljs-built_in">round</span>((i + <span class="hljs-number">1</span>) * step_y) - <span class="hljs-built_in">round</span>(i * step_y),<br>                )<br><br>        <span class="hljs-comment"># pylint: disable=protected-access</span><br>        self.w3c_actions.pointer_action._duration = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">for</span> ddx, ddy <span class="hljs-keyword">in</span> get_displacements():<br>            self.w3c_actions.pointer_action.move_by(ddx, ddy)<br><br>        <span class="hljs-keyword">return</span> self<br></code></pre></td></tr></table></figure>
 
 
 
 
 
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle">pnpm config set store-dir <span class="hljs-regexp">/Volumes/</span><span class="hljs-keyword">file</span><span class="hljs-regexp">/code/</span><span class="hljs-number">01</span>pnpm_cache_dir<br></code></pre></td></tr></table></figure>
+
 
 
               
