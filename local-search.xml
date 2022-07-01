@@ -4,6 +4,32 @@
   
   
   <entry>
+    <title></title>
+    <link href="/2022/07/01/ohmyzsh%E8%87%AA%E7%94%A8%E6%8F%92%E4%BB%B6%E5%92%8C%E8%A7%A6%E5%8F%91%E6%96%B9%E5%BC%8F/"/>
+    <url>/2022/07/01/ohmyzsh%E8%87%AA%E7%94%A8%E6%8F%92%E4%BB%B6%E5%92%8C%E8%A7%A6%E5%8F%91%E6%96%B9%E5%BC%8F/</url>
+    
+    <content type="html"><![CDATA[<p>title: ohmyzsh自用插件和触发方式<br>date: 2022-07-01 16:55:28<br>tags: [“zsh”,”shell”,”ohmyzsh”]</p><h1 id="zsh-插件配置及功能启用方式"><a href="#zsh-插件配置及功能启用方式" class="headerlink" title="zsh 插件配置及功能启用方式"></a>zsh 插件配置及功能启用方式</h1><p>插件配置方法</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">~/.zshrc</span><br>plugins=(git zsh-autosuggestions last-working-dir incr  autojump zsh-syntax-highlighting  extract safe-paste )<br></code></pre></td></tr></table></figure><table><thead><tr><th>插件名称</th><th>触发方式</th><th align="left">命令使用</th><th>插件作用</th></tr></thead><tbody><tr><td>zsh-autosuggestions</td><td>手动</td><td align="left">tab 补全</td><td>命令提示</td></tr><tr><td>autojump</td><td>手动</td><td align="left">j [aid] dirname</td><td>快捷跳转目录</td></tr><tr><td>incr</td><td>自动</td><td align="left"></td><td>命令提示</td></tr><tr><td>zsh-syntax-highlighting</td><td>自动</td><td align="left"></td><td>Zsh语法高亮</td></tr><tr><td>safe-paste</td><td>自动</td><td align="left"></td><td>粘贴命令不自动执行</td></tr><tr><td>last-working-dir</td><td>自动</td><td align="left"></td><td>自动跳转到上次退出的目录</td></tr><tr><td>extarct</td><td>手动</td><td align="left">extract file.ext 或 x file.ext</td><td>tar, gz, zip, rar 等等一键解压缩</td></tr><tr><td>git</td><td>手动</td><td align="left">alias |grep git</td><td>git 的快捷命令</td></tr></tbody></table>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>某来电APP参数破解</title>
+    <link href="/2022/06/20/%E6%9F%90%E6%9D%A5%E7%94%B5APP%E5%8F%82%E6%95%B0%E7%A0%B4%E8%A7%A3/"/>
+    <url>/2022/06/20/%E6%9F%90%E6%9D%A5%E7%94%B5APP%E5%8F%82%E6%95%B0%E7%A0%B4%E8%A7%A3/</url>
+    
+    <content type="html"><![CDATA[]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>AES_CBC_PKCS7算法加解密Python实现</title>
     <link href="/2022/06/11/AES-CBC-PKCS7%E7%AE%97%E6%B3%95%E5%8A%A0%E8%A7%A3%E5%AF%86Python%E5%AE%9E%E7%8E%B0/"/>
     <url>/2022/06/11/AES-CBC-PKCS7%E7%AE%97%E6%B3%95%E5%8A%A0%E8%A7%A3%E5%AF%86Python%E5%AE%9E%E7%8E%B0/</url>
