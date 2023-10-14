@@ -16,12 +16,12 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="Spider python go java Android">
   
-    <meta name="description" content="title: 空气质量监控平台分析date: 2022-08-10 21:14:33tags: [“JS 逆向”,”JS反调试”]categories:  JS逆向top:    第一个反爬：禁止右键和快捷键 F12解决措施 第二个反爬：debuggr 第三个反爬虫 反调试定时器 清除定时任务 注意下面命令的执行时间要在catch 代码执行之前执行 不然加了定时器之后 调试会一直在打转 1end">
+    <meta name="description" content="第一个反爬：禁止右键和快捷键 F12解决措施 第二个反爬：debuggr 第三个反爬虫 反调试定时器 清除定时任务 注意下面命令的执行时间要在catch 代码执行之前执行 不然加了定时器之后 调试会一直在打转 1end&#x3D;setInterval(function()&amp;#123;&amp;#125;,10000);for(i&#x3D;1;i&lt;&#x3D;end;i++)&amp;#123;clearInterval(i);&amp;#1">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ruhai&#39;s blogs">
-<meta property="og:url" content="https://kingjem.github.io/2022/11/10/apistudy/index.html">
+<meta property="og:title" content="空气质量监控平台分析反爬虫分析">
+<meta property="og:url" content="https://kingjem.github.io/2022/08/10/apistudy/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="title: 空气质量监控平台分析date: 2022-08-10 21:14:33tags: [“JS 逆向”,”JS反调试”]categories:  JS逆向top:    第一个反爬：禁止右键和快捷键 F12解决措施 第二个反爬：debuggr 第三个反爬虫 反调试定时器 清除定时任务 注意下面命令的执行时间要在catch 代码执行之前执行 不然加了定时器之后 调试会一直在打转 1end">
+<meta property="og:description" content="第一个反爬：禁止右键和快捷键 F12解决措施 第二个反爬：debuggr 第三个反爬虫 反调试定时器 清除定时任务 注意下面命令的执行时间要在catch 代码执行之前执行 不然加了定时器之后 调试会一直在打转 1end&#x3D;setInterval(function()&amp;#123;&amp;#125;,10000);for(i&#x3D;1;i&lt;&#x3D;end;i++)&amp;#123;clearInterval(i);&amp;#1">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s2.loli.net/2022/08/09/XC89Qrs1WH3G5Sc.png">
 <meta property="og:image" content="https://s2.loli.net/2022/08/09/Y9ahkHWc1iPmXET.png">
@@ -35,15 +35,16 @@
 <meta property="og:image" content="https://s2.loli.net/2022/08/09/v2OYBQqdXeHIy4s.png">
 <meta property="og:image" content="https://s2.loli.net/2022/08/09/hX1MlpfxP64YmZ8.png">
 <meta property="og:image" content="https://s2.loli.net/2022/08/09/6Jkr4Qj2bKv3eU8.png">
-<meta property="article:published_time" content="2022-11-10T02:02:55.368Z">
-<meta property="article:modified_time" content="2022-11-10T02:02:55.368Z">
+<meta property="article:published_time" content="2022-08-10T13:14:33.000Z">
+<meta property="article:modified_time" content="2023-10-14T04:36:10.534Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="Spider python go java Android">
+<meta property="article:tag" content="JS 逆向">
+<meta property="article:tag" content="JS反调试">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://s2.loli.net/2022/08/09/XC89Qrs1WH3G5Sc.png">
   
   
-  <title>Ruhai&#39;s blogs</title>
+  <title>空气质量监控平台分析反爬虫分析 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -200,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text=""></span>
+            <span id="subtitle" data-typed-text="空气质量监控平台分析反爬虫分析"></span>
           
         </div>
 
@@ -211,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-11-10 10:02" pubdate>
-          2022年11月10日 上午
+        <time datetime="2022-08-10 21:14" pubdate>
+          2022年8月10日 晚上
         </time>
       </span>
     
@@ -223,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          9.5k 字
+          8.8k 字
         
       </span>
     
@@ -234,7 +235,7 @@
         
         
         
-          79 分钟
+          74 分钟
         
       </span>
     
@@ -280,17 +281,11 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">空气质量监控平台分析反爬虫分析</h1>
             
             <div class="markdown-body">
               
-              <hr>
-<p>title: 空气质量监控平台分析<br>date: 2022-08-10 21:14:33<br>tags: [“JS 逆向”,”JS反调试”]<br>categories:</p>
-<ul>
-<li>JS逆向<br>top: </li>
-</ul>
-<hr>
-<h3 id="第一个反爬：禁止右键和快捷键-F12"><a href="#第一个反爬：禁止右键和快捷键-F12" class="headerlink" title="第一个反爬：禁止右键和快捷键 F12"></a>第一个反爬：禁止右键和快捷键 F12</h3><h4 id="解决措施"><a href="#解决措施" class="headerlink" title="解决措施"></a>解决措施</h4><p><img src="https://s2.loli.net/2022/08/09/XC89Qrs1WH3G5Sc.png" srcset="/img/loading.gif" lazyload alt="image-20220809214407034"></p>
+              <h3 id="第一个反爬：禁止右键和快捷键-F12"><a href="#第一个反爬：禁止右键和快捷键-F12" class="headerlink" title="第一个反爬：禁止右键和快捷键 F12"></a>第一个反爬：禁止右键和快捷键 F12</h3><h4 id="解决措施"><a href="#解决措施" class="headerlink" title="解决措施"></a>解决措施</h4><p><img src="https://s2.loli.net/2022/08/09/XC89Qrs1WH3G5Sc.png" srcset="/img/loading.gif" lazyload alt="image-20220809214407034"></p>
 <h3 id="第二个反爬：debuggr"><a href="#第二个反爬：debuggr" class="headerlink" title="第二个反爬：debuggr"></a>第二个反爬：debuggr</h3><p><img src="https://s2.loli.net/2022/08/09/Y9ahkHWc1iPmXET.png" srcset="/img/loading.gif" lazyload alt="image-20220809213856610"></p>
 <h3 id="第三个反爬虫-反调试定时器"><a href="#第三个反爬虫-反调试定时器" class="headerlink" title="第三个反爬虫 反调试定时器"></a>第三个反爬虫 反调试定时器</h3><p><img src="https://s2.loli.net/2022/08/09/dlhMpmjcKzSkRqT.png" srcset="/img/loading.gif" lazyload alt="image-20220809214717694"></p>
 <p>清除定时任务 注意下面命令的执行时间要在catch 代码执行之前执行 不然加了定时器之后 调试会一直在打转</p>
@@ -337,22 +332,42 @@
 
 
 
-
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">cd <span class="hljs-regexp">/home/</span>suroot<span class="hljs-regexp">/wuyou_outnet_spider &amp;&amp; git pull &amp;&amp;  python3 -u  /</span>home<span class="hljs-regexp">/suroot/</span>wuyou_outnet_spider<span class="hljs-regexp">/sns_spider/</span>spiders<span class="hljs-regexp">/facebook/</span>temp_start.py &gt;  <span class="hljs-regexp">/home/</span>suroot<span class="hljs-regexp">/spider_log/</span>tmp_start.log <span class="hljs-number">2</span>&gt;&amp;<span class="hljs-number">1</span> &amp;<br></code></pre></td></tr></table></figure>
-
-
-
-
-
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">cd <span class="hljs-regexp">/home/</span>suroot<span class="hljs-regexp">/wuyou_outnet_spider &amp;&amp; ps -ef|grep python3|grep -v grep |awk &#123;&#x27;print $2&#x27;&#125;|  xargs kill -9 ||  git pull &amp;&amp; python3 -u /</span>home<span class="hljs-regexp">/suroot/</span>wuyou_outnet_spider<span class="hljs-regexp">/sns_spider/</span>scripts<span class="hljs-regexp">/schdule_start.py &amp;&amp; python3 -u  /</span>home<span class="hljs-regexp">/suroot/</span>wuyou_outnet_spider<span class="hljs-regexp">/sns_spider/</span>spiders<span class="hljs-regexp">/facebook/</span>temp_start.py &gt;  <span class="hljs-regexp">/home/</span>suroot<span class="hljs-regexp">/spider_log/</span>tmp_start.log <span class="hljs-number">2</span>&gt;&amp;<span class="hljs-number">1</span> &amp;<br></code></pre></td></tr></table></figure>
-
-
               
             </div>
             <hr/>
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JS-%E9%80%86%E5%90%91/">#JS 逆向</a>
+      
+        <a href="/tags/JS%E5%8F%8D%E8%B0%83%E8%AF%95/">#JS反调试</a>
+      
+    </div>
   
 </div>
 
@@ -362,8 +377,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div></div>
-      <div>https://kingjem.github.io/2022/11/10/apistudy/</div>
+      <div>空气质量监控平台分析反爬虫分析</div>
+      <div>https://kingjem.github.io/2022/08/10/apistudy/</div>
     </div>
     <div class="license-meta">
       
@@ -375,7 +390,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年11月10日</div>
+          <div>2022年8月10日</div>
         </div>
       
       
@@ -405,9 +420,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/02/02/pythonlogging%E9%85%8D%E7%BD%AE/" title="pythonlogging配置">
+                      <a href="/2022/08/16/%E5%AE%89%E5%8D%93%E6%89%8B%E6%9C%BA%E5%AE%89%E8%A3%85Openwrt/" title="安卓手机安装Openwrt">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">pythonlogging配置</span>
+                        <span class="hidden-mobile">安卓手机安装Openwrt</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -415,8 +430,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/11/08/kitty-md/" title="kitty Mac上常用快捷键和配置">
-                        <span class="hidden-mobile">kitty Mac上常用快捷键和配置</span>
+                      <a href="/2022/08/02/Tiktok/" title="Tiktok">
+                        <span class="hidden-mobile">Tiktok</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
