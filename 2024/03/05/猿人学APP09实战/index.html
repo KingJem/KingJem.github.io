@@ -16,21 +16,28 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="Spider python go java Android">
   
-    <meta name="description" content="nginx-proxy-manager123456789101112131415version: &amp;#x27;3.8&amp;#x27;services:  app:    image: &amp;#x27;jc21&#x2F;nginx-proxy-manager:latest&amp;#x27;    restart: unless-stopped    ports:      - &amp;#x27;80:80&amp;#x27;">
+    <meta name="description" content="尝试平常常见的关键词 cert password  都搜索不到 不起作用 1objection -g  com.yuanrenxue.challenge  explore --startup-command &quot;android hooking watch class_method java.io.File.$init  –-dump-args –-dump-backtrace –-dump">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Orbstack 配置 docker 环境">
-<meta property="og:url" content="https://kingjem.github.io/2023/07/05/Orbstack%20%E9%85%8D%E7%BD%AEdocker%E7%8E%AF%E5%A2%83/index.html">
+<meta property="og:title" content="猿人学APP09-证书验证闯关">
+<meta property="og:url" content="https://kingjem.github.io/2024/03/05/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP09%E5%AE%9E%E6%88%98/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="nginx-proxy-manager123456789101112131415version: &amp;#x27;3.8&amp;#x27;services:  app:    image: &amp;#x27;jc21&#x2F;nginx-proxy-manager:latest&amp;#x27;    restart: unless-stopped    ports:      - &amp;#x27;80:80&amp;#x27;">
+<meta property="og:description" content="尝试平常常见的关键词 cert password  都搜索不到 不起作用 1objection -g  com.yuanrenxue.challenge  explore --startup-command &quot;android hooking watch class_method java.io.File.$init  –-dump-args –-dump-backtrace –-dump">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-07-05T05:19:32.636Z">
-<meta property="article:modified_time" content="2023-10-14T05:18:53.595Z">
+<meta property="og:image" content="https://s2.loli.net/2023/12/29/L9cRipkIuW2bsPC.png">
+<meta property="og:image" content="https://s2.loli.net/2023/12/29/rIjLEi7CJ236NU8.png">
+<meta property="og:image" content="https://s2.loli.net/2023/12/30/Rix8qWBuo5CZvGm.png">
+<meta property="og:image" content="https://s2.loli.net/2023/12/30/AoZjDtVvxgl29pd.png">
+<meta property="og:image" content="https://s2.loli.net/2023/12/30/uDjkzEflZcHUpe2.png">
+<meta property="article:published_time" content="2024-03-05T07:40:37.977Z">
+<meta property="article:modified_time" content="2024-03-05T07:40:37.977Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="APP逆向">
+<meta property="article:tag" content="证书逆向">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://s2.loli.net/2023/12/29/L9cRipkIuW2bsPC.png">
   
   
-  <title>Orbstack 配置 docker 环境 - Ruhai&#39;s blogs</title>
+  <title>猿人学APP09-证书验证闯关 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -187,7 +194,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Orbstack 配置 docker 环境"></span>
+            <span id="subtitle" data-typed-text="猿人学APP09-证书验证闯关"></span>
           
         </div>
 
@@ -198,8 +205,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-07-05 13:19" pubdate>
-          2023年7月5日 下午
+        <time datetime="2024-03-05 15:40" pubdate>
+          2024年3月5日 下午
         </time>
       </span>
     
@@ -210,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.1k 字
+          4k 字
         
       </span>
     
@@ -221,7 +228,7 @@
         
         
         
-          18 分钟
+          34 分钟
         
       </span>
     
@@ -267,56 +274,79 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Orbstack 配置 docker 环境</h1>
+            <h1 style="display: none">猿人学APP09-证书验证闯关</h1>
             
             <div class="markdown-body">
               
-              <h2 id="nginx-proxy-manager"><a href="#nginx-proxy-manager" class="headerlink" title="nginx-proxy-manager"></a>nginx-proxy-manager</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3.8&#x27;</span><br><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">app:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">&#x27;jc21/nginx-proxy-manager:latest&#x27;</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;80:80&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;81:81&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;443:443&#x27;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">nginx-proxy-manager_data:/data</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">nginx-proxy-manager_letsencrypt:/etc/letsencrypt</span><br><span class="hljs-attr">volumes:</span><br> <span class="hljs-attr">nginx-proxy-manager_data:</span><br> <span class="hljs-attr">nginx-proxy-manager_letsencrypt:</span> <br></code></pre></td></tr></table></figure>
+              <h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>平常常见的关键词 cert password  都搜索不到</p>
+<p>不起作用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">objection -g  com.yuanrenxue.challenge  explore --startup-command &quot;android hooking watch class_method java.io.File.$init  –-dump-args –-dump-backtrace –-dump-return&quot;<br></code></pre></td></tr></table></figure>
 
 
 
 
 
-
-
-<h2 id="dozzle"><a href="#dozzle" class="headerlink" title="dozzle"></a>dozzle</h2><p>docker 容器日志查看</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">docker run --name dozzle -d --volume=<span class="hljs-regexp">/var/</span>run<span class="hljs-regexp">/docker.sock:/</span>var<span class="hljs-regexp">/run/</span>docker.sock -p <span class="hljs-number">8888</span>:<span class="hljs-number">8080</span> amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">docker</span> run --name dozzle -d  -p <span class="hljs-number">8888</span>:<span class="hljs-number">8080</span> amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
+<h2 id="代码审查"><a href="#代码审查" class="headerlink" title="代码审查"></a>代码审查</h2><p>搜索关键词  借问酒家何处有跳转到相关的组件中进行代码审查</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle bundle)</span> &#123;<br>    <span class="hljs-built_in">super</span>.onCreate(bundle);<br>    <span class="hljs-keyword">try</span> &#123;<br>        C9174oo0o0Oo.<span class="hljs-type">C9175OooO00o</span> <span class="hljs-variable">OoooO002</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">C9174oo0o0Oo</span>().OooOoO0().OoooO00(<span class="hljs-literal">false</span>);<br>        <span class="hljs-type">TimeUnit</span> <span class="hljs-variable">timeUnit</span> <span class="hljs-operator">=</span> TimeUnit.SECONDS;<br>        C9174oo0o0Oo.<span class="hljs-type">C9175OooO00o</span> <span class="hljs-variable">OoooO0O2</span> <span class="hljs-operator">=</span> OoooO002.OooO0o0(<span class="hljs-number">60</span>, timeUnit).Oooo(<span class="hljs-number">60</span>, timeUnit).OoooO0O(<span class="hljs-number">60</span>, timeUnit);<br>        <span class="hljs-type">TrustManagerFactory</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());<br>        instance.init(OooOooO());<br>        TrustManager[] trustManagers = instance.getTrustManagers();<br>        <span class="hljs-keyword">if</span> (trustManagers.length == <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-type">TrustManager</span> <span class="hljs-variable">trustManager</span> <span class="hljs-operator">=</span> trustManagers[<span class="hljs-number">0</span>];<br>            <span class="hljs-keyword">if</span> (trustManager <span class="hljs-keyword">instanceof</span> X509TrustManager) &#123;<br>                <span class="hljs-type">KeyStore</span> <span class="hljs-variable">instance2</span> <span class="hljs-operator">=</span> KeyStore.getInstance(C8385o00O0O.OooO00o(-<span class="hljs-number">5190684656253612251L</span>));<br>                instance2.load(getContext().getApplicationContext().getAssets().open(C8385o00O0O.OooO00o(-<span class="hljs-number">5190684673433481435L</span>)), C8385o00O0O.OooO00o(-<span class="hljs-number">5190684729268056283L</span>).toCharArray());<br>                <span class="hljs-type">KeyManagerFactory</span> <span class="hljs-variable">instance3</span> <span class="hljs-operator">=</span> KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());<br>                instance3.init(instance2, C8385o00O0O.OooO00o(-<span class="hljs-number">5190684802282500315L</span>).toCharArray());<br>                <span class="hljs-type">SSLContext</span> <span class="hljs-variable">instance4</span> <span class="hljs-operator">=</span> SSLContext.getInstance(C8385o00O0O.OooO00o(-<span class="hljs-number">5190684875296944347L</span>));<br>                instance4.init(instance3.getKeyManagers(), trustManagers, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SecureRandom</span>());<br>                OoooO0O2.OoooO0(instance4.getSocketFactory(), (X509TrustManager) trustManager);<br>                OoooO0O2.Oooo0o0(<span class="hljs-keyword">new</span> <span class="hljs-title class_">C6642oo000o</span>(<span class="hljs-built_in">this</span>));<br>                <span class="hljs-built_in">this</span>.f12034OooO0o = OoooO0O2.OooO0OO();<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(C8385o00O0O.OooO00o(-<span class="hljs-number">5190684505929756891L</span>) + Arrays.toString(trustManagers));<br>    &#125; <span class="hljs-keyword">catch</span> (Exception unused) &#123;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
 
-<h2 id="postgresql"><a href="#postgresql" class="headerlink" title="postgresql"></a>postgresql</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs shell"><br>docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -v pgdata:/var/lib/postgresql/data -d postgres<br><br><br><br>docker run -p 5432:5432 --name postgres -v pgdata:/var/lib/postgresql/data -d postgres<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">进入交互式环境</span><br>docker exec -it postgres psql -U postgres -d postgres<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">查看数据存放路径</span><br>show data_directory  <br>docker cp postgres:/var/lib/postgresql/data/pg_hba.conf .<br>docker cp ./pg_hba.conf postgres:/var/lib/postgresql/data/pg_hba.conf .<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">重启服务</span><br>docker restart postgres<br></code></pre></td></tr></table></figure>
+<h2 id="找到相关代码"><a href="#找到相关代码" class="headerlink" title="找到相关代码"></a>找到相关代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">instance2.load(getContext().getApplicationContext().getAssets().open(C8385o00O0O.OooO00o(-<span class="hljs-number">5190684673433481435L</span>)), C8385o00O0O.OooO00o(-<span class="hljs-number">5190684729268056283L</span>).toCharArray());<br></code></pre></td></tr></table></figure>
 
 
 
-
-
-<h2 id="kafka-kafka-manger"><a href="#kafka-kafka-manger" class="headerlink" title="kafka kafka-manger"></a>kafka kafka-manger</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker pull wurstmeister/zookeeper<br>docker <span class="hljs-built_in">run</span> -d --name zookeeper -p 2181:2181 -e <span class="hljs-attribute">TZ</span>=<span class="hljs-string">&quot;Asia/Shanghai&quot;</span> wurstmeister/zookeeper:latest<br>docker pull wurstmeister/kafka<br>docker <span class="hljs-built_in">run</span> -d --name kafka -p 9092:9092 -e <span class="hljs-attribute">KAFKA_BROKER_ID</span>=0 -e <span class="hljs-attribute">KAFKA_ZOOKEEPER_CONNECT</span>=192.168.1.111:2181 -e <span class="hljs-attribute">KAFKA_ADVERTISED_LISTENERS</span>=PLAINTEXT://192.168.1.111:9092 -e <span class="hljs-attribute">KAFKA_LISTENERS</span>=PLAINTEXT://0.0.0.0:9092 -e <span class="hljs-attribute">TZ</span>=<span class="hljs-string">&quot;Asia/Shanghai&quot;</span> wurstmeister/kafka:latest<br></code></pre></td></tr></table></figure>
-
-
-
-
-
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker pull sheepkiller/kafka-manager<br>docker <span class="hljs-built_in">run</span> -d --name kfk-manager -p 9000:9000 -e <span class="hljs-attribute">ZK_HOSTS</span>=192.168.1.111:2181 sheepkiller/kafka-manager:latest<br><br></code></pre></td></tr></table></figure>
-
-<p>然后访问 <code>http://localhost:9000</code> 查看配置</p>
-<h2 id="配置es-集群可视化工具"><a href="#配置es-集群可视化工具" class="headerlink" title="配置es 集群可视化工具"></a>配置es 集群可视化工具</h2><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs livescript">docker pull lmenezes/cerebro<br><br> docker run -d -p <span class="hljs-number">9003</span>:<span class="hljs-number">9000</span> <span class="hljs-string">\</span><br>--restart=<span class="hljs-keyword">unless</span>-stopped <span class="hljs-string">\</span><br>--name cerebro <span class="hljs-string">\</span><br>-v cerebro:/opt/cerebro <span class="hljs-string">\</span><br>-h cerebro <span class="hljs-string">\</span><br>lmenezes/cerebro<br><br></code></pre></td></tr></table></figure>
+<p>发现不是明文，补<code>C8385o00O0O.OooO00o</code>环境</p>
+<p><img src="https://s2.loli.net/2023/12/29/L9cRipkIuW2bsPC.png" srcset="/img/loading.gif" lazyload alt="image-20231229182603589"></p>
+<p><img src="https://s2.loli.net/2023/12/29/rIjLEi7CJ236NU8.png" srcset="/img/loading.gif" lazyload alt="image-20231229161050587"></p>
+<p>文件名是： ./clientCA.bks</p>
+<p>密码是：MZ4cozY8Qu32UzGe</p>
+<h2 id="证书转换"><a href="#证书转换" class="headerlink" title="证书转换"></a>证书转换</h2><p>bks 不是标准的jks 文件需要安装 BouncyCastleProvider 密码学组件</p>
+<p>官网地址:<a target="_blank" rel="noopener" href="https://www.bouncycastle.org/latest_releases.html">https://www.bouncycastle.org/latest_releases.html</a></p>
+<p>1.8到17 版本的jar包 <a target="_blank" rel="noopener" href="https://www.bouncycastle.org/download/bcprov-ext-jdk18on-177.jar">https://www.bouncycastle.org/download/bcprov-ext-jdk18on-177.jar</a></p>
+<p>jdk17 不支持 lib/ext/ 目录</p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/67302528/java-security-keystoreexception-when-running-my-app-with-docker-compose">openjdk version “1.8.0_292” 有bug</a></p>
+<p>本文使用的是 <code>openjdk version &quot;1.8.0_392&quot;</code> 版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo cp ~/Downloads/bcprov-jdk18on-177.jar/Library/Java/JavaVirtualMachines/openjdk1.8.392/Contents/Home/jre/lib/ext<br><br>sudo vim /Library/Java/JavaVirtualMachines/openjdk1.8.392/Contents/Home/jre/lib/security/java.security<br><br><br><br>增加 security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider #这一行<br><br>11 代表行数  如果有11 这一行，这个编号就往后加<br></code></pre></td></tr></table></figure>
 
 
 
 
 
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs"><br></code></pre></td></tr></table></figure>
+<p>将bks 文件转换为 p12</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">keytool -importkeystore -srckeystore ./clientCA.bks -srcstoretype BKS -destkeystore clientCA.p12 -deststoretype PKCS12<br></code></pre></td></tr></table></figure>
 
-<h2 id="配置-grafana"><a href="#配置-grafana" class="headerlink" title="配置 grafana"></a>配置 grafana</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker <span class="hljs-built_in">run</span> -itd <span class="hljs-attribute">--name</span>=grafana \<br><span class="hljs-attribute">--restart</span>=always \<br>-p 3000:3000 \<br>-v grafana-storage:/var/lib/grafana \<br>grafana/grafana<br><br></code></pre></td></tr></table></figure>
 
-<h2 id="配置prometheus"><a href="#配置prometheus" class="headerlink" title="配置prometheus"></a>配置prometheus</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker <span class="hljs-built_in">run</span> -itd <span class="hljs-attribute">--name</span>=prometheus <span class="hljs-attribute">--restart</span>=always -p 9090:9090 prom/prometheus<br><br></code></pre></td></tr></table></figure>
 
-<h2 id="配置监控器"><a href="#配置监控器" class="headerlink" title="配置监控器"></a>配置监控器</h2><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">docker run -itd --<span class="hljs-attr">name=</span><span class="hljs-keyword">node</span><span class="hljs-title">-exporter</span> \<br>--<span class="hljs-attr">restart=</span>always \<br>-p <span class="hljs-number">9100</span>:<span class="hljs-number">9100</span> \<br>-v <span class="hljs-string">&quot;/proc:/host/proc:ro&quot;</span> \<br>-v <span class="hljs-string">&quot;/sys:/host/sys:ro&quot;</span> \<br>-v <span class="hljs-string">&quot;/:/rootfs:ro&quot;</span> \<br>prom/<span class="hljs-keyword">node</span><span class="hljs-title">-exporter</span><br></code></pre></td></tr></table></figure>
+<p>将p12 文件转换为 pem </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">openssl pkcs12 -in clientCA.p12 -out clientCA.pem<br></code></pre></td></tr></table></figure>
 
+
+
+<p>密码是上面解出来的 <code>MZ4cozY8Qu32UzGe</code> </p>
+<h2 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h2><p>mitmproxy 没有起作用 </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">mitmweb  -<span class="hljs-selector-tag">p</span> <span class="hljs-number">9998</span> <span class="hljs-attr">--certs</span> ./clientCA<span class="hljs-selector-class">.pem</span> <span class="hljs-attr">--cert-passphrase</span> MZ4cozY8Qu32UzGe<br></code></pre></td></tr></table></figure>
+
+
+
+<p>这里使用的是新版的BurpSuite 社区版,点击右上角<code>settings</code> 搜索<code>SSL</code> 在<code>TLS</code>中配置证书</p>
+<p><img src="https://s2.loli.net/2023/12/30/Rix8qWBuo5CZvGm.png" srcset="/img/loading.gif" lazyload alt="image-20231230165018837"></p>
+<p><img src="https://s2.loli.net/2023/12/30/AoZjDtVvxgl29pd.png" srcset="/img/loading.gif" lazyload alt="image-20231230165206011"></p>
+<h2 id="转换证书"><a href="#转换证书" class="headerlink" title="转换证书"></a>转换证书</h2><p>在python 中使用自定义证书</p>
+<p>requests 不支持p12 证书需要进行转换</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stylus">openssl pkcs12 -clcerts -nokeys -out cer<span class="hljs-selector-class">.pem</span> -<span class="hljs-keyword">in</span> ./clientCA<span class="hljs-selector-class">.p12</span><br><br>openssl pkcs12 -nocerts -out key<span class="hljs-selector-class">.pem</span> -<span class="hljs-keyword">in</span> ./clientCA<span class="hljs-selector-class">.p12</span> -nodes  <br><br></code></pre></td></tr></table></figure>
+
+<p>在这里,我们通过**-in<strong>参数指定传入的文件名称,而</strong>-out<strong>文件指定输出的文件名称,而</strong>-nodes**参数表示不对私钥进行加密。在这个过程中,我们需要输入签名时的密码。</p>
+<h2 id="在requests-中使用"><a href="#在requests-中使用" class="headerlink" title="在requests 中使用"></a>在requests 中使用</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>cert_file = <span class="hljs-string">&#x27;/Users/king/cer.pem&#x27;</span><br>cert_password = <span class="hljs-string">&#x27;/Users/king/key.pem&#x27;</span><br><br>headers = &#123;<br>    <span class="hljs-string">&#x27;Host&#x27;</span>: <span class="hljs-string">&#x27;180.76.60.244:8443&#x27;</span>,<br>    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/x-www-form-urlencoded&#x27;</span>,<br>    <span class="hljs-comment"># &#x27;Content-Length&#x27;: &#x27;6&#x27;,</span><br>    <span class="hljs-comment"># &#x27;Accept-Encoding&#x27;: &#x27;gzip, deflate, br&#x27;,</span><br>    <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;okhttp/4.9.1&#x27;</span>,<br>    <span class="hljs-string">&#x27;Connection&#x27;</span>: <span class="hljs-string">&#x27;close&#x27;</span>,<br>&#125;<br><br>data = &#123;<br>    <span class="hljs-string">&#x27;page&#x27;</span>: <span class="hljs-string">&#x27;1&#x27;</span>,<br>&#125;<br><br>response = requests.post(<span class="hljs-string">&#x27;https://180.76.60.244:8443/api/app9&#x27;</span>, headers=headers, data=data, verify=<span class="hljs-literal">False</span>,<br>                         cert=(cert_file, cert_password))<br><br><span class="hljs-built_in">print</span>(response)<br><span class="hljs-built_in">print</span>(response.text)<br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p><img src="https://s2.loli.net/2023/12/30/uDjkzEflZcHUpe2.png" srcset="/img/loading.gif" lazyload alt="image-20231230165520348"></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>1.<a target="_blank" rel="noopener" href="https://www.ucloud.cn/yun/9438.html">使用 OpenSSL 实现私钥和证书的转换</a></p>
+<p>2.<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-265404.htm">安卓APP抓包之双向认证突破</a></p>
+<p>3.<a target="_blank" rel="noopener" href="https://www.secpulse.com/archives/177572.html">双向认证APP自吐证书密码与抓包</a></p>
+<p>4.<a target="_blank" rel="noopener" href="https://www.ssl.com/zh-CN/%E5%A6%82%E4%BD%95/%E4%BD%BF%E7%94%A8openssl%E4%BB%8Epkcs12%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AF%BC%E5%87%BA%E8%AF%81%E4%B9%A6%E7%A7%81%E9%92%A5/">使用openssl从pkcs12文件中导出证书私钥</a></p>
 
               
             </div>
@@ -324,32 +354,13 @@
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/docker/" class="category-chain-item">docker</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
-  
   
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/docker/">#docker</a>
+        <a href="/tags/APP%E9%80%86%E5%90%91/">#APP逆向</a>
+      
+        <a href="/tags/%E8%AF%81%E4%B9%A6%E9%80%86%E5%90%91/">#证书逆向</a>
       
     </div>
   
@@ -361,8 +372,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Orbstack 配置 docker 环境</div>
-      <div>https://kingjem.github.io/2023/07/05/Orbstack 配置docker环境/</div>
+      <div>猿人学APP09-证书验证闯关</div>
+      <div>https://kingjem.github.io/2024/03/05/猿人学APP09实战/</div>
     </div>
     <div class="license-meta">
       
@@ -374,7 +385,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年7月5日</div>
+          <div>2024年3月5日</div>
         </div>
       
       
@@ -404,9 +415,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/07/06/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" title="adb 常用命令">
+                      <a href="/2024/03/05/%E5%94%AF%E5%93%81%E4%BC%9A%E6%90%9C%E7%B4%A2%E6%8E%A5%E5%8F%A3%E9%80%86%E5%90%91/" title="唯品会搜索接口逆向">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">adb 常用命令</span>
+                        <span class="hidden-mobile">唯品会搜索接口逆向</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -414,8 +425,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/06/01/chrome%E6%8F%92%E4%BB%B6%E9%80%86%E5%90%91/" title="chrome插件逆向">
-                        <span class="hidden-mobile">chrome插件逆向</span>
+                      <a href="/2024/03/05/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP10%E5%AE%9E%E6%88%98/" title="猿人学APP10-ReactNative">
+                        <span class="hidden-mobile">猿人学APP10-ReactNative</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
