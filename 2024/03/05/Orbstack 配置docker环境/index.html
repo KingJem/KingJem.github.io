@@ -280,7 +280,7 @@
 
 
 <h2 id="dozzle"><a href="#dozzle" class="headerlink" title="dozzle"></a>dozzle</h2><p>docker 容器日志查看</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">docker run --name dozzle -d --volume=<span class="hljs-regexp">/var/</span>run<span class="hljs-regexp">/docker.sock:/</span>var<span class="hljs-regexp">/run/</span>docker.sock -p <span class="hljs-number">8888</span>:<span class="hljs-number">8080</span> amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">docker <span class="hljs-keyword">run</span> --name dozzle -<span class="hljs-keyword">d</span> --volume=/<span class="hljs-keyword">var</span>/<span class="hljs-keyword">run</span>/docker.sock:/<span class="hljs-keyword">var</span>/<span class="hljs-keyword">run</span>/docker.sock -p 8888:8080 amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
 
 
 
