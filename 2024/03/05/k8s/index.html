@@ -24,7 +24,7 @@
 <meta property="og:description" content="安装本文使用orbstack 中的minikube 也可以是用在线的k8s playground  1https:&#x2F;&#x2F;labs.play-with-k8s.com&#x2F;    部署应用kubectl 基础知识kubectl 命令的常见格式是：kubectl 操作资源 这会对指定的资源（类似 node 或 deployment）执行指定的操作（类似 create、describe 或 delete）。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-03-05T07:40:37.975Z">
-<meta property="article:modified_time" content="2024-03-05T07:40:37.975Z">
+<meta property="article:modified_time" content="2024-05-07T06:17:37.060Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Spider python go java Android">
 <meta name="twitter:card" content="summary_large_image">
@@ -210,7 +210,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          3.2k 字
         
       </span>
     
@@ -221,7 +221,7 @@
         
         
         
-          16 分钟
+          27 分钟
         
       </span>
     
@@ -295,7 +295,7 @@
 
 
 <p>由于网络问题暂时使用<code>hhitzhl/kubernetes-bootcamp</code> 代替</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull hhitzhl/kubernetes-bootcamp<br>kubectl delete deployments kubernetes-bootcamp<br>kubectl create deployment kubernetes-bootcamp --image=hhitzhl/kubernetes-bootcamp<br><br></code></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull hhitzhl/kubernetes-bootcamp<br>kubectl delete deployments kubernetes-bootcamp<br>kubectl create deployment kubernetes-bootcamp --image=hhitzhl/kubernetes-bootcamp<br></code></pre></td></tr></table></figure>
 
 
 
@@ -308,7 +308,50 @@
 
 
 
+<p><code>K8s node top </code>报错<code>error: Metrics API not available</code>  </p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/52694238/kubectl-top-node-error-metrics-not-available-yet-using-metrics-server-as-he">原文</a></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">kubectl apply -f https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/kubernetes-sigs/m</span>etrics-server<span class="hljs-regexp">/releases/</span>latest<span class="hljs-regexp">/download/</span>components.yaml<br></code></pre></td></tr></table></figure>
 
+
+
+
+
+
+
+
+
+<h2 id="安装-kuboard"><a href="#安装-kuboard" class="headerlink" title="安装 kuboard"></a>安装 kuboard</h2><p><a target="_blank" rel="noopener" href="https://kuboard.cn/install/install-dashboard.html#%E5%AE%89%E8%A3%85">https://kuboard.cn/install/install-dashboard.html#%E5%AE%89%E8%A3%85</a></p>
+<p>访问kuboard  </p>
+<h2 id="安装Habor"><a href="#安装Habor" class="headerlink" title="安装Habor"></a>安装Habor</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker tag goharbor/harbor-exporter:v2.9.4 127.0.0.1:80/library/goharbor/harbor-exporter:v2.9.4<br><br>docker push 127.0.0.1:80/library/goharbor/harbor-exporter:v2.9.4<br><br><br><br><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="简单项目部署"><a href="#简单项目部署" class="headerlink" title="简单项目部署"></a>简单项目部署</h2><p>项目目录</p>
+<figure class="highlight mizar"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs mizar">├── app.py<br>├── dockerfile<br>├── harbor<br>├── k8s<br>└── <span class="hljs-keyword">requirements</span>.txt<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># app.py</span><br><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, jsonify, abort<br><br>app = Flask(__name__)<br><br><br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get</span>():<br>    resp = jsonify(&#123;<span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;OK&quot;</span>&#125;)<br>    resp.status_code = <span class="hljs-number">200</span><br>    <span class="hljs-keyword">return</span> resp<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    app.run(host=<span class="hljs-string">&#x27;0.0.0.0&#x27;</span>, port=<span class="hljs-number">8080</span>)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>requirements.txt </code></p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">Flask</span><span class="hljs-operator">=</span><span class="hljs-operator">=</span><span class="hljs-number">2.1</span>.<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><code>Dockerfile</code></p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> python:alpine3.<span class="hljs-number">19</span> as Builder<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span><br><span class="hljs-keyword">ADD</span><span class="language-bash"> app.py /app</span><br><span class="hljs-keyword">ADD</span><span class="language-bash"> ./requirements.txt requirements.txt</span><br><span class="hljs-keyword">RUN</span><span class="language-bash"> pip3 install -r requirements.txt</span><br><br><span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">8080</span><br><span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;python app.py&quot;</span>]</span><br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker buildx build -t k8s_flask_demo:v1 .<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker tag k8s_flask_demo:v1 127.0.0.1:80/library/k8s_flask_demo:v1 # 打包docker 镜像<br>docker push 127.0.0.1:80/library/k8s_flask_demo:v1 # docker images <br><br><br><br>docker tag k8s_flask_demo:v3 127.0.0.1:80/library/k8s_flask_demo:v3 # 打包docker 镜像<br>docker push 127.0.0.1:80/library/k8s_flask_demo:v3 # docker images <br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs"><br></code></pre></td></tr></table></figure>
 
 
               
