@@ -1,0 +1,859 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &amp;#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="转载- frida检测及其应对方法">
+<meta property="og:url" content="https://kingjem.github.io/2024/10/14/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91--frida%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%85%B6%E5%BA%94%E5%AF%B9%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &amp;#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/f4igulUQ7Wh3rkx.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/8qOvVJfHne19Lir.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/q4X5VcvSjknB2Gd.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/jW4qMtKeBCd6wyR.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/hWvmN4lLknGsQdX.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/JEj5fUgW6uyDVRt.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/SOW3bnJEYF1pjKe.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/bfOh89MPnIp3vQB.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/c3Lg9t18uAaYhVl.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/M84p3aJDFRoNIwY.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/BH8XmMv4F6lEfZz.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/cSV4bKsXlxIy7Jk.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/cFC3s2H4vj8ZDeq.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/XqMBgzoQe1mai4R.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/6fEYay17XVkxWIM.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/i1OAU9HuKNCqVkY.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/AnoF3QcY4ErLHaM.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/eZt3aqNuywxcVlU.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/wdK8u5qXhgSCpae.png">
+<meta property="og:image" content="https://s2.loli.net/2024/03/05/txHewCIrVPiv4K5.png">
+<meta property="article:published_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:modified_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="安卓逆向">
+<meta property="article:tag" content="frida">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://s2.loli.net/2024/03/05/f4igulUQ7Wh3rkx.png">
+  
+  
+  <title>转载- frida检测及其应对方法 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="转载- frida检测及其应对方法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-14 11:05" pubdate>
+          2024年10月14日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          16k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          133 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">转载- frida检测及其应对方法</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="1-检测原理"><a href="#1-检测原理" class="headerlink" title="1.检测原理"></a>1.检测原理</h1><h2 id="1-1-进程名检测"><a href="#1-1-进程名检测" class="headerlink" title="1.1 进程名检测"></a>1.1 进程名检测</h2><p>当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。</p>
+<p><img src="https://s2.loli.net/2024/03/05/f4igulUQ7Wh3rkx.png" srcset="/img/loading.gif" lazyload alt="image-20230308110400132"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">checkRunningProcesses</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-type">boolean</span> <span class="hljs-variable">returnValue</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br>  <span class="hljs-comment">// Get currently running application processes</span><br>  List&lt;RunningServiceInfo&gt; list = manager.getRunningServices(<span class="hljs-number">300</span>);<br>  <span class="hljs-keyword">if</span>(list != <span class="hljs-literal">null</span>)&#123;<br>    String tempName;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;list.size();++i)&#123;<br>      tempName = list.get(i).process;<br>      <span class="hljs-keyword">if</span>(tempName.contains(<span class="hljs-string">&quot;frida-server&quot;</span>)) &#123;<br>        returnValue = <span class="hljs-literal">true</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> returnValue;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>如何绕过？</strong></p>
+<p>修改下文件名的名称即可，例如：<code>frida-server-16.0.1-android-arm64</code> 改成 <code>fdd</code></p>
+<p><img src="https://s2.loli.net/2024/03/05/8qOvVJfHne19Lir.png" srcset="/img/loading.gif" lazyload alt="image-20230308110502818"></p>
+<h2 id="1-2-端口监测"><a href="#1-2-端口监测" class="headerlink" title="1.2 端口监测"></a>1.2 端口监测</h2><p>frida默认使用的端口是 27042，有app就会去监测是否开放了此端口。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">boolean <span class="hljs-title function_">is_frida_server_listening</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sockaddr_in</span> <span class="hljs-title">sa</span>;</span><br>    <span class="hljs-built_in">memset</span>(&amp;sa, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(sa));<br>    sa.sin_family = AF_INET;<br>    sa.sin_port = htons(<span class="hljs-number">27042</span>);<br>    inet_aton(<span class="hljs-string">&quot;127.0.0.1&quot;</span>, &amp;(sa.sin_addr));<br>    <span class="hljs-type">int</span> sock = socket(AF_INET , SOCK_STREAM , <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">if</span> (connect(sock , (<span class="hljs-keyword">struct</span> sockaddr*)&amp;sa , <span class="hljs-keyword">sizeof</span> sa) != <span class="hljs-number">-1</span>) &#123;<br>      <span class="hljs-comment">/* Frida server detected. Do something… */</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>如何绕过？</strong></p>
+<p>让frida-server在运行时，更换下端口即可。【<strong>注意</strong>：建议使用 frida-server-14.2.18 】</p>
+<ul>
+<li><p>在手段端运行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./fdd -l 0.0.0.0:8877<br></code></pre></td></tr></table></figure></li>
+<li><p>在电脑上</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs stylus">端口转发<br>	adb forward tcp:<span class="hljs-number">8877</span> tcp:<span class="hljs-number">8877</span><br>	<br>脚本运行：<br>    frida -H <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">8877</span> -l  jd<span class="hljs-selector-class">.js</span>   -f<br>	frida -H <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">8877</span> -l  jd<span class="hljs-selector-class">.js</span>  -f com<span class="hljs-selector-class">.che168</span><span class="hljs-selector-class">.autotradercloud</span> <span class="hljs-attr">--no-pause</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> frida<br><span class="hljs-keyword">import</span> sys<br><br>str_host = <span class="hljs-string">&quot;127.0.0.1:8877&quot;</span><br>manager = frida.get_device_manager()<br>rdev = manager.add_remote_device(str_host)<br>session = rdev.attach(<span class="hljs-string">&quot;com.che168.autotradercloud&quot;</span>)<br><br>scr = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">Java.perform(function () &#123;</span><br><span class="hljs-string">    console.log(&quot;加载&quot;);</span><br><span class="hljs-string">&#125;);</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>script = session.create_script(scr)<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">on_message</span>(<span class="hljs-params">message, data</span>):<br>    <span class="hljs-built_in">print</span>(message, data)<br><br><br>script.on(<span class="hljs-string">&quot;message&quot;</span>, on_message)<br>script.load()<br>sys.stdin.read()<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> frida<br><span class="hljs-keyword">import</span> sys<br><br>str_host = <span class="hljs-string">&quot;127.0.0.1:8877&quot;</span><br>manager = frida.get_device_manager()<br>rdev = manager.add_remote_device(str_host)<br><span class="hljs-comment"># rdev = frida.get_remote_device()</span><br>pid = rdev.spawn([<span class="hljs-string">&quot;com.che168.autotradercloud&quot;</span>])<br>session = rdev.attach(pid)<br><br>scr = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Java.perform(function () &#123;</span><br><span class="hljs-string"></span><br><span class="hljs-string">    &#125;);</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>script = session.create_script(scr)<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">on_message</span>(<span class="hljs-params">message, data</span>):<br>    <span class="hljs-built_in">print</span>(message, data)<br><br><br>script.on(<span class="hljs-string">&quot;message&quot;</span>, on_message)<br>script.load()<br>rdev.resume(pid)<br>sys.stdin.read()<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="1-3-D-Bus协议通信"><a href="#1-3-D-Bus协议通信" class="headerlink" title="1.3 D-Bus协议通信"></a>1.3 D-Bus协议通信</h2><p>frida-server使用D-Bus网络协议通信，有些app就会遍历内部所有端口，向端口发送消息，如果端口回复了<code>REJECT</code>则表示此端口就是 frida-server，也证明了你在使用frida进行调试。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span> ; i &lt;= <span class="hljs-number">65535</span> ; i++) &#123;<br>    sock = socket(AF_INET , SOCK_STREAM , <span class="hljs-number">0</span>);<br>    sa.sin_port = htons(i);<br>    <span class="hljs-keyword">if</span> (connect(sock , (<span class="hljs-keyword">struct</span> sockaddr*)&amp;sa , <span class="hljs-keyword">sizeof</span> sa) != <span class="hljs-number">-1</span>) &#123;<br>        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,  <span class="hljs-string">&quot;FRIDA DETECTION [1]: Open Port: %d&quot;</span>, i);<br>        <span class="hljs-built_in">memset</span>(res, <span class="hljs-number">0</span> , <span class="hljs-number">7</span>);<br>        <span class="hljs-comment">// send a D-Bus AUTH message. Expected answer is “REJECT&quot;</span><br>        send(sock, <span class="hljs-string">&quot;\x00&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-literal">NULL</span>);<br>        send(sock, <span class="hljs-string">&quot;AUTH\r\n&quot;</span>, <span class="hljs-number">6</span>, <span class="hljs-literal">NULL</span>);<br>        usleep(<span class="hljs-number">100</span>);<br>        <span class="hljs-keyword">if</span> (ret = recv(sock, res, <span class="hljs-number">6</span>, MSG_DONTWAIT) != <span class="hljs-number">-1</span>) &#123;<br>            <span class="hljs-comment">// 判断是否返回 REJECT</span><br>            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(res, <span class="hljs-string">&quot;REJECT&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>               <span class="hljs-comment">/* Frida server detected. Do something… */</span><br>            &#125;<br>        &#125;<br>    &#125;<br>    close(sock);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>如何绕过呢？</strong></p>
+<p>可以Hook C语言中用于  strstr 和  strcmp 方法，如果出现 <code>REJECT</code> 则返回</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replace_str</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_strstr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strstr&#x27;</span>);<br>    <span class="hljs-keyword">var</span> pt_strcmp = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strcmp&#x27;</span>);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strstr, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strcmp, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;)<br><br>&#125;<br><br><span class="hljs-title function_">replace_str</span>();<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="1-4-maps文件"><a href="#1-4-maps文件" class="headerlink" title="1.4 maps文件"></a>1.4 maps文件</h2><p>当APP在手机上运行时，在  <code>/proc/进程ID/...</code> 目录下会创建很多跟app运行相关的文件。</p>
+<p>先启动起来APP，然后查看他的进程ID：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> frida<br><span class="hljs-keyword">import</span> requests<br><br><span class="hljs-comment"># 获取设备信息</span><br>rdev = frida.get_remote_device()<br><br><span class="hljs-comment"># 获取在前台运行的APP</span><br>front_app = rdev.get_frontmost_application()<br><span class="hljs-built_in">print</span>(front_app)<br><br><span class="hljs-comment"># Application(identifier=&quot;com.che168.autotradercloud&quot;, name=&quot;车智赢+&quot;, pid=24606, parameters=&#123;&#125;)</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/q4X5VcvSjknB2Gd.png" srcset="/img/loading.gif" lazyload alt="image-20230308135900353"></p>
+<p>然后就可以通过adb进入目录查看生成相应的文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ps</span> -A|<span class="hljs-keyword">grep</span> <span class="hljs-keyword">com</span>.che168.autotradercloud<br><span class="hljs-keyword">cd</span> /proc/<span class="hljs-number">24606</span>/<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/jW4qMtKeBCd6wyR.png" srcset="/img/loading.gif" lazyload alt="image-20230308140013901"></p>
+<p>这个maps文件中存储的是APP运行时加载的依赖：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">cat</span> maps<br><span class="hljs-keyword">cat</span> maps |<span class="hljs-keyword">grep</span> native-lib<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/hWvmN4lLknGsQdX.png" srcset="/img/loading.gif" lazyload alt="image-20230308140818820"></p>
+<p>当启动frida后，在maps文件中就会存在 <code>frida-agent-64.so</code>、<code>frida-agent-32.so</code>  文件。</p>
+<p><img src="https://s2.loli.net/2024/03/05/JEj5fUgW6uyDVRt.png" srcset="/img/loading.gif" lazyload alt="image-20230308141249527"></p>
+<p>所以，在一些APP中就会去读取maps文件的内容，看看是否有frida来监测是否有被frida调试。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">char</span> line[<span class="hljs-number">512</span>];<br>FILE* fp;<br>fp = fopen(<span class="hljs-string">&quot;/proc/self/maps&quot;</span>, <span class="hljs-string">&quot;r&quot;</span>);<br><span class="hljs-keyword">if</span> (fp) &#123;<br>    <span class="hljs-keyword">while</span> (fgets(line, <span class="hljs-number">512</span>, fp)) &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strstr</span>(line, <span class="hljs-string">&quot;frida&quot;</span>)) &#123;<br>            <span class="hljs-comment">/* Evil library is loaded. Do something… */</span><br>        &#125;<br>    &#125;<br>    fclose(fp);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>       <span class="hljs-comment">/* Error opening /proc/self/maps. If this happens, something is off. */</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>如何绕过呢？</strong></p>
+<p>Hook C语言中的 strstr    strcmp 来进行判断  <code>frida-agent-64.so</code> 或 <code>re.frida.server</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replace_str_maps</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_strstr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strstr&#x27;</span>);<br>    <span class="hljs-keyword">var</span> pt_strcmp = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strcmp&#x27;</span>);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strstr, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span>  || str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strcmp, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span>  || str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;)<br><br>&#125;<br><br><span class="hljs-title function_">replace_str</span>();<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="1-5-task目录"><a href="#1-5-task目录" class="headerlink" title="1.5 task目录"></a>1.5 task目录</h2><p><img src="https://s2.loli.net/2024/03/05/SOW3bnJEYF1pjKe.png" srcset="/img/loading.gif" lazyload alt="image-20230308143148838"></p>
+<p>可以在运行frida和未运行frida时，进行对比，看看frida的启动创建了哪些线程。</p>
+<ul>
+<li>未运行frida<br><img src="https://s2.loli.net/2024/03/05/bfOh89MPnIp3vQB.png" srcset="/img/loading.gif" lazyload alt="image-20230308143748368"></li>
+<li>运行frida<br><img src="https://s2.loli.net/2024/03/05/c3Lg9t18uAaYhVl.png" srcset="/img/loading.gif" lazyload alt="image-20230308143828697"></li>
+</ul>
+<p><img src="https://s2.loli.net/2024/03/05/M84p3aJDFRoNIwY.png" srcset="/img/loading.gif" lazyload alt="image-20230308144040636"></p>
+<p>对上述的线程ID进行比较，发现由于frida的运行新增了的线程ID：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#123;&#x27;<span class="hljs-number">2616</span>3&#x27;, &#x27;<span class="hljs-number">2616</span>4&#x27;, &#x27;<span class="hljs-number">2616</span>6&#x27;, &#x27;<span class="hljs-number">2616</span>7&#x27;, &#x27;<span class="hljs-number">2616</span>5&#x27;&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>在某些app中就会去读取 <code>/proc/stask/线程ID/status</code> 文件，如果是运行frida产生的，则进行反调试。</p>
+<p>例如：<code>gmain/gdbus/gum-js-loop/pool-frida</code>等</p>
+<p><img src="https://s2.loli.net/2024/03/05/BH8XmMv4F6lEfZz.png" srcset="/img/loading.gif" lazyload alt="image-20230308144442592"></p>
+<p>如何绕过？</p>
+<p>Hook C语言中的 strstr    strcmp 来进行判断 <code>gmain</code> 、<code>gdbus</code>等字符串。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replace_str</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_strstr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strstr&#x27;</span>);<br>    <span class="hljs-keyword">var</span> pt_strcmp = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strcmp&#x27;</span>);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strstr, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br><br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gdbus&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;pool-frida&quot;</span>) !== -<span class="hljs-number">1</span>||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;);<br><br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strcmp, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> || <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gdbus&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;pool-frida&quot;</span>) !== -<span class="hljs-number">1</span>|| <br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;)<br><br>&#125;<br><br><span class="hljs-title function_">replace_str</span>();<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="1-6-fd目录"><a href="#1-6-fd目录" class="headerlink" title="1.6 fd目录"></a>1.6 fd目录</h2><p>记录app都打开的了哪些文件。</p>
+<p><img src="https://s2.loli.net/2024/03/05/cSV4bKsXlxIy7Jk.png" srcset="/img/loading.gif" lazyload alt="image-20230308153508092"></p>
+<p><img src="https://s2.loli.net/2024/03/05/cFC3s2H4vj8ZDeq.png" srcset="/img/loading.gif" lazyload alt="image-20230308153521696"></p>
+<h2 id="1-7-frida-server启动"><a href="#1-7-frida-server启动" class="headerlink" title="1.7 frida-server启动"></a>1.7 frida-server启动</h2><p>当frida-server启动时，在 <code>/data/local/tmp/</code>目录下会生成一个文件夹并且会生成一下带有frida的特征。</p>
+<p><img src="https://s2.loli.net/2024/03/05/XqMBgzoQe1mai4R.png" srcset="/img/loading.gif" lazyload alt="image-20230308152327490"></p>
+<p><strong>如何绕过？</strong></p>
+<p>使用将 <code>hluda-server</code>，在运行frida之后就不会出现frida等字眼了。</p>
+<p><img src="https://s2.loli.net/2024/03/05/6fEYay17XVkxWIM.png" srcset="/img/loading.gif" lazyload alt="image-20230308164214258"></p>
+<p>当使用了 <code>hluda-server</code>后，由于 <code>/data/local/tmp/</code> 目录下文件夹和文件的名称改变了，所以在使用了<code>hluda-server</code>后相当于</p>
+<p>解决了：</p>
+<ul>
+<li>fd目录问题， <code>/data/local/tmp/re.frida.server/linjector</code></li>
+<li>maps文件问题，<code>/data/local/tmp/re.frida.server/frida-agent-64.so</code></li>
+</ul>
+<p>未解决：</p>
+<ul>
+<li>task目录问题，Hook： <code>gmain</code> 、<code>gdbus</code>等</li>
+<li>D-Bus协议问题，Hook：<code>REJECT</code></li>
+<li>端口问题，切换端口</li>
+<li>进程名问题，更换文件名</li>
+</ul>
+<h1 id="2-实战案例"><a href="#2-实战案例" class="headerlink" title="2.实战案例"></a>2.实战案例</h1><h2 id="2-1-frida版本"><a href="#2-1-frida版本" class="headerlink" title="2.1 frida版本"></a>2.1 frida版本</h2><p>在逆向时，请务必使用  <code>hluda-server-14.2.18</code> + <code>python3.8</code> 来对常见frida的特征进行隐藏。</p>
+<p><strong>注意：其他高版本不好使。</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">pip</span> install frida==<span class="hljs-number">14</span>.<span class="hljs-number">2</span>.<span class="hljs-number">18</span><br><span class="hljs-attribute">pip</span> install frida-tools==<span class="hljs-number">9</span>.<span class="hljs-number">2</span>.<span class="hljs-number">5</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/i1OAU9HuKNCqVkY.png" srcset="/img/loading.gif" lazyload alt="image-20230922164243197"></p>
+<p>安装过程中如果需要用到下载egg相关文件，请点击：</p>
+<p><a target="_blank" rel="noopener" href="https://pypi.doubanio.com/simple/frida/">https://pypi.doubanio.com/simple/frida/</a></p>
+<p><img src="https://s2.loli.net/2024/03/05/AnoF3QcY4ErLHaM.png" srcset="/img/loading.gif" lazyload alt="image-20230313213113367"></p>
+<h2 id="2-2-第一类：识货、得物、唯品会等"><a href="#2-2-第一类：识货、得物、唯品会等" class="headerlink" title="2.2 第一类：识货、得物、唯品会等"></a>2.2 第一类：识货、得物、唯品会等</h2><p>代表APP有：识货、得物、唯品会、豆瓣、豆瓣、雷速体育</p>
+<h3 id="1-加载so"><a href="#1-加载so" class="headerlink" title="1.加载so"></a>1.加载so</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> dlopen = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;dlopen&quot;</span>);<br><span class="hljs-keyword">var</span> android_dlopen_ext = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;android_dlopen_ext&quot;</span>);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(dlopen, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(android_dlopen_ext, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen_ext:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><br><span class="hljs-comment">// frida -U -f com.hupu.shihuo -l load_so.js --no-pause</span><br><span class="hljs-comment">// frida -U -f com.shizhuang.duapp -l load_so.js --no-pause</span><br><span class="hljs-comment">// frida -U -f com.achievo.vipshop -l load_so.js --no-pause</span><br><span class="hljs-comment">// frida -U -f com.leisu.sports -l load_so.js --no-pause</span><br><span class="hljs-comment">// frida -U -f com.douban.frodo -l load_so.js --no-pause</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/eZt3aqNuywxcVlU.png" srcset="/img/loading.gif" lazyload alt="image-20230313215530556"></p>
+<h3 id="2-删除so【搞定】"><a href="#2-删除so【搞定】" class="headerlink" title="2.删除so【搞定】"></a>2.删除so【搞定】</h3><p>先尝试删除可能的so文件，看看app是否可正常运行。</p>
+<p>有些app的监测是在一个单独的so文件中，但删除后业务功能不受任何影响。</p>
+<ul>
+<li><p>识货、得物、唯品会，<strong>删除</strong>后可以绕过。</p>
+</li>
+<li><p>豆瓣、雷速体育，<strong>删除</strong>后<strong>无法正常</strong>运行（闪退或白屏）</p>
+</li>
+</ul>
+<h3 id="3-尝试Hook关键词【可选】"><a href="#3-尝试Hook关键词【可选】" class="headerlink" title="3.尝试Hook关键词【可选】"></a>3.尝试Hook关键词【可选】</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replace_str</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_strstr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strstr&#x27;</span>);<br>    <span class="hljs-keyword">var</span> pt_strcmp = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strcmp&#x27;</span>);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strstr, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span><br>            ) &#123;<br>                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;strstr--&gt;&quot;</span>, str1, str2);<br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strcmp, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span><br>            ) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;)<br><br>&#125;<br><br><span class="hljs-title function_">replace_str</span>();<br><br><span class="hljs-comment">// frida -U  -l 5.绕过.js -f com.hupu.shihuo --no-pause</span><br><span class="hljs-comment">// frida -U  -l 5.绕过.js -f com.shizhuang.duapp --no-pause</span><br><span class="hljs-comment">// frida -U  -l 5.绕过.js -f com.achievo.vipshop --no-pause</span><br><span class="hljs-comment">// frida -U  -l 5.绕过.js -f com.leisu.sports --no-pause</span><br><span class="hljs-comment">// frida -U  -l hook.js -f com.leisu.sports --no-pause</span><br><span class="hljs-comment">// frida -U  -l hook.js -f com.douban.frodo --no-pause</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="2-3-第二类：e充电"><a href="#2-3-第二类：e充电" class="headerlink" title="2.3 第二类：e充电"></a>2.3 第二类：e充电</h2><p>代表APP有：e充电（含ROOT监测）</p>
+<h3 id="1-加载so-1"><a href="#1-加载so-1" class="headerlink" title="1.加载so"></a>1.加载so</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> dlopen = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;dlopen&quot;</span>);<br><span class="hljs-keyword">var</span> android_dlopen_ext = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;android_dlopen_ext&quot;</span>);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(dlopen, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(android_dlopen_ext, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen_ext:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><br><span class="hljs-comment">// frida -U -f  com.sgcc.evs.echarge -l 3.加载so.js --no-pause</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/wdK8u5qXhgSCpae.png" srcset="/img/loading.gif" lazyload alt="image-20230313220627675"></p>
+<h3 id="2-删除so【报错】"><a href="#2-删除so【报错】" class="headerlink" title="2.删除so【报错】"></a>2.删除so【报错】</h3><p>删除so文件后，无法运行。</p>
+<h3 id="3-尝试Hook关键词【搞定】"><a href="#3-尝试Hook关键词【搞定】" class="headerlink" title="3.尝试Hook关键词【搞定】"></a>3.尝试Hook关键词【搞定】</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replace_str</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_strstr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strstr&#x27;</span>);<br>    <span class="hljs-keyword">var</span> pt_strcmp = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;strcmp&#x27;</span>);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strstr, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span><br>            ) &#123;<br>                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;strstr--&gt;&quot;</span>, str1, str2);<br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_strcmp, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-keyword">var</span> str1 = args[<span class="hljs-number">0</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">var</span> str2 = args[<span class="hljs-number">1</span>].<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-keyword">if</span> (<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;REJECT&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;tmp&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;frida&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gum-js-loop&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;gmain&quot;</span>) !== -<span class="hljs-number">1</span> ||<br>                str2.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;linjector&quot;</span>) !== -<span class="hljs-number">1</span><br>            ) &#123;<br>                <span class="hljs-comment">//console.log(&quot;strcmp--&gt;&quot;, str1, str2);</span><br>                <span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span> = <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">hook</span>) &#123;<br>                retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">0</span>);<br>            &#125;<br>        &#125;<br>    &#125;)<br><br>&#125;<br><br><span class="hljs-title function_">replace_str</span>();<br><br><span class="hljs-comment">// frida -U  -l hook.js -f com.sgcc.evs.echarge --no-pause</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="2-4-第三类：安吉星、ibox、贵旅优品"><a href="#2-4-第三类：安吉星、ibox、贵旅优品" class="headerlink" title="2.4 第三类：安吉星、ibox、贵旅优品"></a>2.4 第三类：安吉星、ibox、贵旅优品</h2><p>代表APP有：安吉星（含ROOT检测）、ibox（含ROOT检测）、贵旅优品（含ROOT检测）</p>
+<h3 id="1-加载so-2"><a href="#1-加载so-2" class="headerlink" title="1.加载so"></a>1.加载so</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> dlopen = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;dlopen&quot;</span>);<br><span class="hljs-keyword">var</span> android_dlopen_ext = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;android_dlopen_ext&quot;</span>);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(dlopen, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(android_dlopen_ext, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-keyword">var</span> path_ptr = args[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> path = <span class="hljs-title function_">ptr</span>(path_ptr).<span class="hljs-title function_">readCString</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[dlopen_ext:]&quot;</span>, path);<br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>    &#125;<br>&#125;);<br><br><br><span class="hljs-comment">// frida -U -f com.shanghaionstar -l load_so.js --no-pause</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2024/03/05/txHewCIrVPiv4K5.png" srcset="/img/loading.gif" lazyload alt="image-20230313220953748"></p>
+<h3 id="2-pthread-create【搞定】"><a href="#2-pthread-create【搞定】" class="headerlink" title="2.pthread_create【搞定】"></a>2.pthread_create【搞定】</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook_pthread_create</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_create_func = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;pthread_create&#x27;</span>);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_create_func, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-comment">// 是那个so文件调用我，创建线程</span><br>            <span class="hljs-keyword">var</span> so_name = <span class="hljs-title class_">Process</span>.<span class="hljs-title function_">findModuleByAddress</span>(args[<span class="hljs-number">2</span>]).<span class="hljs-property">name</span>;<br>            <span class="hljs-keyword">if</span> (so_name.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;libDexHelper.so&quot;</span>) != -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">replace</span>(args[<span class="hljs-number">2</span>], <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeCallback</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>                        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;replace success&#x27;</span>);<br>                        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>                    &#125;, <span class="hljs-string">&#x27;void&#x27;</span>, [<span class="hljs-string">&quot;void&quot;</span>]));<br>                &#125; <span class="hljs-keyword">catch</span> (e) &#123;<br><br>                &#125;<br><br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>        &#125;<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">hook_pthread_create</span>();<br><br><span class="hljs-comment">// frida -U  -l pthread_create.js -f  com.shanghaionstar --no-pause</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook_pthread_create</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_create_func = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;pthread_create&#x27;</span>);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_create_func, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-comment">// 是那个so文件调用我，创建线程</span><br>            <span class="hljs-keyword">var</span> so_name = <span class="hljs-title class_">Process</span>.<span class="hljs-title function_">findModuleByAddress</span>(args[<span class="hljs-number">2</span>]).<span class="hljs-property">name</span>;<br>            <span class="hljs-keyword">if</span> (so_name.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;libDexHelper.so&quot;</span>) != -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">replace</span>(args[<span class="hljs-number">2</span>], <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeCallback</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>                        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;replace success&#x27;</span>);<br>                        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>                    &#125;, <span class="hljs-string">&#x27;void&#x27;</span>, [<span class="hljs-string">&quot;void&quot;</span>]));<br>                &#125; <span class="hljs-keyword">catch</span> (e) &#123;<br><br>                &#125;<br><br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>        &#125;<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">hook_pthread_create</span>();<br><br><span class="hljs-comment">// frida -U  -l pthread_create.js -f com.box.art  --no-pause</span><br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook_pthread_create</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pt_create_func = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&#x27;pthread_create&#x27;</span>);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(pt_create_func, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-comment">// 是那个so文件调用我，创建线程</span><br>            <span class="hljs-keyword">var</span> so_name = <span class="hljs-title class_">Process</span>.<span class="hljs-title function_">findModuleByAddress</span>(args[<span class="hljs-number">2</span>]).<span class="hljs-property">name</span>;<br><br>            <span class="hljs-keyword">if</span> (so_name.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;libexec.so&quot;</span>) != -<span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">replace</span>(args[<span class="hljs-number">2</span>], <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeCallback</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>                        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;replace success&#x27;</span>);<br>                        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>                    &#125;, <span class="hljs-string">&#x27;void&#x27;</span>, [<span class="hljs-string">&quot;void&quot;</span>]));<br>                &#125; <span class="hljs-keyword">catch</span> (e) &#123;<br><br>                &#125;<br><br>            &#125;<br>        &#125;, <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>        &#125;<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">hook_pthread_create</span>();<br><br><span class="hljs-comment">// frida -U  -l pthread_create.js -f  com.gzlex.hui.guoziwei.travel  --no-pause</span><br></code></pre></td></tr></table></figure>
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">#安卓逆向</a>
+      
+        <a href="/tags/frida/">#frida</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>转载- frida检测及其应对方法</div>
+      <div>https://kingjem.github.io/2024/10/14/【转载】--frida检测及其应对方法/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/10/14/wg%E7%9B%B8%E5%85%B3%E7%94%9F%E6%80%81/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/14/%E4%BA%94%E7%A7%92%E7%9B%BE%E5%AF%B9%E6%8A%97/" title="五秒盾对抗系列">
+                        <span class="hidden-mobile">五秒盾对抗系列</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

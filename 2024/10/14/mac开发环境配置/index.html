@@ -1,0 +1,847 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="Dotfile 管理.zshrc 文件是Oh My ZSH默认配置文件，其中会引用.zshrc.pre-oh-my-zsh .zshrc.pre-oh-my-zsh 文件是安装Oh My ZSH 时自动把你的 ~&#x2F;.zshrc 备份成这个名字 botdot 管理配置文件 123pip install dotbotdotbot -c &lt;path to configuration file&amp;gt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mac开发环境配置">
+<meta property="og:url" content="https://kingjem.github.io/2024/10/14/mac%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="Dotfile 管理.zshrc 文件是Oh My ZSH默认配置文件，其中会引用.zshrc.pre-oh-my-zsh .zshrc.pre-oh-my-zsh 文件是安装Oh My ZSH 时自动把你的 ~&#x2F;.zshrc 备份成这个名字 botdot 管理配置文件 123pip install dotbotdotbot -c &lt;path to configuration file&amp;gt">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:modified_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="终端">
+<meta property="article:tag" content="shell">
+<meta property="article:tag" content="ohmyzsh">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>mac开发环境配置 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="mac开发环境配置"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-14 11:05" pubdate>
+          2024年10月14日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          32 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">mac开发环境配置</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="Dotfile-管理"><a href="#Dotfile-管理" class="headerlink" title="Dotfile 管理"></a>Dotfile 管理</h2><p>.zshrc 文件是Oh My ZSH默认配置文件，其中会引用.zshrc.pre-oh-my-zsh</p>
+<p>.zshrc.pre-oh-my-zsh 文件是安装Oh My ZSH 时自动把你的 ~/.zshrc 备份成这个名字</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/anishathalye/dotbot">botdot 管理配置文件</a></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">pip install dotbot<br><br>dotbot -c &lt;<span class="hljs-type">path</span> <span class="hljs-keyword">to</span> <span class="hljs-keyword">configuration</span> file&gt;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="使用zplug-插件管理"><a href="#使用zplug-插件管理" class="headerlink" title="使用zplug 插件管理"></a>使用zplug 插件管理</h2><p> 安装 zplug</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>zshrc 配置 环境变量和alias 是单独配置的。 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs zshrc"># zsh 插件加载<br>export ZPLUG_HOME=/opt/homebrew/opt/zplug<br>source $ZPLUG_HOME/init.zsh<br><br># === History config ===<br>HISTSIZE=10000<br>SAVEHIST=10000<br>HISTFILE=~/.zsh_history<br>setopt append_history<br>setopt share_history<br>setopt long_list_jobs<br>setopt hist_expire_dups_first<br>setopt hist_ignore_dups<br>setopt hist_ignore_all_dups<br>setopt hist_ignore_space<br>setopt hist_find_no_dups<br>setopt hist_reduce_blanks<br>setopt hist_verify<br>setopt hist_no_store<br>setopt interactivecomments<br>zstyle &#x27;:completion:*&#x27; rehash true<br><br><br><br># &gt; === zplug 插件安装 ===<br>zplug &#x27;zplug/zplug&#x27;, hook-build:&#x27;zplug --self-manage&#x27;<br>zplug &quot;plugins/git&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/tmux&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/safe-paste&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/last-working-dir&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/macos&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/vscode&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/z&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/d&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/extract&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/git-open&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/sudo&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/cp&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/web-search&quot;,   from:oh-my-zsh<br>zplug &quot;plugins/rand-quote&quot;, from:oh-my-zsh<br>zplug &quot;plugins/history-substring-search&quot;,  from:oh-my-zsh<br>zplug &quot;plugins/command-not-found&quot;,   from:oh-my-zsh<br>zplug &quot;zsh-users/zsh-syntax-highlighting&quot;<br>zplug &quot;zsh-users/zsh-autosuggestions&quot;<br>zplug &quot;voronkovich/gitignore.plugin.zsh&quot;<br>zplug &quot;zsh-users/zsh-history-substring-search&quot;<br>zplug &quot;lib/completion&quot;, from:oh-my-zsh<br>zplug &quot;plugins/man&quot;, from:oh-my-zsh<br>zplug &quot;plugins/colored-man-pages&quot;, from:oh-my-zsh<br>#zplug &quot;junegunn/fzf&quot;<br>#zplug &quot;junegunn/fzf-bin&quot;, \<br>#    from:gh-r, \<br>#    as:command, \<br>#    rename-to:fzf, \<br>#    use:&quot;*linux*amd64*&quot;<br>source $ZPLUG_HOME/repos/junegunn/fzf/shell/completion.zsh<br>source $ZPLUG_HOME/repos/junegunn/fzf/shell/key-bindings.zsh<br><br><br># &gt; zplug 安装检查<br>if ! zplug check --verbose; then<br>    printf &quot;Install? [y/N]: &quot;<br>    if read -q; then<br>        echo; zplug install<br>    fi<br>fi<br><br># &gt; zplug 安装<br>zplug load<br><br><br>[ -f ~/.fzf.zsh ] &amp;&amp; source ~/.fzf.zsh<br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<ul>
+<li>powerlevel10k： 我使用的主题 </li>
+<li>git: 提供很多 git 的快捷操作  安装之后是一系列alias 可以使用 alias |grep git 查看相关的aias  gaa gcmsg gpr gp gl 是我比较常用的</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">gaa = git add --all<br>gcmsg = git commit -m<br>ga = git add<br>gst = git status<br>gp = git push<br><br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><p>macos: 在终端控制你的mac，如 spotify 切歌 </p>
+</li>
+<li><p>extract: 解压工具  </p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs llvm"><span class="hljs-keyword">x</span> filename.tar.gz<br></code></pre></td></tr></table></figure></li>
+<li><p>git-open: </p>
+</li>
+<li><p>sudo: 摁两次esc，在命令前加 sudo </p>
+</li>
+<li><p>cp: 安全复制 使用 cpv 命令</p>
+</li>
+<li><p>web-search: 在终端中 google 或其他搜索引擎 </p>
+</li>
+<li><p>rand-quote: 随机一句quote，可以放在 zsh 加载的最后一行</p>
+</li>
+<li><p>history-substring-search: 查找匹配前缀的历史输入 </p>
+</li>
+<li><p>command-not-found</p>
+</li>
+<li><p>zsh-syntax-highlighting: zsh 高亮 </p>
+</li>
+<li><p>zsh-autosuggestions: 自动提示输入内容 </p>
+</li>
+<li><p>gitignore: 快速添加 <code>.gitignore</code></p>
+</li>
+</ul>
+ <figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">gi python &gt; <span class="hljs-string">.gitignore</span>  <span class="hljs-comment"># 快速生成python 的忽略文件</span><br></code></pre></td></tr></table></figure>
+
+<p>​    </p>
+<ul>
+<li><p>tmux  tmux 的alias   tl  ta ts    具体通过alias|grep tmux 查看</p>
+</li>
+<li><p> vi-mode 终端下使用vi </p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>插件名称</th>
+<th>触发方式</th>
+<th align="left">命令使用</th>
+<th>插件作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>zsh-autosuggestions</td>
+<td>手动</td>
+<td align="left">tab 补全</td>
+<td>命令提示</td>
+</tr>
+<tr>
+<td>autojump[已舍弃] 改用 zsh z</td>
+<td>手动</td>
+<td align="left">j [aid] dirname</td>
+<td>快捷跳转目录</td>
+</tr>
+<tr>
+<td>incr</td>
+<td>自动</td>
+<td align="left">无</td>
+<td>命令提示</td>
+</tr>
+<tr>
+<td>zsh-syntax-highlighting</td>
+<td>自动</td>
+<td align="left">无</td>
+<td>Zsh语法高亮</td>
+</tr>
+<tr>
+<td>safe-paste</td>
+<td>自动</td>
+<td align="left">无</td>
+<td>粘贴命令不自动执行</td>
+</tr>
+<tr>
+<td>last-working-dir</td>
+<td>自动</td>
+<td align="left">无</td>
+<td>自动跳转到上次退出的目录</td>
+</tr>
+<tr>
+<td>extarct</td>
+<td>手动</td>
+<td align="left">extract file.ext 或 x file.ext</td>
+<td>tar, gz, zip, rar 等等一键解压缩</td>
+</tr>
+<tr>
+<td>git</td>
+<td>手动</td>
+<td align="left">alias |grep git</td>
+<td>git 的快捷命令 比如 gaa == git add all</td>
+</tr>
+</tbody></table>
+<h2 id="终端工具"><a href="#终端工具" class="headerlink" title="终端工具"></a>终端工具</h2><ul>
+<li><p>fzf  模糊搜索</p>
+</li>
+<li><p>bat  更美观的内容查看</p>
+</li>
+<li><p>fd   替换find </p>
+</li>
+<li><p>lazygit  命令行图形化的界面  不常用的 还是git 缩写用的多</p>
+</li>
+<li><p>ag  强化版的grep </p>
+</li>
+<li><p>tree以树形查看文件</p>
+</li>
+<li><p>pstree  树型查看进程</p>
+</li>
+<li><p>以树形查看brew 安装的软件及其依赖 <code>brew deps --include-build --tree $(brew leaves)</code></p>
+</li>
+<li><p>删除软件及其依赖rmtree </p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">brew tap beeftornado/rmtree #添加源<br>brew install brew-rmtree # 安装<br>brew rmtree maven # 卸载maven 及其依赖<br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="noopener" href="https://guojing.io/posts/zplug/">https://guojing.io/posts/zplug/</a></p>
+<p><a target="_blank" rel="noopener" href="https://macosdoc.googo.cc/enivironment/zhong-jian-kai-fa-huan-jing">https://macosdoc.googo.cc/enivironment/zhong-jian-kai-fa-huan-jing</a></p>
+<p><a target="_blank" rel="noopener" href="https://zbttl-github-io.vercel.app/huan-yong-zplug/">https://zbttl-github-io.vercel.app/huan-yong-zplug/</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/wklken/config">https://github.com/wklken/config</a></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BB%88%E7%AB%AF/">#终端</a>
+      
+        <a href="/tags/shell/">#shell</a>
+      
+        <a href="/tags/ohmyzsh/">#ohmyzsh</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>mac开发环境配置</div>
+      <div>https://kingjem.github.io/2024/10/14/mac开发环境配置/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/10/14/lxml%E8%A7%A3%E6%9E%90html%E7%9A%84%E4%B8%8D%E5%90%8C%E5%AE%9E%E4%BE%8B%E5%8C%96%E7%B1%BB%E7%9A%84%E6%AF%94%E8%BE%83/" title="lxml解析html的不同实例化类的比较">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">lxml解析html的不同实例化类的比较</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/14/mmdb%E6%95%B0%E6%8D%AE%E5%BA%93/" title="mmdb 数据库">
+                        <span class="hidden-mobile">mmdb 数据库</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="正戏开始更新源  apt-get update  你可以查看qemu有什么包，可以根据自己的需求安装模拟其他架构  apt search qemu  安装qemu工具包  apt install qemu-utils  当然，我的是arm64位架构的，模拟arm的性能损耗会更低 安装模拟aarch64架构的  apt install qemu-system-aarch64-headless  首先">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安卓手机安装Openwrt">
+<meta property="og:url" content="https://kingjem.github.io/2022/08/16/%E5%AE%89%E5%8D%93%E6%89%8B%E6%9C%BA%E5%AE%89%E8%A3%85Openwrt/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="正戏开始更新源  apt-get update  你可以查看qemu有什么包，可以根据自己的需求安装模拟其他架构  apt search qemu  安装qemu工具包  apt install qemu-utils  当然，我的是arm64位架构的，模拟arm的性能损耗会更低 安装模拟aarch64架构的  apt install qemu-system-aarch64-headless  首先">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-16T02:24:42.000Z">
+<meta property="article:modified_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Openwrt">
+<meta property="article:tag" content="Termux">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>安卓手机安装Openwrt - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="安卓手机安装Openwrt"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-16 10:24" pubdate>
+          2022年8月16日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          24 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">安卓手机安装Openwrt</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="正戏开始"><a href="#正戏开始" class="headerlink" title="正戏开始"></a>正戏开始</h1><p>更新源</p>
+<blockquote>
+<p>apt-get update</p>
+</blockquote>
+<p>你可以查看qemu有什么包，可以根据自己的需求安装模拟其他架构</p>
+<blockquote>
+<p>apt search qemu</p>
+</blockquote>
+<p>安装qemu工具包</p>
+<blockquote>
+<p>apt install qemu-utils</p>
+</blockquote>
+<p>当然，我的是arm64位架构的，模拟arm的性能损耗会更低</p>
+<p>安装模拟aarch64架构的</p>
+<blockquote>
+<p>apt install qemu-system-aarch64-headless</p>
+</blockquote>
+<p>首先进行arm架构的教程</p>
+<p>这里先采用官方releases版固件，你们成功后可以换其他充满插件的固件、或者手动构建armvirt镜像，替换执行命令里固件名字就行了</p>
+<p>下载arm固件</p>
+<blockquote>
+<p>wget <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/19.07.8/targets/armvirt/64/openwrt-19.07.8-armvirt-64-root.ext4.gz">https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/19.07.8/targets/armvirt/64/openwrt-19.07.8-armvirt-64-root.ext4.gz</a></p>
+</blockquote>
+<p>(额，可能提示The program wget is not installed.那就执行pkg install wget安装wget后，再下载)</p>
+<blockquote>
+<p>gzip -d openwrt-19.07.8-armvirt-64-root.ext4.gz</p>
+</blockquote>
+<p>与X86会有combined不同的是，还有指定kernel，所以还要内核镜像。你们使用自己编译的固件时，记得也把内核文件复制到手机</p>
+<blockquote>
+<p>wget <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/19.07.8/targets/armvirt/64/openwrt-19.07.8-armvirt-64-Image">https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/19.07.8/targets/armvirt/64/openwrt-19.07.8-armvirt-64-Image</a></p>
+</blockquote>
+<p>这个时候输入查看命令ls执行可以看到文件openwrt-19.07.8-armvirt-64-root.ext4 和 openwrt-19.07.8-armvirt-64-Image</p>
+<p>开始运行openwrt</p>
+<blockquote>
+<p>qemu-system-aarch64 -M virt -m 1024m -kernel openwrt-19.07.8-armvirt-64-Image -append “root=fe00” -hda openwrt-19.07.8-armvirt-64-root.ext4 -no-reboot -nographic -cpu cortex-a53 -smp 3 -net nic -net user,id=wan,hostfwd=tcp::7080-:80,hostfwd=tcp::7022-:22</p>
+</blockquote>
+<p>命令说明：</p>
+<p>​        -M 是模拟的机器，可以执行qemu-system-aarch64 -M help查看列表，可以看到有树莓派的，所以也可以直接用树莓派的固件</p>
+<p>​        -m 是分配内存大小 我这里分配1024mb</p>
+<p>​        -kernel是指定内核</p>
+<p>​        -append cmdline 设置Linux内核命令行和启动参数</p>
+<p>​             我这里”root=fe00“指定根的块设备是fe00，如果你没有指定这个，内核将列出可用的块设备并重新启动，之后你们自己的固件可以取消这个”root=fe00“看可用块设备列表，再修改填上。我之前在这徘徊了很久啊。</p>
+<p>​        -hda是指定硬盘镜像</p>
+<p>​        –no-reboot 就是字面意思，里面客户系统如果重启就会直接退出qemu，重启相当于关机退出qemu。可以不要这条，这样客户系统可以进行重启的操作</p>
+<p>​        -nographic 关闭qemu的图形化界面输出。也可以去掉，然后加上–vnc :1  以vnc为图像模式输出到”显示器”，并占用vnc 1端口，vnc访问手机ip:5901显示进入图像界面。-nographic与–vnc不同的是执行运行后不会立即有回显。</p>
+<p>​          -cpu cortex-a53 模拟cortex-a53类型的处理器，因为前面查询我的骁龙625是cortex-a53类型处理器，模拟这个性能损失较小。可以输入qemu-system-aarch64 -cpu help查看可模拟列表</p>
+<p>​        -smp 核数，给cpu分配核数</p>
+<p>​        -net nic 就是快速配置网卡。后面net user,id=wan,hostfwd=tcp::7080-:80,hostfwd=tcp::7022-:22配置网卡网络模式为用户模式（nat模式，使用主机网络nat联网），分配id标识为wan，hostfwd是端口重定向参数，可以加逗号多个使用，很清晰可以自己根据需要增加和删改，这里我把主机7080端口重定向到客户系统的80端口，把主机7022端口重定向到客户系统的22端口。这两个端口分别是web网页管理地址端口、ssh端口。还有具体设置网卡可以百度搜索qemu网络模式。</p>
+<p>执行后耐心等待跑码，看下面图</p>
+<p>出现第一个框就可以按回车输命令了，但是不急，等第二个</p>
+<p>出现br-lan: port 1(eth0) entered forwarding state就是启动好了（改过下面以后，第二次运行是出现8021q: adding VLAN 0 to HW filter on device eth0）</p>
+<p>因为第一个网卡默认是分配给lan的，所以我们要改一下，分给wan（这个镜像改过一次，下次再启动就不用改了）</p>
+<p>输入</p>
+<blockquote>
+<p>vi /etc/config/network </p>
+</blockquote>
+<p>按键盘i就可以编辑进行增删了，把config interface ‘wan’ 那整部分改成以下这样</p>
+<blockquote>
+<p>config interface ‘wan’</p>
+<p>​    option ifname ‘eth0’</p>
+<p>​    option proto ‘dhcp’</p>
+</blockquote>
+<p>编辑好了，按键盘ESC，然后按住shift再按一下键盘上的；就可以输入wq回车后保存退出（就是按esc退出后，按出冒号，wq命令保存退出）</p>
+<p>重启网络服务</p>
+<blockquote>
+<p>/etc/init.d/network restart</p>
+</blockquote>
+<p>输入ifconfig看看</p>
+<p>eth0   Link encap:Ethernet HWaddr 52:54:00:12:34:56</p>
+<p>​       inet addr:10.0.2.15</p>
+<p>获得了一个nat地址</p>
+<p>现在ping一下外网</p>
+<blockquote>
+<p>ping <a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a></p>
+</blockquote>
+<p>只要手机能联网，它就能联网！</p>
+<p>因为我手机用的是4g数据，地方信号不好，延迟有点大哈别介意</p>
+<p>开放wan的80端口</p>
+<blockquote>
+<p>iptables -I INPUT -p tcp –dport 80 -j ACCEPT</p>
+</blockquote>
+<p>前面执行命令的时候，我们已经弄好手机7080端口重定向客户机的80端口了，所以我们在浏览器访问手机ip加7080端口，就可以进入openwrt的管理页面啦！</p>
+<p>连上openwrt的ssh，前面执行命令的时候，我们已经弄好手机7022端口重定向客户机的22端口了，只要在openwrt开放22端口，就可以手机ip加7022连上了</p>
+<blockquote>
+<p>iptables -I INPUT -p tcp –dport 80 -j ACCEPT</p>
+</blockquote>
+<p>你可以根据需要设置好重定向端口和开放端口，例子很明白了</p>
+<blockquote>
+<p>iptables -I INPUT -p tcp –dport 7080 -j ACCEPT</p>
+</blockquote>
+<p>浏览器访问手机ip:7080进行设置</p>
+<p>本次用到的工具是termux 安卓7 (API 24) 及以上版本，旧版本系统使用本镜像可能导致程序错误。</p>
+<p>替换国内清华源参考 <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/help/termux/">https://mirrors.tuna.tsinghua.edu.cn/help/termux/</a></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Openwrt/">#Openwrt</a>
+      
+        <a href="/tags/Termux/">#Termux</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>安卓手机安装Openwrt</div>
+      <div>https://kingjem.github.io/2022/08/16/安卓手机安装Openwrt/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年8月16日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/17/%E8%87%B4%E8%BF%9Cjs%E7%AC%94%E8%AE%B0/" title="致远js笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">致远js笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/10/%E7%A9%BA%E6%B0%94%E8%B4%A8%E9%87%8F%E7%9B%91%E6%8E%A7%E5%B9%B3%E5%8F%B0%E5%88%86%E6%9E%90%E5%8F%8D%E7%88%AC%E8%99%AB%E5%88%86%E6%9E%90/" title="空气质量监控平台分析反爬虫分析">
+                        <span class="hidden-mobile">空气质量监控平台分析反爬虫分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

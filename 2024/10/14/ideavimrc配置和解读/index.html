@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="ideavim配置ideavim 是jetbrains 官方实现的插件和jetbrain 旗下的平台结合的很紧密，也可以通过设置实现vim 和jetbrains 旗下产品的深度绑定，但是只是实现vim 的部分功能。 无法通过 souce ~&#x2F;.ideavimrc 来更新配置  必须通过再次打开软件来加载新的配置文件使其生效。 官方仓库 web-storm团队的一些入门介绍 Ideavim 有些插件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ideavimrc配置和解读">
+<meta property="og:url" content="https://kingjem.github.io/2024/10/14/ideavimrc%E9%85%8D%E7%BD%AE%E5%92%8C%E8%A7%A3%E8%AF%BB/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="ideavim配置ideavim 是jetbrains 官方实现的插件和jetbrain 旗下的平台结合的很紧密，也可以通过设置实现vim 和jetbrains 旗下产品的深度绑定，但是只是实现vim 的部分功能。 无法通过 souce ~&#x2F;.ideavimrc 来更新配置  必须通过再次打开软件来加载新的配置文件使其生效。 官方仓库 web-storm团队的一些入门介绍 Ideavim 有些插件">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:modified_time" content="2024-10-14T03:05:33.274Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="vim">
+<meta property="article:tag" content="ideavim，jetbrains">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>ideavimrc配置和解读 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ideavimrc配置和解读"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-14 11:05" pubdate>
+          2024年10月14日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          57 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">ideavimrc配置和解读</h1>
+            
+            <div class="markdown-body">
+              
+              <h3 id="ideavim配置"><a href="#ideavim配置" class="headerlink" title="ideavim配置"></a>ideavim配置</h3><p>ideavim 是jetbrains 官方实现的插件和jetbrain 旗下的平台结合的很紧密，也可以通过设置实现vim 和jetbrains 旗下产品的深度绑定，但是只是实现vim 的部分功能。</p>
+<p>无法通过 souce ~/.ideavimrc 来更新配置  必须通过再次打开软件来加载新的配置文件使其生效。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/JetBrains/ideavim#executing-ide-actions">官方仓库</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.jetbrains.com/zh-hans/webstorm/2022/10/ideavim-in-webstorm/">web-storm团队的一些入门介绍</a></p>
+<p>Ideavim 有些插件可以通过官方仓库来安装，但是我看到ideavim 的仓库里这样介绍</p>
+<p>If you reuse your existing <code>.vimrc</code> file using <code>source ~/.vimrc</code>, IdeaVim can parse and enable plugins that are defined using <a target="_blank" rel="noopener" href="https://github.com/junegunn/vim-plug">vim-plug</a> or <a target="_blank" rel="noopener" href="https://github.com/VundleVim/Vundle.vim">vundle</a>. No additional set commands in <code>~/.ideavimrc</code> are required</p>
+<p>可以解析一部分vim 插件，插件是通过idea vim 模拟的。不是原生的vim 插件</p>
+<p>支持的插件有以下这些</p>
+<ul>
+<li>vim-easymotion</li>
+<li>NERDTree</li>
+<li>vim-surround</li>
+<li>vim-multiple-cursors</li>
+<li>vim-commentary</li>
+<li>argtextobj.vim</li>
+<li>vim-textobj-entire</li>
+<li>ReplaceWithRegister</li>
+<li>vim-exchange</li>
+<li>vim-highlightedyank</li>
+<li>vim-paragraph-motion</li>
+<li>vim-indent-object</li>
+<li>match.it</li>
+</ul>
+<p>通过插件提供的 <code>IdeaVim: track action Ids</code> 来查找ID  两下<code>shift </code>  来查找 可以帮经常使用的快捷键录制下来，制作成常用的暗转</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/JetBrains/ideavim/raw/master/assets/readme/track_action_light.gif">官方演示gif</a></p>
+<figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><code class="hljs pony"><br><br><span class="hljs-string">&quot; 搜索设置</span><br><span class="hljs-string">set incsearch</span><br><span class="hljs-string">set hlsearch</span><br><span class="hljs-string">set ignorecase &quot;</span>搜索时智能匹配大小写<br>set smartcase<br>set wrapscan  <span class="hljs-string">&quot;环形搜索</span><br><span class="hljs-string">&quot;</span>关闭搜索高亮<br>nnoremap &lt;leader&gt;/ :nohl&lt;<span class="hljs-type">CR</span>&gt;<br><br><br><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;</span> 通用设置<br><span class="hljs-string">&quot;语法高亮显示</span><br><span class="hljs-string">syntax on</span><br><span class="hljs-string">&quot;</span> 不使用兼容模式<br>set nocompatible<br><span class="hljs-string">&quot;显示行号</span><br><span class="hljs-string">set number</span><br><span class="hljs-string">&quot;</span>显示相对行号<br>set relativenumber<br><span class="hljs-string">&quot;显示光标所在位置的行号和列号</span><br><span class="hljs-string">set ruler</span><br><span class="hljs-string">&quot;</span>自动折行<br>set wrap<br><span class="hljs-string">&quot;移位操作 &gt;&gt; 或 &lt;&lt; 的缩进长度（以空格的数量表示）</span><br><span class="hljs-string">set shiftwidth=4</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span>设置文件里的制表符 (<span class="hljs-type">TAB</span>) 的宽度（以空格的数量表示<br>set tabstop=<span class="hljs-number">4</span><br>set softtabstop=<span class="hljs-number">4</span><br><span class="hljs-string">&quot;换行的时候下一行使用上一行的缩进</span><br><span class="hljs-string">set smartindent</span><br><span class="hljs-string">&quot;</span>将tab替换为相应数量空格<br>set expandtab<br>set backspace=<span class="hljs-number">2</span><br><span class="hljs-string">&quot; 上下滚动的时候保留5行</span><br><span class="hljs-string">set co=5</span><br><span class="hljs-string">&quot;</span>突出显示当前行<br>set cursorline<br><span class="hljs-string">&quot; 禁止创建备份文件</span><br><span class="hljs-string">set nobackup</span><br><span class="hljs-string">&quot;</span> 禁止创建交换文件 .swp 开头<br>set noswapfile<br><span class="hljs-string">&quot; Vim 的默认寄存器和系统剪贴板共享</span><br><span class="hljs-string">set clipboard+=unnamed</span><br><span class="hljs-string">&quot;</span> 显示当前的模式<br>set showmode<br><span class="hljs-string">&quot;光标距窗口上下保留 5 行</span><br><span class="hljs-string">set scrolloff=5</span><br><span class="hljs-string">&quot;</span>显示文件名、行号和列号<br>set laststatus=<span class="hljs-number">2</span><br><span class="hljs-string">&quot;创建undo文件</span><br><span class="hljs-string">&quot;</span>set undofile<br><span class="hljs-string">&quot;关闭错误响铃</span><br><span class="hljs-string">set noerrorbells</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span>屏幕命令显示<br>set showcmd<br><span class="hljs-string">&quot;当前所处的模式&quot;</span><br>set showmode<br><span class="hljs-string">&quot;显示匹配的括号&quot;</span><br>set showmatch<br><span class="hljs-string">&quot; 参考 https://linux265.com/news/3395.html </span><br><span class="hljs-string">&quot;</span> 参考 http:<span class="hljs-comment">//t.zoukankan.com/fuhai0815-p-9443916.html</span><br><br><br><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;</span> 通用设置 结束<br><br><br><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot; ideavim 插件配置</span><br><span class="hljs-string">&quot;</span>设置space为leader<br><span class="hljs-keyword">let</span> mapleader=<span class="hljs-string">&quot; &quot;</span><br><br><span class="hljs-string">&quot;sneak 插件 s/S &#123;char&#125;&#123;char&#125; 跳转</span><br><span class="hljs-string">set sneak</span><br><span class="hljs-string">&quot;</span> 启用vim surround功能<br>set surround<br><span class="hljs-string">&quot;启用e asymotin 插件</span><br><span class="hljs-string">set easymotion</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span>为<span class="hljs-type">IdeaVim</span>插件增加自动切换为英文输入法的功能<br><span class="hljs-string">&quot;set keep-english-in-normal</span><br><span class="hljs-string"></span><br><span class="hljs-string">Plug &#x27;preservim/nerdtree`</span><br><span class="hljs-string">map &lt;c-t&gt; :NERDTree&gt;</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span> ideavim 插件配置 结束<br><br><br><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="hljs-string">&quot; idea的动作映射&quot;</span><br><span class="hljs-string">&quot;idea的动作映射 https://github.com/JetBrains/ideavim#executing-ide-actions</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span> 撤回<br>nnoremap <span class="hljs-type">U</span> &lt;<span class="hljs-type">C</span>-r&gt;<br><span class="hljs-string">&quot; 复制到行尾</span><br><span class="hljs-string">nnoremap Y y$</span><br><span class="hljs-string">&quot;</span>格式化代码 \r<br>map \r &lt;<span class="hljs-type">Action</span>&gt;(<span class="hljs-type">ReformatCode</span>)<br><span class="hljs-string">&quot; Debug</span><br><span class="hljs-string">map &lt;leader&gt;d &lt;Action&gt;(Debug)</span><br><span class="hljs-string">&quot;</span>运行当前文件<br>nnoremap &lt;leader&gt;r :action <span class="hljs-type">RunClass</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot;改变量名</span><br><span class="hljs-string">nnoremap &lt;leader&gt;s :action RenameElement&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span>新建一个文件<br>nnoremap &lt;leader&gt;n :action <span class="hljs-type">NewFile</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot;Ctrl + Shift + I查看快速定义</span><br><span class="hljs-string">nnoremap &lt;leader&gt;v :action QuickImplementations&lt;CR&gt;</span><br><span class="hljs-string">noremap &lt;leader&gt;gc :action GotoClass&lt;CR&gt;</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span>noremap / :action <span class="hljs-type">Find</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot;noremap f :action AceAction&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span>noremap <span class="hljs-type">F</span> :action <span class="hljs-type">AceTargetAction</span>&lt;<span class="hljs-type">CR</span>&gt;<br><br><br><br><span class="hljs-string">&quot; 后退</span><br><span class="hljs-string">nnoremap [[ :action Back&lt;CR&gt;</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span>前进<span class="hljs-string">&quot;</span><br><span class="hljs-string"></span><br><span class="hljs-string">noremap  ]] :action Forward&lt;CR&gt;</span><br><span class="hljs-string"> &quot;</span> 弹出输入框，可以跳到指定类<br>nnoremap &lt;<span class="hljs-type">Space</span>&gt;gc :action <span class="hljs-type">GotoClass</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 弹出输入框，跳转到指定操作</span><br><span class="hljs-string">nnoremap &lt;Space&gt;ga :action GotoAction&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span> 跳转到定义<br>nnoremap &lt;leader&gt;gd :action <span class="hljs-type">GotoDeclaration</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 跳转到实现</span><br><span class="hljs-string">nnoremap &lt;Space&gt;gi :action GotoImplementation&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span> 跳转到指定的文件<br>nnoremap &lt;<span class="hljs-type">Space</span>&gt;gf :action <span class="hljs-type">GotoFile</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 跳转到方法的声明</span><br><span class="hljs-string">nnoremap &lt;Space&gt;gs :action GotoSuperMethod&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span> 跳转到测试<br><span class="hljs-string">&quot;nnoremap &lt;Space&gt;gT :action GotoTest&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span> 弹出输入框，跳转到符号<br>nnoremap &lt;<span class="hljs-type">Space</span>&gt;gS :action <span class="hljs-type">GotoSymbol</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 弹出输入框 跳转到文件结构  不是command +7</span><br><span class="hljs-string">noremap &lt;leader&gt;fs :action FileStructurePopup&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span>noremap &lt;leader&gt;v :action <span class="hljs-type">VimVisualToggleBlockMode</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 查找使用</span><br><span class="hljs-string">nnoremap &lt;Space&gt;fu :action FindUsages&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span> 显示使用<br>nnoremap &lt;<span class="hljs-type">Space</span>&gt;su :action <span class="hljs-type">ShowUsages</span>&lt;<span class="hljs-type">CR</span>&gt;<br><span class="hljs-string">&quot; 窗口切换</span><br><span class="hljs-string">nnoremap &lt;Space&gt;&lt;TAB&gt;:action Switcher&lt;CR&gt;</span><br><span class="hljs-string"></span><br><span class="hljs-string">&quot;</span> 查看文档  <span class="hljs-type">F1</span>键<br>nnoremap &lt;<span class="hljs-type">Space</span>&gt;h :action <span class="hljs-type">QuickJavaDoc</span>&lt;<span class="hljs-type">CR</span>&gt;<br><br><span class="hljs-string">&quot; 显示错误信息 鼠标悬停在错误页面上的效果</span><br><span class="hljs-string">nnoremap &lt;Space&gt;se :action ShowErrorDescription&lt;CR&gt;</span><br><span class="hljs-string">&quot;</span>nnoremap  :action <span class="hljs-type">ShowErrorDescription</span>  鼠标悬停在错误页面上的效果<br><br><br><br><span class="hljs-string">&quot; gh=go head, 映射vim中的^</span><br><span class="hljs-string">nnoremap gh ^</span><br><span class="hljs-string">&quot;</span> gl=go last，映射vim中的$<br>nnoremap gl $<br><br><span class="hljs-string">&quot; Window operation</span><br><span class="hljs-string">&quot;</span>nnoremap &lt;<span class="hljs-type">Space</span>&gt;ww &lt;<span class="hljs-type">C</span>-<span class="hljs-type">W</span>&gt;w  <span class="hljs-string">&quot;切换窗口&quot;</span><br><span class="hljs-string">&quot;nnoremap &lt;Space&gt;wc &lt;C-W&gt;c  &quot;</span>关闭窗口<span class="hljs-string">&quot;</span><br><span class="hljs-string">&quot;</span>nnoremap &lt;<span class="hljs-type">Space</span>&gt;wj &lt;<span class="hljs-type">C</span>-<span class="hljs-type">W</span>&gt;j<br><span class="hljs-string">&quot;nnoremap &lt;Space&gt;wk &lt;C-W&gt;k</span><br><span class="hljs-string">&quot;</span>nnoremap &lt;<span class="hljs-type">Space</span>&gt;wh &lt;<span class="hljs-type">C</span>-<span class="hljs-type">W</span>&gt;h<br><span class="hljs-string">&quot;nnoremap &lt;Space&gt;wl &lt;C-W&gt;l</span><br><span class="hljs-string">&quot;</span>nnoremap &lt;<span class="hljs-type">Space</span>&gt;ws &lt;<span class="hljs-type">C</span>-<span class="hljs-type">W</span>&gt;s<br><span class="hljs-string">&quot;nnoremap &lt;Space&gt;w- &lt;C-W&gt;-</span><br><span class="hljs-string">&quot;</span>nnoremap &lt;<span class="hljs-type">Space</span>&gt;w+ &lt;<span class="hljs-type">C</span>-<span class="hljs-type">W</span>&gt;+<br><br><br><br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p>掘金上有篇文章介绍的还挺全的 但是我不是Java 开发有好些功能用不上<a target="_blank" rel="noopener" href="https://juejin.cn/post/7086003739718811661">传送门</a>在这，还是根据自己的需要定制，适合自己的才是最好的</p>
+<h2 id="插件用法介绍"><a href="#插件用法介绍" class="headerlink" title="插件用法介绍"></a>插件用法介绍</h2><p>Ace-jump 插件</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/phantom_dapeng/article/details/110391053"></a></p>
+<p>Vim-surround</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zwlove5280/article/details/108276285">https://blog.csdn.net/zwlove5280/article/details/108276285</a></p>
+<p>参考文章</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br><span class="hljs-string">&quot;https://javaforall.cn/186961.html</span><br><span class="hljs-string">&quot;</span>https://blog.csdn.net/weixin_33859844/article/details/91658609<br><span class="hljs-string">&quot;https://github.com/JetBrains/ideavim#executing-ide-actions</span><br><span class="hljs-string">&quot;</span>https://github.com/JetBrains/ideavim/wiki/%22set%22-commands<br><span class="hljs-string">&quot;https://blog.csdn.net/kl28978113/article/details/53980440</span><br><span class="hljs-string">&quot;</span>https://gist.github.com/AlexPl292/50a3ff4cef1badcbb23436b22cbd3cf4<span class="hljs-string">&quot;</span><br><span class="hljs-string">&quot;</span>https://blog.csdn.net/weixin_33859844/article/details/91658609<span class="hljs-string">&quot;</span><br><span class="hljs-string">&quot;</span>https://zhuanlan.zhihu.com/p/404818431<span class="hljs-string">&quot;</span><br><span class="hljs-string">&quot;</span>https://zhuanlan.zhihu.com/p/579636452<span class="hljs-string">&quot;</span><br><span class="hljs-string">&quot;</span>https://www.jianshu.com/p/ddd56ceeb83d<span class="hljs-string">&quot;</span><br><span class="hljs-string"></span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p>isneedpay</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/vim/">#vim</a>
+      
+        <a href="/tags/ideavim%EF%BC%8Cjetbrains/">#ideavim，jetbrains</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ideavimrc配置和解读</div>
+      <div>https://kingjem.github.io/2024/10/14/ideavimrc配置和解读/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/10/14/filewall/" title="firewall">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">firewall</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/14/jsrpc-%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E5%92%8C%E4%BB%A3%E7%A0%81%E4%BF%AE%E6%94%B9/" title="jsrpc 框架使用">
+                        <span class="hidden-mobile">jsrpc 框架使用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
