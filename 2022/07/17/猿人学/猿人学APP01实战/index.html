@@ -19,7 +19,7 @@
     <meta name="description" content="环境说明：  Nexus 6P Android8.1 已root 抓包软件 Http Canary frida&#x3D;12.8.10  frida-tools&#x3D;5.4.0  objection&#x3D;1.8.4 猿人学APP 1.0.31 Flask&#x3D;1.1.3  分析思路先抓包看下是第一题怎么发的包 123post 请求 dst https:&#x2F;&#x2F;www.python-spider.com&#x2F;api&#x2F;app1编">
 <meta property="og:type" content="article">
 <meta property="og:title" content="猿人学APP01实战">
-<meta property="og:url" content="https://kingjem.github.io/2022/07/17/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP01%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:url" content="https://kingjem.github.io/2022/07/17/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP01%E5%AE%9E%E6%88%98/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
 <meta property="og:description" content="环境说明：  Nexus 6P Android8.1 已root 抓包软件 Http Canary frida&#x3D;12.8.10  frida-tools&#x3D;5.4.0  objection&#x3D;1.8.4 猿人学APP 1.0.31 Flask&#x3D;1.1.3  分析思路先抓包看下是第一题怎么发的包 123post 请求 dst https:&#x2F;&#x2F;www.python-spider.com&#x2F;api&#x2F;app1编">
 <meta property="og:locale" content="zh_CN">
@@ -287,7 +287,7 @@
 <li>Flask=1.1.3</li>
 </ul>
 <h1 id="分析思路"><a href="#分析思路" class="headerlink" title="分析思路"></a>分析思路</h1><p>先抓包看下是第一题怎么发的包</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">post 请求 <br>dst https:<span class="hljs-regexp">//</span>www.python-spider.com<span class="hljs-regexp">/api/</span>app1<br>编码参数 page=<span class="hljs-number">1</span>&amp;sign=<span class="hljs-number">19</span>fb8a2eb72e4710109759fd992852d4&amp;t=<span class="hljs-number">1650780086008</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dts">post 请求 <br>dst https:<span class="hljs-comment">//www.python-spider.com/api/app1</span><br>编码参数 <span class="hljs-attr">page</span><span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-variable">&amp;sign</span>=<span class="hljs-number">19f</span>b8a2eb72e4710109759fd992852d4<span class="hljs-variable">&amp;t</span>=<span class="hljs-number">1650780086008</span><br></code></pre></td></tr></table></figure>
 
 
 
@@ -301,7 +301,7 @@
 <p>定位如图的函数 </p>
 <p>最后这个函数调用了 <code>OooO(Integer.valueOf(this.f7810OooO0o0), OooO2, Long.valueOf(currentTimeMillis)), new OooO00o(o00o0002));</code> 来发送最终的请求</p>
 <p>格式和API 中定义的接口请求大体相似</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">f7810OooO0o0 就是page 的变量名 第一次请求值是<span class="hljs-number">1</span> 请求第二页page 值+<span class="hljs-number">1</span> <br>t = currentTimeMillis<br>sign = <span class="hljs-keyword">new</span> <span class="hljs-constructor">Oooo000()</span>.<span class="hljs-constructor">OooO(<span class="hljs-params">byteArray</span>(<span class="hljs-string">&quot;page=1&quot;</span>+ <span class="hljs-params">str</span>(<span class="hljs-params">t</span>)</span>))<br></code></pre></td></tr></table></figure>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-variable">f7810OooO0o0</span> 就是<span class="hljs-variable">page</span> 的变量名 第一次请求值是<span class="hljs-number">1</span> 请求第二页<span class="hljs-variable">page</span> 值+<span class="hljs-number">1</span> <br><span class="hljs-variable">t</span> = <span class="hljs-variable">currentTimeMillis</span><br><span class="hljs-variable">sign</span> = <span class="hljs-variable">new</span> <span class="hljs-function"><span class="hljs-title">Oooo000</span>().OooO(<span class="hljs-title">byteArray</span>(<span class="hljs-string">&quot;page=1&quot;</span>+ <span class="hljs-title">str</span>(<span class="hljs-variable">t</span>)))</span><br></code></pre></td></tr></table></figure>
 
 
 
@@ -386,7 +386,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>猿人学APP01实战</div>
-      <div>https://kingjem.github.io/2022/07/17/猿人学APP01实战/</div>
+      <div>https://kingjem.github.io/2022/07/17/猿人学/猿人学APP01实战/</div>
     </div>
     <div class="license-meta">
       
@@ -438,7 +438,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/07/17/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP02%E5%AE%9E%E6%88%98/" title="猿人学APP02实战">
+                      <a href="/2022/07/17/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP02%E5%AE%9E%E6%88%98/" title="猿人学APP02实战">
                         <span class="hidden-mobile">猿人学APP02实战</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
