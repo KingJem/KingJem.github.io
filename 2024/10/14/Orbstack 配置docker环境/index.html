@@ -24,7 +24,7 @@
 <meta property="og:description" content="nginx-proxy-manager123456789101112131415version: &amp;#x27;3.8&amp;#x27;services:  app:    image: &amp;#x27;jc21&#x2F;nginx-proxy-manager:latest&amp;#x27;    restart: unless-stopped    ports:      - &amp;#x27;80:80&amp;#x27;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-14T03:05:33.264Z">
-<meta property="article:modified_time" content="2024-10-14T03:05:33.264Z">
+<meta property="article:modified_time" content="2024-12-03T03:18:16.738Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="docker">
 <meta name="twitter:card" content="summary_large_image">
@@ -280,7 +280,7 @@
 
 
 <h2 id="dozzle"><a href="#dozzle" class="headerlink" title="dozzle"></a>dozzle</h2><p>docker 容器日志查看</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">docker run --name dozzle -d --volume=<span class="hljs-regexp">/var/</span>run<span class="hljs-regexp">/docker.sock:/</span>var<span class="hljs-regexp">/run/</span>docker.sock -p <span class="hljs-number">8888</span>:<span class="hljs-number">8080</span> amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">docker <span class="hljs-keyword">run</span> --name dozzle -<span class="hljs-keyword">d</span> --volume=/<span class="hljs-keyword">var</span>/<span class="hljs-keyword">run</span>/docker.sock:/<span class="hljs-keyword">var</span>/<span class="hljs-keyword">run</span>/docker.sock -p 8888:8080 amir20/dozzle:latest<br><br></code></pre></td></tr></table></figure>
 
 
 
