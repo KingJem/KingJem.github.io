@@ -4,6 +4,46 @@
   
   
   <entry>
+    <title>lightpanda使用</title>
+    <link href="/2025/02/12/%E4%BD%BF%E7%94%A8/"/>
+    <url>/2025/02/12/%E4%BD%BF%E7%94%A8/</url>
+    
+    <content type="html"><![CDATA[<h2 id="1-缘起"><a href="#1-缘起" class="headerlink" title="1.缘起"></a>1.缘起</h2><p>阮一峰老师的&lt;&lt;科技爱好者周刊（第 336 期）：面对 AI，互联网正在衰落&gt;&gt; 中提到了一个项目<a href="https://github.com/lightpanda-io/browser">Lightpanda</a>,</p><p>今天来一起看下这个项目怎么在爬虫中使用。</p><h2 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h2><h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget https://github.com/lightpanda-io/browser/releases/download/nightly/lightpanda-x86_64-linux | chmod a+x ./lightpanda-x86_64-linux |mv  lightpanda-x86_64-linux   lightpanda<br></code></pre></td></tr></table></figure><h3 id="Macos"><a href="#Macos" class="headerlink" title="Macos"></a>Macos</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><br>wget https://github.com/lightpanda-io/browser/releases/download/nightly/lightpanda-aarch64-macos | chmod a+x ./lightpanda-aarch64-macos |mv  lightpanda-aarch64-macos   lightpanda<br></code></pre></td></tr></table></figure><p>只有Macos 和Linux 能用,下载后统一加权限改名</p><h2 id="功能介绍"><a href="#功能介绍" class="headerlink" title="功能介绍"></a>功能介绍</h2><p>❯ ./lightpanda -h<br>usage: ./lightpanda [options] [URL]</p><p>  start Lightpanda browser</p><ul><li>if an url is provided the browser will fetch the page and exit</li><li>otherwhise the browser starts a CDP server</li></ul><p>  -h, –help      Print this help message and exit.<br>  –verbose       Display all logs. By default only info, warn and err levels are displayed.<br>  –host          Host of the CDP server (default “127.0.0.1”)<br>  –port          Port of the CDP server (default “9222”)<br>  –timeout       Timeout for incoming connections of the CDP server (in seconds, default “3”)<br>  –dump          Dump document in stdout (fetch mode only)</p><p>  使用时 lightpanda 后面如果只有选项,没有url, 比如 –dump,–timeout, 会启动CDP server<br>  如果有url, 就会下载网页之后退出,这个一般应该不常用的.</p><h2 id="在项目中使用"><a href="#在项目中使用" class="headerlink" title="在项目中使用"></a>在项目中使用</h2><p>启动CDP 服务 </p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./lightpanda --host 127.0.0.1 --port 9222<br></code></pre></td></tr></table></figure><h3 id="访问网址"><a href="#访问网址" class="headerlink" title="访问网址"></a>访问网址</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs shell">import puppeteer from &#x27;puppeteer-core&#x27;;<br><br>const browser = await puppeteer.connect(&#123;<br>    browserWSEndpoint: &quot;ws://127.0.0.1:9222&quot;,<br>&#125;);<br><br>const context = await browser.createBrowserContext();<br>const page = await context.newPage();<br>await page.goto(&#x27;https://baidu.com&#x27;);<br>console.log(await page.content());<br>await page.close();<br>await context.close();<br><br></code></pre></td></tr></table></figure><h3 id="执行js"><a href="#执行js" class="headerlink" title="执行js"></a>执行js</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs shell">import puppeteer from &#x27;puppeteer-core&#x27;;<br><br>const browser = await puppeteer.connect(&#123;<br>    browserWSEndpoint: &quot;ws://127.0.0.1:9222&quot;,<br>&#125;);<br><br>const context = await browser.createBrowserContext();<br>const page = await context.newPage();<br>await page.goto(&#x27;https://baidu.com&#x27;);<br><br>let data = await page.evaluate(() =&gt; &#123;<br>    const arr = [];<br>    for (let i = 0; i &lt; 10; i++) &#123;<br>        arr.push(i);<br>    &#125;<br>    return arr;<br>&#125;)<br><br>console.log(data)<br><br></code></pre></td></tr></table></figure><h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>非常容易出现panic 导致程序退出,功能覆盖还不完全无法应用到正常的生产环境中去.</p><p>info(server): accepting new conn…<br>thread 1243245 panic: attempt to use null value<br>/home/runner/work/browser/browser/vendor/zig-js-runtime/src/engines/v8/callback.zig:0:0: 0x17b91d3 in call__anon_36850 (lightpanda)<br>/home/runner/work/browser/browser/vendor/zig-js-runtime/src/loop.zig:141:24: 0x176c348 in wrapper (lightpanda)<br>/opt/hostedtoolcache/zig/0.13.0/x64/lib/std/debug.zig:0:9: 0x1531192 in run_for_ns (lightpanda)<br>/home/runner/work/browser/browser/src/server.zig:476:31: 0x152f5e8 in handle (lightpanda)<br>/opt/hostedtoolcache/zig/0.13.0/x64/lib/std/Thread.zig:429:13: 0x15321fe in entryFn (lightpanda)<br>./nptl/pthread_create.c:442:8: 0x7f445177fac2 in start_thread (pthread_create.c)<br>../sysdeps/unix/sysv/linux/x86_64/clone3.S:81:0: 0x7f445181184f in ??? (../sysdeps/unix/sysv/linux/x86_64/clone3.S)<br>???:?:?: 0x0 in ??? (???)<br>[1]    1243244 IOT instruction  ./lightpanda</p>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>happy-dom 使用</title>
+    <link href="/2025/02/08/happy-dom/"/>
+    <url>/2025/02/08/happy-dom/</url>
+    
+    <content type="html"><![CDATA[<h2 id="使用-happy-dom-生成document"><a href="#使用-happy-dom-生成document" class="headerlink" title="使用 happy-dom 生成document"></a>使用 happy-dom 生成document</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">import</span> &#123; <span class="hljs-title class_">Window</span> &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;happy-dom&#x27;</span>;<br><br><span class="hljs-comment">// Create a new Window object</span><br><span class="hljs-keyword">const</span> <span class="hljs-variable language_">window</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Window</span>();<br><span class="hljs-keyword">const</span> domparser = <span class="hljs-keyword">new</span> <span class="hljs-variable language_">window</span>.<span class="hljs-title class_">DOMParser</span>();<br><br><span class="hljs-keyword">const</span> inputs = [<br>    <span class="hljs-string">&#x27;&lt;input aria-autocomplete=&quot;list&quot; aria-expanded=&quot;false&quot; aria-owns=&quot;search-quick-list_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20&quot; autocomplete=&quot;off&quot; class=&quot;c-navigation-search--input js--navigation-search--input&quot; data-target=&quot;#nav-search-static_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20&quot; id=&quot;nav-search-static--input_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20&quot; max-num-list=&quot;5&quot; name=&quot;q&quot; placeholder=&quot;搜索物流.dhl&quot; tabindex=&quot;0&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input class=&quot;c-voc-tracking-bar--input js--tracking-bar--input&quot; data-error-message=&quot;请输入您的追踪号码&quot; id=&quot;c-voc-tracking-input-box-93feb1c7-e949-4ba9-93ec-e8177ba64bf1&quot; name=&quot;tracking-id&quot; required=&quot;&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input aria-autocomplete=&quot;list&quot; aria-expanded=&quot;false&quot; aria-owns=&quot;search-quick-list_4a601d43-b0fe-40c3-91e2-8ef1d84d4bf4_mobile&quot; autocomplete=&quot;off&quot; class=&quot;c-navigation-search--input js--navigation-search--input&quot; data-target=&quot;#nav-search-mobile_4a601d43-b0fe-40c3-91e2-8ef1d84d4bf4&quot; id=&quot;nav-search-mobile--input_4a601d43-b0fe-40c3-91e2-8ef1d84d4bf4&quot; max-num-list=&quot;5&quot; name=&quot;q&quot; placeholder=&quot;搜索物流.dhl&quot; tabindex=&quot;0&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input class=&quot;c-voc-tracking-bar--input js--tracking-bar--input&quot; data-error-message=&quot;请输入您的追踪号码&quot; id=&quot;c-voc-tracking-input-box-4e2f5755-4129-4b60-b9b8-eb013caab702&quot; name=&quot;tracking-id&quot; required=&quot;&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input class=&quot;c-voc-tracking-bar--input js--tracking-bar--input&quot; data-error-message=&quot;请输入您的追踪号码&quot; id=&quot;c-voc-tracking-input-box-3bbf287b-d43f-4197-8d5f-352ad354a37f&quot; name=&quot;tracking-id&quot; required=&quot;&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input aria-autocomplete=&quot;list&quot; aria-expanded=&quot;false&quot; aria-owns=&quot;search-quick-list_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20_sticky&quot; autocomplete=&quot;off&quot; class=&quot;c-navigation-search--input js--navigation-search--input&quot; data-target=&quot;#nav-search-sticky_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20&quot; id=&quot;nav-search-sticky--input_b8ff7daf-20e1-4fbb-b38a-e8956b0dea20&quot; max-num-list=&quot;5&quot; name=&quot;q&quot; placeholder=&quot;搜索物流.dhl&quot; tabindex=&quot;0&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input class=&quot;c-voc-tracking-bar--input js--tracking-bar--input&quot; data-error-message=&quot;请输入您的追踪号码&quot; id=&quot;c-voc-tracking-input-box-18f42330-cd6a-491d-a9b1-211fd95d4f24&quot; name=&quot;tracking-id&quot; required=&quot;&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input aria-autocomplete=&quot;list&quot; aria-expanded=&quot;false&quot; aria-owns=&quot;search-quick-list_8f3736d6-d68f-45d8-ab69-e317d1abdfc4_mobile&quot; autocomplete=&quot;off&quot; class=&quot;c-navigation-search--input js--navigation-search--input&quot; data-target=&quot;#nav-search-mobile_8f3736d6-d68f-45d8-ab69-e317d1abdfc4&quot; id=&quot;nav-search-mobile--input_8f3736d6-d68f-45d8-ab69-e317d1abdfc4&quot; max-num-list=&quot;5&quot; name=&quot;q&quot; placeholder=&quot;搜索物流.dhl&quot; tabindex=&quot;0&quot; type=&quot;text&quot;/&gt;&#x27;</span>,<br>    <span class="hljs-string">&#x27;&lt;input class=&quot;c-voc-tracking-bar--input js--tracking--input-field js--tracking-bar--input js--voc-tracking--input-field&quot; data-error-message=&quot;请输入您的追踪号码&quot; id=&quot;c-tracking--input&quot; name=&quot;tracking-id&quot; type=&quot;input&quot;/&gt;&#x27;</span><br>];<br><br><span class="hljs-keyword">const</span> htmlString = inputs.<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;\n&#x27;</span>);<br><br><span class="hljs-comment">// Parse the HTML string using the DOMParser</span><br><br><br><span class="hljs-keyword">const</span> dom = domparser.<span class="hljs-title function_">parseFromString</span>(htmlString, <span class="hljs-string">&#x27;text/html&#x27;</span>);<br><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(dom);<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>js逆向</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>happy-dom</tag>
+      
+      <tag>jsdom</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>akamai 混淆解密</title>
     <link href="/2025/01/08/%E9%80%86%E5%90%91/akamai%20%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/"/>
     <url>/2025/01/08/%E9%80%86%E5%90%91/akamai%20%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/</url>
@@ -17,6 +57,25 @@
       <tag>js逆向</tag>
       
       <tag>akamai</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>jsdom 可替代方案</title>
+    <link href="/2025/01/04/2025-1-14%20jsom%E4%BC%98%E5%8C%96%E7%82%B9/"/>
+    <url>/2025/01/04/2025-1-14%20jsom%E4%BC%98%E5%8C%96%E7%82%B9/</url>
+    
+    <content type="html"><![CDATA[<p>在使用jsdom 时发现这个库的效率有点低，随即在denojs 环境或者nodejs 环境中查找没有类似的库可以替代。</p><p><a href="https://docs.deno.org.cn/runtime/manual/advanced/jsx_dom/jsdom">在 Deno 中使用 jsdom</a> 中提到了使用  <a href="https://docs.deno.org.cn/runtime/manual/advanced/jsx_dom/deno_dom">deno-dom</a> 和 <a href="https://docs.deno.org.cn/runtime/manual/advanced/jsx_dom/linkedom">LinkeDOM</a> </p><p>nodejs 中有一个 <a href="https://www.npmjs.com/package/happy-dom"> Happy DOM</a></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>nodejs</tag>
       
     </tags>
     
