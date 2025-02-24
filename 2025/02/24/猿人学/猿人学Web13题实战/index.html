@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="破题123456789101112success: function(data) &amp;#123;    var s &#x3D; &amp;#x27;&lt;tr class&#x3D;&quot;odd&quot;&gt;&amp;#x27;;    ttf &#x3D; data.woff;    $(&amp;#x27;.font&amp;#x27;).text(&amp;#x27;&amp;#x27;).append(&amp;#x27;@font-face &amp;#123; f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学web-13题">
+<meta property="og:url" content="https://kingjem.github.io/2025/02/24/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web13%E9%A2%98%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="破题123456789101112success: function(data) &amp;#123;    var s &#x3D; &amp;#x27;&lt;tr class&#x3D;&quot;odd&quot;&gt;&amp;#x27;;    ttf &#x3D; data.woff;    $(&amp;#x27;.font&amp;#x27;).text(&amp;#x27;&amp;#x27;).append(&amp;#x27;@font-face &amp;#123; f">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-24T08:10:21.000Z">
+<meta property="article:modified_time" content="2025-02-24T08:41:12.006Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Spider python go java Android">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学web-13题 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学web-13题"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-24 16:10" pubdate>
+          2025年2月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          18k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          151 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学web-13题</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="破题"><a href="#破题" class="headerlink" title="破题"></a>破题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-attr">success</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) &#123;<br>    <span class="hljs-keyword">var</span> s = <span class="hljs-string">&#x27;&lt;tr class=&quot;odd&quot;&gt;&#x27;</span>;<br>    ttf = data.<span class="hljs-property">woff</span>;<br>    $(<span class="hljs-string">&#x27;.font&#x27;</span>).<span class="hljs-title function_">text</span>(<span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;@font-face &#123; font-family:&quot;fonteditor&quot;;src: url(data:font/truetype;charset=utf-8;base64,&#x27;</span> + ttf + <span class="hljs-string">&#x27;); &#125;&#x27;</span>);<br>    datas = data.<span class="hljs-property">data</span>;<br>    $.<span class="hljs-title function_">each</span>(datas, <span class="hljs-keyword">function</span>(<span class="hljs-params">index, val</span>) &#123;<br>        <span class="hljs-keyword">var</span> html = <span class="hljs-string">&#x27;&lt;td class=&quot;info fonteditor&quot;&gt;&#x27;</span> + val.<span class="hljs-property">value</span> + <span class="hljs-string">&#x27;&lt;/td&gt;&#x27;</span>;<br>        s += html<br>    &#125;);<br>    $(<span class="hljs-string">&#x27;.data&#x27;</span>).<span class="hljs-title function_">text</span>(<span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">append</span>(s + <span class="hljs-string">&#x27;&lt;/tr&gt;&#x27;</span>)<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>看一下<code>13.html</code> 中的ajax 的回调，相当于每次页面中的数字每次都是根据响应中的 woff 内容加载出来的</p>
+<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs html"><br><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css"></span><br><span class="language-css">        <span class="hljs-keyword">@font-face</span> &#123;</span><br><span class="language-css">            <span class="hljs-attribute">font-family</span>: <span class="hljs-string">&#x27;PingFangSC-Regular&#x27;</span>;</span><br><span class="language-css">            <span class="hljs-attribute">src</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">data:application/font-woff;charset=utf-8;base64,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</span>)</span><br><span class="language-css">        &#125;</span><br><span class="language-css">    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;font-family: PingFangSC-Regular;&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">td</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;info fonteditor&quot;</span>&gt;</span> &amp;#xe519 &amp;#xc974 &amp;#xf296 &amp;#xb291 <span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>td 中的内容要和style 中的内容保持一致。</p>
+<h2 id="python-操作ttf"><a href="#python-操作ttf" class="headerlink" title="python 操作ttf"></a>python 操作ttf</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">response = requests.post(url, headers=headers, data=data)<br>res_data = response.json()<br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;font.ttf&#x27;</span>, <span class="hljs-string">&#x27;wb&#x27;</span>) <span class="hljs-keyword">as</span> f:<br>    f.write(base64.b64decode(res_data[<span class="hljs-string">&#x27;woff&#x27;</span>]))<br><br>font = TTFont(<span class="hljs-string">&#x27;font.ttf&#x27;</span>)  <span class="hljs-comment"># 打开本地的ttf文件</span><br>font.saveXML(<span class="hljs-string">&#x27;font.xml&#x27;</span>)  <span class="hljs-comment"># 转换成xml</span><br></code></pre></td></tr></table></figure>
+
+<p>将数据保存为ttf 和xml 后 使用<a target="_blank" rel="noopener" href="https://font.qqe2.com/#">在线工具</a> 加载字形，最后发现数据内容是</p>
+<h2 id="将字体字形数据和具体数值做一个映射"><a href="#将字体字形数据和具体数值做一个映射" class="headerlink" title="将字体字形数据和具体数值做一个映射"></a>将字体字形数据和具体数值做一个映射</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br></pre></td><td class="code"><pre><code class="hljs python">data = &#123;<br><br>    <span class="hljs-string">&#x27;0&#x27;</span>: <span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;300&quot; y=&quot;728&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;171&quot; y=&quot;729&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;107&quot; y=&quot;615&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;50&quot; y=&quot;519&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;50&quot; y=&quot;195&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;107&quot; y=&quot;99&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;171&quot; y=&quot;-14&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;427&quot; y=&quot;-14&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;493&quot; y=&quot;99&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;550&quot; y=&quot;195&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;550&quot; y=&quot;519&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;493&quot; y=&quot;615&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;427&quot; y=&quot;729&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;</span><br><span class="hljs-string">      &lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;300&quot; y=&quot;658&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;396&quot; y=&quot;658&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;438&quot; y=&quot;555&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;469&quot; y=&quot;483&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;469&quot; y=&quot;233&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;438&quot; y=&quot;159&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;396&quot; y=&quot;57&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;204&quot; y=&quot;57&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;162&quot; y=&quot;159&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;132&quot; y=&quot;233&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;132&quot; y=&quot;483&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;162&quot; y=&quot;555&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;204&quot; y=&quot;658&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&quot;1&quot;</span>: <span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;297&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;262&quot; y=&quot;674&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;160&quot; y=&quot;612&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;111&quot; y=&quot;598&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;111&quot; y=&quot;516&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;212&quot; y=&quot;546&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;279&quot; y=&quot;614&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;279&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;361&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;361&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&quot;2&quot;</span>: <span class="hljs-string">&quot;&quot;&quot;&lt;pt x=&quot;467&quot; y=&quot;352&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;537&quot; y=&quot;427&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;537&quot; y=&quot;614&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;409&quot; y=&quot;728&quot; on=&quot;0&quot;/&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&quot;3&quot;</span>: <span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;307&quot; y=&quot;728&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;205&quot; y=&quot;728&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;142&quot; y=&quot;670&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;76&quot; y=&quot;612&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;66&quot; y=&quot;508&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;147&quot; y=&quot;508&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;154&quot; y=&quot;580&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;236&quot; y=&quot;658&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;308&quot; y=&quot;657&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;378&quot; y=&quot;658&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;417&quot; y=&quot;622&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;454&quot; y=&quot;589&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;454&quot; y=&quot;469&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;379&quot; y=&quot;404&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;307&quot; y=&quot;404&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;252&quot; y=&quot;404&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;252&quot; y=&quot;340&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;310&quot; y=&quot;340&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;385&quot; y=&quot;341&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;468&quot; y=&quot;269&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;468&quot; y=&quot;142&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;425&quot; y=&quot;100&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;379&quot; y=&quot;56&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;302&quot; y=&quot;56&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;235&quot; y=&quot;57&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;190&quot; y=&quot;93&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;137&quot; y=&quot;137&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;134&quot; y=&quot;221&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;51&quot; y=&quot;221&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;60&quot; y=&quot;101&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;136&quot; y=&quot;38&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;200&quot; y=&quot;-13&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;302&quot; y=&quot;-14&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;413&quot; y=&quot;-14&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;550&quot; y=&quot;111&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;550&quot; y=&quot;208&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;550&quot; y=&quot;271&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;514&quot; y=&quot;313&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;481&quot; y=&quot;355&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;418&quot; y=&quot;374&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;535&quot; y=&quot;414&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;535&quot; y=&quot;534&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;535&quot; y=&quot;624&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;410&quot; y=&quot;728&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&quot;4&quot;</span>: <span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;384&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;24&quot; y=&quot;240&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;24&quot; y=&quot;162&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;383&quot; y=&quot;162&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;383&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;461&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;461&quot; y=&quot;162&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;577&quot; y=&quot;162&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;577&quot; y=&quot;229&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;461&quot; y=&quot;229&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;461&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;</span><br><span class="hljs-string">      &lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;380&quot; y=&quot;607&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;383&quot; y=&quot;607&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;383&quot; y=&quot;229&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;93&quot; y=&quot;229&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&quot;5&quot;</span>:<span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;105&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;67&quot; y=&quot;320&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;145&quot; y=&quot;320&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;167&quot; y=&quot;363&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;209&quot; y=&quot;384&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;249&quot; y=&quot;406&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;300&quot; y=&quot;406&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;378&quot; y=&quot;407&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;468&quot; y=&quot;313&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;468&quot; y=&quot;227&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;468&quot; y=&quot;152&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;370&quot; y=&quot;56&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;295&quot; y=&quot;56&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;229&quot; y=&quot;56&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;186&quot; y=&quot;88&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;138&quot; y=&quot;124&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;132&quot; y=&quot;192&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;51&quot; y=&quot;192&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;58&quot; y=&quot;94&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;133&quot; y=&quot;37&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;199&quot; y=&quot;-14&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;294&quot; y=&quot;-14&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;400&quot; y=&quot;-14&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;472&quot; y=&quot;51&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;549&quot; y=&quot;120&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;549&quot; y=&quot;228&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;549&quot; y=&quot;343&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;422&quot; y=&quot;473&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;320&quot; y=&quot;473&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;271&quot; y=&quot;474&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;229&quot; y=&quot;456&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;182&quot; y=&quot;438&quot; on=&quot;0&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;152&quot; y=&quot;402&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;148&quot; y=&quot;402&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;172&quot; y=&quot;641&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;520&quot; y=&quot;641&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;520&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&#x27;6&#x27;</span>:<span class="hljs-string">&quot;&quot;&quot;&lt;pt x=&quot;307&quot; y=&quot;399&quot; on=&quot;1&quot;/&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&#x27;7&#x27;</span>:<span class="hljs-string">&quot;&quot;&quot;&lt;contour&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;66&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;66&quot; y=&quot;639&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;451&quot; y=&quot;639&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;185&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;272&quot; y=&quot;0&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;535&quot; y=&quot;647&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">        &lt;pt x=&quot;535&quot; y=&quot;714&quot; on=&quot;1&quot;/&gt;</span><br><span class="hljs-string">      &lt;/contour&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&#x27;8&#x27;</span>:<span class="hljs-string">&quot;&quot;&quot;&lt;pt x=&quot;213&quot; y=&quot;344&quot; on=&quot;0&quot;/&gt;&quot;&quot;&quot;</span>,<br>    <span class="hljs-string">&#x27;9&#x27;</span>:<span class="hljs-string">&quot;&quot;&quot;&lt;pt x=&quot;294&quot; y=&quot;659&quot; on=&quot;1&quot;/&gt;&quot;&quot;&quot;</span>,<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<pre><code class="hljs">这个字形和数字的匹配结果可能不唯一。
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">reversed_dict = &#123;v: k <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> fontMap.items()&#125;<br>d = <span class="hljs-built_in">dict</span>()<br><span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> reversed_dict.items():<br>    <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> tree.xpath(<span class="hljs-string">&#x27;//TTGlyph&#x27;</span>):<br>        <span class="hljs-keyword">if</span> k.strip() <span class="hljs-keyword">in</span> <span class="hljs-built_in">str</span>(etree.tostring(w, pretty_print=<span class="hljs-literal">True</span>), <span class="hljs-string">&#x27;utf-8&#x27;</span>):<br>            d[v] = w.xpath(<span class="hljs-string">&#x27;./@name&#x27;</span>)[<span class="hljs-number">0</span>].replace(<span class="hljs-string">&#x27;uni&#x27;</span>, <span class="hljs-string">&#x27;&amp;#x&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<p>这里找到动态返回内容的临时数字对应关系</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">realNumer</span>(<span class="hljs-params">value, tem</span>):<br>    result = <span class="hljs-string">&#x27;&#x27;</span><br>    rev_maps = &#123;v: k <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> tem.items()&#125;<br><br>    temp = value.split()<br>    num1 = temp[<span class="hljs-number">0</span>]<br>    num2 = temp[<span class="hljs-number">1</span>]<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">2</span>:<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">3</span>:<br>        num3 = temp[<span class="hljs-number">2</span>]<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">100</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num3])<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">4</span>:<br>        num3 = temp[<span class="hljs-number">2</span>]<br>        num4 = temp[<span class="hljs-number">3</span>]<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">1000</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">100</span> + <span class="hljs-built_in">int</span>(rev_maps[num3]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num4])<br><br>    <span class="hljs-keyword">return</span> result<br></code></pre></td></tr></table></figure>
+
+<p>这里将每一个data 中的value 转化为数字 </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> base64<br><br><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">from</span> lxml <span class="hljs-keyword">import</span> etree<br><span class="hljs-keyword">from</span> fontTools.ttLib <span class="hljs-keyword">import</span> TTFont<br><span class="hljs-keyword">from</span> data <span class="hljs-keyword">import</span> data <span class="hljs-keyword">as</span> fontMap<br><span class="hljs-keyword">from</span> redis <span class="hljs-keyword">import</span> Redis<br><span class="hljs-keyword">from</span> json <span class="hljs-keyword">import</span> loads<br><br>parser = etree.XMLParser()<br><br>client = Redis()<br><br>headers = &#123;<br>    <span class="hljs-string">&quot;accept&quot;</span>: <span class="hljs-string">&quot;application/json, text/javascript, */*; q=0.01&quot;</span>,<br>    <span class="hljs-string">&quot;accept-language&quot;</span>: <span class="hljs-string">&quot;zh-CN,zh;q=0.9,en;q=0.8&quot;</span>,<br>    <span class="hljs-string">&quot;content-type&quot;</span>: <span class="hljs-string">&quot;application/x-www-form-urlencoded; charset=UTF-8&quot;</span>,<br>    <span class="hljs-string">&quot;origin&quot;</span>: <span class="hljs-string">&quot;https://www.python-spider.com&quot;</span>,<br>    <span class="hljs-string">&quot;referer&quot;</span>: <span class="hljs-string">&quot;https://www.python-spider.com/challenge/13&quot;</span>,<br>    <span class="hljs-string">&quot;user-agent&quot;</span>: <span class="hljs-string">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36&quot;</span>,<br>    <span class="hljs-string">&quot;x-requested-with&quot;</span>: <span class="hljs-string">&quot;XMLHttpRequest&quot;</span><br>&#125;<br>url = <span class="hljs-string">&quot;https://www.python-spider.com/api/challenge13&quot;</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">realNumer</span>(<span class="hljs-params">value, tem</span>):<br>    result = <span class="hljs-string">&#x27;&#x27;</span><br>    rev_maps = &#123;v: k <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> tem.items()&#125;<br><br>    temp = value.split()<br>    num1 = temp[<span class="hljs-number">0</span>]<br>    num2 = temp[<span class="hljs-number">1</span>]<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">2</span>:<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">3</span>:<br>        num3 = temp[<span class="hljs-number">2</span>]<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">100</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num3])<br><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(temp) == <span class="hljs-number">4</span>:<br>        num3 = temp[<span class="hljs-number">2</span>]<br>        num4 = temp[<span class="hljs-number">3</span>]<br>        result = <span class="hljs-built_in">int</span>(rev_maps[num1]) * <span class="hljs-number">1000</span> + <span class="hljs-built_in">int</span>(rev_maps[num2]) * <span class="hljs-number">100</span> + <span class="hljs-built_in">int</span>(rev_maps[num3]) * <span class="hljs-number">10</span> + <span class="hljs-built_in">int</span>(rev_maps[num4])<br><br>    <span class="hljs-keyword">return</span> result<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    sumList = []<br><br>    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">101</span>):<br><br>        <span class="hljs-built_in">print</span>(p)<br>        data = &#123;<br>            <span class="hljs-string">&quot;page&quot;</span>: p<br>        &#125;<br>        response = requests.post(url, headers=headers, data=data)<br>        res_data = loads(response.text)<br>        <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;font.ttf&#x27;</span>, <span class="hljs-string">&#x27;wb&#x27;</span>) <span class="hljs-keyword">as</span> f:<br>            f.write(base64.b64decode(res_data[<span class="hljs-string">&#x27;woff&#x27;</span>]))<br><br>        font = TTFont(<span class="hljs-string">&#x27;font.ttf&#x27;</span>)  <span class="hljs-comment"># 打开本地的ttf文件</span><br>        font.saveXML(<span class="hljs-string">&#x27;font.xml&#x27;</span>)  <span class="hljs-comment"># 转换成xml</span><br><br>        xml_data = <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;font.xml&#x27;</span>, <span class="hljs-string">&#x27;rb&#x27;</span>).read()<br>        tree = etree.fromstring(xml_data, parser=parser)<br>        reversed_dict = &#123;v: k <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> fontMap.items()&#125;<br>        d = <span class="hljs-built_in">dict</span>()<br>        <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> reversed_dict.items():<br>            <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> tree.xpath(<span class="hljs-string">&#x27;//TTGlyph&#x27;</span>):<br>                <span class="hljs-keyword">if</span> k.strip() <span class="hljs-keyword">in</span> <span class="hljs-built_in">str</span>(etree.tostring(w, pretty_print=<span class="hljs-literal">True</span>), <span class="hljs-string">&#x27;utf-8&#x27;</span>):<br>                    d[v] = w.xpath(<span class="hljs-string">&#x27;./@name&#x27;</span>)[<span class="hljs-number">0</span>].replace(<span class="hljs-string">&#x27;uni&#x27;</span>, <span class="hljs-string">&#x27;&amp;#x&#x27;</span>)<br>        <span class="hljs-built_in">print</span>(d)<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> res_data[<span class="hljs-string">&#x27;data&#x27;</span>]:<br>            <span class="hljs-keyword">if</span> j[<span class="hljs-string">&#x27;value&#x27;</span>]:<br>                real = realNumer(j[<span class="hljs-string">&#x27;value&#x27;</span>], d)<br>                sumList.append(real)<br><br><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">sum</span>(sumList))<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    main()<br><br></code></pre></td></tr></table></figure>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学web-13题</div>
+      <div>https://kingjem.github.io/2025/02/24/猿人学/猿人学Web13题实战/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月24日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/21/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web64%E9%A2%98%E5%AE%9E%E6%88%98/" title="猿人学Web64题实战">
+                        <span class="hidden-mobile">猿人学Web64题实战</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
