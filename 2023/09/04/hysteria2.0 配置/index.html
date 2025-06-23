@@ -18,19 +18,19 @@
   
     <meta name="description" content="最近hysteria发布了2.0 API与1.0 不一样 暂时没有客户端适配，只能使用原生配置的方式运行 下载发行包1curl -Lo &#x2F;root&#x2F;hysteria https:&#x2F;&#x2F;github.com&#x2F;apernet&#x2F;hysteria&#x2F;releases&#x2F;latest&#x2F;download&#x2F;hysteria-linux-amd64 &amp;&amp; chmod +x &#x2F;root&#x2F;hysteria">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hysteria2.0 配置">
+<meta property="og:title" content="hysteria2  配置">
 <meta property="og:url" content="https://kingjem.github.io/2023/09/04/hysteria2.0%20%E9%85%8D%E7%BD%AE/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
 <meta property="og:description" content="最近hysteria发布了2.0 API与1.0 不一样 暂时没有客户端适配，只能使用原生配置的方式运行 下载发行包1curl -Lo &#x2F;root&#x2F;hysteria https:&#x2F;&#x2F;github.com&#x2F;apernet&#x2F;hysteria&#x2F;releases&#x2F;latest&#x2F;download&#x2F;hysteria-linux-amd64 &amp;&amp; chmod +x &#x2F;root&#x2F;hysteria">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-04T12:30:15.000Z">
-<meta property="article:modified_time" content="2023-10-14T05:17:26.533Z">
+<meta property="article:modified_time" content="2024-06-27T05:23:34.984Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="Spider python go java Android">
+<meta property="article:tag" content="hysteria2">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>hysteria2.0 配置 - Ruhai&#39;s blogs</title>
+  <title>hysteria2  配置 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -187,7 +187,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="hysteria2.0 配置"></span>
+            <span id="subtitle" data-typed-text="hysteria2  配置"></span>
           
         </div>
 
@@ -267,7 +267,7 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">hysteria2.0 配置</h1>
+            <h1 style="display: none">hysteria2  配置</h1>
             
             <div class="markdown-body">
               
@@ -277,7 +277,7 @@
 
 
 <h2 id="Acme-申请证书"><a href="#Acme-申请证书" class="headerlink" title="Acme 申请证书"></a>Acme 申请证书</h2><p> 省略</p>
-<h2 id="创建简单配置"><a href="#创建简单配置" class="headerlink" title="创建简单配置"></a>创建简单配置</h2><h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br><span class="hljs-comment"># vim /etc/hysteria2/config.yaml</span><br><br><span class="hljs-attr">listen:</span> <span class="hljs-string">:27042</span><br><span class="hljs-attr">tls:</span><br>  <span class="hljs-attr">cert:</span> <span class="hljs-string">/root/.acme.sh/ruha11.xyz_ecc/ruha11.xyz.cer</span><br>  <span class="hljs-attr">key:</span> <span class="hljs-string">/root/.acme.sh/ruha11.xyz_ecc/ruha11.xyz.key</span><br><br><span class="hljs-attr">quic:</span><br>  <span class="hljs-attr">initStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">maxStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">initConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br>  <span class="hljs-attr">maxConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br><span class="hljs-attr">auth:</span><br>  <span class="hljs-attr">type:</span> <span class="hljs-string">password</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">chika</span><br><br><span class="hljs-attr">masquerade:</span><br>  <span class="hljs-attr">type:</span> <span class="hljs-string">proxy</span><br>  <span class="hljs-attr">proxy:</span><br>    <span class="hljs-attr">url:</span> <span class="hljs-string">https://www.lovelive-anime.jp</span><br>    <span class="hljs-attr">rewriteHost:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+<h2 id="创建简单配置"><a href="#创建简单配置" class="headerlink" title="创建简单配置"></a>创建简单配置</h2><h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br><span class="hljs-comment"># vim /etc/hysteria2/config.yaml</span><br><br><span class="hljs-attr">listen:</span> <span class="hljs-string">:27042</span><br><span class="hljs-attr">tls:</span><br>  <span class="hljs-attr">cert:</span> <span class="hljs-string">/root/.acme.sh/www.ruha11.xyz_ecc/fullchain.cer</span><br>  <span class="hljs-attr">key:</span> <span class="hljs-string">/root/.acme.sh/www.ruha11.xyz_ecc/ruha11.xyz.key</span><br><br><span class="hljs-attr">quic:</span><br>  <span class="hljs-attr">initStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">maxStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">initConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br>  <span class="hljs-attr">maxConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br><span class="hljs-attr">auth:</span><br>  <span class="hljs-attr">type:</span> <span class="hljs-string">password</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">chika</span><br><br><span class="hljs-attr">masquerade:</span><br>  <span class="hljs-attr">type:</span> <span class="hljs-string">proxy</span><br>  <span class="hljs-attr">proxy:</span><br>    <span class="hljs-attr">url:</span> <span class="hljs-string">https://www.lovelive-anime.jp</span><br>    <span class="hljs-attr">rewriteHost:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span> <span class="hljs-string">$remote_ip:27042</span><br><span class="hljs-attr">auth:</span> <span class="hljs-string">$password</span><br><span class="hljs-attr">tls:</span><br>  <span class="hljs-attr">sni:</span> <span class="hljs-string">$domain</span><br><br><span class="hljs-attr">quic:</span><br>  <span class="hljs-attr">initStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">maxStreamReceiveWindow:</span> <span class="hljs-number">16777216</span><br>  <span class="hljs-attr">initConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br>  <span class="hljs-attr">maxConnReceiveWindow:</span> <span class="hljs-number">33554432</span><br><br><span class="hljs-attr">fastOpen:</span> <span class="hljs-literal">true</span><br><span class="hljs-attr">socks5:</span><br>  <span class="hljs-attr">listen:</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span><span class="hljs-string">:50000</span><br></code></pre></td></tr></table></figure>
 
@@ -315,6 +315,13 @@
               <div class="post-metas my-3">
   
   
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/hysteria2/">#hysteria2</a>
+      
+    </div>
+  
 </div>
 
 
@@ -323,7 +330,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>hysteria2.0 配置</div>
+      <div>hysteria2  配置</div>
       <div>https://kingjem.github.io/2023/09/04/hysteria2.0 配置/</div>
     </div>
     <div class="license-meta">
