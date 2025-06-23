@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>chrouim编译(1)-代码拉取</title>
+    <link href="/2025/06/23/chrouim%E7%BC%96%E8%AF%91-1-%E4%BB%A3%E7%A0%81%E6%8B%89%E5%8F%96/"/>
+    <url>/2025/06/23/chrouim%E7%BC%96%E8%AF%91-1-%E4%BB%A3%E7%A0%81%E6%8B%89%E5%8F%96/</url>
+    
+    <content type="html"><![CDATA[<p>笔者编译浏览器环境是在Mac电脑上，安装好了git和xcode</p><h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>下载dep_tools 并且导出到环境变量</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://chromium.googlesource.com/chromium/tools/depot_tools /opt/depot_tools<br>export $PATH=$PATH:/opt/depot_tools<br></code></pre></td></tr></table></figure><h3 id="拉取代码配置信息"><a href="#拉取代码配置信息" class="headerlink" title="拉取代码配置信息"></a>拉取代码配置信息</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">gclient config https://chromium.googlesource.com/chromium/src.git<br>gclient config --cache-dir git_cache https://chromium.googlesource.com/chromium/src.git<br></code></pre></td></tr></table></figure><p><code>cat .gclient</code>查看信息 配置已经写入到文件中</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs shel">❯ cat .gclient<br>solutions = [<br>  &#123; &quot;name&quot;        : &#x27;src&#x27;,<br>    &quot;url&quot;         : &#x27;https://chromium.googlesource.com/chromium/src.git&#x27;,<br>    &quot;deps_file&quot;   : &#x27;DEPS&#x27;,<br>    &quot;managed&quot;     : True,<br>    &quot;custom_deps&quot; : &#123;<br>    &#125;,<br>    &quot;custom_vars&quot;: &#123;&#125;,<br>  &#125;,<br>]<br>cache_dir = &#x27;git_cache&#x27;<br></code></pre></td></tr></table></figure><h3 id="拉取代码"><a href="#拉取代码" class="headerlink" title="拉取代码"></a>拉取代码</h3><ol><li><p> <code>fetch --no-hooks chromium</code></p></li><li><p> <code>gclient sync </code> 拉取最新的代码</p></li><li><p><code>gclient sync --revision src@120.0.6099.312 --with_tags --with_branch_heads -D</code> 拉取指定的代码</p></li></ol><h3 id="编译浏览器"><a href="#编译浏览器" class="headerlink" title="编译浏览器"></a>编译浏览器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">gn gen out/Default --args=&#x27;is_debug=false&#x27;  #（Releas版）<br>gn gen out/Default --args=&#x27;target_cpu=&quot;x64&quot; # 指定CPU<br>gn gen out/Default --args=&#x27;target_os=&quot;android&quot; target_cpu=&quot;x86&quot;&#x27; # 给android 平台编译并且指定cpu 指令集，下同<br>gn gen out/Default --args=&#x27;target_os=&quot;android&quot; target_cpu=&quot;x64&quot;&#x27;<br>gn gen out/Default --args=&#x27;target_os=&quot;android&quot; target_cpu=&quot;arm64&quot;&#x27;<br>gn gen out/Default --args=&#x27;target_os=&quot;android&quot; target_cpu=&quot;arm&quot;<br>gn gen out/Default --args=&#x27;target_os=&quot;linux&quot; target_cpu=&quot;x64&quot; # 给linux 平台编译并且指定cpu 架构<br></code></pre></td></tr></table></figure><p>chrome 是可以做到交叉编译的，但是还是推荐在同类型的机器上做编译。</p><h3 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sh">autoninja -C out/Default chrome chromedriver<br></code></pre></td></tr></table></figure><p>编译的速度和电脑配置相关。修改代码之后代理是增量编译，因此建议拉取代码之后编译一下，后续修改速度就比较快。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>chromium编译</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Redis-Stack 使用</title>
     <link href="/2025/06/07/Redis-stack%20%E4%BD%BF%E7%94%A8/"/>
     <url>/2025/06/07/Redis-stack%20%E4%BD%BF%E7%94%A8/</url>
