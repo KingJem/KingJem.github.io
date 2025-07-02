@@ -1,0 +1,774 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="Redis-Stack 使用1. Redis-Stack 是什么Redis-Stack 是一个包含了各种 Redis 模块的综合性发行版，旨在简化开发者的使用和部署。它不仅仅是经典的 Redis 数据库，还集成了 Redis 最受欢迎的扩展功能，例如：  RedisJSON：支持存储、更新和检索 JSON 文档，让 Redis 不仅仅是键值存储，还能高效处理半结构化数据。 RedisSearch：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-Stack 使用">
+<meta property="og:url" content="https://kingjem.github.io/2025/06/07/Redis-stack%20%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="Redis-Stack 使用1. Redis-Stack 是什么Redis-Stack 是一个包含了各种 Redis 模块的综合性发行版，旨在简化开发者的使用和部署。它不仅仅是经典的 Redis 数据库，还集成了 Redis 最受欢迎的扩展功能，例如：  RedisJSON：支持存储、更新和检索 JSON 文档，让 Redis 不仅仅是键值存储，还能高效处理半结构化数据。 RedisSearch：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-06-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-01T08:28:35.718Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Spider python go java Android">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Redis-Stack 使用 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Redis-Stack 使用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-06-07 00:00" pubdate>
+          2025年6月7日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          119 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis-Stack 使用</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="Redis-Stack-使用"><a href="#Redis-Stack-使用" class="headerlink" title="Redis-Stack 使用"></a>Redis-Stack 使用</h2><h3 id="1-Redis-Stack-是什么"><a href="#1-Redis-Stack-是什么" class="headerlink" title="1. Redis-Stack 是什么"></a>1. Redis-Stack 是什么</h3><p><strong>Redis-Stack</strong> 是一个包含了各种 Redis 模块的综合性发行版，旨在简化开发者的使用和部署。它不仅仅是经典的 Redis 数据库，还集成了 Redis 最受欢迎的扩展功能，例如：</p>
+<ul>
+<li><strong>RedisJSON</strong>：支持存储、更新和检索 JSON 文档，让 Redis 不仅仅是键值存储，还能高效处理半结构化数据。</li>
+<li><strong>RedisSearch</strong>：提供强大的全文搜索、聚合和二级索引功能，使得在 Redis 中实现复杂查询变得轻而易举。</li>
+<li><strong>RedisGraph</strong>：一个图数据库模块，用于存储和查询图数据，支持 Cypher 查询语言，非常适合处理社交网络、推荐系统等场景。</li>
+<li><strong>RedisTimeSeries</strong>：用于存储和查询时间序列数据，支持聚合查询和下采样，适用于监控、IoT 等领域。</li>
+<li><strong>RedisBloom</strong>：提供了布隆过滤器 (Bloom Filter) 和 Cuckoo 过滤器等概率数据结构，用于高效地检查元素是否存在，常用于去重和缓存判断。</li>
+</ul>
+<p>Redis-Stack 的出现极大地简化了开发者在 Redis 上构建复杂应用的过程，无需单独安装和配置这些模块，开箱即用，提升了开发效率和部署便利性。</p>
+<h3 id="2-RedisJSON-使用"><a href="#2-RedisJSON-使用" class="headerlink" title="2. RedisJSON 使用"></a>2. RedisJSON 使用</h3><p><strong>RedisJSON</strong> 模块让 Redis 能够像文档数据库一样处理 JSON 数据。它提供了丰富的命令来操作 JSON 文档的各个部分，支持嵌套结构和路径查询。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> redis<br><br><span class="hljs-comment"># 连接到 Redis</span><br>r = redis.Redis()<br><br><span class="hljs-comment"># 示例数据</span><br>data = &#123;<br>    <span class="hljs-string">&#x27;dog&#x27;</span>: &#123;<br>        <span class="hljs-string">&#x27;scientific-name&#x27;</span>: <span class="hljs-string">&#x27;Canis familiaris&#x27;</span>,<br>        <span class="hljs-string">&#x27;breed&#x27;</span>: <span class="hljs-string">&#x27;Labrador&#x27;</span>,<br>        <span class="hljs-string">&#x27;age&#x27;</span>: <span class="hljs-number">3</span>,<br>        <span class="hljs-string">&#x27;toys&#x27;</span>: [<span class="hljs-string">&#x27;ball&#x27;</span>, <span class="hljs-string">&#x27;frisbee&#x27;</span>]<br>    &#125;,<br>    <span class="hljs-string">&#x27;cat&#x27;</span>: &#123;<br>        <span class="hljs-string">&#x27;scientific-name&#x27;</span>: <span class="hljs-string">&#x27;Felis catus&#x27;</span>,<br>        <span class="hljs-string">&#x27;breed&#x27;</span>: <span class="hljs-string">&#x27;Siamese&#x27;</span>,<br>        <span class="hljs-string">&#x27;age&#x27;</span>: <span class="hljs-number">2</span><br>    &#125;<br>&#125;<br><br><span class="hljs-comment"># 使用 json().set() 存储 JSON 对象</span><br><span class="hljs-comment"># &#x27;doc&#x27; 是键名，&#x27;&lt;span class=&quot;math-inline&quot;&gt;&#x27; 表示根路径，data 是要存储的 Python 字典</span><br>r\.json\(\)\.<span class="hljs-built_in">set</span>\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;&#x27;</span>, data)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;--- 存储后的数据 ---&quot;</span>)<br><span class="hljs-comment"># 使用 json().get() 获取整个 JSON 文档</span><br>doc = r.json().get(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;span class=&quot;math-inline&quot;&gt;&#x27;</span>\)<br><span class="hljs-built_in">print</span>\(<span class="hljs-string">f&quot;整个文档\: \&#123;doc\&#125;&quot;</span>\)<br>\<span class="hljs-comment"># 获取 JSON 文档中特定路径的数据</span><br>dog \= r\.json\(\)\.get\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;.dog&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;狗狗信息: <span class="hljs-subst">&#123;dog&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 获取嵌套路径的数据，例如狗狗的科学名称</span><br>scientific_name_dog = r.json().get(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;$.dog.scientific-name&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;狗狗的科学名称: <span class="hljs-subst">&#123;scientific_name_dog&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 使用 JSONPath 的深层查询 (递归下降操作符 &lt;span class=&quot;math-inline&quot;&gt;\.\.\) 来获取所有科学名称</span><br><span class="hljs-built_in">all</span>\_scientific\_names \= r\.json\(\)\.get\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;..scientific-name&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;所有科学名称: <span class="hljs-subst">&#123;all_scientific_names&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 更新 JSON 文档中的某个字段</span><br>r.json().<span class="hljs-built_in">set</span>(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;span class=&quot;math-inline&quot;&gt;\.dog\.age&#x27;</span>, <span class="hljs-number">4</span>\)<br>updated\_dog\_age \= r\.json\(\)\.get\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;.dog.age&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;更新后的狗狗年龄: <span class="hljs-subst">&#123;updated_dog_age&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 向数组中添加元素</span><br>r.json().arrappend(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;span class=&quot;math-inline&quot;&gt;\.dog\.toys&#x27;</span>, <span class="hljs-string">&#x27;rope&#x27;</span>\)<br>dog\_toys\_after\_append \= r\.json\(\)\.get\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;.dog.toys&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;添加玩具后的狗狗玩具列表: <span class="hljs-subst">&#123;dog_toys_after_append&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 删除 JSON 文档中的某个字段</span><br>r.json().delete(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;span class=&quot;math-inline&quot;&gt;\.cat\.breed&#x27;</span>\)<br>cat\_after\_delete\_breed \= r\.json\(\)\.get\(<span class="hljs-string">&#x27;doc&#x27;</span>, <span class="hljs-string">&#x27;&lt;/span&gt;.cat&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;删除猫咪品种后的信息: <span class="hljs-subst">&#123;cat_after_delete_breed&#125;</span>&quot;</span>)<br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h3 id="3-RedisBloom-使用"><a href="#3-RedisBloom-使用" class="headerlink" title="3. RedisBloom 使用"></a>3. RedisBloom 使用</h3><p><strong>RedisBloom</strong> 模块提供了一系列概率数据结构，其中最常用的是布隆过滤器 (Bloom Filter) 和 Cuckoo 过滤器。它们主要用于高效地判断一个元素是否存在于一个集合中，通常用于<strong>去重、缓存击穿防护和黑名单过滤</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> redis<br><br><span class="hljs-comment"># 连接到 Redis</span><br>r = redis.Redis()<br><br><span class="hljs-comment"># 创建一个布隆过滤器</span><br><span class="hljs-comment"># r.bf().create(&quot;bloom&quot;, 0.01, 1000)</span><br><span class="hljs-comment"># 参数解释：</span><br><span class="hljs-comment"># &quot;mybloomfilter&quot;: 布隆过滤器的键名</span><br><span class="hljs-comment"># 0.001: 错误率 (false positive probability)，表示误判的概率，越小精度越高，但占用空间越大</span><br><span class="hljs-comment"># 5000: 预期要添加的元素数量，这个值会影响布隆过滤器的大小和效率</span><br>r.bf().create(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-number">0.001</span>, <span class="hljs-number">5000</span>)<br><br><span class="hljs-comment"># 添加元素到布隆过滤器</span><br>r.bf().add(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-string">&quot;foo&quot;</span>)<br>r.bf().add(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-string">&quot;bar&quot;</span>)<br>r.bf().add(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-string">&quot;baz&quot;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;--- 布隆过滤器操作 ---&quot;</span>)<br><br><span class="hljs-comment"># 检查元素是否存在</span><br><span class="hljs-keyword">if</span> r.bf().exists(<span class="hljs-string">&#x27;mybloomfilter&#x27;</span>, <span class="hljs-string">&quot;foo&quot;</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;foo 存在于布隆过滤器中！&quot;</span>)<br><span class="hljs-keyword">else</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;foo 不存在于布隆过滤器中。&quot;</span>)<br><br><span class="hljs-keyword">if</span> r.bf().exists(<span class="hljs-string">&#x27;mybloomfilter&#x27;</span>, <span class="hljs-string">&quot;qux&quot;</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;qux 存在于布隆过滤器中！&quot;</span>)<br><span class="hljs-keyword">else</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;qux 不存在于布隆过滤器中。&quot;</span>) <span class="hljs-comment"># 预期输出：qux 不存在</span><br><br><span class="hljs-comment"># 批量添加元素</span><br>r.bf().madd(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;orange&quot;</span>, <span class="hljs-string">&quot;grape&quot;</span>)<br><br><span class="hljs-comment"># 批量检查元素</span><br>results = r.bf().mexists(<span class="hljs-string">&quot;mybloomfilter&quot;</span>, <span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;banana&quot;</span>, <span class="hljs-string">&quot;grape&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;批量检查结果 (apple, banana, grape): <span class="hljs-subst">&#123;results&#125;</span>&quot;</span>) <span class="hljs-comment"># [1, 0, 1] (1表示可能存在，0表示一定不存在)</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="RedisBloom-使用说明："><a href="#RedisBloom-使用说明：" class="headerlink" title="RedisBloom 使用说明："></a>RedisBloom 使用说明：</h4><ul>
+<li>布隆过滤器特性：<ul>
+<li><strong>高效性：</strong> 空间效率高，查询速度快。</li>
+<li><strong>概率性：</strong> 存在误判（false positive）的可能，即判断某个元素存在，但它实际上不存在。但它绝不会误报不存在（false negative），即如果布隆过滤器说一个元素不存在，那么它就一定不存在。</li>
+<li><strong>不可删除性：</strong> 一般情况下，布隆过滤器中的元素不能被单独删除，因为删除会影响其他元素的判断。</li>
+</ul>
+</li>
+</ul>
+<p>RedisBloom 在需要高效去重、避免重复处理或快速判断是否存在大量数据时非常有用，比如：</p>
+<ul>
+<li><strong>防止缓存击穿：</strong> 在查询数据库之前，先通过布隆过滤器判断数据是否存在，如果不存在则直接返回，避免大量请求直接打到数据库。</li>
+<li><strong>爬虫URL去重：</strong> 避免重复爬取相同的 URL。</li>
+<li><strong>垃圾邮件过滤：</strong> 识别已知的垃圾邮件地址。</li>
+<li><strong>推荐系统：</strong> 过滤掉用户已经看过的内容。</li>
+</ul>
+<h3 id="4-RedisSearch-使用"><a href="#4-RedisSearch-使用" class="headerlink" title="4. RedisSearch 使用"></a>4. RedisSearch 使用</h3><p><strong>RedisSearch</strong> 模块提供高性能的全文搜索、二级索引、聚合和数据过滤功能。它允许你在 Redis 中构建复杂的查询，而无需将数据迁移到其他专门的搜索数据库。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> redis<br><span class="hljs-keyword">from</span> redis.commands.search.field <span class="hljs-keyword">import</span> TagField, TextField, NumericField<br><span class="hljs-keyword">from</span> redis.commands.search.query <span class="hljs-keyword">import</span> Query<br><br><span class="hljs-comment"># 连接到 Redis</span><br>r = redis.Redis()<br><br><span class="hljs-comment"># 定义索引 schema</span><br><span class="hljs-comment"># 定义字段，TagField 适用于精确匹配和过滤，TextField 适用于全文搜索，NumericField 适用于数值范围查询</span><br>schema = (<br>    TagField(<span class="hljs-string">&quot;brand&quot;</span>, as_name=<span class="hljs-string">&quot;brand&quot;</span>),<br>    TextField(<span class="hljs-string">&quot;model&quot;</span>, as_name=<span class="hljs-string">&quot;model&quot;</span>, sortable=<span class="hljs-literal">True</span>), <span class="hljs-comment"># sortable=True 允许按此字段排序</span><br>    NumericField(<span class="hljs-string">&quot;year&quot;</span>, as_name=<span class="hljs-string">&quot;year&quot;</span>),<br>    NumericField(<span class="hljs-string">&quot;price&quot;</span>, as_name=<span class="hljs-string">&quot;price&quot;</span>, sortable=<span class="hljs-literal">True</span>)<br>)<br><br><span class="hljs-comment"># 创建索引</span><br><span class="hljs-comment"># &quot;idx:cars&quot; 是索引名称</span><br><span class="hljs-comment"># prefix=[&quot;car:&quot;] 表示只有键名前缀为 &quot;car:&quot; 的数据才会被索引</span><br>r.ft(<span class="hljs-string">&quot;idx:cars&quot;</span>).create_index(schema, prefix=[<span class="hljs-string">&quot;car:&quot;</span>])<br><br><span class="hljs-comment"># 添加一些车辆数据 (使用 HSET 来存储数据，RedisSearch 会从哈希中读取字段)</span><br>r.hset(<span class="hljs-string">&quot;car:1&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;Toyota&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;Camry&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2020</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">25000</span>&#125;)<br>r.hset(<span class="hljs-string">&quot;car:2&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;Honda&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;Civic&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2022</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">22000</span>&#125;)<br>r.hset(<span class="hljs-string">&quot;car:3&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;Toyota&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;Corolla&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2021</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">23000</span>&#125;)<br>r.hset(<span class="hljs-string">&quot;car:4&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;BMW&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;X5&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2023</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">60000</span>&#125;)<br>r.hset(<span class="hljs-string">&quot;car:5&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;Mercedes&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;C-Class&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2022</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">55000</span>&#125;)<br>r.hset(<span class="hljs-string">&quot;car:6&quot;</span>, mapping=&#123;<span class="hljs-string">&quot;brand&quot;</span>: <span class="hljs-string">&quot;Honda&quot;</span>, <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;CRV&quot;</span>, <span class="hljs-string">&quot;year&quot;</span>: <span class="hljs-number">2023</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">30000</span>&#125;)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;--- RedisSearch 查询 ---&quot;</span>)<br><br><span class="hljs-comment"># 全文搜索：查找包含 &quot;Honda&quot; 或 &quot;Toyota&quot; 的汽车</span><br>query = Query(<span class="hljs-string">&quot;Honda | Toyota&quot;</span>)<br>result = r.ft(<span class="hljs-string">&quot;idx:cars&quot;</span>).search(query)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;搜索 &#x27;Honda | Toyota&#x27; 的结果 (<span class="hljs-subst">&#123;result.total&#125;</span> 条):&quot;</span>)<br><span class="hljs-keyword">for</span> doc <span class="hljs-keyword">in</span> result.docs:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  Brand: <span class="hljs-subst">&#123;doc.brand&#125;</span>, Model: <span class="hljs-subst">&#123;doc.model&#125;</span>, Year: <span class="hljs-subst">&#123;doc.year&#125;</span>, Price: <span class="hljs-subst">&#123;doc.price&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 组合查询：查找品牌为 &quot;Toyota&quot; 且年份大于 2020 的汽车</span><br>query = Query(<span class="hljs-string">&quot;@brand:&#123;Toyota&#125; @year:[2021 2023]&quot;</span>) <span class="hljs-comment"># 使用 @field:&#123;value&#125; 语法进行标签/精确匹配，[min max] 进行数值范围</span><br>result = r.ft(<span class="hljs-string">&quot;idx:cars&quot;</span>).search(query)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n搜索 &#x27;Toyota&#x27; 且年份在 2021-2023 的结果 (<span class="hljs-subst">&#123;result.total&#125;</span> 条):&quot;</span>)<br><span class="hljs-keyword">for</span> doc <span class="hljs-keyword">in</span> result.docs:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  Brand: <span class="hljs-subst">&#123;doc.brand&#125;</span>, Model: <span class="hljs-subst">&#123;doc.model&#125;</span>, Year: <span class="hljs-subst">&#123;doc.year&#125;</span>, Price: <span class="hljs-subst">&#123;doc.price&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 排序和限制结果</span><br>query = Query(<span class="hljs-string">&quot;*&quot;</span>).sort_by(<span class="hljs-string">&quot;price&quot;</span>, asc=<span class="hljs-literal">False</span>).return_field(<span class="hljs-string">&quot;model&quot;</span>).return_field(<span class="hljs-string">&quot;price&quot;</span>).paging(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>) <span class="hljs-comment"># 按价格降序，只返回model和price，取前3条</span><br>result = r.ft(<span class="hljs-string">&quot;idx:cars&quot;</span>).search(query)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n按价格降序排列的前3辆车 (<span class="hljs-subst">&#123;result.total&#125;</span> 条):&quot;</span>)<br><span class="hljs-keyword">for</span> doc <span class="hljs-keyword">in</span> result.docs:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  Model: <span class="hljs-subst">&#123;doc.model&#125;</span>, Price: <span class="hljs-subst">&#123;doc.price&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 删除索引 (如果需要重新创建或清理)</span><br><span class="hljs-comment"># r.ft(&quot;idx:cars&quot;).dropindex()</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="RedisSearch-使用说明："><a href="#RedisSearch-使用说明：" class="headerlink" title="RedisSearch 使用说明："></a>RedisSearch 使用说明：</h4><ul>
+<li><strong>索引创建：</strong> 使用 <code>ft().create_index()</code> 定义要索引的字段和类型。</li>
+<li><strong>数据存储：</strong> RedisSearch 可以索引 Redis <strong>Hash</strong> 或 <strong>JSON</strong> 数据类型的数据。在示例中，我们使用 <code>HSET</code> 存储车辆信息。</li>
+<li><strong>查询语法：</strong> RedisSearch 支持一套丰富的查询语法，包括全文搜索、标签过滤、数值范围、地理空间查询等。</li>
+<li><strong>性能：</strong> 通过倒排索引和高效的数据结构，RedisSearch 能够提供非常快的搜索速度。</li>
+</ul>
+<p>RedisSearch 是构建实时搜索、数据过滤和分析应用的关键工具</p>
+<h3 id="5-RedisGraph-使用"><a href="#5-RedisGraph-使用" class="headerlink" title="5. RedisGraph 使用"></a>5. RedisGraph 使用</h3><p><strong>RedisGraph</strong> 是一个高性能的图数据库模块，它利用稀疏邻接矩阵存储图数据，并使用 Cypher 查询语言进行数据操作。它非常适合处理节点和关系之间复杂连接的数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> redis<br><span class="hljs-keyword">from</span> redis.commands.graph <span class="hljs-keyword">import</span> Graph<br><br><span class="hljs-comment"># 连接到 Redis</span><br>r = redis.Redis()<br><span class="hljs-comment"># 获取 RedisGraph 客户端实例</span><br>graph = Graph(r, <span class="hljs-string">&quot;social-network&quot;</span>) <span class="hljs-comment"># &quot;social-network&quot; 是图的名称</span><br><br><span class="hljs-comment"># 清理旧数据 (可选，用于每次运行示例时重置图)</span><br><span class="hljs-comment"># graph.delete()</span><br><br><span class="hljs-comment"># 创建节点和关系</span><br><span class="hljs-comment"># 使用 Cypher 语言定义图结构</span><br><span class="hljs-comment"># CREATE (:Person &#123;name: &#x27;Alice&#x27;, age: 30&#125;)</span><br><span class="hljs-comment"># CREATE (:Person &#123;name: &#x27;Bob&#x27;, age: 25&#125;)</span><br><span class="hljs-comment"># CREATE (:Person &#123;name: &#x27;Charlie&#x27;, age: 35&#125;)</span><br><span class="hljs-comment"># CREATE (:Movie &#123;title: &#x27;Inception&#x27;, release_year: 2010&#125;)</span><br><span class="hljs-comment"># CREATE (:Movie &#123;title: &#x27;The Matrix&#x27;, release_year: 1999&#125;)</span><br><span class="hljs-comment"># CREATE (p1:Person &#123;name: &#x27;Alice&#x27;&#125;)-[:FRIENDS_WITH]-&gt;(p2:Person &#123;name: &#x27;Bob&#x27;&#125;)</span><br><span class="hljs-comment"># CREATE (p1)-[:WATCHED &#123;rating: 9&#125;]-&gt;(m1:Movie &#123;title: &#x27;Inception&#x27;&#125;)</span><br><span class="hljs-comment"># CREATE (p2)-[:WATCHED &#123;rating: 8&#125;]-&gt;(m1)</span><br><span class="hljs-comment"># CREATE (p3:Person &#123;name: &#x27;Charlie&#x27;&#125;)-[:FRIENDS_WITH]-&gt;(p1)</span><br><br>query_create = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">CREATE (:Person &#123;name: &#x27;Alice&#x27;, age: 30&#125;),</span><br><span class="hljs-string">       (:Person &#123;name: &#x27;Bob&#x27;, age: 25&#125;),</span><br><span class="hljs-string">       (:Person &#123;name: &#x27;Charlie&#x27;, age: 35&#125;),</span><br><span class="hljs-string">       (:Movie &#123;title: &#x27;Inception&#x27;, release_year: 2010&#125;),</span><br><span class="hljs-string">       (:Movie &#123;title: &#x27;The Matrix&#x27;, release_year: 1999&#125;),</span><br><span class="hljs-string">       (:Movie &#123;title: &#x27;Dune&#x27;, release_year: 2021&#125;),</span><br><span class="hljs-string">       (a:Person &#123;name: &#x27;Alice&#x27;&#125;)-[:FRIENDS_WITH]-&gt;(b:Person &#123;name: &#x27;Bob&#x27;&#125;),</span><br><span class="hljs-string">       (a)-[:WATCHED &#123;rating: 9&#125;]-&gt;(i:Movie &#123;title: &#x27;Inception&#x27;&#125;),</span><br><span class="hljs-string">       (b)-[:WATCHED &#123;rating: 8&#125;]-&gt;(i),</span><br><span class="hljs-string">       (c:Person &#123;name: &#x27;Charlie&#x27;&#125;)-[:FRIENDS_WITH]-&gt;(a),</span><br><span class="hljs-string">       (a)-[:WATCHED &#123;rating: 7&#125;]-&gt;(:Movie &#123;title: &#x27;Dune&#x27;&#125;)</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>graph.query(query_create)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;--- RedisGraph 查询 ---&quot;</span>)<br><br><span class="hljs-comment"># 查询：查找所有 Person 节点</span><br>query_persons = <span class="hljs-string">&quot;MATCH (p:Person) RETURN p.name, p.age&quot;</span><br>result_persons = graph.query(query_persons)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;所有人物:&quot;</span>)<br><span class="hljs-keyword">for</span> record <span class="hljs-keyword">in</span> result_persons.result_set:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  姓名: <span class="hljs-subst">&#123;record[<span class="hljs-number">0</span>]&#125;</span>, 年龄: <span class="hljs-subst">&#123;record[<span class="hljs-number">1</span>]&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 查询：查找观看过 &#x27;Inception&#x27; 且评分大于 8 的人</span><br>query_watched_inception = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">MATCH (p:Person)-[w:WATCHED]-&gt;(m:Movie)</span><br><span class="hljs-string">WHERE m.title = &#x27;Inception&#x27; AND w.rating &gt; 8</span><br><span class="hljs-string">RETURN p.name AS Viewer, w.rating AS Rating, m.title AS MovieTitle</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>result_watched = graph.query(query_watched_inception)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;\n观看 &#x27;Inception&#x27; 且评分大于 8 的人:&quot;</span>)<br><span class="hljs-keyword">for</span> record <span class="hljs-keyword">in</span> result_watched.result_set:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  观看者: <span class="hljs-subst">&#123;record[<span class="hljs-number">0</span>]&#125;</span>, 评分: <span class="hljs-subst">&#123;record[<span class="hljs-number">1</span>]&#125;</span>, 电影: <span class="hljs-subst">&#123;record[<span class="hljs-number">2</span>]&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 查询：查找 Alice 的所有朋友以及他们观看过的电影</span><br>query_alice_friends_movies = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">MATCH (alice:Person &#123;name: &#x27;Alice&#x27;&#125;)-[:FRIENDS_WITH]-(friend:Person)</span><br><span class="hljs-string">OPTIONAL MATCH (friend)-[:WATCHED]-&gt;(movie:Movie)</span><br><span class="hljs-string">RETURN friend.name AS FriendName, COLLECT(movie.title) AS WatchedMovies</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>result_friends_movies = graph.query(query_alice_friends_movies)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;\nAlice 的朋友及他们观看的电影:&quot;</span>)<br><span class="hljs-keyword">for</span> record <span class="hljs-keyword">in</span> result_friends_movies.result_set:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  朋友: <span class="hljs-subst">&#123;record[<span class="hljs-number">0</span>]&#125;</span>, 观看的电影: <span class="hljs-subst">&#123;record[<span class="hljs-number">1</span>] <span class="hljs-keyword">if</span> record[<span class="hljs-number">1</span>] <span class="hljs-keyword">else</span> <span class="hljs-string">&#x27;无&#x27;</span>&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 删除整个图 (可选，用于清理)</span><br><span class="hljs-comment"># graph.delete()</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="RedisGraph-使用说明："><a href="#RedisGraph-使用说明：" class="headerlink" title="RedisGraph 使用说明："></a>RedisGraph 使用说明：</h4><ul>
+<li><strong>图模型：</strong> RedisGraph 使用<strong>节点 (Nodes)</strong> 和<strong>关系 (Relationships)</strong> 来表示数据，每个节点和关系都可以有属性。</li>
+<li><strong>Cypher 查询语言：</strong> RedisGraph 使用 Cypher，这是一种声明式图查询语言，语法直观且功能强大。</li>
+<li><strong>应用场景：</strong> 非常适合处理复杂关联数据，如社交网络分析、推荐系统、知识图谱、网络拓扑管理等。</li>
+</ul>
+<p>RedisGraph 提供了在 Redis 生态系统中构建高性能图应用的能力，无需引入独立的图数据库。</p>
+<h3 id="6-RedisTimeSeries-使用"><a href="#6-RedisTimeSeries-使用" class="headerlink" title="6. RedisTimeSeries 使用"></a>6. RedisTimeSeries 使用</h3><p><strong>RedisTimeSeries</strong> 模块用于存储和查询时间序列数据。它针对时间序列数据进行了优化，支持高吞吐量的写入和查询，并提供了聚合、下采样、数据保留策略等功能。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> redis<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime, timedelta<br><br><span class="hljs-comment"># 连接到 Redis</span><br>r = redis.Redis()<br><br><span class="hljs-comment"># 创建时间序列 (可选，如果已存在则跳过)</span><br><span class="hljs-comment"># r.ts().create(&quot;sensor:temperature&quot;) # 创建一个名为 &quot;sensor:temperature&quot; 的时间序列</span><br><span class="hljs-comment"># r.ts().create(&quot;sensor:humidity&quot;, retention_msecs=60 * 60 * 1000) # 设置数据保留时间为 1 小时</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;--- RedisTimeSeries 操作 ---&quot;</span>)<br><br><span class="hljs-comment"># 添加数据点</span><br><span class="hljs-comment"># ts().add(key, timestamp, value, **kwargs)</span><br><span class="hljs-comment"># timestamp 可以是 Unix 毫秒时间戳，也可以是 &#x27;*&#x27; 表示当前时间</span><br><br><span class="hljs-comment"># 记录当前时间</span><br>now_ms = <span class="hljs-built_in">int</span>(time.time() * <span class="hljs-number">1000</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;添加数据点...&quot;</span>)<br><span class="hljs-comment"># 模拟在不同时间点添加温度数据</span><br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, now_ms, <span class="hljs-number">25.5</span>)<br>time.sleep(<span class="hljs-number">0.1</span>) <span class="hljs-comment"># 模拟时间流逝</span><br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, now_ms + <span class="hljs-number">100</span>, <span class="hljs-number">25.7</span>)<br>time.sleep(<span class="hljs-number">0.1</span>)<br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, now_ms + <span class="hljs-number">200</span>, <span class="hljs-number">25.8</span>)<br>time.sleep(<span class="hljs-number">0.1</span>)<br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, now_ms + <span class="hljs-number">300</span>, <span class="hljs-number">26.0</span>)<br>time.sleep(<span class="hljs-number">0.1</span>)<br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, now_ms + <span class="hljs-number">400</span>, <span class="hljs-number">25.9</span>)<br><br><span class="hljs-comment"># 也可以直接使用 &#x27;*&#x27; 作为时间戳，Redis 会自动使用当前服务器时间</span><br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, <span class="hljs-string">&#x27;*&#x27;</span>, <span class="hljs-number">26.1</span>)<br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, <span class="hljs-string">&#x27;*&#x27;</span>, <span class="hljs-number">26.2</span>)<br>r.ts().add(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, <span class="hljs-string">&#x27;*&#x27;</span>, <span class="hljs-number">26.0</span>)<br><br><span class="hljs-comment"># 获取最新的数据点</span><br>latest_temperature = r.ts().get(<span class="hljs-string">&quot;sensor:temperature&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n最新温度: <span class="hljs-subst">&#123;latest_temperature&#125;</span>&quot;</span>) <span class="hljs-comment"># (时间戳, 值)</span><br><br><span class="hljs-comment"># 查询时间范围数据</span><br><span class="hljs-comment"># 从过去 5 秒到现在的温度数据</span><br>five_seconds_ago_ms = <span class="hljs-built_in">int</span>((datetime.now() - timedelta(seconds=<span class="hljs-number">5</span>)).timestamp() * <span class="hljs-number">1000</span>)<br>range_data = r.ts().<span class="hljs-built_in">range</span>(<span class="hljs-string">&quot;sensor:temperature&quot;</span>, five_seconds_ago_ms, now_ms + <span class="hljs-number">1000</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n过去几秒的温度数据 (<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(range_data)&#125;</span> 条):&quot;</span>)<br><span class="hljs-keyword">for</span> ts, val <span class="hljs-keyword">in</span> range_data:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  时间: <span class="hljs-subst">&#123;datetime.fromtimestamp(ts / <span class="hljs-number">1000</span>).strftime(<span class="hljs-string">&#x27;%H:%M:%S.%f&#x27;</span>)[:-<span class="hljs-number">3</span>]&#125;</span>, 值: <span class="hljs-subst">&#123;val&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 使用聚合查询：获取过去 10 秒内每 1 秒的平均温度</span><br><span class="hljs-comment"># from_timestamp_ms = int((datetime.now() - timedelta(seconds=10)).timestamp() * 1000)</span><br><span class="hljs-comment"># to_timestamp_ms = int(datetime.now().timestamp() * 1000)</span><br>from_timestamp_ms = now_ms - <span class="hljs-number">1000</span> <span class="hljs-comment"># 从初始时间戳开始的1秒前</span><br>to_timestamp_ms = now_ms + <span class="hljs-number">10000</span> <span class="hljs-comment"># 初始时间戳的10秒后</span><br><br><br>aggregated_data = r.ts().<span class="hljs-built_in">range</span>(<br>    <span class="hljs-string">&quot;sensor:temperature&quot;</span>,<br>    from_timestamp_ms,<br>    to_timestamp_ms,<br>    aggregation_type=<span class="hljs-string">&#x27;AVG&#x27;</span>, <span class="hljs-comment"># 聚合类型：平均值 (SUM, MIN, MAX, COUNT, FIRST, LAST, STDD.P, VAR.P 等)</span><br>    bucket_size_msec=<span class="hljs-number">1000</span> <span class="hljs-comment"># 桶大小：每 1000 毫秒 (1 秒) 聚合一次</span><br>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n过去几秒每秒平均温度 (<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(aggregated_data)&#125;</span> 条):&quot;</span>)<br><span class="hljs-keyword">for</span> ts, val <span class="hljs-keyword">in</span> aggregated_data:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  时间: <span class="hljs-subst">&#123;datetime.fromtimestamp(ts / <span class="hljs-number">1000</span>).strftime(<span class="hljs-string">&#x27;%H:%M:%S&#x27;</span>)&#125;</span>, 平均值: <span class="hljs-subst">&#123;val&#125;</span>&quot;</span>)<br><br><span class="hljs-comment"># 获取时间序列信息</span><br>info = r.ts().info(<span class="hljs-string">&quot;sensor:temperature&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n时间序列 &#x27;sensor:temperature&#x27; 的信息: <span class="hljs-subst">&#123;info&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="RedisTimeSeries-使用说明："><a href="#RedisTimeSeries-使用说明：" class="headerlink" title="RedisTimeSeries 使用说明："></a>RedisTimeSeries 使用说明：</h4><ul>
+<li><strong>数据点：</strong> 每个数据点由一个<strong>时间戳</strong>和一个<strong>值</strong>组成。时间戳通常是 Unix 毫秒时间戳。</li>
+<li><strong>创建：</strong> <code>ts().create()</code> 用于创建时间序列，可以设置保留时间 (<code>retention_msecs</code>)。</li>
+<li><strong>添加：</strong> <code>ts().add()</code> 用于添加数据点。</li>
+<li><strong>查询：</strong> <code>ts().range()</code> 用于查询某个时间范围内的数据，并支持各种聚合类型（如 <code>AVG</code>, <code>SUM</code>, <code>MIN</code>, <code>MAX</code>）和桶大小 (<code>bucket_size_msec</code>) 进行下采样。</li>
+<li><strong>性能：</strong> RedisTimeSeries 采用特殊的数据结构来存储时间序列数据，以实现高效的写入和查询。</li>
+</ul>
+<p>RedisTimeSeries 适用于需要处理大量时间序列数据的场景，如：</p>
+<ul>
+<li><strong>物联网 (IoT) 数据：</strong> 传感器数据采集和分析。</li>
+<li><strong>监控和警报：</strong> 系统性能指标监控。</li>
+<li><strong>金融数据：</strong> 股票价格、交易量等。</li>
+<li><strong>日志分析：</strong> 记录和查询事件发生频率。</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="category-chain-item">开发环境搭建</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Redis-Stack 使用</div>
+      <div>https://kingjem.github.io/2025/06/07/Redis-stack 使用/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年6月7日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/06/23/%E9%98%BF%E9%87%8C%E4%BA%91%E9%80%9A%E8%BF%87sdk%E6%B7%BB%E5%8A%A0%E5%AE%89%E5%85%A8%E7%BB%84/" title="阿里云通过sdk添加安全组">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">阿里云通过sdk添加安全组</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/25/docker/%E4%BD%BF%E7%94%A8docker%20%E8%BF%90%E8%A1%8Cdp/" title="docker运行dp可视化教程">
+                        <span class="hidden-mobile">docker运行dp可视化教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

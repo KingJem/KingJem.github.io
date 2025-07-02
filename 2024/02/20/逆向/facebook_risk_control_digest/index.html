@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="Facebook风控与账号环境策略摘要本文档旨在总结Facebook平台风控的核心要点，并提供一套关于账号购买、环境搭建和“养号”的最佳实践策略。内容整合自fb风控.md及相关公开资源。 1. 核心风控原则：模拟真实用户Facebook的风控系统极其复杂，其核心目标是识别并限制非真实、自动化的或有滥用倾向的账号。因此，所有规避策略的出发点都应该是 **“像一个真实用户一样行事”**。 2. 账号来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Facebook风控与账号环境策略摘要">
+<meta property="og:url" content="https://kingjem.github.io/2024/02/20/%E9%80%86%E5%90%91/facebook_risk_control_digest/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="Facebook风控与账号环境策略摘要本文档旨在总结Facebook平台风控的核心要点，并提供一套关于账号购买、环境搭建和“养号”的最佳实践策略。内容整合自fb风控.md及相关公开资源。 1. 核心风控原则：模拟真实用户Facebook的风控系统极其复杂，其核心目标是识别并限制非真实、自动化的或有滥用倾向的账号。因此，所有规避策略的出发点都应该是 **“像一个真实用户一样行事”**。 2. 账号来">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-02T06:12:13.979Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="facebook">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Facebook风控与账号环境策略摘要 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Facebook风控与账号环境策略摘要"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-20 00:00" pubdate>
+          2024年2月20日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          15 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Facebook风控与账号环境策略摘要</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="Facebook风控与账号环境策略摘要"><a href="#Facebook风控与账号环境策略摘要" class="headerlink" title="Facebook风控与账号环境策略摘要"></a>Facebook风控与账号环境策略摘要</h1><p>本文档旨在总结Facebook平台风控的核心要点，并提供一套关于账号购买、环境搭建和“养号”的最佳实践策略。内容整合自<code>fb风控.md</code><br>及相关公开资源。</p>
+<h2 id="1-核心风控原则：模拟真实用户"><a href="#1-核心风控原则：模拟真实用户" class="headerlink" title="1. 核心风控原则：模拟真实用户"></a>1. 核心风控原则：模拟真实用户</h2><p>Facebook的风控系统极其复杂，其核心目标是识别并限制非真实、自动化的或有滥用倾向的账号。因此，所有规避策略的出发点都应该是 *<br>*“像一个真实用户一样行事”**。</p>
+<h2 id="2-账号来源与选择"><a href="#2-账号来源与选择" class="headerlink" title="2. 账号来源与选择"></a>2. 账号来源与选择</h2><p>对于需要批量操作或进行广告投放的用户来说，直接注册新号的成功率极低且不稳定。因此，从专业的服务商处购买现有账号是行业内的普遍做法。</p>
+<h3 id="推荐的账号类型："><a href="#推荐的账号类型：" class="headerlink" title="推荐的账号类型："></a>推荐的账号类型：</h3><ul>
+<li><strong>耐用老号</strong>: 注册时间越长（例如，一年以上），账号的信任权重通常越高，抗风控能力越强。</li>
+<li><strong>友缘号/真人好友号</strong>: 账号内已有一定数量的真实好友和互动记录，这会大大增加账号的“真实性”评分。</li>
+<li><strong>带双重验证 (2FA) 的账号</strong>: 2FA是账号安全的基础，也是一个重要的信任信号。</li>
+<li><strong>特定国家/地区的账号</strong>: 用于本地化业务时，使用目标地区的账号可以降低因IP地址与账号注册地不匹配而引发的风险。</li>
+</ul>
+<h3 id="账号购买渠道示例："><a href="#账号购买渠道示例：" class="headerlink" title="账号购买渠道示例："></a>账号购买渠道示例：</h3><ul>
+<li><code>ppfacebook.com</code>: 提供各类FB账号、TikTok账号等。</li>
+<li><code>fbdlz.com</code>: (根据URL推测) 可能也是一个账号分销平台。</li>
+</ul>
+<p><strong>注意</strong>: 购买账号本身存在风险，请选择信誉良好的服务商。</p>
+<h2 id="3-安全登录与环境隔离"><a href="#3-安全登录与环境隔离" class="headerlink" title="3. 安全登录与环境隔离"></a>3. 安全登录与环境隔离</h2><p>环境问题是导致账号被封的最主要原因之一。Facebook会严格检测IP地址、浏览器指纹、设备信息等环境因素。</p>
+<h3 id="3-1-登录技巧"><a href="#3-1-登录技巧" class="headerlink" title="3.1. 登录技巧"></a>3.1. 登录技巧</h3><ul>
+<li><strong>安全登录网址</strong>: 使用 <code>mbasic.facebook.com</code> 或 <code>d.facebook.com</code> (移动基础版) 进行首次登录。这种方式加载的资源较少，可以降低被检测的风险。</li>
+<li><strong>登录流程</strong>:<ol>
+<li>在 <code>mbasic.facebook.com</code> 成功登录。</li>
+<li>保持窗口开启，等待几分钟，让账号状态稳定。</li>
+<li>再切换到 <code>www.facebook.com</code> 进入正常的网页版。</li>
+</ol>
+</li>
+<li><strong>Cookie登录</strong>: 相比账号密码登录，直接导入Cookie登录可以绕过部分登录验证，被认为是更安全的方式。</li>
+</ul>
+<h3 id="3-2-环境隔离方案"><a href="#3-2-环境隔离方案" class="headerlink" title="3.2. 环境隔离方案"></a>3.2. 环境隔离方案</h3><p><strong>目标</strong>：确保每个Facebook账号都在一个独立、干净、固定的环境中运行，避免账号之间产生关联。</p>
+<ul>
+<li><p><strong>VPS + 指纹浏览器 (推荐)</strong>: 这是目前最主流的方案。</p>
+<ul>
+<li><strong>VPS (Virtual Private Server)</strong>: 提供一个固定的、独立的IP地址。</li>
+<li><strong>指纹浏览器 (如 AdsPower, Multilogin)</strong>: 可以为每个账号模拟独一无二的浏览器环境（包括User-Agent, Canvas, WebGL,<br>字体等），有效防止因浏览器指纹相同而导致的账号关联。</li>
+</ul>
+</li>
+<li><p><strong>VPS方案的成本与风险</strong>:</p>
+<ul>
+<li>直接在同一个VPS上登录多个账号，无法做到IP隔离，风险极高。</li>
+<li>一个折中的低成本方案是：<strong>一个独立IP的VPS内，登录不超过5个账号</strong>。虽然这并非绝对安全，但在成本和风险之间取得了一定的平衡。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-“养号”操作指南"><a href="#4-“养号”操作指南" class="headerlink" title="4. “养号”操作指南"></a>4. “养号”操作指南</h2><p>“养号”是指在新账号到手后，通过一系列模拟真人操作的行为，逐步提升账号的信任度和权重，使其能够承载后续的营销或广告活动。这是一个循序渐进的过程，切忌操之过急。</p>
+<h3 id="养号核心步骤-基于知乎链接标题推断并结合行业知识"><a href="#养号核心步骤-基于知乎链接标题推断并结合行业知识" class="headerlink" title="养号核心步骤 (基于知乎链接标题推断并结合行业知识):"></a>养号核心步骤 (基于知乎链接标题推断并结合行业知识):</h3><ol>
+<li><p><strong>初期稳定 (第1-3天)</strong>:</p>
+<ul>
+<li>登录后，除了完善个人资料（头像、封面照片），<strong>不要进行任何敏感操作</strong>。</li>
+<li>每天花少量时间（15-20分钟）随意浏览动态、看看视频。</li>
+</ul>
+</li>
+<li><p><strong>建立社交联系 (第4-7天)</strong>:</p>
+<ul>
+<li>开始搜索并添加少量推荐好友，或加入一些兴趣小组。</li>
+<li>每天添加好友不超过5个，避免过于频繁。</li>
+<li>对好友的帖子进行少量点赞、评论等互动。</li>
+</ul>
+</li>
+<li><p><strong>内容输出与互动 (第8-14天)</strong>:</p>
+<ul>
+<li>开始尝试发布简单的个人动态（如文字、图片）。</li>
+<li>在兴趣小组内进行有意义的互动，而不是简单的发帖。</li>
+<li>保持每天登录并进行少量互动。</li>
+</ul>
+</li>
+<li><p><strong>功能试探 (15天以后)</strong>:</p>
+<ul>
+<li>如果需要，可以开始尝试创建粉丝页 (Fan Page)。</li>
+<li>对于广告账号，可以先开通广告账户，但不要立即投放广告。先让账户“静置”一段时间。</li>
+</ul>
+</li>
+</ol>
+<p><strong>养号关键禁忌</strong>:</p>
+<ul>
+<li><strong>短时间内大量加友/发帖</strong>。</li>
+<li><strong>频繁修改个人资料</strong>。</li>
+<li><strong>登录IP地址频繁变动</strong>。</li>
+<li><strong>发布大量链接或明显的广告内容</strong>。</li>
+<li><strong>一登录就创建主页或广告</strong>。</li>
+</ul>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>成功的Facebook运营始于对风控的理解和尊重。通过 <strong>购买高质量的源账号</strong>、<strong>搭建稳定隔离的登录环境</strong>、以及 **耐心细致地执行养号策略<br>**，可以最大限度地降低账号被封的风险，为后续的业务开展打下坚实的基础。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/facebook/">#facebook</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Facebook风控与账号环境策略摘要</div>
+      <div>https://kingjem.github.io/2024/02/20/逆向/facebook_risk_control_digest/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月20日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/05/%E9%80%86%E5%90%91/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91--frida%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%85%B6%E5%BA%94%E5%AF%B9%E6%96%B9%E6%B3%95/" title="转载- frida检测及其应对方法">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">转载- frida检测及其应对方法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/14/%E9%80%86%E5%90%91/%E4%BA%94%E7%A7%92%E7%9B%BE%E5%AF%B9%E6%8A%97/" title="五秒盾对抗系列">
+                        <span class="hidden-mobile">五秒盾对抗系列</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

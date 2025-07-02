@@ -1,0 +1,773 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="Spider python go java Android">
+  
+    <meta name="description" content="由WebStorm引发的疑问起因是这样，我想在 webstrom中使用cropto-js,安装导入后却没有任何和这个类相关的代码提示，但是在vscode 中确实会有代码提示，这个真的真的不能忍，  搜索了一圈发现要在WebStrom 中这这样设置 依次打开 settings -&gt; Languages &amp;&amp; Frameworks-&gt; JavaScript -&gt; Li">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python与代码提示">
+<meta property="og:url" content="https://kingjem.github.io/2023/09/17/python/python%E4%B8%8E%E4%BB%A3%E7%A0%81%E6%8F%90%E7%A4%BA/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="由WebStorm引发的疑问起因是这样，我想在 webstrom中使用cropto-js,安装导入后却没有任何和这个类相关的代码提示，但是在vscode 中确实会有代码提示，这个真的真的不能忍，  搜索了一圈发现要在WebStrom 中这这样设置 依次打开 settings -&gt; Languages &amp;&amp; Frameworks-&gt; JavaScript -&gt; Li">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2023/09/24/NHDnMzThg8YQicG.png">
+<meta property="og:image" content="https://s2.loli.net/2023/09/24/McUhO267TtxFXrb.png">
+<meta property="og:image" content="https://s2.loli.net/2023/09/24/stOGLiY5bMxQuo6.png">
+<meta property="og:image" content="https://s2.loli.net/2023/09/24/MVGXDlxcOnapW5q.png">
+<meta property="article:published_time" content="2023-09-17T03:12:52.000Z">
+<meta property="article:modified_time" content="2025-07-02T05:20:14.610Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="代码提示">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://s2.loli.net/2023/09/24/NHDnMzThg8YQicG.png">
+  
+  
+  <title>python与代码提示 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="python与代码提示"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-09-17 11:12" pubdate>
+          2023年9月17日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">python与代码提示</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="由WebStorm引发的疑问"><a href="#由WebStorm引发的疑问" class="headerlink" title="由WebStorm引发的疑问"></a>由WebStorm引发的疑问</h2><p>起因是这样，我想在 webstrom中使用cropto-js,安装导入后却没有任何和这个类相关的代码提示，但是在vscode 中确实会有代码提示，这个真的真的不能忍，</p>
+<p><img src="https://s2.loli.net/2023/09/24/NHDnMzThg8YQicG.png" srcset="/img/loading.gif" lazyload alt="image-20230924000418946"></p>
+<p>搜索了一圈发现要在WebStrom 中这这样设置</p>
+<p>依次打开</p>
+<p><code>settings</code> -&gt; <code>Languages &amp;&amp; Frameworks</code>-&gt; <code>JavaScript</code> -&gt; <code>Library</code> </p>
+<p><img src="https://s2.loli.net/2023/09/24/McUhO267TtxFXrb.png" srcset="/img/loading.gif" lazyload alt="image-20230924001734600"></p>
+<p><img src="https://s2.loli.net/2023/09/24/stOGLiY5bMxQuo6.png" srcset="/img/loading.gif" lazyload alt="image-20230924001758457"></p>
+<p>然后往下找到<code>cropto-js</code> 的存根下载并安装就可以了，再写代码就有提示出现了，美滋滋。</p>
+<p>JetBrains 把这个库的代码是称作存根，文件是存储在一个git项目中的</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">abs-svg-path	https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/DefinitelyTyped/</span>DefinitelyTyped<span class="hljs-regexp">/raw/m</span>aster<span class="hljs-regexp">/types/</span>abs-svg-path/<br></code></pre></td></tr></table></figure>
+
+<p>在一些开发项目中<code>@types/xxx</code> 会被做为开发依赖安装到库中</p>
+<p><code>npm</code> <a target="_blank" rel="noopener" href="https://www.npmjs.com/package/@types/crypto-js">仓库</a>中直接有这个类型提示可以直接安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">npm i @types/crypto-js<br></code></pre></td></tr></table></figure>
+
+
+
+<p>深入了解之下发现这个东西叫<code>DefinitelyTyped</code> 也就是上面<code>git</code>项目的仓库名，在 &lt;&lt;深入理解TypeScript&gt;&gt; 英文书名<a target="_blank" rel="noopener" href="https://github.com/basarat/typescript-book/">《TypeScript Deep Dive》</a>中对此有深入介绍<br><a target="_blank" rel="noopener" href="https://jkchao.github.io/typescript-book-chinese/typings/types.html#%E4%BD%BF%E7%94%A8-types">连接在此</a> </p>
+<blockquote>
+<p>毫无疑问，<a target="_blank" rel="noopener" href="https://github.com/borisyankov/DefinitelyTyped">DefinitelyTyped</a> 是 TypeScript 最大的优势之一，社区已经记录了 90% 的顶级 JavaScript 库。</p>
+<p>这意味着，你可以非常高效地使用这些库，而无须在单独的窗口打开相应文档以确保输入的正确性。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/DefinitelyTyped/DefinitelyTyped">https://github.com/DefinitelyTyped/DefinitelyTyped</a>  这个仓库有45.3k 的star(2023-09),其流行程度可见一斑。</p>
+<p><strong>我不是专业的前端工程师，平时写js不太多，主要是以python为主，但是不禁要问这么好的东西在Python语言中有没有？</strong></p>
+<h2 id="Python-中的存根系统"><a href="#Python-中的存根系统" class="headerlink" title="Python 中的存根系统"></a>Python 中的存根系统</h2><p>你猜怎么着，<strong>真的有</strong> 这种东西。</p>
+<p>首先找到了<code>Hacker News</code> 上的一个老哥，发出了和我一样的疑问。</p>
+<blockquote>
+<p>Is there something like DefinitelyTyped for Python?</p>
+</blockquote>
+<p>经过一番搜索发现了微软开源的<a target="_blank" rel="noopener" href="https://github.com/microsoft/python-type-stubs"><code>python-type-stubs</code> 仓库</a> 里面有这样一段话:</p>
+<blockquote>
+<p>有两种方法可以提供类型注释 — 通过内联类型注释和 <code>.pyi</code> 类型存根文件，这些文件可以与包捆绑在一起，也可以与其他一些源（如 typeshed 或 PyPI）分开安装。我们认为，包作者的最佳方法是使用显式内联类型注释来准确完整地描述其公共接口协定。这允许工具为包作者本身验证类型，并减少保持两个单独的 API 定义同步的维护负担。在无法进行内联类型注释的情况下（例如，对于编译的库），包应包含描述接口这些部分的存根文件。</p>
+<p>There are two ways type annotations can be provided — through <a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0484/#type-definition-syntax">inline type annotations</a> and through <a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0484/#stub-files"><code>.pyi</code> type stub files</a>, which may be bundled with the package or installed separately from some other source such as typeshed or PyPI. <em>We believe that the best approach for package authors is to have explicit inline type annotations that accurately and completely describe their public interface contract. This allows tools to validate the types for the package authors themselves and reduces the maintenance burden of keeping two separate API definitions in sync. In cases where inline type annotations are not possible (e.g. for compiled libraries), packages should include stub files that describe those portions of the interface.</em></p>
+</blockquote>
+<p><code>.pyi</code> 文件类型中没有函数中没有具体实现，定义的是函数或者类的返回值类型。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">use</span>(<span class="hljs-params">style: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-literal">None</span>: ...<br><span class="hljs-meta">@contextlib.contextmanager</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">context</span>(<span class="hljs-params">style: <span class="hljs-built_in">str</span>, after_reset: <span class="hljs-built_in">bool</span> = ...</span>)-&gt; Generator: ...<br></code></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>Stubs for the following libraries now exist in typeshed or the libraries themselves and are no longer maintained here</p>
+<p>以下库的存根现在存在于 typeshed 或库本身中，不再在此处维护</p>
+</blockquote>
+<p><code>python-type-stubs</code>中提到的 <code>typeshed</code> 没有在仓库中给出链接，以这个关键词搜索找到了<code>https://github.com/python/typeshed/</code> ，这个项目应该就是<code>python-type-stubs</code> 仓库中提到的<code>typeshed</code>。</p>
+<blockquote>
+<p>如果你只是使用类型检查器（mypy，pyright，pytype，PyCharm等），而不是开发它，你根本不需要与typeshed存储库进行交互：typeshed的标准库部分的副本与类型检查器捆绑在一起。并且您正在使用的第三方软件包和模块的类型存根可以从 PyPI 安装。例如，如果使用 <code>six</code> 和 <code>requests</code> ，则可以使用</p>
+<p>If you’re just using a type checker (<a target="_blank" rel="noopener" href="https://github.com/python/mypy/">mypy</a>, <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright">pyright</a>, <a target="_blank" rel="noopener" href="https://github.com/google/pytype/">pytype</a>, PyCharm, …), as opposed to developing it, you don’t need to interact with the typeshed repo at all: a copy of standard library part of typeshed is bundled with type checkers. And type stubs for third party packages and modules you are using can be installed from PyPI. For example, if you are using <code>six</code> and <code>requests</code>, you can install the type stubs using</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">pip install <span class="hljs-keyword">types</span>-six <span class="hljs-keyword">types</span>-requests<br></code></pre></td></tr></table></figure>
+</blockquote>
+<p>原来这个类型检测能直接下载，马上去pypi 上搜索仓库中包含<code>typed</code> 和<code>stubs</code> 关键词的库</p>
+<p>有的库是基于<code>typeshed</code> 库的提交自动生成的，有的是自己实现的。有的库还提到是基于<a target="_blank" rel="noopener" href="https://peps.python.org/pep-0561/">pep561</a> 提案写出来的，这个pep首次提案在2017年。</p>
+<p><img src="https://s2.loli.net/2023/09/24/MVGXDlxcOnapW5q.png" srcset="/img/loading.gif" lazyload alt="image-20230924095251317"></p>
+<p>我在pypi中找到了常用库的<code>typed</code>，可以留作参考，有需要的可以自己去pypi 中查找。 搜索的时候可以使用<code>types</code> 或者<code>stubs</code> 做为关键词</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">pip install types-requests<br>pip install types-lxml<br>pip install types-redis<br>pip install pandas-stubs<br>pip install lxml-stubs<br>pip install types-python-dateutil<br>pip install types-ujson<br></code></pre></td></tr></table></figure>
+
+<p>大名鼎鼎的<code>numpy</code>现在把<code>typed</code> 集成到了自己的仓库中,直接下载最新的<code>numpy</code>会有类型提示。 </p>
+<p>在<code>PEP621</code> 之前所有的python 官方是在一个<code>requirements.txt</code> 中记录安装信息 信息之有库及其版本号，无法区分生产环境和开发环境，如果只想在开发环境使用这些库，需要手维护两个版本的<code>requirement.txt</code>文件</p>
+<p>在<code>PEP621</code> 之后基于<code>pyproject.yaml</code> 可以使用<code>poetry</code> 或者<code>flit</code> 管理python包</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">poetry install MonkeyType<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ol>
+<li><p><a target="_blank" rel="noopener" href="https://black.readthedocs.io/en/stable/">black官网</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://news.ycombinator.com/item?id=27171290">hack news </a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/JelleZijlstra/autotyping">autotyping</a></p>
+</li>
+</ol>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/python/">#python</a>
+      
+        <a href="/tags/%E4%BB%A3%E7%A0%81%E6%8F%90%E7%A4%BA/">#代码提示</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>python与代码提示</div>
+      <div>https://kingjem.github.io/2023/09/17/python/python与代码提示/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年9月17日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/10/14/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" title="adb 常用命令">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">adb 常用命令</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/09/04/software/hysteria2.0%20%E9%85%8D%E7%BD%AE/" title="hysteria2  配置">
+                        <span class="hidden-mobile">hysteria2  配置</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
