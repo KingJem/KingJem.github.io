@@ -14,19 +14,19 @@
   
   <meta name="theme-color" content="#2f4154">
   <meta name="author" content="Ruhai">
-  <meta name="keywords" content="Spider python go java Android">
+  <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="环境： Windows ,化妆品监管APP2.0.5  查壳使用梆梆加固    打开APP 发现使用了Root 检测 frida-dexdump 没有使用  使用BlackDex32 在未Root的手机上，成功的把APP 的Dex 文件dump 下来   放到jadx 中看dex 文件        也可以看到这个逻辑就是检测Root 后创建的su 文件存不存在 只需要把这个函数hook 掉返回f">
+    <meta name="description" content="环境： Windows ,化妆品监管APP2.0.5  查壳使用梆梆加固  打开APP 发现使用了Root 检测 frida-dexdump 没有使用  使用BlackDex32 在未Root的手机上，成功的把APP 的Dex 文件dump 下来  放到jadx 中看dex 文件    也可以看到这个逻辑就是检测Root 后创建的su 文件存不存在 只需要把这个函数hook 掉返回false 就可">
 <meta property="og:type" content="article">
 <meta property="og:title" content="化妆品监管SU检测Hook绕过">
 <meta property="og:url" content="https://kingjem.github.io/2022/07/10/%E9%80%86%E5%90%91/%E5%8C%96%E5%A6%86%E5%93%81%E7%9B%91%E7%AE%A1SU%E6%A3%80%E6%B5%8BHook/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="环境： Windows ,化妆品监管APP2.0.5  查壳使用梆梆加固    打开APP 发现使用了Root 检测 frida-dexdump 没有使用  使用BlackDex32 在未Root的手机上，成功的把APP 的Dex 文件dump 下来   放到jadx 中看dex 文件        也可以看到这个逻辑就是检测Root 后创建的su 文件存不存在 只需要把这个函数hook 掉返回f">
+<meta property="og:description" content="环境： Windows ,化妆品监管APP2.0.5  查壳使用梆梆加固  打开APP 发现使用了Root 检测 frida-dexdump 没有使用  使用BlackDex32 在未Root的手机上，成功的把APP 的Dex 文件dump 下来  放到jadx 中看dex 文件    也可以看到这个逻辑就是检测Root 后创建的su 文件存不存在 只需要把这个函数hook 掉返回false 就可">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s2.loli.net/2022/07/10/vp5f1IXwaAdYuB6.png">
 <meta property="og:image" content="https://s2.loli.net/2022/07/10/wJkesd9fP3hEgmb.png">
-<meta property="article:published_time" content="2022-07-10T02:31:10.000Z">
-<meta property="article:modified_time" content="2023-06-28T04:40:28.437Z">
+<meta property="article:published_time" content="2022-07-09T17:56:49.000Z">
+<meta property="article:modified_time" content="2025-07-02T13:06:32.954Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="APP逆向">
 <meta name="twitter:card" content="summary_large_image">
@@ -201,8 +201,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-07-10 10:31" pubdate>
-          2022年7月10日 上午
+        <time datetime="2022-07-10 01:56" pubdate>
+          2022年7月10日 凌晨
         </time>
       </span>
     
@@ -276,21 +276,19 @@
               
               <p>环境： Windows ,化妆品监管APP2.0.5</p>
 <ol>
-<li><p>查壳使用梆梆加固  </p>
+<li><p>查壳使用梆梆加固</p>
 </li>
 <li><p>打开APP 发现使用了Root 检测 frida-dexdump 没有使用</p>
 </li>
 <li><p>使用BlackDex32 在未Root的手机上，成功的把APP 的Dex 文件dump 下来</p>
 </li>
-<li><p> 放到jadx 中看dex 文件 </p>
+<li><p>放到jadx 中看dex 文件</p>
 </li>
 </ol>
-<p>   <img src="https://s2.loli.net/2022/07/10/vp5f1IXwaAdYuB6.png" srcset="/img/loading.gif" lazyload alt="image-20220710105056885"></p>
+<p><img src="https://s2.loli.net/2022/07/10/vp5f1IXwaAdYuB6.png" srcset="/img/loading.gif" lazyload alt="image-20220710105056885"></p>
 <p>也可以看到这个逻辑就是检测Root 后创建的su 文件存不存在</p>
-<p>只需要把这个函数hook 掉返回false 就可以过掉Root 检测的弹窗了 </p>
+<p>只需要把这个函数hook 掉返回false 就可以过掉Root 检测的弹窗了</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// hook app for v2.0.5</span><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook_su3</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> utils = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;c.a.a.b.t&quot;</span>);<br>    <span class="hljs-keyword">if</span> (utils) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;find utils&quot;</span>)<br>        utils.<span class="hljs-property">p</span>.<span class="hljs-title function_">overload</span>().<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br>    &#125;<br><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook_su3</span>()<br><br>    &#125;);<br>&#125;<br><br><br><span class="hljs-title function_">setImmediate</span>(main, <span class="hljs-number">0</span>);<br></code></pre></td></tr></table></figure>
-
-
 
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">frida -l hook_su.js -F -U<br></code></pre></td></tr></table></figure>
 
@@ -299,16 +297,14 @@
 <p>使用Objection 启动的时候注入命令</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">objection -g com<span class="hljs-selector-class">.nmpaic</span><span class="hljs-selector-class">.hzp</span> explore <span class="hljs-attr">--startup-command</span> <span class="hljs-string">&quot;android hooking list classes&quot;</span><br></code></pre></td></tr></table></figure>
 
-
-
 <p>然后看到几个经过混淆的类</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs stylus">c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.f</span><span class="hljs-selector-class">.a</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.f</span><span class="hljs-selector-class">.b</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.f</span>.b<span class="hljs-variable">$b</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.f</span><span class="hljs-selector-class">.c</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.a</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.b</span><br>c<span class="hljs-selector-class">.d</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.h</span><span class="hljs-selector-class">.d</span><br>char<br>cn<span class="hljs-selector-class">.jpush</span><span class="hljs-selector-class">.android</span><span class="hljs-selector-class">.service</span><span class="hljs-selector-class">.DownloadProvider</span><br>com<span class="hljs-selector-class">.android</span><span class="hljs-selector-class">.i18n</span><span class="hljs-selector-class">.phonenumbers</span>.AlternateFormatsCountryCodeSet<br></code></pre></td></tr></table></figure>
 
 <p>程序最终运行时的类名和反编译得到的类名不一致</p>
-<p>尝试使用 objection 来hook </p>
+<p>尝试使用 objection 来hook</p>
 <figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs brainfuck"><br><span class="hljs-comment">objection</span> <span class="hljs-literal">-</span><span class="hljs-comment">g com</span><span class="hljs-string">.</span><span class="hljs-comment">nmpaic</span><span class="hljs-string">.</span><span class="hljs-comment">hzp explore</span> <span class="hljs-literal">--</span><span class="hljs-comment">startup</span><span class="hljs-literal">-</span><span class="hljs-comment">command &quot;android hooking watch class_method c</span><span class="hljs-string">.</span><span class="hljs-comment">d</span><span class="hljs-string">.</span><span class="hljs-comment">a</span><span class="hljs-string">.</span><span class="hljs-comment">h</span><span class="hljs-string">.</span><span class="hljs-comment">h</span><span class="hljs-string">.</span><span class="hljs-comment">d</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">args</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">backtrace</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">return&quot;</span><br><br><br><span class="hljs-comment">objection</span> <span class="hljs-literal">-</span><span class="hljs-comment">g com</span><span class="hljs-string">.</span><span class="hljs-comment">nmpaic</span><span class="hljs-string">.</span><span class="hljs-comment">hzp explore</span> <span class="hljs-literal">--</span><span class="hljs-comment">startup</span><span class="hljs-literal">-</span><span class="hljs-comment">command &quot;android hooking watch class c</span><span class="hljs-string">.</span><span class="hljs-comment">d</span><span class="hljs-string">.</span><span class="hljs-comment">a</span><span class="hljs-string">.</span><span class="hljs-comment">h</span><span class="hljs-string">.</span><span class="hljs-comment">h</span><span class="hljs-string">.</span><span class="hljs-comment">d</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">args</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">backtrace</span> <span class="hljs-literal">--</span><span class="hljs-comment">dump</span><span class="hljs-literal">-</span><span class="hljs-comment">return&quot;</span><br><br></code></pre></td></tr></table></figure>
 
-<p>这个APP 只用修改这个APP 里一个函数的返回值就可以过掉SU检测 </p>
+<p>这个APP 只用修改这个APP 里一个函数的返回值就可以过掉SU检测</p>
 <p>这里尝试使用APP 中搜索到的方法结合Objection 的设置函数返回值的方式</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">objection -g com.nmpaic.hzp explore --startup-command &quot;android hooking set return_value c.d.a.h.h.d.p false&quot;<br></code></pre></td></tr></table></figure>
 
@@ -332,13 +328,6 @@
         
   <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91%E5%AE%9E%E6%88%98/" class="category-chain-item">安卓逆向实战</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91%E5%AE%9E%E6%88%98/%E6%9C%AA%E5%AE%8C%E6%88%90/" class="category-chain-item">未完成</a>
-  
-  
-
   
 
       </span>
@@ -407,9 +396,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/07/17/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP02%E5%AE%9E%E6%88%98/" title="猿人学APP02实战">
+                      <a href="/2022/07/13/%E9%80%86%E5%90%91/%E5%A4%A9%E7%BF%BC%E4%BA%91%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B/" title="天翼云登录过程">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">猿人学APP02实战</span>
+                        <span class="hidden-mobile">天翼云登录过程</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -417,8 +406,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/07/07/%E9%80%86%E5%90%91/%E5%A4%A9%E7%BF%BC%E4%BA%91%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B/" title="天翼云登录过程">
-                        <span class="hidden-mobile">天翼云登录过程</span>
+                      <a href="/2022/07/02/software/OB%20%E6%B7%B7%E6%B7%86%E5%AE%9E%E4%BE%8B/" title="OB 混淆实例">
+                        <span class="hidden-mobile">OB 混淆实例</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
