@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="简单配置最简单的docker-compose 配置  文件名为 docker-compose.base.yaml 123456789services:  traefik:    image: traefik:v3.5    ports:      - &quot;8080:8080&quot;    command:      - &quot;--api&#x3D;true&quot;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="traefik 配置教程">
+<meta property="og:url" content="https://kingjem.github.io/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="简单配置最简单的docker-compose 配置  文件名为 docker-compose.base.yaml 123456789services:  traefik:    image: traefik:v3.5    ports:      - &quot;8080:8080&quot;    command:      - &quot;--api&#x3D;true&quot;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-07T20:24:30.000Z">
+<meta property="article:modified_time" content="2025-09-08T08:13:19.751Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="traefik ">
+<meta property="article:tag" content="云原生">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>traefik 配置教程 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="traefik 配置教程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-08 04:24" pubdate>
+          2025年9月8日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          57 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">traefik 配置教程</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="简单配置"><a href="#简单配置" class="headerlink" title="简单配置"></a>简单配置</h2><p>最简单的<code>docker-compose</code> 配置  文件名为 <code>docker-compose.base.yaml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik:v3.5</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api=true&quot;</span>           <span class="hljs-comment"># 开启dashboard 和api </span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.dashboard=true&quot;</span> <span class="hljs-comment"># 默认开启8080</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.insecure=true&quot;</span>  <span class="hljs-comment"># 通过http方式访问</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>访问 <code>http://localhost:8080/dashboard</code> 就能看到后台管理界面,以及能够访问到<code>api</code> 路由,具体文档见官网](<a target="_blank" rel="noopener" href="https://doc.traefik.io/traefik/reference/install-configuration/api-dashboard/#endpoints">https://doc.traefik.io/traefik/reference/install-configuration/api-dashboard/#endpoints</a>)</p>
+<h2 id="重定向Dashboard到localhost"><a href="#重定向Dashboard到localhost" class="headerlink" title="重定向Dashboard到localhost"></a>重定向Dashboard到localhost</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik:v3.5</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;80:81&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.dashboard=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.insecure=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.web.address=:81&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.docker=true&quot;</span><br>    <span class="hljs-attr">labels:</span><br>      <span class="hljs-comment"># 创建一个 router，匹配 Host 并指向 api@internal</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.rule=Host(`localhost`)&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.entrypoints=web&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.service=api@internal&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/var/run/docker.sock:/var/run/docker.sock:ro</span>  <span class="hljs-comment"># 挂载 docker.sock</span><br><br></code></pre></td></tr></table></figure>
+
+<p><strong>静态配置（command）</strong></p>
+<ul>
+<li><code>--entrypoints.web.address=:81</code> → 定义一个名为 <code>web</code> 的入口，监听容器内部的 <code>81</code> 端口。</li>
+<li><code>ports: &quot;80:81&quot;</code> → 把宿主机的 <code>80</code> 映射到容器的 <code>81</code>，所以外部访问 <code>http://localhost:80</code> 实际进入 Traefik 的 <code>web</code> entrypoint。</li>
+<li><code>--providers.docker=true</code> → 让 Traefik 从 Docker labels 里动态加载路由规则。</li>
+</ul>
+<p><strong>动态配置（labels）</strong></p>
+<ul>
+<li><code>traefik.http.routers.traefik.rule=Host(</code>localhost<code>)</code><br> → 匹配请求的 <code>Host</code> 头是 <code>localhost</code> 的流量。</li>
+<li><code>traefik.http.routers.traefik.entrypoints=web</code><br> → 绑定到 <code>web</code> 入口（即 <code>:81</code> 端口）。</li>
+<li><code>traefik.http.routers.traefik.service=api@internal</code><br> → 把流量转发到 Traefik 内置的 Dashboard API 服务。</li>
+</ul>
+<pre><code class=" mermaid">flowchart LR
+    A[&quot;外部请 localhost:80&quot;] --&gt; B[&quot;Traefik 81端口 (entrypoint:web)&quot;]
+    B --&gt; C&#123;&quot;Router&quot;&#125;
+    C --&gt;|&quot;Host = localhost&quot;| D[&quot;Router: traefik&quot;]
+    D --&gt;|&quot;service = api@internal&quot;| E[&quot;Dashboard 服务&quot;]
+
+</code></pre>
+
+<blockquote>
+<p>Note: 范围的时候必须使用localhost访问,使用127.0.0.1 路由规则会匹配失效.</p>
+</blockquote>
+<h2 id="Traefix-使用自定义域名"><a href="#Traefix-使用自定义域名" class="headerlink" title="Traefix 使用自定义域名"></a>Traefix 使用自定义域名</h2><h3 id="wsl-配置"><a href="#wsl-配置" class="headerlink" title="wsl 配置"></a>wsl 配置</h3><p>笔者使用的环境是wsl,所以有些操作和可能会和<code>macos/linux</code>上的配置有写不同. 如果运行出现失败请自己动手解决.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik:v3.5</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;80:81&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.dashboard=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.insecure=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.web.address=:81&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.docker=true&quot;</span><br>    <span class="hljs-attr">labels:</span><br>      <span class="hljs-comment"># 创建一个 router，匹配 Host 并指向 api@internal</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.rule=Host(`docker.local`)&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.entrypoints=web&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.traefik.service=api@internal&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/var/run/docker.sock:/var/run/docker.sock:ro</span>  <span class="hljs-comment"># 挂载 docker.sock</span><br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>和上使用<code>localhost</code> 域名相比,只改动了一个<code>docker.local</code> 的域名</li>
+<li>由于<code>docker.local</code> 在公共DNS 中查询不到,需要手动配置</li>
+</ul>
+<p>如果没有特殊指定,docker-compose 中拆创建的网络格式为<code>&#123;project_name&#125;_default</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ docker network ls<br>NETWORK ID     NAME                   DRIVER    SCOPE<br>26659d36dd60   traefik-demo_default   bridge    local<br></code></pre></td></tr></table></figure>
+
+<p>使用命令查看网关</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker network inspect 26659d36dd60 | jq -r &#x27;.[0].IPAM.Config[0].Gateway&#x27;<br>172.19.0.1<br></code></pre></td></tr></table></figure>
+
+<p>将这个地址写入<code>/etc/hosts</code> 并手动检查联通性</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;$(docker network inspect traefil | jq -r &#x27;.[0].IPAM.Config[0].Gateway&#x27;) docker.local&quot; &gt;&gt; /etc/hosts<br>ping docker.local -c 5<br></code></pre></td></tr></table></figure>
+
+<p>没有问题之后手动访问<code>docker.local</code> 就可以跳转到<code>dashboard</code> 页面</p>
+<p>这种配置有一个问题,就是docker 分配网络是随机分配未占用的网络给容器使用,一旦wsl 重启,或者执行<code>docker compose down</code> 之后,再运行这个compose,docker 分配的ip 地址就可能会改变,相对应的<code>/etc/host</code> 中的自定义地址需要相对应地做出修改.</p>
+<h3 id="docker-compose-IP改变的对应之策"><a href="#docker-compose-IP改变的对应之策" class="headerlink" title="docker-compose IP改变的对应之策"></a>docker-compose IP改变的对应之策</h3><p>为了解决容器IP变更问题,我有以下思路.</p>
+<h4 id="在docker-compose-之外创建网络"><a href="#在docker-compose-之外创建网络" class="headerlink" title="在docker compose 之外创建网络"></a>在docker compose 之外创建网络</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker network  create traefik<br></code></pre></td></tr></table></figure>
+
+<p>网络不使用docker-compose 自动创建得,而是自行维护,docker-compose 在执行down 子命令得时候,不会删除该网络.</p>
+<p>同时在对应的yaml 中配置network要使用<code>external</code> 关键字. 在 Docker Compose 的网络配置中，<code>external</code> 用于指定该网络是在 Compose 之外手动创建和管理的。设置 <code>external: true</code> 后，Compose 不会尝试创建这个网络，而是会查找并连接到已经存在的同名网络。如果该网络不存在，则会报错.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">networks:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">traefik</span><br>    <span class="hljs-attr">external:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="创建网络的时候指定IP和网关"><a href="#创建网络的时候指定IP和网关" class="headerlink" title="创建网络的时候指定IP和网关"></a>创建网络的时候指定IP和网关</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">networks:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">driver:</span> <span class="hljs-string">bridge</span>  <br>    <span class="hljs-attr">ipam:</span><br>      <span class="hljs-attr">driver:</span> <span class="hljs-string">default</span><br>      <span class="hljs-attr">config:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">subnet:</span> <span class="hljs-number">172.19</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/24</span>  <span class="hljs-comment"># 自定义子网</span><br>          <span class="hljs-attr">gateway:</span> <span class="hljs-number">172.19</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>    <span class="hljs-comment"># 自定义网关</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>这种方式创建的网络在重启之后,还会是指定的IP和网关地址.</p>
+<h2 id="Traefix-自签名证书"><a href="#Traefix-自签名证书" class="headerlink" title="Traefix 自签名证书"></a>Traefix 自签名证书</h2><p>配置参考<a target="_blank" rel="noopener" href="https://doc.traefik.io/traefik/setup/docker/">官方文档</a></p>
+<h4 id="首先生成docker-local泛域名证书"><a href="#首先生成docker-local泛域名证书" class="headerlink" title="首先生成docker.local泛域名证书."></a>首先生成<code>docker.local</code>泛域名证书.</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \<br>  -keyout key.pem -out cert.pem \<br>  -subj &quot;/C=CN/ST=Shanghai/L=Shanghai/O=Dev/OU=Dev/CN=docker.local&quot; \<br>  -addext &quot;subjectAltName=DNS:docker.local,DNS:*.docker.local&quot;<br></code></pre></td></tr></table></figure>
+
+<p>创建证书tls.yaml文件内容如下</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">tls:</span><br>  <span class="hljs-attr">certificates:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">certFile:</span> <span class="hljs-string">/ca/cert.pem</span><br>      <span class="hljs-attr">keyFile:</span>  <span class="hljs-string">/ca/key.pem</span><br></code></pre></td></tr></table></figure>
+
+<p>创建docker-compose.yaml 文件,内容如下.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik:v3.5</span><br>    <span class="hljs-attr">container_name:</span> <span class="hljs-string">traefik</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span><br>    <span class="hljs-attr">security_opt:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-literal">no</span><span class="hljs-string">-new-privileges:true</span><br><br>    <span class="hljs-attr">networks:</span><br>      <span class="hljs-comment"># Connect to the &#x27;traefik&#x27; overlay network for inter-container communication across nodes</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">traefik</span><br><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;80:80&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;443:443&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/var/run/docker.sock:/var/run/docker.sock:ro</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">./ca:/ca:ro</span><br><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-comment"># EntryPoints</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.http.address=:80&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.http.http.redirections.entrypoint.to=https&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.http.http.redirections.entrypoint.scheme=https&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.http.http.redirections.entrypoint.permanent=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.https.address=:443&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--entrypoints.https.http.tls=true&quot;</span><br><br>      <span class="hljs-comment"># Attach the static configuration tls.yaml file that contains the tls configuration settings</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.file.filename=/ca/tls.yaml&quot;</span><br>      <span class="hljs-comment"># Providers</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.docker=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.docker.exposedbydefault=false&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--providers.docker.network=traefik&quot;</span><br><br>      <span class="hljs-comment"># API &amp; Dashboard</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.dashboard=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;--api.insecure=false&quot;</span><br><br><br>    <span class="hljs-comment"># Traefik Dynamic configuration via Docker labels</span><br>    <span class="hljs-attr">labels:</span><br>      <span class="hljs-comment"># Enable self‑routing</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.enable=true&quot;</span><br><br>      <span class="hljs-comment"># Dashboard router</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.dashboard.rule=Host(`dashboard.docker.local`)&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.dashboard.entrypoints=https&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.dashboard.service=api@internal&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.dashboard.tls=true&quot;</span><br><br>      <span class="hljs-comment"># Basic‑auth middleware</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$JTAIcybX$$SftqEr2Mq301.opQyUoHo.&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.dashboard.middlewares=dashboard-auth@docker&quot;</span><br><br>  <span class="hljs-comment"># Whoami application</span><br>  <span class="hljs-attr">whoami:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">traefik/whoami</span><br>    <span class="hljs-attr">container_name:</span> <span class="hljs-string">whoami</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span><br>    <span class="hljs-attr">networks:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">traefik</span><br>    <span class="hljs-attr">labels:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.enable=true&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.whoami.rule=Host(`whoami.docker.local`)&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.whoami.entrypoints=https&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;traefik.http.routers.whoami.tls=true&quot;</span><br><br><span class="hljs-attr">networks:</span><br>  <span class="hljs-attr">traefik:</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">traefik</span><br>    <span class="hljs-attr">external:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs stylus">├── ca<br>│   ├── cert<span class="hljs-selector-class">.pem</span><br>│   ├── key<span class="hljs-selector-class">.pem</span><br>│   └── tls<span class="hljs-selector-class">.yaml</span><br>├── docker-compose<span class="hljs-selector-class">.self-signed</span><span class="hljs-selector-class">.yaml</span><br>└── sign-ca.sh<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="添加whoami-到hosts-文件"><a href="#添加whoami-到hosts-文件" class="headerlink" title="添加whoami 到hosts 文件"></a>添加<code>whoami</code> 到hosts 文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;$(docker network inspect traefik | jq -r &#x27;.[0].IPAM.Config[0].Gateway&#x27;) whoami.docker.local&quot; &gt;&gt; /etc/hosts<br></code></pre></td></tr></table></figure>
+
+<h4 id="信任证书"><a href="#信任证书" class="headerlink" title="信任证书"></a>信任证书</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cp ./ca/cert.pem /usr/local/share/ca-certificates/docker.local.crt<br>update-ca-certificates<br></code></pre></td></tr></table></figure>
+
+<p>使用 curl 查看接口使用正常工作</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ curl whoami.docker.local -L<br>Hostname: c2eb174645c1<br>IP: 127.0.0.1<br>IP: ::1<br>IP: 172.17.0.3<br>RemoteAddr: 172.17.0.2:56402<br>GET / HTTP/1.1<br>Host: whoami.docker.local<br>User-Agent: curl/7.81.0<br>Accept: */*<br>Accept-Encoding: gzip<br>X-Forwarded-For: 172.17.0.1<br>X-Forwarded-Host: whoami.docker.local<br>X-Forwarded-Port: 443<br>X-Forwarded-Proto: https<br>X-Forwarded-Server: 183b22a98bed<br>X-Real-Ip: 172.17.0.1<br></code></pre></td></tr></table></figure>
+
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/traefik/">#traefik </a>
+      
+        <a href="/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/">#云原生</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>traefik 配置教程</div>
+      <div>https://kingjem.github.io/2025/09/08/traefik使用教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/01/docker-compose%E9%94%9A%E7%82%B9%E5%86%99%E6%B3%95/" title="docker-compose锚点写法">
+                        <span class="hidden-mobile">docker-compose锚点写法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
