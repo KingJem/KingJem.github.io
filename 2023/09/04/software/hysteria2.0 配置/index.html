@@ -73,7 +73,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -299,7 +299,7 @@
 
 
 
-<h2 id="编辑systemd配置"><a href="#编辑systemd配置" class="headerlink" title="编辑systemd配置"></a>编辑systemd配置</h2><p>vim /etc/systemd/service/hysteria2.service</p>
+<h2 id="编辑systemd配置"><a href="#编辑systemd配置" class="headerlink" title="编辑systemd配置"></a>编辑systemd配置</h2><p>vim &#x2F;etc&#x2F;systemd&#x2F;service&#x2F;hysteria2.service</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs shell">[Unit]<br>After=network.target nss-lookup.target<br><br>[Service]<br>User=root<br>WorkingDirectory=/etc/hysteria2<br>CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW<br>AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW<br>ExecStart=/usr/local/bin/hysteria server -c /etc/hysteria2/config.yaml --log-level info<br>Restart=on-failure<br>RestartSec=10<br>LimitNOFILE=infinity<br><br>[Install]<br>WantedBy=multi-user.target<br></code></pre></td></tr></table></figure>
 
 

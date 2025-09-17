@@ -74,7 +74,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -222,7 +222,7 @@
         
         
         
-          24 分钟
+          25 分钟
         
       </span>
     
@@ -306,27 +306,27 @@
 <p>这个时候输入查看命令ls执行可以看到文件openwrt-19.07.8-armvirt-64-root.ext4 和 openwrt-19.07.8-armvirt-64-Image</p>
 <p>开始运行openwrt</p>
 <blockquote>
-<p>qemu-system-aarch64 -M virt -m 1024m -kernel openwrt-19.07.8-armvirt-64-Image -append “root=fe00” -hda openwrt-19.07.8-armvirt-64-root.ext4 -no-reboot -nographic -cpu cortex-a53 -smp 3 -net nic -net user,id=wan,hostfwd=tcp::7080-:80,hostfwd=tcp::7022-:22</p>
+<p>qemu-system-aarch64 -M virt -m 1024m -kernel openwrt-19.07.8-armvirt-64-Image -append “root&#x3D;fe00” -hda openwrt-19.07.8-armvirt-64-root.ext4 -no-reboot -nographic -cpu cortex-a53 -smp 3 -net nic -net user,id&#x3D;wan,hostfwd&#x3D;tcp::7080-:80,hostfwd&#x3D;tcp::7022-:22</p>
 </blockquote>
 <p>命令说明：</p>
 <p>​        -M 是模拟的机器，可以执行qemu-system-aarch64 -M help查看列表，可以看到有树莓派的，所以也可以直接用树莓派的固件</p>
 <p>​        -m 是分配内存大小 我这里分配1024mb</p>
 <p>​        -kernel是指定内核</p>
 <p>​        -append cmdline 设置Linux内核命令行和启动参数</p>
-<p>​             我这里”root=fe00“指定根的块设备是fe00，如果你没有指定这个，内核将列出可用的块设备并重新启动，之后你们自己的固件可以取消这个”root=fe00“看可用块设备列表，再修改填上。我之前在这徘徊了很久啊。</p>
+<p>​             我这里”root&#x3D;fe00“指定根的块设备是fe00，如果你没有指定这个，内核将列出可用的块设备并重新启动，之后你们自己的固件可以取消这个”root&#x3D;fe00“看可用块设备列表，再修改填上。我之前在这徘徊了很久啊。</p>
 <p>​        -hda是指定硬盘镜像</p>
 <p>​        –no-reboot 就是字面意思，里面客户系统如果重启就会直接退出qemu，重启相当于关机退出qemu。可以不要这条，这样客户系统可以进行重启的操作</p>
 <p>​        -nographic 关闭qemu的图形化界面输出。也可以去掉，然后加上–vnc :1  以vnc为图像模式输出到”显示器”，并占用vnc 1端口，vnc访问手机ip:5901显示进入图像界面。-nographic与–vnc不同的是执行运行后不会立即有回显。</p>
 <p>​          -cpu cortex-a53 模拟cortex-a53类型的处理器，因为前面查询我的骁龙625是cortex-a53类型处理器，模拟这个性能损失较小。可以输入qemu-system-aarch64 -cpu help查看可模拟列表</p>
 <p>​        -smp 核数，给cpu分配核数</p>
-<p>​        -net nic 就是快速配置网卡。后面net user,id=wan,hostfwd=tcp::7080-:80,hostfwd=tcp::7022-:22配置网卡网络模式为用户模式（nat模式，使用主机网络nat联网），分配id标识为wan，hostfwd是端口重定向参数，可以加逗号多个使用，很清晰可以自己根据需要增加和删改，这里我把主机7080端口重定向到客户系统的80端口，把主机7022端口重定向到客户系统的22端口。这两个端口分别是web网页管理地址端口、ssh端口。还有具体设置网卡可以百度搜索qemu网络模式。</p>
+<p>​        -net nic 就是快速配置网卡。后面net user,id&#x3D;wan,hostfwd&#x3D;tcp::7080-:80,hostfwd&#x3D;tcp::7022-:22配置网卡网络模式为用户模式（nat模式，使用主机网络nat联网），分配id标识为wan，hostfwd是端口重定向参数，可以加逗号多个使用，很清晰可以自己根据需要增加和删改，这里我把主机7080端口重定向到客户系统的80端口，把主机7022端口重定向到客户系统的22端口。这两个端口分别是web网页管理地址端口、ssh端口。还有具体设置网卡可以百度搜索qemu网络模式。</p>
 <p>执行后耐心等待跑码，看下面图</p>
 <p>出现第一个框就可以按回车输命令了，但是不急，等第二个</p>
 <p>出现br-lan: port 1(eth0) entered forwarding state就是启动好了（改过下面以后，第二次运行是出现8021q: adding VLAN 0 to HW filter on device eth0）</p>
 <p>因为第一个网卡默认是分配给lan的，所以我们要改一下，分给wan（这个镜像改过一次，下次再启动就不用改了）</p>
 <p>输入</p>
 <blockquote>
-<p>vi /etc/config/network </p>
+<p>vi &#x2F;etc&#x2F;config&#x2F;network </p>
 </blockquote>
 <p>按键盘i就可以编辑进行增删了，把config interface ‘wan’ 那整部分改成以下这样</p>
 <blockquote>
@@ -337,7 +337,7 @@
 <p>编辑好了，按键盘ESC，然后按住shift再按一下键盘上的；就可以输入wq回车后保存退出（就是按esc退出后，按出冒号，wq命令保存退出）</p>
 <p>重启网络服务</p>
 <blockquote>
-<p>/etc/init.d/network restart</p>
+<p>&#x2F;etc&#x2F;init.d&#x2F;network restart</p>
 </blockquote>
 <p>输入ifconfig看看</p>
 <p>eth0   Link encap:Ethernet HWaddr 52:54:00:12:34:56</p>

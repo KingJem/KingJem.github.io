@@ -41,8 +41,8 @@
 <meta property="article:published_time" content="2023-02-01T20:52:18.635Z">
 <meta property="article:modified_time" content="2025-07-21T07:38:46.049Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="logging">
 <meta property="article:tag" content="python">
+<meta property="article:tag" content="logging">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://s2.loli.net/2023/02/09/M57HNfkoIJcmDGA.png">
   
@@ -90,7 +90,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -238,7 +238,7 @@
         
         
         
-          253 分钟
+          255 分钟
         
       </span>
     
@@ -327,7 +327,7 @@
 </tr>
 <tr>
 <td align="left"><em>datefmt</em></td>
-<td align="left">使用指定的日期/时间格式，与 <a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3.10/library/time.html#time.strftime"><code>time.strftime()</code></a> 所接受的格式相同。</td>
+<td align="left">使用指定的日期&#x2F;时间格式，与 <a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3.10/library/time.html#time.strftime"><code>time.strftime()</code></a> 所接受的格式相同。</td>
 </tr>
 <tr>
 <td align="left"><em>style</em></td>
@@ -523,7 +523,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> logging<br><span class="hljs-keyword">from</span> logging <span class="hljs-keyword">import</span> config<br><br>dict_config = &#123;<br>    <span class="hljs-string">&quot;version&quot;</span>: <span class="hljs-number">1</span>,<br>    <span class="hljs-string">&quot;formatters&quot;</span>: &#123;<br>        <span class="hljs-string">&quot;simple&quot;</span>: &#123;<br>            <span class="hljs-string">&#x27;format&#x27;</span>: <span class="hljs-string">&quot;%(asctime)s - %(levelname)s - %(user)s[%(ip)s] - %(message)s&quot;</span>,<br>            <span class="hljs-string">&#x27;datefmt&#x27;</span>: <span class="hljs-string">&quot;%Y-%m-%d %H:%M:%S&quot;</span><br>        &#125;,<br>    &#125;,<br><br>    <span class="hljs-string">&quot;handlers&quot;</span>: &#123;<br>        <span class="hljs-string">&quot;stream&quot;</span>: &#123;<br>            <span class="hljs-string">&quot;class&quot;</span>: <span class="hljs-string">&quot;logging.StreamHandler&quot;</span>,<br>            <span class="hljs-string">&quot;formatter&quot;</span>: <span class="hljs-string">&quot;simple&quot;</span>,<br>            <span class="hljs-string">&quot;level&quot;</span>: <span class="hljs-string">&quot;INFO&quot;</span>,<br>            <span class="hljs-string">&quot;stream&quot;</span>: <span class="hljs-string">&quot;ext://sys.stdout&quot;</span><br><br>        &#125;,<br><br>    &#125;,<br><br>    <span class="hljs-string">&quot;root&quot;</span>: &#123;<br>        <span class="hljs-string">&#x27;handlers&#x27;</span>: [<span class="hljs-string">&#x27;stream&#x27;</span>, ],<br>        <span class="hljs-string">&#x27;level&#x27;</span>: <span class="hljs-string">&quot;INFO&quot;</span>,<br>    &#125;<br>&#125;<br><br>config.dictConfig(dict_config)<br>log = logging.getLogger()<br><br><span class="hljs-keyword">try</span>:<br>    <span class="hljs-keyword">assert</span> <span class="hljs-number">1</span> == <span class="hljs-number">2</span><br><span class="hljs-keyword">except</span>:<br>    log.exception(<span class="hljs-string">&quot;Some one delete the log file.&quot;</span>, exc_info=<span class="hljs-literal">True</span>, extra=&#123;<span class="hljs-string">&#x27;user&#x27;</span>: <span class="hljs-string">&#x27;Tom&#x27;</span>, <span class="hljs-string">&#x27;ip&#x27;</span>: <span class="hljs-string">&#x27;47.98.53.222&#x27;</span>&#125;,<br>                  stack_info=<span class="hljs-literal">False</span>)<br><br></code></pre></td></tr></table></figure>
 
 <p><img src="https://s2.loli.net/2023/02/04/h3Agmn4sNwlTcMY.png" srcset="/img/loading.gif" lazyload alt="image-20230204120514526"></p>
-<p><code>logging.exception</code> 是对<code>logging.error</code>的封装 ，有个默认值 exec_info=True,会默认输出Traceback 信息</p>
+<p><code>logging.exception</code> 是对<code>logging.error</code>的封装 ，有个默认值 exec_info&#x3D;True,会默认输出Traceback 信息</p>
 <p><img src="https://s2.loli.net/2023/02/04/4hDw2okUPbgEGuQ.png" srcset="/img/loading.gif" lazyload alt="image-20230204121612310"></p>
 <p>其他关键的关键词参数有：</p>
 <p><code>extra</code> : 向logrecord中添加指定的字段</p>
@@ -535,16 +535,16 @@
 
 
 <p>执行结果为：</p>
-<p>![image-20230204122023336](/Users/king/Library/Application Support/typora-user-images/image-20230204122023336.png)</p>
+<p>![image-20230204122023336](&#x2F;Users&#x2F;king&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20230204122023336.png)</p>
 <p>在实际运行的过程中，代码可能会比上面的demo 更加复杂，传入的参数很多，引起错误的原因也不太好定位，这样记录日志只会知道代码有报错，但是具体的代码的参数是什么，哪个参数引起的报错，无从得知。如果复现debug 的时间长，过程繁琐 。。。。。 不说了已经开始头疼了</p>
 <h4 id="使用better-exceptions-显示函数的参数值"><a href="#使用better-exceptions-显示函数的参数值" class="headerlink" title="使用better_exceptions 显示函数的参数值"></a>使用better_exceptions 显示函数的参数值</h4><p><a target="_blank" rel="noopener" href="https://github.com/Qix-/better-exceptions">github 地址</a></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> better_exceptions<br>better_exceptions.hook()<br><br>request = <span class="hljs-string">&quot;test test test&quot;</span>  <span class="hljs-comment"># 从request中获取到数据</span><br>a, b, c, d = request.split()  <span class="hljs-comment"># 处理数据</span><br></code></pre></td></tr></table></figure>
 
-<p>![image-20230204123509091](/Users/king/Library/Application Support/typora-user-images/image-20230204123509091.png)</p>
+<p>![image-20230204123509091](&#x2F;Users&#x2F;king&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20230204123509091.png)</p>
 <p>可以看到代码提示中有参数输出，对于复杂程序的定位还是很有帮助的</p>
 <p>better_exception 还有个设置就是控制变量的字符数， 在<code>0.3.3</code>版本汇总 MAX_LENGTH 有如下默认值</p>
-<p>better_exceptions.MAX_LENGTH   = 128 </p>
-<p>better_exceptions.MAX_LENGTH = None 表示无限制</p>
+<p>better_exceptions.MAX_LENGTH   &#x3D; 128 </p>
+<p>better_exceptions.MAX_LENGTH &#x3D; None 表示无限制</p>
 <p><code>better_exceptions</code> 是怎么实现参数打印的呢</p>
 <p><img src="https://s2.loli.net/2023/02/04/QC3XtRKePrgv2Wa.png" srcset="/img/loading.gif" lazyload alt="image-20230204180853544"></p>
 <p><code>better_exceptions</code>中的<code>hook </code>方法把 sys.excepthook 函数定义成自己的<code>excepthook</code> 方法 ,调用了 自己的格式化方法给错误信息添加上了变量和颜色设置 </p>
@@ -577,7 +577,7 @@
 <h2 id="logging-中的RotatingFileHandler"><a href="#logging-中的RotatingFileHandler" class="headerlink" title="logging 中的RotatingFileHandler"></a>logging 中的<code>RotatingFileHandler</code></h2><p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/logging.handlers.html#rotatingfilehandler">官方文档</a></p>
 <p><code>RotatingFileHandler</code> 可以按照文件大小旋转日志</p>
 <blockquote>
-<p>class logging.handlers.RotatingFileHandler(filename, mode=‘a’, maxBytes=0, backupCount=0, encoding=None, delay=False, errors=None)</p>
+<p>class logging.handlers.RotatingFileHandler(filename, mode&#x3D;‘a’, maxBytes&#x3D;0, backupCount&#x3D;0, encoding&#x3D;None, delay&#x3D;False, errors&#x3D;None)</p>
 </blockquote>
 <p>返回一个 RotatingFileHandler 类的新实例。 将打开指定的文件并将其用作日志记录流。 如果未指定 mode，则会使用 ‘a’。 如果 encoding 不为 None，则会将其用作打开文件的编码格式。 如果 delay 为真值，则文件打开会被推迟至第一次调用 emit()。 默认情况下，文件会无限增长。 如果提供了 errors，它会被用于确定编码格式错误的处理方式。</p>
 <p>你可以使用 maxBytes 和 backupCount 值来允许文件以预定的大小执行 rollover。 当即将超出预定大小时，将关闭旧文件并打开一个新文件用于输出。 只要当前日志文件长度接近 maxBytes 就会发生轮换；但是如果 maxBytes 或 backupCount 两者之一的值为零，就不会发生轮换，因此你通常要设置 backupCount 至少为 1，而 maxBytes 不能为零。 当 backupCount 为非零值时，系统将通过为原文件名添加扩展名 ‘.1’, ‘.2’ 等来保存旧日志文件。 例如，当 backupCount 为 5 而基本文件名为 app.log 时，你将得到 app.log, app.log.1, app.log.2 直至 app.log.5。 当前被写入的文件总是 app.log。 当此文件写满时，它会被关闭并重户名为 app.log.1，而如果文件 app.log.1, app.log.2 等存在，则它们会被分别重命名为 app.log.2, app.log.3 等等。</p>
@@ -590,7 +590,7 @@
 <p><img src="https://s2.loli.net/2023/02/05/AbpiJz4LMthw9DX.png" srcset="/img/loading.gif" lazyload alt="image-20230205210424080"></p>
 <p>不算当前文件名，日志只会保留五个备份，会舍弃一部分日志，日志文件具体大小，文件路径可以根据自身情况来配置</p>
 <h3 id="logging-的TimedRotatingFileHandler"><a href="#logging-的TimedRotatingFileHandler" class="headerlink" title="logging 的TimedRotatingFileHandler"></a>logging 的<code>TimedRotatingFileHandler</code></h3><blockquote>
-<p><em>class</em> logging.handlers.<strong>TimedRotatingFileHandler</strong>(<em>filename</em>, <em>when=’h’</em>, <em>interval=1</em>, <em>backupCount=0</em>, <em>encoding=None</em>, <em>delay=False</em>, <em>utc=False</em>, <em>atTime=None</em>, <em>errors=None</em>)</p>
+<p><em>class</em> logging.handlers.<strong>TimedRotatingFileHandler</strong>(<em>filename</em>, <em>when&#x3D;’h’</em>, <em>interval&#x3D;1</em>, <em>backupCount&#x3D;0</em>, <em>encoding&#x3D;None</em>, <em>delay&#x3D;False</em>, <em>utc&#x3D;False</em>, <em>atTime&#x3D;None</em>, <em>errors&#x3D;None</em>)</p>
 </blockquote>
 <p>返回一个新的 <a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/logging.handlers.html#logging.handlers.TimedRotatingFileHandler"><code>TimedRotatingFileHandler</code></a> 类实例。 指定的文件会被打开并用作日志记录的流。 对于轮换操作它还会设置文件名前缀。 轮换的发生是基于 <em>when</em> 和 <em>interval</em> 的积。</p>
 <p>你可以使用 <em>when</em> 来指定 <em>interval</em> 的类型。 可能的值列表如下。 请注意它们不是大小写敏感的。</p>
@@ -599,7 +599,7 @@
 <tr>
 <th align="left">值</th>
 <th align="left">间隔类型</th>
-<th align="left">如果/如何使用 <em>atTime</em></th>
+<th align="left">如果&#x2F;如何使用 <em>atTime</em></th>
 </tr>
 </thead>
 <tbody><tr>
@@ -624,7 +624,7 @@
 </tr>
 <tr>
 <td align="left"><code>&#39;W0&#39;-&#39;W6&#39;</code></td>
-<td align="left">工作日(0=星期一)</td>
+<td align="left">工作日(0&#x3D;星期一)</td>
 <td align="left">用于计算初始轮换时间</td>
 </tr>
 <tr>
@@ -692,9 +692,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/logging/">#logging</a>
-      
         <a href="/tags/python/">#python</a>
+      
+        <a href="/tags/logging/">#logging</a>
       
     </div>
   

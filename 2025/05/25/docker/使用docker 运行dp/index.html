@@ -85,7 +85,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.6k 字
+          1.7k 字
         
       </span>
     
@@ -292,7 +292,7 @@
 
 
 
-<h2 id="访问web界面"><a href="#访问web界面" class="headerlink" title="访问web界面"></a>访问web界面</h2><p>访问web界面：http://主机ip/6080</p>
+<h2 id="访问web界面"><a href="#访问web界面" class="headerlink" title="访问web界面"></a>访问web界面</h2><p>访问web界面：http:&#x2F;&#x2F;主机ip&#x2F;6080</p>
 <p>我的虚拟机ip是：172.10.12.21所以访问地址是<a target="_blank" rel="noopener" href="http://172.10.12.21:6080/">http://172.10.12.21:6080</a></p>
 <p>账户：root</p>
 <p>密码：mypassword</p>
@@ -311,7 +311,7 @@
 
 <p>可以看到code目录中有我们拷贝进去的main.py文件</p>
 <p><img src="https://s2.loli.net/2024/03/22/AQECk6NrxIL31i9.png" srcset="/img/loading.gif" lazyload alt="1710301687304"></p>
-<h2 id="运行代码"><a href="#运行代码" class="headerlink" title="运行代码"></a>运行代码</h2><p>容器内：/root/code/main.py，代码内容</p>
+<h2 id="运行代码"><a href="#运行代码" class="headerlink" title="运行代码"></a>运行代码</h2><p>容器内：&#x2F;root&#x2F;code&#x2F;main.py，代码内容</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding:utf-8 -*-</span><br><span class="hljs-keyword">from</span> DrissionPage <span class="hljs-keyword">import</span> ChromiumPage<br><span class="hljs-keyword">from</span> DataRecorder <span class="hljs-keyword">import</span> Recorder<br><br><span class="hljs-comment"># 创建页面对象</span><br>page = ChromiumPage()<br><span class="hljs-comment"># 创建记录器对象</span><br>recorder = Recorder(<span class="hljs-string">&#x27;data.csv&#x27;</span>)<br><span class="hljs-comment"># 访问网页</span><br>page.get(<span class="hljs-string">&#x27;https://www.maoyan.com/board/4&#x27;</span>)<br><br><span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    <span class="hljs-comment"># 遍历页面上所有 dd 元素</span><br>    <span class="hljs-keyword">for</span> mov <span class="hljs-keyword">in</span> page.eles(<span class="hljs-string">&#x27;t:dd&#x27;</span>):<br>        <span class="hljs-comment"># 获取需要的信息</span><br>        num = mov(<span class="hljs-string">&#x27;t:i&#x27;</span>).text<br>        score = mov(<span class="hljs-string">&#x27;.score&#x27;</span>).text<br>        title = mov(<span class="hljs-string">&#x27;@data-act=boarditem-click&#x27;</span>).attr(<span class="hljs-string">&#x27;title&#x27;</span>)<br>        star = mov(<span class="hljs-string">&#x27;.star&#x27;</span>).text<br>        time = mov(<span class="hljs-string">&#x27;.releasetime&#x27;</span>).text<br>        <span class="hljs-comment"># 写入到记录器</span><br>        recorder.add_data((num, title, star, time, score))<br><br>    <span class="hljs-comment"># 获取下一页按钮，有就点击</span><br>    btn = page(<span class="hljs-string">&#x27;下一页&#x27;</span>, timeout=<span class="hljs-number">2</span>)<br>    <span class="hljs-keyword">if</span> btn:<br>        btn.click()<br>        page.wait.load_start()<br>    <span class="hljs-comment"># 没有则退出程序</span><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">break</span><br><br>recorder.record()<br></code></pre></td></tr></table></figure>
 
 <p>运行main.py</p>

@@ -74,7 +74,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -211,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.4k 字
+          3.5k 字
         
       </span>
     
@@ -277,18 +277,18 @@
 
 
 
-<h2 id="nc-使用HTTP-1-0-协议与httpbin-org-进行报文通讯"><a href="#nc-使用HTTP-1-0-协议与httpbin-org-进行报文通讯" class="headerlink" title="nc 使用HTTP/1.0 协议与httpbin.org 进行报文通讯"></a>nc 使用HTTP/1.0 协议与httpbin.org 进行报文通讯</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ nc -v 18.213.123.165 80<br><br>Connection to 18.213.123.165 80 port [tcp/http] succeeded!<br>GET /get HTTP/1.0 <br><br><br>HTTP/1.1 200 OK<br>Date: Tue, 03 Dec 2024 02:22:19 GMT<br>Content-Type: application/json<br>Content-Length: 317<br>Connection: close<br>Server: gunicorn/19.9.0<br>Access-Control-Allow-Origin: *<br>Access-Control-Allow-Credentials: true<br><br>&#123;<br>  &quot;args&quot;: &#123;&#125;, <br>  &quot;headers&quot;: &#123;<br>    &quot;Host&quot;: &quot;k8s-pmhttpbi-pmhttpbi-4b5623588d-1738525105.us-east-1.elb.amazonaws.com&quot;, <br>    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-674e6b5b-33e7909f46b99703252571c3&quot;<br>  &#125;, <br>  &quot;origin&quot;: &quot;128.1.97.123&quot;, <br>  &quot;url&quot;: &quot;http://k8s-pmhttpbi-pmhttpbi-4b5623588d-1738525105.us-east-1.elb.amazonaws.com/get&quot;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h2 id="nc-使用HTTP-1-0-协议与httpbin-org-进行报文通讯"><a href="#nc-使用HTTP-1-0-协议与httpbin-org-进行报文通讯" class="headerlink" title="nc 使用HTTP&#x2F;1.0 协议与httpbin.org 进行报文通讯"></a>nc 使用HTTP&#x2F;1.0 协议与httpbin.org 进行报文通讯</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ nc -v 18.213.123.165 80<br><br>Connection to 18.213.123.165 80 port [tcp/http] succeeded!<br>GET /get HTTP/1.0 <br><br><br>HTTP/1.1 200 OK<br>Date: Tue, 03 Dec 2024 02:22:19 GMT<br>Content-Type: application/json<br>Content-Length: 317<br>Connection: close<br>Server: gunicorn/19.9.0<br>Access-Control-Allow-Origin: *<br>Access-Control-Allow-Credentials: true<br><br>&#123;<br>  &quot;args&quot;: &#123;&#125;, <br>  &quot;headers&quot;: &#123;<br>    &quot;Host&quot;: &quot;k8s-pmhttpbi-pmhttpbi-4b5623588d-1738525105.us-east-1.elb.amazonaws.com&quot;, <br>    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-674e6b5b-33e7909f46b99703252571c3&quot;<br>  &#125;, <br>  &quot;origin&quot;: &quot;128.1.97.123&quot;, <br>  &quot;url&quot;: &quot;http://k8s-pmhttpbi-pmhttpbi-4b5623588d-1738525105.us-east-1.elb.amazonaws.com/get&quot;<br>&#125;<br><br></code></pre></td></tr></table></figure>
 
 <ul>
 <li>-v 参数是打印详细信息</li>
-<li>GET /get HTTP/1.0 是自己手动输入的</li>
-<li> <code>Enter</code> 按两次</li>
+<li>GET &#x2F;get HTTP&#x2F;1.0 是自己手动输入的</li>
+<li><code>Enter</code> 按两次</li>
 </ul>
 <h3 id="使用echo-命令转义字符"><a href="#使用echo-命令转义字符" class="headerlink" title="使用echo 命令转义字符"></a>使用echo 命令转义字符</h3><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs accesslog">echo -e <span class="hljs-string">&quot;<span class="hljs-keyword">GET</span> /get HTTP/1.0\r\n&quot;</span> | nc  <span class="hljs-number">18</span>.<span class="hljs-number">213</span>.<span class="hljs-number">123</span>.<span class="hljs-number">165</span> <span class="hljs-number">80</span><br></code></pre></td></tr></table></figure>
 
 
 
-<h2 id="nc-使用HTTP-1-1-协议与httpbin-org-进行报文通讯"><a href="#nc-使用HTTP-1-1-协议与httpbin-org-进行报文通讯" class="headerlink" title="nc 使用HTTP/1.1 协议与httpbin.org 进行报文通讯"></a>nc 使用HTTP/1.1 协议与httpbin.org 进行报文通讯</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ nc -v 18.213.123.165 80<br><br>Connection to 18.213.123.165 80 port [tcp/http] succeeded!<br>GET /get HTTP/1.1<br>HOST: httpbin.org<br><br>HTTP/1.1 200 OK<br>Date: Tue, 03 Dec 2024 02:27:10 GMT<br>Content-Type: application/json<br>Content-Length: 197<br>Connection: keep-alive<br>Server: gunicorn/19.9.0<br>Access-Control-Allow-Origin: *<br>Access-Control-Allow-Credentials: true<br><br>&#123;<br>  &quot;args&quot;: &#123;&#125;, <br>  &quot;headers&quot;: &#123;<br>    &quot;Host&quot;: &quot;httpbin.org&quot;, <br>    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-674e6c7e-1299f1db390d3827443ff03b&quot;<br>  &#125;, <br>  &quot;origin&quot;: &quot;128.1.97.123&quot;, <br>  &quot;url&quot;: &quot;http://httpbin.org/get&quot;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h2 id="nc-使用HTTP-1-1-协议与httpbin-org-进行报文通讯"><a href="#nc-使用HTTP-1-1-协议与httpbin-org-进行报文通讯" class="headerlink" title="nc 使用HTTP&#x2F;1.1 协议与httpbin.org 进行报文通讯"></a>nc 使用HTTP&#x2F;1.1 协议与httpbin.org 进行报文通讯</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ nc -v 18.213.123.165 80<br><br>Connection to 18.213.123.165 80 port [tcp/http] succeeded!<br>GET /get HTTP/1.1<br>HOST: httpbin.org<br><br>HTTP/1.1 200 OK<br>Date: Tue, 03 Dec 2024 02:27:10 GMT<br>Content-Type: application/json<br>Content-Length: 197<br>Connection: keep-alive<br>Server: gunicorn/19.9.0<br>Access-Control-Allow-Origin: *<br>Access-Control-Allow-Credentials: true<br><br>&#123;<br>  &quot;args&quot;: &#123;&#125;, <br>  &quot;headers&quot;: &#123;<br>    &quot;Host&quot;: &quot;httpbin.org&quot;, <br>    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-674e6c7e-1299f1db390d3827443ff03b&quot;<br>  &#125;, <br>  &quot;origin&quot;: &quot;128.1.97.123&quot;, <br>  &quot;url&quot;: &quot;http://httpbin.org/get&quot;<br>&#125;<br><br></code></pre></td></tr></table></figure>
 
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo -e &quot;GET /get HTTP/1.1\r\nHost: httpbin.org\r\n&quot; | nc -v 18.213.123.165 80<br></code></pre></td></tr></table></figure>
 
@@ -303,21 +303,22 @@
 
 
 <ol>
-<li> 直接使用 get 中的方式</li>
+<li>直接使用 get 中的方式</li>
 </ol>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo -e &quot;POST /post HTTP/1.0\r\n\r\nkey1=value1&amp;key2=value2&quot; | nc -v 18.213.123.165 80<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">响应没有解析出来</span><br></code></pre></td></tr></table></figure>
 
 
 <ol start="2">
 <li><p>直接使用表单格式</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo -e &quot;POST /post HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nkey1=value1&amp;key2=value2&quot; | nc -v 18.213.123.165 80<br><span class="hljs-meta prompt_"># </span><span class="language-bash">没有解析出来</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo -e &quot;POST /post HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nkey1=value1&amp;key2=value2&quot; | nc -v 18.213.123.165 80<br><span class="hljs-meta prompt_"># </span><span class="language-bash">没有解析出来</span><br></code></pre></td></tr></table></figure>
+</li>
 <li><p>使用 Content-Length + form</p>
 </li>
 </ol>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sh"><span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;POST /post HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 23\r\n\r\nkey1=value1&amp;key2=value2&quot;</span> | nc -v 18.213.123.165 80<br><br>  <span class="hljs-comment">#&quot;form&quot;: &#123;</span><br>  <span class="hljs-comment">#  &quot;key1&quot;: &quot;value1&quot;,</span><br>  <span class="hljs-comment">#  &quot;key2&quot;: &quot;value2&quot;</span><br>  <span class="hljs-comment">#&#125;</span><br></code></pre></td></tr></table></figure>
 
 <ol start="4">
-<li> 只使用Content-Length</li>
+<li>只使用Content-Length</li>
 </ol>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs swift">echo <span class="hljs-operator">-</span>e <span class="hljs-string">&quot;POST /post HTTP/1.0<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>Content-Length: 23<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span><span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>key1=value1&amp;key2=value2&quot;</span> <span class="hljs-operator">|</span> nc <span class="hljs-operator">-</span>v <span class="hljs-number">18.213</span>.<span class="hljs-number">123.165</span> <span class="hljs-number">80</span><br></code></pre></td></tr></table></figure>
 

@@ -79,7 +79,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -324,8 +324,7 @@
 <blockquote>
 <p>如果你只是使用类型检查器（mypy，pyright，pytype，PyCharm等），而不是开发它，你根本不需要与typeshed存储库进行交互：typeshed的标准库部分的副本与类型检查器捆绑在一起。并且您正在使用的第三方软件包和模块的类型存根可以从 PyPI 安装。例如，如果使用 <code>six</code> 和 <code>requests</code> ，则可以使用</p>
 <p>If you’re just using a type checker (<a target="_blank" rel="noopener" href="https://github.com/python/mypy/">mypy</a>, <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright">pyright</a>, <a target="_blank" rel="noopener" href="https://github.com/google/pytype/">pytype</a>, PyCharm, …), as opposed to developing it, you don’t need to interact with the typeshed repo at all: a copy of standard library part of typeshed is bundled with type checkers. And type stubs for third party packages and modules you are using can be installed from PyPI. For example, if you are using <code>six</code> and <code>requests</code>, you can install the type stubs using</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">pip install <span class="hljs-keyword">types</span>-six <span class="hljs-keyword">types</span>-requests<br></code></pre></td></tr></table></figure>
-</blockquote>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">pip install <span class="hljs-keyword">types</span>-six <span class="hljs-keyword">types</span>-requests<br></code></pre></td></tr></table></figure></blockquote>
 <p>原来这个类型检测能直接下载，马上去pypi 上搜索仓库中包含<code>typed</code> 和<code>stubs</code> 关键词的库</p>
 <p>有的库是基于<code>typeshed</code> 库的提交自动生成的，有的是自己实现的。有的库还提到是基于<a target="_blank" rel="noopener" href="https://peps.python.org/pep-0561/">pep561</a> 提案写出来的，这个pep首次提案在2017年。</p>
 <p><img src="https://s2.loli.net/2023/09/24/MVGXDlxcOnapW5q.png" srcset="/img/loading.gif" lazyload alt="image-20230924095251317"></p>

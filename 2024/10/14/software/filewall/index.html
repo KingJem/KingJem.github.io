@@ -16,12 +16,12 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="设置alias fwc&#x3D;firewall-cmd 123456789101112131415161718192021222324252627282930313233343536373839404142fwc --list-all # 获取所有规则 public (active)  target: default  icmp-block-inversion: no  interfaces: eth0">
+    <meta name="description" content="设置alias fwc&#x3D;firewall-cmd 123456789101112131415161718192021222324252627282930313233343536373839404142fwc --list-all # 获取所有规则 public (active)  target: default  icmp-block-inversion: no  interfaces:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="firewall">
 <meta property="og:url" content="https://kingjem.github.io/2024/10/14/software/filewall/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="设置alias fwc&#x3D;firewall-cmd 123456789101112131415161718192021222324252627282930313233343536373839404142fwc --list-all # 获取所有规则 public (active)  target: default  icmp-block-inversion: no  interfaces: eth0">
+<meta property="og:description" content="设置alias fwc&#x3D;firewall-cmd 123456789101112131415161718192021222324252627282930313233343536373839404142fwc --list-all # 获取所有规则 public (active)  target: default  icmp-block-inversion: no  interfaces:">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-13T16:00:00.000Z">
 <meta property="article:modified_time" content="2025-07-21T07:38:46.049Z">
@@ -74,7 +74,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -211,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          987 字
+          992 字
         
       </span>
     
@@ -272,7 +272,7 @@
             
             <div class="markdown-body">
               
-              <p>设置alias fwc=firewall-cmd</p>
+              <p>设置alias fwc&#x3D;firewall-cmd</p>
 <figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs dsconfig"><span class="hljs-string">fwc</span> <span class="hljs-built_in">--list-all</span> <span class="hljs-comment"># 获取所有规则 </span><br><span class="hljs-string">public</span> (<span class="hljs-string">active</span>)<br>  <span class="hljs-string">target</span>: <span class="hljs-string">default</span><br>  <span class="hljs-string">icmp-block-inversion</span>: <span class="hljs-string">no</span><br>  <span class="hljs-string">interfaces</span>: <span class="hljs-string">eth0</span><br>  <span class="hljs-string">sources</span>:<br>  <span class="hljs-string">services</span>: <span class="hljs-string">cockpit</span> <span class="hljs-string">dhcpv6-client</span> <span class="hljs-string">http</span> <span class="hljs-string">https</span> <span class="hljs-string">redis</span> <span class="hljs-string">ssh</span><br>  <span class="hljs-string">ports</span>: <span class="hljs-string">10136</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">9998</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">51574</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">5180</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">80</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">443</span>/<span class="hljs-string">tcp</span> <span class="hljs-string">27861</span>/<span class="hljs-string">udp</span> <span class="hljs-string">41078</span>/<span class="hljs-string">tcp</span><br>  <span class="hljs-string">protocols</span>:<br>  <span class="hljs-string">forward</span>: <span class="hljs-string">no</span><br>  <span class="hljs-string">masquerade</span>: <span class="hljs-string">yes</span><br>  <span class="hljs-string">forward-ports</span>:<br>        <span class="hljs-string">port</span>=<span class="hljs-string">47000-48000:proto=</span><span class="hljs-string">udp:toport=</span><span class="hljs-string">27861:toaddr=</span><br>  <span class="hljs-string">source-ports</span>:<br>  <span class="hljs-string">icmp-blocks</span>:<br>  <span class="hljs-string">rich</span> <span class="hljs-string">rules</span>:<br><br><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--get-services</span> <span class="hljs-comment">## 获取服务</span><br><br> <br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--get-services</span> <span class="hljs-comment">## 获取服务</span><br><span class="hljs-comment">#RH-Satellite-6 RH-Satellite-6-capsule  .... 一个服务对应一种默认端口</span><br><br><br><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--add-service</span> <span class="hljs-string">http</span> <span class="hljs-comment">## 临时放行 </span><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--remove-service</span> <span class="hljs-string">http</span>  <span class="hljs-comment"># 临时删除</span><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--add-port=2222/tcp</span> <span class="hljs-built_in">--per</span> <span class="hljs-comment">#永久放行</span><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--add-service</span> <span class="hljs-string">http</span> <span class="hljs-built_in">--permanent</span> <span class="hljs-comment">## 永久添加 或者 --per</span><br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--reload</span> <span class="hljs-comment"># 重新加载配置文件</span><br><br> <br><span class="hljs-string">fwc</span> <span class="hljs-built_in">--remove-port=2222/tcp</span> <span class="hljs-built_in">--per</span> <span class="hljs-comment"># 永久放行 </span><br><span class="hljs-string">firewall-cmd</span> <span class="hljs-built_in">--zone=public</span> <span class="hljs-built_in">--add-forward-port=port=8080:proto=tcp:toport=8088</span><br><span class="hljs-string">firewall-cmd</span> <span class="hljs-built_in">--permanent</span> <span class="hljs-built_in">--add-forward-port=port=48000-49000:proto=udp:toport=27042</span><br><span class="hljs-string">firewall-cmd</span> <span class="hljs-built_in">--permanent</span> <span class="hljs-built_in">--remove-forward-port=port=48000-49000:proto=udp:toport=27042</span><br><span class="hljs-string">sudo</span> <span class="hljs-string">firewall-cmd</span> <span class="hljs-built_in">--reload</span><br><br><br><br><br></code></pre></td></tr></table></figure>
 
 

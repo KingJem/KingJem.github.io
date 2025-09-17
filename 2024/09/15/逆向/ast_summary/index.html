@@ -16,12 +16,12 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="利用AST对抗JavaScript混淆：核心知识总结本文档旨在总结通过分析ast.html及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。 1. 核心概念：什么是AST？**AST (Abstract Syntax Tree)**，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构">
+    <meta name="description" content="利用AST对抗JavaScript混淆：核心知识总结本文档旨在总结通过分析ast.html及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。 1. 核心概念：什么是AST？AST (Abstract Syntax Tree)，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构。 对于">
 <meta property="og:type" content="article">
 <meta property="og:title" content="利用AST对抗JavaScript混淆">
 <meta property="og:url" content="https://kingjem.github.io/2024/09/15/%E9%80%86%E5%90%91/ast_summary/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="利用AST对抗JavaScript混淆：核心知识总结本文档旨在总结通过分析ast.html及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。 1. 核心概念：什么是AST？**AST (Abstract Syntax Tree)**，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构">
+<meta property="og:description" content="利用AST对抗JavaScript混淆：核心知识总结本文档旨在总结通过分析ast.html及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。 1. 核心概念：什么是AST？AST (Abstract Syntax Tree)，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构。 对于">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-09-14T16:00:00.000Z">
 <meta property="article:modified_time" content="2025-07-21T07:38:46.049Z">
@@ -74,7 +74,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -211,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.6k 字
+          2.7k 字
         
       </span>
     
@@ -222,7 +222,7 @@
         
         
         
-          22 分钟
+          23 分钟
         
       </span>
     
@@ -273,67 +273,67 @@
             <div class="markdown-body">
               
               <h1 id="利用AST对抗JavaScript混淆：核心知识总结"><a href="#利用AST对抗JavaScript混淆：核心知识总结" class="headerlink" title="利用AST对抗JavaScript混淆：核心知识总结"></a>利用AST对抗JavaScript混淆：核心知识总结</h1><p>本文档旨在总结通过分析<code>ast.html</code>及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。</p>
-<h2 id="1-核心概念：什么是AST？"><a href="#1-核心概念：什么是AST？" class="headerlink" title="1. 核心概念：什么是AST？"></a>1. 核心概念：什么是AST？</h2><p>**AST (Abstract Syntax Tree)**，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构。</p>
+<h2 id="1-核心概念：什么是AST？"><a href="#1-核心概念：什么是AST？" class="headerlink" title="1. 核心概念：什么是AST？"></a>1. 核心概念：什么是AST？</h2><p><strong>AST (Abstract Syntax Tree)</strong>，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构。</p>
 <p>对于JavaScript混淆来说，代码通常会被转化为难以阅读的格式，例如：</p>
 <ul>
-<li>  变量名替换（<code>a</code>, <code>b</code>, <code>c</code>）</li>
-<li>  字符串加密到数组中，通过函数调用还原</li>
-<li>  控制流平坦化（使用<code>while</code>循环和<code>switch</code>语句打乱代码执行顺序）</li>
-<li>  代码无用化（插入不会被执行的“死代码”）</li>
+<li>变量名替换（<code>a</code>, <code>b</code>, <code>c</code>）</li>
+<li>字符串加密到数组中，通过函数调用还原</li>
+<li>控制流平坦化（使用<code>while</code>循环和<code>switch</code>语句打乱代码执行顺序）</li>
+<li>代码无用化（插入不会被执行的“死代码”）</li>
 </ul>
 <p>直接通过阅读或正则表达式来处理这种代码非常困难，但如果将其转换为AST，这些混淆手段在结构上就会变得清晰，从而可以通过程序化的方式进行分析和还原。</p>
 <p><strong>反混淆的本质</strong>：就是将混淆的JS代码 <strong>解析(Parse)</strong> 成AST，通过 <strong>遍历(Traverse)</strong> 和 <strong>操作(Manipulate)</strong> AST节点来还原代码逻辑，最后再将修改后的AST <strong>生成(Generate)</strong> 为可读的代码。</p>
 <h2 id="2-准备工作与环境搭建"><a href="#2-准备工作与环境搭建" class="headerlink" title="2. 准备工作与环境搭建"></a>2. 准备工作与环境搭建</h2><p>要利用AST进行反混淆，需要一个Node.js环境，并安装Babel相关的核心工具库。</p>
 <h3 id="2-1-环境"><a href="#2-1-环境" class="headerlink" title="2.1. 环境"></a>2.1. 环境</h3><ul>
-<li>  <strong>Node.js</strong>: AST操作通常在Node.js环境中完成。</li>
-<li>  <strong>VSCode</strong>: 推荐的代码编辑器，便于调试。</li>
+<li><strong>Node.js</strong>: AST操作通常在Node.js环境中完成。</li>
+<li><strong>VSCode</strong>: 推荐的代码编辑器，便于调试。</li>
 </ul>
 <h3 id="2-2-Babel核心依赖"><a href="#2-2-Babel核心依赖" class="headerlink" title="2.2. Babel核心依赖"></a>2.2. Babel核心依赖</h3><p>Babel是一个强大的JavaScript编译器，其工具链是进行AST操作的事实标准。首先，需要初始化一个npm项目 (<code>npm init</code>)，然后安装以下核心依赖：</p>
 <ul>
-<li><code>@babel/parser</code>: 将JavaScript代码解析成AST。  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/parser --save<br></code></pre></td></tr></table></figure></li>
-<li><code>@babel/traverse</code>: 提供了遍历AST节点的功能，这是反混淆操作的核心。  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/traverse --save<br></code></pre></td></tr></table></figure></li>
-<li><code>@babel/types</code>: 包含用于创建、验证和修改AST节点的方法。  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/types --save<br></code></pre></td></tr></table></figure></li>
-<li><code>@babel/generator</code>: 将修改后的AST重新生成为JavaScript代码。  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/generator --save<br></code></pre></td></tr></table></figure></li>
+<li><code>@babel/parser</code>: 将JavaScript代码解析成AST。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/parser --save<br></code></pre></td></tr></table></figure></li>
+<li><code>@babel/traverse</code>: 提供了遍历AST节点的功能，这是反混淆操作的核心。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/traverse --save<br></code></pre></td></tr></table></figure></li>
+<li><code>@babel/types</code>: 包含用于创建、验证和修改AST节点的方法。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/types --save<br></code></pre></td></tr></table></figure></li>
+<li><code>@babel/generator</code>: 将修改后的AST重新生成为JavaScript代码。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install @babel/generator --save<br></code></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="3-反混淆流程与Babel-API实践"><a href="#3-反混淆流程与Babel-API实践" class="headerlink" title="3. 反混淆流程与Babel API实践"></a>3. 反混淆流程与Babel API实践</h2><p>一个典型的AST反混淆流程如下：</p>
 <ol>
-<li> <strong>读取混淆代码</strong>：将混淆的JS代码作为字符串读入。</li>
-<li> **解析 (Parse)**：使用<code>@babel/parser</code>将代码字符串转换为AST。</li>
-<li> **遍历与操作 (Traverse &amp; Manipulate)**：使用<code>@babel/traverse</code>编写一个“访问者”（Visitor）对象，遍历AST。在访问者中，针对特定类型的节点编写处理逻辑。</li>
-<li> **生成 (Generate)**：使用<code>@babel/generator</code>将处理过的AST转换回可读的JavaScript代码。</li>
+<li><strong>读取混淆代码</strong>：将混淆的JS代码作为字符串读入。</li>
+<li><strong>解析 (Parse)</strong>：使用<code>@babel/parser</code>将代码字符串转换为AST。</li>
+<li><strong>遍历与操作 (Traverse &amp; Manipulate)</strong>：使用<code>@babel/traverse</code>编写一个“访问者”（Visitor）对象，遍历AST。在访问者中，针对特定类型的节点编写处理逻辑。</li>
+<li><strong>生成 (Generate)</strong>：使用<code>@babel/generator</code>将处理过的AST转换回可读的JavaScript代码。</li>
 </ol>
 <h3 id="3-1-关键API：path对象"><a href="#3-1-关键API：path对象" class="headerlink" title="3.1. 关键API：path对象"></a>3.1. 关键API：<code>path</code>对象</h3><p>在使用<code>@babel/traverse</code>进行遍历时，其提供给访问者函数的最重要的参数是<code>path</code>对象。<code>path</code>对象封装了AST节点及其与父节点、作用域等相关的所有上下文信息。</p>
 <p><code>path</code>对象常用属性和方法：</p>
 <ul>
-<li>  <code>path.node</code>: 当前正在访问的AST节点。</li>
-<li>  <code>path.parent</code>: 父节点。</li>
-<li>  <code>path.scope</code>: 当前节点的作用域信息，非常适合用于查找变量声明、重命名变量等。</li>
-<li>  <code>path.replaceWith(newNode)</code>: 用一个新节点替换当前节点。</li>
-<li>  <code>path.remove()</code>: 删除当前节点。</li>
-<li>  <code>path.findParent(callback)</code>: 向上查找符合条件的父节点。</li>
-<li>  <code>path.get(key)</code>: 获取子节点路径。</li>
+<li><code>path.node</code>: 当前正在访问的AST节点。</li>
+<li><code>path.parent</code>: 父节点。</li>
+<li><code>path.scope</code>: 当前节点的作用域信息，非常适合用于查找变量声明、重命名变量等。</li>
+<li><code>path.replaceWith(newNode)</code>: 用一个新节点替换当前节点。</li>
+<li><code>path.remove()</code>: 删除当前节点。</li>
+<li><code>path.findParent(callback)</code>: 向上查找符合条件的父节点。</li>
+<li><code>path.get(key)</code>: 获取子节点路径。</li>
 </ul>
 <h3 id="3-2-示例：常量折叠"><a href="#3-2-示例：常量折叠" class="headerlink" title="3.2. 示例：常量折叠"></a>3.2. 示例：常量折叠</h3><p>常量折叠是反混淆中一个常见的操作。例如，混淆代码中可能存在 <code>const a = 1 + 2;</code> 这样的表达式。通过AST可以计算出结果并直接替换。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> visitor = &#123;<br>  <span class="hljs-title class_">BinaryExpression</span>(path) &#123;<br>    <span class="hljs-keyword">const</span> &#123; left, right, operator &#125; = path.<span class="hljs-property">node</span>;<br>    <span class="hljs-comment">// 确保左右两边都是数字</span><br>    <span class="hljs-keyword">if</span> (t.<span class="hljs-title function_">isNumericLiteral</span>(left) &amp;&amp; t.<span class="hljs-title function_">isNumericLiteral</span>(right)) &#123;<br>      <span class="hljs-keyword">const</span> result = <span class="hljs-built_in">eval</span>(<span class="hljs-string">`<span class="hljs-subst">$&#123;left.value&#125;</span> <span class="hljs-subst">$&#123;operator&#125;</span> <span class="hljs-subst">$&#123;right.value&#125;</span>`</span>);<br>      <span class="hljs-comment">// 用计算结果创建一个新的数字字面量节点并替换原有表达式</span><br>      path.<span class="hljs-title function_">replaceWith</span>(t.<span class="hljs-title function_">numericLiteral</span>(result));<br>    &#125;<br>  &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <h2 id="4-实用工具与参考资源"><a href="#4-实用工具与参考资源" class="headerlink" title="4. 实用工具与参考资源"></a>4. 实用工具与参考资源</h2><ul>
-<li><p><strong>AST Explorer</strong>: <a target="_blank" rel="noopener" href="https://astexplorer.net/">astexplorer.net</a><br>  一个在线工具，可以实时查看代码对应的AST结构。这是学习和调试AST操作必不可少的工具。</p>
+<li><p><strong>AST Explorer</strong>: <a target="_blank" rel="noopener" href="https://astexplorer.net/">astexplorer.net</a><br>一个在线工具，可以实时查看代码对应的AST结构。这是学习和调试AST操作必不可少的工具。</p>
 </li>
-<li><p><strong>JavaScript Obfuscator Tool</strong>: <a target="_blank" rel="noopener" href="https://obfuscator.io/">obfuscator.io</a><br>  一个强大的在线JS混淆工具，可以作为逆向研究的目标。</p>
+<li><p><strong>JavaScript Obfuscator Tool</strong>: <a target="_blank" rel="noopener" href="https://obfuscator.io/">obfuscator.io</a><br>一个强大的在线JS混淆工具，可以作为逆向研究的目标。</p>
 </li>
 <li><p><strong>Babel官方手册 (中文翻译)</strong>:</p>
 <ul>
-<li><strong>插件手册</strong>: <a target="_blank" rel="noopener" href="https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md">github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md</a><br>  学习如何编写Babel插件（即AST操作的核心逻辑）的权威指南。</li>
+<li><strong>插件手册</strong>: <a target="_blank" rel="noopener" href="https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md">github.com&#x2F;jamiebuilds&#x2F;babel-handbook&#x2F;blob&#x2F;master&#x2F;translations&#x2F;zh-Hans&#x2F;plugin-handbook.md</a><br>学习如何编写Babel插件（即AST操作的核心逻辑）的权威指南。</li>
 </ul>
 </li>
 <li><p><strong>Babel Traverse API文档 (非官方但详尽)</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://evilrecluse.top/Babel-traverse-api-doc/#/">evilrecluse.top/Babel-traverse-api-doc/</a><br>  一个非常详细的<code>@babel/traverse</code> API文档，弥补了官方文档的不足。</li>
+<li><a target="_blank" rel="noopener" href="https://evilrecluse.top/Babel-traverse-api-doc/#/">evilrecluse.top&#x2F;Babel-traverse-api-doc&#x2F;</a><br>一个非常详细的<code>@babel/traverse</code> API文档，弥补了官方文档的不足。</li>
 </ul>
 </li>
 <li><p><strong>掘金文章：玩转babel工具链</strong>:</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7113800415057018894">juejin.cn/post/7113800415057018894</a><br>  对Babel工具链，特别是<code>@babel/traverse</code>和<code>scope</code>有深入的讲解。</li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7113800415057018894">juejin.cn&#x2F;post&#x2F;7113800415057018894</a><br>对Babel工具链，特别是<code>@babel/traverse</code>和<code>scope</code>有深入的讲解。</li>
 </ul>
 </li>
 </ul>

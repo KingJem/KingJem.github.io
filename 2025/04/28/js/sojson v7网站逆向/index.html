@@ -88,7 +88,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.0.0"></head>
+<meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3k 字
+          3.1k 字
         
       </span>
     
@@ -236,7 +236,7 @@
         
         
         
-          26 分钟
+          27 分钟
         
       </span>
     
@@ -299,9 +299,9 @@
 
 <ul>
 <li>_0x5182a9 为参数</li>
-<li>_0x5489a3(512, “%cUf”) == ‘CmUyU’</li>
-<li>_0x55c569[‘CmUyU’] == <code>function(_0x4afd55, _0x7b9059) &#123;return _0x4afd55(_0x7b9059);</code></li>
-<li>_0x963e97 = _0x595165(JSON.stringify(_0x5182a9))</li>
+<li>_0x5489a3(512, “%cUf”) &#x3D;&#x3D; ‘CmUyU’</li>
+<li>_0x55c569[‘CmUyU’] &#x3D;&#x3D; <code>function(_0x4afd55, _0x7b9059) &#123;return _0x4afd55(_0x7b9059);</code></li>
+<li>_0x963e97 &#x3D; _0x595165(JSON.stringify(_0x5182a9))</li>
 </ul>
 <p>这里 <code>_0x595165</code>就是加密函数，找到函数定义之后能看到关键词为AES ，打上断点之后，刷新网页。</p>
 <p><img src="https://s2.loli.net/2024/11/15/S5mp2raVBj3OwT8.png" srcset="/img/loading.gif" lazyload alt="image-20241111162808157"></p>
@@ -318,11 +318,11 @@
 
 
 
-<p>Content ==  _0x963e97 == _0x595165(JSON.stringify(_0x5182a9))  参数 0x5182a9 已知，_0x595165 为aes 加密 key,iv 可以拿到</p>
-<p>Sign == _0x1c8141 == _0xad2e02(_0x963e97) ,_0xad2e02 位置，但猜测是一个hash 函数</p>
-<p>RsaPubAes = _0x30ed66  未知</p>
-<p>IV == _0x4bb657 == qccppm.split(‘|’)[1]</p>
-<p>TimesTamp == qccppm.split(‘|’)[2]</p>
+<p>Content &#x3D;&#x3D;  _0x963e97 &#x3D;&#x3D; _0x595165(JSON.stringify(_0x5182a9))  参数 0x5182a9 已知，_0x595165 为aes 加密 key,iv 可以拿到</p>
+<p>Sign &#x3D;&#x3D; _0x1c8141 &#x3D;&#x3D; _0xad2e02(_0x963e97) ,_0xad2e02 位置，但猜测是一个hash 函数</p>
+<p>RsaPubAes &#x3D; _0x30ed66  未知</p>
+<p>IV &#x3D;&#x3D; _0x4bb657 &#x3D;&#x3D; qccppm.split(‘|’)[1]</p>
+<p>TimesTamp &#x3D;&#x3D; qccppm.split(‘|’)[2]</p>
 <p>接下来就要找 _0xad2e02的函数 和_0x30ed66   的生成</p>
 <p>找到函数定义</p>
 <p><img src="https://s2.loli.net/2024/11/15/TaXJehfK4LQyIB7.png" srcset="/img/loading.gif" lazyload alt="image-20241111180649878"></p>
@@ -330,8 +330,8 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js">  , _0xad2e02 = <span class="hljs-keyword">function</span>(<span class="hljs-params">_0x8c7424</span>) &#123;<br>    <span class="hljs-keyword">var</span> _0x47d8cc = _0xa6527a<br>      , _0x4fd74e = <span class="hljs-variable constant_">KEYUTIL</span>[<span class="hljs-string">&#x27;getKey&#x27;</span>](_0x3051cc)<br>      , _0x26889a = <span class="hljs-keyword">new</span> <span class="hljs-variable constant_">KJUR</span>[(<span class="hljs-string">&#x27;crypto&#x27;</span>)][<span class="hljs-string">&quot;Signature&quot;</span>](&#123;<br>        <span class="hljs-attr">alg</span>: <span class="hljs-string">&#x27;SHA1withRSA&#x27;</span><br>    &#125;);<br>    <span class="hljs-keyword">return</span> _0x26889a.<span class="hljs-title function_">init</span>(_0x4fd74e),<br>    _0x26889a[<span class="hljs-string">&#x27;updateString&#x27;</span>](_0x8c7424),<br>    <span class="hljs-title function_">hextob64</span>(_0x26889a.<span class="hljs-title function_">sign</span>());<br>&#125;;<br></code></pre></td></tr></table></figure>
 
 <p>这里_0x3051cc 未知，搜索发现KEYUTIL 为jsrsasign 中的方法,是个JavaScript的RSA和ECC加密库</p>
-<p>_0x3051cc = ‘—–BEGIN PRIVATE KEY—–\n’ + ‘一串私钥’ + ‘—–END PRIVATE KEY—–’</p>
-<p> _0x26d6c0 = “—–BEGIN\x20PUBLIC\x20KEY—– ….”</p>
+<p>_0x3051cc &#x3D; ‘—–BEGIN PRIVATE KEY—–\n’ + ‘一串私钥’ + ‘—–END PRIVATE KEY—–’</p>
+<p> _0x26d6c0 &#x3D; “—–BEGIN\x20PUBLIC\x20KEY—– ….”</p>
 <p>这里看得出是一对rsa 密钥，_0xad2e02函数为SHA1withRSA  加密</p>
 <p><img src="https://s2.loli.net/2024/11/15/e68JnYLK9wsE7ak.png" srcset="/img/loading.gif" lazyload alt="image-20241111184449150"></p>
 <p>按照同样的思路结果可以精简为</p>
@@ -342,7 +342,7 @@
 
 
 
-<p>其中<code> _0x55c569[_0x5df6fc(548, &quot;8E1C&quot;)]</code> === <code>function(_0x2a2c4b, _0x3415f3) &#123;return _0x2a2c4b(_0x3415f3);</code></p>
+<p>其中<code> _0x55c569[_0x5df6fc(548, &quot;8E1C&quot;)]</code> &#x3D;&#x3D;&#x3D; <code>function(_0x2a2c4b, _0x3415f3) &#123;return _0x2a2c4b(_0x3415f3);</code></p>
 <p>这里着重查看_0x316c29 函数全文搜索之后</p>
 <p><img src="https://s2.loli.net/2024/11/15/8pDfos1G3i7vwta.png" srcset="/img/loading.gif" lazyload alt="image-20241112103756549"></p>
 <p>其中 <code>_0x307ab8</code> 和 <code>_0x4bb657</code> 为 qccppm 的前两个部分，到这里这个网站的加密就全找出来了。</p>
