@@ -16,23 +16,25 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="前言macOS 的磁盘清理和系统优化一直是刚需，各种工具 CleanMyMac、DaisyDisk、iStat Menus 各有侧重，但通常需要分别安装。今天介绍一款国产开源工具 Mole，将多个工具的能力合为一体，一个 binary 全搞定。 项目地址：tw93&#x2F;Mole">
+    <meta name="description" content="来源：公众号 Pythonlx（lx777）原文链接：一文搭建免费的AI逆向工具链调研时间：2026-03-23  前言分享一套免费、操作简单、易落地的 AI 逆向工程环境。核心思路是通过逆向相关的 MCP 和 SKILLS 构建 AGENT，让 Trae 的 SOLO 模式更智能化地辅助分析。  1. TRAE IDETRAE 是字节跳动自研的 AI 原生智能开发环境（IDE），主打自然语言生">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mole - macOS 深度清理与系统优化工具">
-<meta property="og:url" content="https://kingjem.github.io/2026/03/21/Mole-macOS-%E6%B7%B1%E5%BA%A6%E6%B8%85%E7%90%86%E4%B8%8E%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:title" content="一文搭建免费的AI逆向工具链">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/20/%E4%B8%80%E6%96%87%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E7%9A%84AI%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7%E9%93%BE/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="前言macOS 的磁盘清理和系统优化一直是刚需，各种工具 CleanMyMac、DaisyDisk、iStat Menus 各有侧重，但通常需要分别安装。今天介绍一款国产开源工具 Mole，将多个工具的能力合为一体，一个 binary 全搞定。 项目地址：tw93&#x2F;Mole">
+<meta property="og:description" content="来源：公众号 Pythonlx（lx777）原文链接：一文搭建免费的AI逆向工具链调研时间：2026-03-23  前言分享一套免费、操作简单、易落地的 AI 逆向工程环境。核心思路是通过逆向相关的 MCP 和 SKILLS 构建 AGENT，让 Trae 的 SOLO 模式更智能化地辅助分析。  1. TRAE IDETRAE 是字节跳动自研的 AI 原生智能开发环境（IDE），主打自然语言生">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-21T03:21:00.000Z">
-<meta property="article:modified_time" content="2026-03-21T03:24:29.439Z">
+<meta property="article:published_time" content="2026-03-20T07:58:39.000Z">
+<meta property="article:modified_time" content="2026-03-23T05:45:10.153Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="macOS">
-<meta property="article:tag" content="效率工具">
-<meta property="article:tag" content="系统维护">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="逆向工程">
+<meta property="article:tag" content="AI工具">
+<meta property="article:tag" content="Trae">
+<meta property="article:tag" content="Claude Code">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>Mole - macOS 深度清理与系统优化工具 - Ruhai&#39;s blogs</title>
+  <title>一文搭建免费的AI逆向工具链 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -189,7 +191,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Mole - macOS 深度清理与系统优化工具"></span>
+            <span id="subtitle" data-typed-text="一文搭建免费的AI逆向工具链"></span>
           
         </div>
 
@@ -200,8 +202,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-03-21 11:21" pubdate>
-          2026年3月21日 上午
+        <time datetime="2026-03-20 15:58" pubdate>
+          2026年3月20日 下午
         </time>
       </span>
     
@@ -212,7 +214,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.9k 字
         
       </span>
     
@@ -223,7 +225,7 @@
         
         
         
-          10 分钟
+          17 分钟
         
       </span>
     
@@ -269,98 +271,136 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Mole - macOS 深度清理与系统优化工具</h1>
+            <h1 style="display: none">一文搭建免费的AI逆向工具链</h1>
             
             <div class="markdown-body">
               
-              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>macOS 的磁盘清理和系统优化一直是刚需，各种工具 CleanMyMac、DaisyDisk、iStat Menus 各有侧重，但通常需要分别安装。今天介绍一款国产开源工具 <strong>Mole</strong>，将多个工具的能力合为一体，一个 binary 全搞定。</p>
-<p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/tw93/Mole">tw93/Mole</a></p>
-<span id="more"></span>
+              <blockquote>
+<p><strong>来源</strong>：公众号 Pythonlx（lx777）<br><strong>原文链接</strong>：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU4NzkwNTU3Ng==&mid=2247485291&idx=1&sn=0852bd946aa6e69dde74db745588d3cb">一文搭建免费的AI逆向工具链</a><br><strong>调研时间</strong>：2026-03-23</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>分享一套免费、操作简单、易落地的 AI 逆向工程环境。核心思路是通过逆向相关的 MCP 和 SKILLS 构建 AGENT，让 Trae 的 SOLO 模式更智能化地辅助分析。</p>
+<hr>
+<h2 id="1-TRAE-IDE"><a href="#1-TRAE-IDE" class="headerlink" title="1. TRAE IDE"></a>1. TRAE IDE</h2><p>TRAE 是字节跳动自研的 AI 原生智能开发环境（IDE），主打自然语言生成、多模态转代码、AI 驱动的全流程开发，面向快速原型、全栈开发与团队协作。</p>
+<ul>
+<li><strong>官网</strong>：<a target="_blank" rel="noopener" href="https://www.trae.cn/">https://www.trae.cn</a></li>
+<li><strong>费用</strong>：个人开发者版本免费，SOLO 模式可满足日常使用</li>
+</ul>
+<hr>
+<h2 id="2-MCP-配置"><a href="#2-MCP-配置" class="headerlink" title="2. MCP 配置"></a>2. MCP 配置</h2><h3 id="2-1-JADX-MCP"><a href="#2-1-JADX-MCP" class="headerlink" title="2.1 JADX MCP"></a>2.1 JADX MCP</h3><p><strong>目标</strong>：通过 AI 辅助反编译 Android APK。</p>
+<p><strong>依赖工具</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/skylot/jadx">jadx</a>（推荐 1.5.5+，跨平台命令行+GUI）</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zinja-coder/jadx-ai-mcp">jadx-ai-mcp</a>（Jadx 插件，6.2.0）</li>
+<li>Java 17+</li>
+<li>Python 3.12.10</li>
+</ul>
+<p><strong>安装步骤</strong>：</p>
+<p><strong>① 下载 jadx 和 jadx-ai-mcp</strong></p>
+<p>到 GitHub releases 下载最新版：</p>
+<ul>
+<li><code>jadx-1.5.5.zip</code>（命令行和 GUI）</li>
+<li><code>jadx-ai-mcp-6.2.0.jar</code> + <code>jadx-mcp-server-v6.2.0.zip</code></li>
+</ul>
+<p><strong>② 安装 jadx-ai-mcp 插件</strong></p>
+<p>打开 Jadx → 菜单栏 <code>插件 → 管理插件 → 安装插件</code>，选择下载的 <code>jadx-ai-mcp-6.2.0.jar</code>。</p>
+<p>打开 APK 后，在 <code>Plugins</code> 中查看服务状态。</p>
+<p><strong>③ 配置环境变量</strong></p>
+<p>将 jadx 路径加入 <code>Path</code>，方便后续快捷调用。</p>
+<blockquote>
+<p><strong>提示</strong>：jadx 默认内存较低，Windows 可修改 <code>jadx-gui.bat</code>，将 <code>-Xmx4g</code> 改为 <code>-Xmx12g</code> 或更高。</p>
+</blockquote>
+<p><strong>④ 配置 jadx-mcp-server</strong></p>
+<p>解压 <code>jadx-mcp-server-v6.2.0.zip</code>，安装 Python 依赖：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install -r requirements.txt<br></code></pre></td></tr></table></figure>
 
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>通过 Homebrew 一行命令搞定：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">brew install mole<br></code></pre></td></tr></table></figure>
+<p><strong>⑤ 在 TRAE 中添加 MCP</strong></p>
+<p>手动添加 MCP，<code>command</code> 和 <code>args</code> 根据实际路径修改。</p>
+<hr>
+<h3 id="2-2-IDA-Pro-MCP"><a href="#2-2-IDA-Pro-MCP" class="headerlink" title="2.2 IDA Pro MCP"></a>2.2 IDA Pro MCP</h3><p><strong>目标</strong>：将 IDA Pro 与 MCP 客户端连接，实现自动化获取函数、字符串、交叉引用、反编译、重命名、注释等信息。</p>
+<ul>
+<li><strong>GitHub</strong>：<a target="_blank" rel="noopener" href="https://github.com/mrexodia/ida-pro-mcp">https://github.com/mrexodia/ida-pro-mcp</a></li>
+<li><strong>环境</strong>：Python 3.12.10、IDA Pro 9.3（不支持免费版）</li>
+<li><strong>安装</strong>：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 直接安装</span><br>pip install https://github.com/mrexodia/ida-pro-mcp/archive/refs/heads/main.zip<br><br><span class="hljs-comment"># 或下载后本地安装</span><br>ida-pro-mcp --install<br></code></pre></td></tr></table></figure>
 
-<p>安装完成后即可使用 <code>mo</code> 命令（不是 <code>mole</code>，是简短的 <code>mo</code>）。</p>
-<h2 id="核心功能一览"><a href="#核心功能一览" class="headerlink" title="核心功能一览"></a>核心功能一览</h2><table>
+<p>安装后在 IDA 中打开 SO 文件，菜单依次找到【编辑 → 插件 → MCP】。</p>
+<p>获取 MCP 服务端配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ida-pro-mcp --config<br></code></pre></td></tr></table></figure>
+
+<p>将输出的 <code>mcpServers</code> 配置复制到 TRAE 中即可。</p>
+<hr>
+<h3 id="2-3-其它-MCP"><a href="#2-3-其它-MCP" class="headerlink" title="2.3 其它 MCP"></a>2.3 其它 MCP</h3><p>根据需求还可配置：</p>
+<ul>
+<li><strong>frida_mcp</strong> — 配合 Frida 使用</li>
+<li><strong>chromeDevToolsMCP</strong> — Web 分析</li>
+<li><strong>js-reverse-mcp</strong> — JS 逆向</li>
+</ul>
+<p><strong>MCP 资源站点</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.mcpworld.com/zh">https://www.mcpworld.com/zh</a></li>
+<li><a target="_blank" rel="noopener" href="https://mcpmarket.com/zh/">https://mcpmarket.com/zh/</a></li>
+<li><a target="_blank" rel="noopener" href="https://skillhub.tencent.com/">https://skillhub.tencent.com/</a></li>
+<li><a target="_blank" rel="noopener" href="https://skillsmp.com/zh">https://skillsmp.com/zh</a></li>
+</ul>
+<hr>
+<h2 id="3-SKILLS"><a href="#3-SKILLS" class="headerlink" title="3. SKILLS"></a>3. SKILLS</h2><p>SKILLS 来自开源项目，在 TRAE 中的配置方式：</p>
+<p><code>设置 → 技能和规则 → 技能 → 创建 → 上传进行智能解析</code></p>
+<ul>
+<li><strong>AGENTS.md</strong>：向 AI 智能体提供行为指引</li>
+<li><strong>项目规则</strong>：规范 AI 在 TRAE 内的行为，可根据项目需求制定</li>
+</ul>
+<hr>
+<h2 id="4-Prompt-提示词"><a href="#4-Prompt-提示词" class="headerlink" title="4. Prompt 提示词"></a>4. Prompt 提示词</h2><p>提示词是核心，需要讲清楚流程和策略。</p>
+<p><strong>参考方法</strong>：</p>
+<ol>
+<li><strong>先告知已知信息</strong>，让 AI 生成 Prompt 后再给 Trae</li>
+<li><strong>分步提问</strong>：先问”如何定位代码”，再问”如何解析逻辑”，最后问”如何还原”，避免一次提问过于宽泛</li>
+<li><strong>及时补充上下文</strong>：根据分析结果动态调整</li>
+<li><strong>结合工具操作</strong>：提示词中明确告知”JADX/IDA 的操作步骤（如搜索路径、断点位置）”，便于落地执行</li>
+</ol>
+<hr>
+<h2 id="5-AGENT-智能体"><a href="#5-AGENT-智能体" class="headerlink" title="5. AGENT 智能体"></a>5. AGENT 智能体</h2><p>创建合理的智能体比较关键。TRAE 中一个智能体工具上限为 <strong>40 个</strong>，建议多建几个不同功能的智能体，每个智能体选择特定的 MCP 工具和 SKILLS。</p>
+<p>使用 SOLO 模式时，Trae 可以根据场景自动调用不同的智能体。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文搭建的 AI 逆向工具链核心组合：</p>
+<table>
 <thead>
 <tr>
-<th>命令</th>
+<th>组件</th>
+<th>工具</th>
 <th>作用</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>mo</code></td>
-<td>交互式主菜单</td>
+<td>IDE</td>
+<td>Trae（免费）</td>
+<td>AI 驱动开发环境</td>
 </tr>
 <tr>
-<td><code>mo clean</code></td>
-<td>深度清理（缓存、日志、浏览器残留）</td>
+<td>MCP</td>
+<td>JADX MCP + IDA Pro MCP</td>
+<td>连接专业逆向工具</td>
 </tr>
 <tr>
-<td><code>mo uninstall</code></td>
-<td>完全卸载 App（连带残留文件）</td>
+<td>SKILLS</td>
+<td>开源 Skill 库</td>
+<td>编码逆向经验</td>
 </tr>
 <tr>
-<td><code>mo optimize</code></td>
-<td>刷新缓存 &amp; 系统服务维护</td>
+<td>Prompt</td>
+<td>分步提示词</td>
+<td>引导 AI 分析路径</td>
 </tr>
 <tr>
-<td><code>mo analyze</code></td>
-<td>磁盘使用可视化（类似 DaisyDisk）</td>
-</tr>
-<tr>
-<td><code>mo status</code></td>
-<td>实时系统监控（CPU/GPU/内存/磁盘/网络）</td>
-</tr>
-<tr>
-<td><code>mo purge</code></td>
-<td>清理项目构建产物</td>
-</tr>
-<tr>
-<td><code>mo installer</code></td>
-<td>清理安装包（.dmg/.pkg）</td>
+<td>Agent</td>
+<td>多 Agent 协作</td>
+<td>按场景自动调度</td>
 </tr>
 </tbody></table>
-<h2 id="常用命令演示"><a href="#常用命令演示" class="headerlink" title="常用命令演示"></a>常用命令演示</h2><h3 id="预览清理内容（安全模式）"><a href="#预览清理内容（安全模式）" class="headerlink" title="预览清理内容（安全模式）"></a>预览清理内容（安全模式）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo clean --dry-run<br></code></pre></td></tr></table></figure>
-
-<p>不带任何风险，先列出待清理项，确认无误后再真正执行。</p>
-<h3 id="深度清理"><a href="#深度清理" class="headerlink" title="深度清理"></a>深度清理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo clean<br></code></pre></td></tr></table></figure>
-
-<p>清理内容涵盖：</p>
-<ul>
-<li>系统缓存（<code>~/Library/Caches</code>）</li>
-<li>日志文件（<code>~/Library/Logs</code>）</li>
-<li>浏览器残留（Cookies、Session、Cache）</li>
-<li>应用残留</li>
-<li>下载缓存</li>
-</ul>
-<h3 id="应用完全卸载"><a href="#应用完全卸载" class="headerlink" title="应用完全卸载"></a>应用完全卸载</h3><p>用过 AppCleaner 的都知道，卸载 App 最头疼的是残留文件。<code>mo uninstall</code> 会一并清除：</p>
-<ul>
-<li>App 本体</li>
-<li>Launch Agents</li>
-<li>Preference 文件</li>
-<li>隐藏残留</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo uninstall          <span class="hljs-comment"># 交互式选择</span><br>mo uninstall --dry-run  <span class="hljs-comment"># 预览要删什么</span><br></code></pre></td></tr></table></figure>
-
-<h3 id="系统状态监控"><a href="#系统状态监控" class="headerlink" title="系统状态监控"></a>系统状态监控</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo status<br></code></pre></td></tr></table></figure>
-
-<p>实时显示 CPU、GPU、内存、磁盘、网络，与 iStat Menus 效果类似。</p>
-<h3 id="磁盘使用分析"><a href="#磁盘使用分析" class="headerlink" title="磁盘使用分析"></a>磁盘使用分析</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo analyze             <span class="hljs-comment"># 分析主硬盘</span><br>mo analyze /Volumes   <span class="hljs-comment"># 分析外接磁盘</span><br></code></pre></td></tr></table></figure>
-
-<p>类似 DaisyDisk，可视化展示各目录占用情况，快速定位大文件。</p>
-<h3 id="项目构建产物清理"><a href="#项目构建产物清理" class="headerlink" title="项目构建产物清理"></a>项目构建产物清理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo purge --dry-run    <span class="hljs-comment"># 预览要清理哪些项目的 build 产物</span><br>mo purge              <span class="hljs-comment"># 真正执行</span><br></code></pre></td></tr></table></figure>
-
-<p>支持配置扫描目录（<code>mo purge --paths</code>），非常适合开发者清理 <code>node_modules</code>、<code>__pycache__</code>、<code>.build</code> 等。</p>
-<h2 id="安全机制"><a href="#安全机制" class="headerlink" title="安全机制"></a>安全机制</h2><p>Mole 所有操作都支持 <code>--dry-run</code> 预览，只读不删。同时提供 <code>--whitelist</code> 白名单机制，保护重要缓存不被误删：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mo clean --whitelist  <span class="hljs-comment"># 管理受保护的缓存白名单</span><br>mo optimize --whitelist<br></code></pre></td></tr></table></figure>
-
-<h2 id="我的使用习惯"><a href="#我的使用习惯" class="headerlink" title="我的使用习惯"></a>我的使用习惯</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 每周执行一次预览</span><br>mo clean --dry-run<br><br><span class="hljs-comment"># 每月正式清理一次</span><br>mo clean<br><br><span class="hljs-comment"># 每次项目迭代后清理 build 产物</span><br>mo purge --dry-run<br>mo purge<br></code></pre></td></tr></table></figure>
-
+<p>整套方案免费、操作简单，适合想用 AI 辅助逆向分析的工程师落地使用。</p>
 <hr>
-<blockquote>
-<p>📝 <strong>待发布审稿</strong> — 草稿状态，需确认内容准确性后再发布。</p>
-</blockquote>
+<p><em>来源：公众号 Pythonlx，原文《一文搭建免费的AI逆向工具链》</em></p>
 
               
             </div>
@@ -378,7 +418,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%B7%A5%E5%85%B7%E6%8E%A8%E8%8D%90/" class="category-chain-item">工具推荐</a>
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E8%B0%83%E7%A0%94/" class="category-chain-item">技术调研</a>
   
   
 
@@ -393,11 +433,15 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/macOS/">#macOS</a>
+        <a href="/tags/MCP/">#MCP</a>
       
-        <a href="/tags/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7/">#效率工具</a>
+        <a href="/tags/%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/">#逆向工程</a>
       
-        <a href="/tags/%E7%B3%BB%E7%BB%9F%E7%BB%B4%E6%8A%A4/">#系统维护</a>
+        <a href="/tags/AI%E5%B7%A5%E5%85%B7/">#AI工具</a>
+      
+        <a href="/tags/Trae/">#Trae</a>
+      
+        <a href="/tags/Claude-Code/">#Claude Code</a>
       
     </div>
   
@@ -409,8 +453,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Mole - macOS 深度清理与系统优化工具</div>
-      <div>https://kingjem.github.io/2026/03/21/Mole-macOS-深度清理与系统优化工具/</div>
+      <div>一文搭建免费的AI逆向工具链</div>
+      <div>https://kingjem.github.io/2026/03/20/一文搭建免费的AI逆向工具链/</div>
     </div>
     <div class="license-meta">
       
@@ -422,7 +466,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年3月21日</div>
+          <div>2026年3月20日</div>
         </div>
       
       
@@ -452,9 +496,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/03/21/AI/Claude-Code-MCP-%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" title="Claude Code 逆向MCP 工具配置指南">
+                      <a href="/2026/03/21/Mole-macOS-%E6%B7%B1%E5%BA%A6%E6%B8%85%E7%90%86%E4%B8%8E%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96%E5%B7%A5%E5%85%B7/" title="Mole - macOS 深度清理与系统优化工具">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Claude Code 逆向MCP 工具配置指南</span>
+                        <span class="hidden-mobile">Mole - macOS 深度清理与系统优化工具</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -462,8 +506,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/03/20/%E4%B8%80%E6%96%87%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E7%9A%84AI%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7%E9%93%BE/" title="一文搭建免费的AI逆向工具链">
-                        <span class="hidden-mobile">一文搭建免费的AI逆向工具链</span>
+                      <a href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="traefik 配置教程">
+                        <span class="hidden-mobile">traefik 配置教程</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

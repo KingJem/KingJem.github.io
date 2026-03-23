@@ -135,6 +135,39 @@
   
   
   <entry>
+    <title>一文搭建免费的AI逆向工具链</title>
+    <link href="/2026/03/20/%E4%B8%80%E6%96%87%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E7%9A%84AI%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7%E9%93%BE/"/>
+    <url>/2026/03/20/%E4%B8%80%E6%96%87%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E7%9A%84AI%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7%E9%93%BE/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p><strong>来源</strong>：公众号 Pythonlx（lx777）<br><strong>原文链接</strong>：<a href="https://mp.weixin.qq.com/s?__biz=MzU4NzkwNTU3Ng==&mid=2247485291&idx=1&sn=0852bd946aa6e69dde74db745588d3cb">一文搭建免费的AI逆向工具链</a><br><strong>调研时间</strong>：2026-03-23</p></blockquote><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>分享一套免费、操作简单、易落地的 AI 逆向工程环境。核心思路是通过逆向相关的 MCP 和 SKILLS 构建 AGENT，让 Trae 的 SOLO 模式更智能化地辅助分析。</p><hr><h2 id="1-TRAE-IDE"><a href="#1-TRAE-IDE" class="headerlink" title="1. TRAE IDE"></a>1. TRAE IDE</h2><p>TRAE 是字节跳动自研的 AI 原生智能开发环境（IDE），主打自然语言生成、多模态转代码、AI 驱动的全流程开发，面向快速原型、全栈开发与团队协作。</p><ul><li><strong>官网</strong>：<a href="https://www.trae.cn/">https://www.trae.cn</a></li><li><strong>费用</strong>：个人开发者版本免费，SOLO 模式可满足日常使用</li></ul><hr><h2 id="2-MCP-配置"><a href="#2-MCP-配置" class="headerlink" title="2. MCP 配置"></a>2. MCP 配置</h2><h3 id="2-1-JADX-MCP"><a href="#2-1-JADX-MCP" class="headerlink" title="2.1 JADX MCP"></a>2.1 JADX MCP</h3><p><strong>目标</strong>：通过 AI 辅助反编译 Android APK。</p><p><strong>依赖工具</strong>：</p><ul><li><a href="https://github.com/skylot/jadx">jadx</a>（推荐 1.5.5+，跨平台命令行+GUI）</li><li><a href="https://github.com/zinja-coder/jadx-ai-mcp">jadx-ai-mcp</a>（Jadx 插件，6.2.0）</li><li>Java 17+</li><li>Python 3.12.10</li></ul><p><strong>安装步骤</strong>：</p><p><strong>① 下载 jadx 和 jadx-ai-mcp</strong></p><p>到 GitHub releases 下载最新版：</p><ul><li><code>jadx-1.5.5.zip</code>（命令行和 GUI）</li><li><code>jadx-ai-mcp-6.2.0.jar</code> + <code>jadx-mcp-server-v6.2.0.zip</code></li></ul><p><strong>② 安装 jadx-ai-mcp 插件</strong></p><p>打开 Jadx → 菜单栏 <code>插件 → 管理插件 → 安装插件</code>，选择下载的 <code>jadx-ai-mcp-6.2.0.jar</code>。</p><p>打开 APK 后，在 <code>Plugins</code> 中查看服务状态。</p><p><strong>③ 配置环境变量</strong></p><p>将 jadx 路径加入 <code>Path</code>，方便后续快捷调用。</p><blockquote><p><strong>提示</strong>：jadx 默认内存较低，Windows 可修改 <code>jadx-gui.bat</code>，将 <code>-Xmx4g</code> 改为 <code>-Xmx12g</code> 或更高。</p></blockquote><p><strong>④ 配置 jadx-mcp-server</strong></p><p>解压 <code>jadx-mcp-server-v6.2.0.zip</code>，安装 Python 依赖：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install -r requirements.txt<br></code></pre></td></tr></table></figure><p><strong>⑤ 在 TRAE 中添加 MCP</strong></p><p>手动添加 MCP，<code>command</code> 和 <code>args</code> 根据实际路径修改。</p><hr><h3 id="2-2-IDA-Pro-MCP"><a href="#2-2-IDA-Pro-MCP" class="headerlink" title="2.2 IDA Pro MCP"></a>2.2 IDA Pro MCP</h3><p><strong>目标</strong>：将 IDA Pro 与 MCP 客户端连接，实现自动化获取函数、字符串、交叉引用、反编译、重命名、注释等信息。</p><ul><li><strong>GitHub</strong>：<a href="https://github.com/mrexodia/ida-pro-mcp">https://github.com/mrexodia/ida-pro-mcp</a></li><li><strong>环境</strong>：Python 3.12.10、IDA Pro 9.3（不支持免费版）</li><li><strong>安装</strong>：</li></ul><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 直接安装</span><br>pip install https://github.com/mrexodia/ida-pro-mcp/archive/refs/heads/main.zip<br><br><span class="hljs-comment"># 或下载后本地安装</span><br>ida-pro-mcp --install<br></code></pre></td></tr></table></figure><p>安装后在 IDA 中打开 SO 文件，菜单依次找到【编辑 → 插件 → MCP】。</p><p>获取 MCP 服务端配置：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ida-pro-mcp --config<br></code></pre></td></tr></table></figure><p>将输出的 <code>mcpServers</code> 配置复制到 TRAE 中即可。</p><hr><h3 id="2-3-其它-MCP"><a href="#2-3-其它-MCP" class="headerlink" title="2.3 其它 MCP"></a>2.3 其它 MCP</h3><p>根据需求还可配置：</p><ul><li><strong>frida_mcp</strong> — 配合 Frida 使用</li><li><strong>chromeDevToolsMCP</strong> — Web 分析</li><li><strong>js-reverse-mcp</strong> — JS 逆向</li></ul><p><strong>MCP 资源站点</strong>：</p><ul><li><a href="https://www.mcpworld.com/zh">https://www.mcpworld.com/zh</a></li><li><a href="https://mcpmarket.com/zh/">https://mcpmarket.com/zh/</a></li><li><a href="https://skillhub.tencent.com/">https://skillhub.tencent.com/</a></li><li><a href="https://skillsmp.com/zh">https://skillsmp.com/zh</a></li></ul><hr><h2 id="3-SKILLS"><a href="#3-SKILLS" class="headerlink" title="3. SKILLS"></a>3. SKILLS</h2><p>SKILLS 来自开源项目，在 TRAE 中的配置方式：</p><p><code>设置 → 技能和规则 → 技能 → 创建 → 上传进行智能解析</code></p><ul><li><strong>AGENTS.md</strong>：向 AI 智能体提供行为指引</li><li><strong>项目规则</strong>：规范 AI 在 TRAE 内的行为，可根据项目需求制定</li></ul><hr><h2 id="4-Prompt-提示词"><a href="#4-Prompt-提示词" class="headerlink" title="4. Prompt 提示词"></a>4. Prompt 提示词</h2><p>提示词是核心，需要讲清楚流程和策略。</p><p><strong>参考方法</strong>：</p><ol><li><strong>先告知已知信息</strong>，让 AI 生成 Prompt 后再给 Trae</li><li><strong>分步提问</strong>：先问”如何定位代码”，再问”如何解析逻辑”，最后问”如何还原”，避免一次提问过于宽泛</li><li><strong>及时补充上下文</strong>：根据分析结果动态调整</li><li><strong>结合工具操作</strong>：提示词中明确告知”JADX/IDA 的操作步骤（如搜索路径、断点位置）”，便于落地执行</li></ol><hr><h2 id="5-AGENT-智能体"><a href="#5-AGENT-智能体" class="headerlink" title="5. AGENT 智能体"></a>5. AGENT 智能体</h2><p>创建合理的智能体比较关键。TRAE 中一个智能体工具上限为 <strong>40 个</strong>，建议多建几个不同功能的智能体，每个智能体选择特定的 MCP 工具和 SKILLS。</p><p>使用 SOLO 模式时，Trae 可以根据场景自动调用不同的智能体。</p><hr><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文搭建的 AI 逆向工具链核心组合：</p><table><thead><tr><th>组件</th><th>工具</th><th>作用</th></tr></thead><tbody><tr><td>IDE</td><td>Trae（免费）</td><td>AI 驱动开发环境</td></tr><tr><td>MCP</td><td>JADX MCP + IDA Pro MCP</td><td>连接专业逆向工具</td></tr><tr><td>SKILLS</td><td>开源 Skill 库</td><td>编码逆向经验</td></tr><tr><td>Prompt</td><td>分步提示词</td><td>引导 AI 分析路径</td></tr><tr><td>Agent</td><td>多 Agent 协作</td><td>按场景自动调度</td></tr></tbody></table><p>整套方案免费、操作简单，适合想用 AI 辅助逆向分析的工程师落地使用。</p><hr><p><em>来源：公众号 Pythonlx，原文《一文搭建免费的AI逆向工具链》</em></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术调研</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>MCP</tag>
+      
+      <tag>逆向工程</tag>
+      
+      <tag>AI工具</tag>
+      
+      <tag>Trae</tag>
+      
+      <tag>Claude Code</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>traefik 配置教程</title>
     <link href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/"/>
     <url>/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
