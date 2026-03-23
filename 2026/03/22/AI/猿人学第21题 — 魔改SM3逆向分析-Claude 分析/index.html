@@ -1,0 +1,861 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="猿人学第21题 — 魔改SM3逆向分析1. 目标 地址：https:&#x2F;&#x2F;match.yuanrenxue.cn&#x2F;match&#x2F;21 目标：逆向页面中 token 参数的生成算法，脱离浏览器使用 Python 成功请求第一页数据 加密算法：魔改 SM3  2. 抓包分析页面通过 POST 请求 &#x2F;api&#x2F;question&#x2F;21 获取数据，请求参数：    参数 说明    page 页码   page">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学第21题 — 魔改SM3逆向分析-Claude 分析">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/22/AI/%E7%8C%BF%E4%BA%BA%E5%AD%A6%E7%AC%AC21%E9%A2%98%20%E2%80%94%20%E9%AD%94%E6%94%B9SM3%E9%80%86%E5%90%91%E5%88%86%E6%9E%90-Claude%20%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="猿人学第21题 — 魔改SM3逆向分析1. 目标 地址：https:&#x2F;&#x2F;match.yuanrenxue.cn&#x2F;match&#x2F;21 目标：逆向页面中 token 参数的生成算法，脱离浏览器使用 Python 成功请求第一页数据 加密算法：魔改 SM3  2. 抓包分析页面通过 POST 请求 &#x2F;api&#x2F;question&#x2F;21 获取数据，请求参数：    参数 说明    page 页码   page">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-22T04:01:00.000Z">
+<meta property="article:modified_time" content="2026-03-22T09:11:54.419Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="逆向">
+<meta property="article:tag" content="Claude">
+<meta property="article:tag" content="MCP">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学第21题 — 魔改SM3逆向分析-Claude 分析 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学第21题 — 魔改SM3逆向分析-Claude 分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-22 12:01" pubdate>
+          2026年3月22日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          76 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学第21题 — 魔改SM3逆向分析-Claude 分析</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="猿人学第21题-—-魔改SM3逆向分析"><a href="#猿人学第21题-—-魔改SM3逆向分析" class="headerlink" title="猿人学第21题 — 魔改SM3逆向分析"></a>猿人学第21题 — 魔改SM3逆向分析</h1><h2 id="1-目标"><a href="#1-目标" class="headerlink" title="1. 目标"></a>1. 目标</h2><ul>
+<li>地址：<code>https://match.yuanrenxue.cn/match/21</code></li>
+<li>目标：逆向页面中 <code>token</code> 参数的生成算法，脱离浏览器使用 Python 成功请求第一页数据</li>
+<li>加密算法：魔改 SM3</li>
+</ul>
+<h2 id="2-抓包分析"><a href="#2-抓包分析" class="headerlink" title="2. 抓包分析"></a>2. 抓包分析</h2><p>页面通过 POST 请求 <code>/api/question/21</code> 获取数据，请求参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>page</code></td>
+<td>页码</td>
+</tr>
+<tr>
+<td><code>pageSize</code></td>
+<td>固定为 10</td>
+</tr>
+<tr>
+<td><code>kw</code></td>
+<td>空字符串</td>
+</tr>
+<tr>
+<td><code>token</code></td>
+<td>SM3 哈希值</td>
+</tr>
+</tbody></table>
+<p>请求头中携带 <code>Accept-Time</code> 字段，值为服务端时间戳。</p>
+<h2 id="3-JS分析-—-定位加密入口"><a href="#3-JS分析-—-定位加密入口" class="headerlink" title="3. JS分析 — 定位加密入口"></a>3. JS分析 — 定位加密入口</h2><h3 id="3-1-页面脚本逻辑"><a href="#3-1-页面脚本逻辑" class="headerlink" title="3.1 页面脚本逻辑"></a>3.1 页面脚本逻辑</h3><p>页面内联脚本（Script ID 18）包含以下关键逻辑：</p>
+<ol>
+<li><strong>XHR 拦截</strong>：重写了 <code>XMLHttpRequest.prototype.open/send/setRequestHeader</code>，将 VM 发出的 <code>/api/match2023/3</code> 请求重定向到真实接口 <code>/api/question/21</code></li>
+<li><strong>时间戳获取</strong>：重写了 <code>Date.now</code>，改为同步请求 <code>/api/getTime</code> 获取服务端时间</li>
+<li><strong>调用 VM</strong>：最后执行 <code>call(String(1))</code> 启动 VM 中的加密流程</li>
+</ol>
+<h3 id="3-2-加密JS文件"><a href="#3-2-加密JS文件" class="headerlink" title="3.2 加密JS文件"></a>3.2 加密JS文件</h3><p>加密逻辑在 <code>match3.js</code>（525KB），这是一个 VM 混淆的JS文件，核心结构：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">Navigation 伪造 → VM解释器函数 <span class="hljs-selector-tag">i</span>(l,s,f,n,t,<span class="hljs-attribute">r</span>,<span class="hljs-selector-tag">a</span>,u) → <span class="hljs-number">185337</span>个字节码<br></code></pre></td></tr></table></figure>
+
+<p>VM 解释器通过巨大的 <code>if-else</code> 链实现状态机，根据字节码数组执行不同操作。字节码中编码了完整的 SM3 算法实现。</p>
+<h2 id="4-Token公式推导"><a href="#4-Token公式推导" class="headerlink" title="4. Token公式推导"></a>4. Token公式推导</h2><p>通过浏览器 DevTools 和 preload 脚本注入，hook <code>window.sm3Digest</code>，确定 token 生成公式：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">token</span> = sm3Digest(timestamp + page)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>timestamp</code>：通过 GET <code>/api/getTime</code> 获取的服务端时间戳字符串</li>
+<li><code>page</code>：页码字符串</li>
+<li>两者直接字符串拼接后传入 <code>sm3Digest</code></li>
+</ul>
+<h2 id="5-魔改SM3逆向过程"><a href="#5-魔改SM3逆向过程" class="headerlink" title="5. 魔改SM3逆向过程"></a>5. 魔改SM3逆向过程</h2><h3 id="5-1-分析方法"><a href="#5-1-分析方法" class="headerlink" title="5.1 分析方法"></a>5.1 分析方法</h3><p>由于 <code>_compress</code> 函数是 VM 字节码生成的闭包，无法直接阅读源码。采用以下策略：</p>
+<ol>
+<li><strong>Hook辅助函数</strong>：通过替换 <code>SM3.prototype</code> 上的 <code>_rotl</code>、<code>_ff</code>、<code>_gg</code>、<code>_t</code>、<code>_expand</code> 方法，捕获每次调用的输入输出</li>
+<li><strong>对比标准SM3</strong>：用标准SM3计算相同输入的期望值，与浏览器实际值逐项对比</li>
+<li><strong>定位差异</strong>：从 IV → T常量 → strToBytes → 压缩函数内部，逐层缩小差异范围</li>
+</ol>
+<h3 id="5-2-已验证的标准部分"><a href="#5-2-已验证的标准部分" class="headerlink" title="5.2 已验证的标准部分"></a>5.2 已验证的标准部分</h3><p>以下组件经验证与标准SM3<strong>完全一致</strong>：</p>
+<ul>
+<li><code>_rotl(x, n)</code> — 32位循环左移</li>
+<li><code>_ff(j, x, y, z)</code> — j&lt;16 用 XOR，j≥16 用多数函数</li>
+<li><code>_gg(j, x, y, z)</code> — j&lt;16 用 XOR，j≥16 用选择函数</li>
+<li><code>_expand(buf)</code> — W 扩展（P1置换 + 循环左移）</li>
+<li>消息填充 — 标准 SM3 填充（0x80 + 零填充 + 64位大端长度）</li>
+</ul>
+<h3 id="5-3-发现的6处魔改"><a href="#5-3-发现的6处魔改" class="headerlink" title="5.3 发现的6处魔改"></a>5.3 发现的6处魔改</h3><h4 id="魔改1：自定义-IV"><a href="#魔改1：自定义-IV" class="headerlink" title="魔改1：自定义 IV"></a>魔改1：自定义 IV</h4><p>标准SM3 IV：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">7380166f</span> <span class="hljs-number">4914</span>b2b9 <span class="hljs-number">172442</span>d7 da8a0600 a96f30bc <span class="hljs-number">163138</span>aa e38dee4d b0fb0e4e<br></code></pre></td></tr></table></figure>
+
+<p>魔改 IV：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">7380067c</span> <span class="hljs-number">7634</span>d2c9 <span class="hljs-number">170042</span>d6 da887534 a10c30bc <span class="hljs-number">151137</span>ad e37caa4d eeeb0f4e<br></code></pre></td></tr></table></figure>
+
+<p><strong>发现方法</strong>：直接读取 <code>new SM3().reg</code> 数组。</p>
+<h4 id="魔改2：自定义-T-常量"><a href="#魔改2：自定义-T-常量" class="headerlink" title="魔改2：自定义 T 常量"></a>魔改2：自定义 T 常量</h4><p>标准SM3：T(0-15) = <code>0x79CC4519</code>，T(16-63) = <code>0x7A879D8A</code></p>
+<p>魔改：T(0-15) = <code>0x79DD4519</code>，T(16-63) = <code>0x7C179D8A</code></p>
+<p><strong>发现方法</strong>：Hook <code>_t(j)</code> 函数，捕获返回值。</p>
+<h4 id="魔改3：strToBytes-清除LSB"><a href="#魔改3：strToBytes-清除LSB" class="headerlink" title="魔改3：strToBytes 清除LSB"></a>魔改3：strToBytes 清除LSB</h4><p>标准SM3 的 strToBytes 是普通的 UTF-8 编码。</p>
+<p>魔改版本对每个字节执行 <code>&amp; 0xFE</code>，即清除最低位。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 标准: &quot;abc&quot; → [0x61, 0x62, 0x63]</span><br><span class="hljs-comment"># 魔改: &quot;abc&quot; → [0x60, 0x62, 0x62]  (每字节 &amp; 0xFE)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>发现方法</strong>：调用 <code>sm3.strToBytes(&quot;abc&quot;)</code> 对比输出字节，发现 0x61→0x60, 0x63→0x62。</p>
+<h4 id="魔改4：ss1-input-掩码-amp-0xFCFFFFFF"><a href="#魔改4：ss1-input-掩码-amp-0xFCFFFFFF" class="headerlink" title="魔改4：ss1_input 掩码 &amp; 0xFCFFFFFF"></a>魔改4：ss1_input 掩码 <code>&amp; 0xFCFFFFFF</code></h4><p>在压缩函数的每一轮中，计算 SS1 前对中间值应用掩码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">ss1_input = (rotl(A, <span class="hljs-number">12</span>) + E + rotl(T, j%<span class="hljs-number">32</span>)) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>ss1_input = ss1_input &amp; <span class="hljs-number">0xFCFFFFFF</span>  <span class="hljs-comment"># 清除 bit 24, 25</span><br>SS1 = rotl(ss1_input, <span class="hljs-number">7</span>)<br></code></pre></td></tr></table></figure>
+
+<p><strong>发现方法</strong>：Hook <code>_rotl</code> 捕获 <code>rotl(ss1_input, 7)</code> 的输入值，与标准计算值对比。例如第0轮：标准值 <code>0x1B513D0D</code>，实际值 <code>0x18513D0D</code>，差异 <code>0x1B &amp; 0xFC = 0x18</code>。</p>
+<h4 id="魔改5：TT1-掩码-amp-0xFFFFFFFA"><a href="#魔改5：TT1-掩码-amp-0xFFFFFFFA" class="headerlink" title="魔改5：TT1 掩码 &amp; 0xFFFFFFFA"></a>魔改5：TT1 掩码 <code>&amp; 0xFFFFFFFA</code></h4><p>TT1 计算结果清除 bit 0 和 bit 2：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">TT1 = (FF(j,A,B,C) + D + SS2 + W<span class="hljs-string">&#x27;[j]) &amp; 0xFFFFFFFA  # 清除 bit 0, 2</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>发现方法</strong>：通过下一轮的 A 值（= 本轮 TT1）反推。第0轮：标准值 <code>0x46B64D4B</code>，实际值 <code>0x46B64D4A</code>（差1）；第1轮：标准值 <code>0xB6DFF66F</code>，实际值 <code>0xB6DFF66A</code>（差5）。验证 <code>&amp; 0xFA</code> 对 LSB 字节在所有64轮均成立。</p>
+<h4 id="魔改6：TT2-掩码-amp-0xFFAFFFFF"><a href="#魔改6：TT2-掩码-amp-0xFFAFFFFF" class="headerlink" title="魔改6：TT2 掩码 &amp; 0xFFAFFFFF"></a>魔改6：TT2 掩码 <code>&amp; 0xFFAFFFFF</code></h4><p>TT2 计算结果清除 bit 20 和 bit 22：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">TT2 = (GG(j,E,F,G) + H + SS1 + W[j]) &amp; <span class="hljs-number">0xFFAFFFFF</span>  <span class="hljs-comment"># 清除 bit 20, 22</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>发现方法</strong>：TT2 是 <code>rotl(TT2, 9)</code> 和 <code>rotl(TT2, 17)</code> 的输入，直接从 <code>_rotl</code> hook 中获取。第0轮：标准值 <code>0x9F6B4336</code>，实际值 <code>0x9F2B4336</code>（<code>0x6B &amp; 0xAF = 0x2B</code>）。验证掩码 <code>&amp; 0xFFAFFFFF</code> 在所有64轮均成立。</p>
+<h3 id="5-4-掩码汇总"><a href="#5-4-掩码汇总" class="headerlink" title="5.4 掩码汇总"></a>5.4 掩码汇总</h3><table>
+<thead>
+<tr>
+<th>位置</th>
+<th>掩码</th>
+<th>清除的位</th>
+<th>字节位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ss1_input</td>
+<td><code>0xFCFFFFFF</code></td>
+<td>bit 24, 25</td>
+<td>字节0 的 bit 0,1</td>
+</tr>
+<tr>
+<td>TT1</td>
+<td><code>0xFFFFFFFA</code></td>
+<td>bit 0, 2</td>
+<td>字节3 的 bit 0,2</td>
+</tr>
+<tr>
+<td>TT2</td>
+<td><code>0xFFAFFFFF</code></td>
+<td>bit 20, 22</td>
+<td>字节1 的 bit 4,6</td>
+</tr>
+</tbody></table>
+<h2 id="6-Python-实现"><a href="#6-Python-实现" class="headerlink" title="6. Python 实现"></a>6. Python 实现</h2><p>完整实现见 <code>solve.py</code>，核心压缩函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">compress</span>(<span class="hljs-params">reg, buf</span>):<br>    W = expand(buf)<br>    A, B, C, D, E, F, G, H = reg<br><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">64</span>):<br>        Tj = T(j)<br>        rotlA12 = rotl(A, <span class="hljs-number">12</span>)<br>        rotlTj = rotl(Tj, j % <span class="hljs-number">32</span>)<br>        ss1_input = (rotlA12 + E + rotlTj) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>        ss1_input = ss1_input &amp; <span class="hljs-number">0xFCFFFFFF</span>          <span class="hljs-comment"># 魔改1</span><br><br>        SS1 = rotl(ss1_input, <span class="hljs-number">7</span>)<br>        SS2 = (SS1 ^ rotlA12) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br>        ffVal = FF(j, A, B, C)<br>        ggVal = GG(j, E, F, G)<br><br>        TT1 = (ffVal + D + SS2 + (W[j] ^ W[j+<span class="hljs-number">4</span>])) &amp; <span class="hljs-number">0xFFFFFFFA</span>  <span class="hljs-comment"># 魔改2</span><br>        TT2 = (ggVal + H + SS1 + W[j]) &amp; <span class="hljs-number">0xFFAFFFFF</span>              <span class="hljs-comment"># 魔改3</span><br><br>        D = C<br>        C = rotl(B, <span class="hljs-number">9</span>)<br>        B = A<br>        A = TT1<br>        H = G<br>        G = rotl(F, <span class="hljs-number">19</span>)<br>        F = E<br>        E = P0(TT2)<br><br>    <span class="hljs-comment"># XOR with initial values</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>        reg[i] = (reg[i] ^ [A,B,C,D,E,F,G,H][i]) &amp; <span class="hljs-number">0xFFFFFFFF</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="7-验证结果"><a href="#7-验证结果" class="headerlink" title="7. 验证结果"></a>7. 验证结果</h2><p>4组浏览器对照测试全部通过：</p>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&quot;0&quot;</code></td>
+<td><code>6cb40d1e1fee0dbbe28c97d57816501d89ecbbc1f8e3a8c1df21892ec8f868c3</code></td>
+</tr>
+<tr>
+<td><code>&quot;abc&quot;</code></td>
+<td><code>1fecc55c368568eb24f6d22e2a37246f06c348cca1b735049cb545c2326d36cb</code></td>
+</tr>
+<tr>
+<td><code>&quot;test&quot;</code></td>
+<td><code>38fbffd4e19cc051d85ff36c016d00accf9a0536f9833c4c677ad8659f4ccffb</code></td>
+</tr>
+<tr>
+<td><code>&quot;17741097605571&quot;</code></td>
+<td><code>adac3db429079e917b41a79b7dbdf50d6751f89082a8147f963e0f213bccab68</code></td>
+</tr>
+</tbody></table>
+<h2 id="8-请求流程"><a href="#8-请求流程" class="headerlink" title="8. 请求流程"></a>8. 请求流程</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python">session = requests.Session()<br>session.headers.update(&#123;<br>    <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;yuanrenxue.project&#x27;</span>,<br>    <span class="hljs-string">&#x27;Referer&#x27;</span>: <span class="hljs-string">&#x27;https://match.yuanrenxue.cn/match/21&#x27;</span>,<br>    <span class="hljs-string">&#x27;Origin&#x27;</span>: <span class="hljs-string">&#x27;https://match.yuanrenxue.cn&#x27;</span>,<br>&#125;)<br><br><span class="hljs-comment"># 1. 获取session cookie</span><br>session.get(<span class="hljs-string">&#x27;https://match.yuanrenxue.cn/match/21&#x27;</span>)<br><br><span class="hljs-comment"># 2. 获取服务端时间戳</span><br>timestamp = session.get(<span class="hljs-string">&#x27;https://match.yuanrenxue.cn/api/getTime&#x27;</span>).text.strip()<br><br><span class="hljs-comment"># 3. 生成token</span><br>page = <span class="hljs-number">1</span><br>token = sm3_digest(<span class="hljs-built_in">str</span>(timestamp) + <span class="hljs-built_in">str</span>(page))<br><br><span class="hljs-comment"># 4. 请求数据</span><br>resp = session.post(<br>    <span class="hljs-string">&#x27;https://match.yuanrenxue.cn/api/question/21&#x27;</span>,<br>    data=&#123;<span class="hljs-string">&#x27;page&#x27;</span>: page, <span class="hljs-string">&#x27;pageSize&#x27;</span>: <span class="hljs-number">10</span>, <span class="hljs-string">&#x27;kw&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;token&#x27;</span>: token&#125;,<br>    headers=&#123;<span class="hljs-string">&#x27;Accept-Time&#x27;</span>: <span class="hljs-built_in">str</span>(timestamp)&#125;,<br>)<br></code></pre></td></tr></table></figure>
+
+<p>响应示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-number">669355</span><span class="hljs-punctuation">,</span> <span class="hljs-number">488782</span><span class="hljs-punctuation">,</span> <span class="hljs-number">586179</span><span class="hljs-punctuation">,</span> <span class="hljs-number">940330</span><span class="hljs-punctuation">,</span> <span class="hljs-number">159643</span><span class="hljs-punctuation">,</span> <span class="hljs-number">832370</span><span class="hljs-punctuation">,</span> <span class="hljs-number">970259</span><span class="hljs-punctuation">,</span> <span class="hljs-number">603537</span><span class="hljs-punctuation">,</span> <span class="hljs-number">407100</span><span class="hljs-punctuation">,</span> <span class="hljs-number">997065</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="9-工具链"><a href="#9-工具链" class="headerlink" title="9. 工具链"></a>9. 工具链</h2><ul>
+<li><strong>js-reverse MCP</strong>：preload 脚本注入、hook SM3 函数、执行浏览器端JS</li>
+<li><strong>Chrome DevTools MCP</strong>：页面导航、脚本分析</li>
+<li><strong>Chrome Remote Debugging</strong>：<code>--remote-debugging-port=9222</code> 启动 Chrome</li>
+<li><strong>Python requests</strong>：最终脱浏览器请求验证</li>
+</ul>
+<h2 id="10-完整代码"><a href="#10-完整代码" class="headerlink" title="10. 完整代码"></a>10. 完整代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> struct<br><span class="hljs-keyword">import</span> requests<br><br><span class="hljs-comment"># Modified SM3 implementation (魔改SM3)</span><br><br><span class="hljs-comment"># Custom IV (different from standard)</span><br>IV = [<br>    <span class="hljs-number">0x7380067c</span>, <span class="hljs-number">0x7634d2c9</span>, <span class="hljs-number">0x170042d6</span>, <span class="hljs-number">0xda887534</span>,<br>    <span class="hljs-number">0xa10c30bc</span>, <span class="hljs-number">0x151137ad</span>, <span class="hljs-number">0xe37caa4d</span>, <span class="hljs-number">0xeeeb0f4e</span>,<br>]<br><br><span class="hljs-comment"># Custom T constants (different from standard)</span><br>T_0_15 = <span class="hljs-number">0x79DD4519</span><br>T_16_63 = <span class="hljs-number">0x7C179D8A</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rotl</span>(<span class="hljs-params">x, n</span>):<br>    n = n % <span class="hljs-number">32</span><br>    <span class="hljs-keyword">return</span> ((x &lt;&lt; n) | (x &gt;&gt; (<span class="hljs-number">32</span> - n))) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">T</span>(<span class="hljs-params">j</span>):<br>    <span class="hljs-keyword">return</span> T_0_15 <span class="hljs-keyword">if</span> j &lt; <span class="hljs-number">16</span> <span class="hljs-keyword">else</span> T_16_63<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">FF</span>(<span class="hljs-params">j, X, Y, Z</span>):<br>    <span class="hljs-keyword">if</span> j &lt; <span class="hljs-number">16</span>:<br>        <span class="hljs-keyword">return</span> (X ^ Y ^ Z) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> ((X &amp; Y) | (X &amp; Z) | (Y &amp; Z)) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">GG</span>(<span class="hljs-params">j, X, Y, Z</span>):<br>    <span class="hljs-keyword">if</span> j &lt; <span class="hljs-number">16</span>:<br>        <span class="hljs-keyword">return</span> (X ^ Y ^ Z) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">return</span> ((X &amp; Y) | ((~X &amp; <span class="hljs-number">0xFFFFFFFF</span>) &amp; Z)) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">P0</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-keyword">return</span> (x ^ rotl(x, <span class="hljs-number">9</span>) ^ rotl(x, <span class="hljs-number">17</span>)) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">P1</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-keyword">return</span> (x ^ rotl(x, <span class="hljs-number">15</span>) ^ rotl(x, <span class="hljs-number">23</span>)) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">expand</span>(<span class="hljs-params">B</span>):<br>    W = <span class="hljs-built_in">list</span>(struct.unpack(<span class="hljs-string">&#x27;&gt;16I&#x27;</span>, B))<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">16</span>, <span class="hljs-number">68</span>):<br>        W.append(P1(W[j-<span class="hljs-number">16</span>] ^ W[j-<span class="hljs-number">9</span>] ^ rotl(W[j-<span class="hljs-number">3</span>], <span class="hljs-number">15</span>)) ^ rotl(W[j-<span class="hljs-number">13</span>], <span class="hljs-number">7</span>) ^ W[j-<span class="hljs-number">6</span>])<br>        W[-<span class="hljs-number">1</span>] &amp;= <span class="hljs-number">0xFFFFFFFF</span><br>    <span class="hljs-keyword">return</span> W<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">compress</span>(<span class="hljs-params">reg, buf</span>):<br>    W = expand(buf)<br>    A, B, C, D, E, F, G, H = reg<br><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">64</span>):<br>        Tj = T(j)<br>        rotlA12 = rotl(A, <span class="hljs-number">12</span>)<br>        rotlTj = rotl(Tj, j % <span class="hljs-number">32</span>)<br>        ss1_input = (rotlA12 + E + rotlTj) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br>        <span class="hljs-comment"># Modification 1: clear bits 24,25 of ss1_input</span><br>        ss1_input = ss1_input &amp; <span class="hljs-number">0xFCFFFFFF</span><br><br>        SS1 = rotl(ss1_input, <span class="hljs-number">7</span>)<br>        SS2 = (SS1 ^ rotlA12) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br>        ffVal = FF(j, A, B, C)<br>        ggVal = GG(j, E, F, G)<br><br>        <span class="hljs-comment"># Modification 2: TT1 clear bits 0,2</span><br>        TT1 = (ffVal + D + SS2 + (W[j] ^ W[j+<span class="hljs-number">4</span>])) &amp; <span class="hljs-number">0xFFFFFFFA</span><br>        <span class="hljs-comment"># Modification 3: TT2 clear bits 20,22</span><br>        TT2 = (ggVal + H + SS1 + W[j]) &amp; <span class="hljs-number">0xFFAFFFFF</span><br><br>        D = C<br>        C = rotl(B, <span class="hljs-number">9</span>)<br>        B = A<br>        A = TT1<br>        H = G<br>        G = rotl(F, <span class="hljs-number">19</span>)<br>        F = E<br>        E = P0(TT2)<br><br>    reg[<span class="hljs-number">0</span>] = (reg[<span class="hljs-number">0</span>] ^ A) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">1</span>] = (reg[<span class="hljs-number">1</span>] ^ B) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">2</span>] = (reg[<span class="hljs-number">2</span>] ^ C) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">3</span>] = (reg[<span class="hljs-number">3</span>] ^ D) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">4</span>] = (reg[<span class="hljs-number">4</span>] ^ E) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">5</span>] = (reg[<span class="hljs-number">5</span>] ^ F) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">6</span>] = (reg[<span class="hljs-number">6</span>] ^ G) &amp; <span class="hljs-number">0xFFFFFFFF</span><br>    reg[<span class="hljs-number">7</span>] = (reg[<span class="hljs-number">7</span>] ^ H) &amp; <span class="hljs-number">0xFFFFFFFF</span><br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">str_to_bytes</span>(<span class="hljs-params">s</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;Custom strToBytes: encode as UTF-8, then clear LSB of each byte (&amp; 0xFE)&quot;&quot;&quot;</span><br>    raw = s.encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>([b &amp; <span class="hljs-number">0xFE</span> <span class="hljs-keyword">for</span> b <span class="hljs-keyword">in</span> raw])<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">sm3_digest</span>(<span class="hljs-params">message</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;Compute modified SM3 hash of a string&quot;&quot;&quot;</span><br>    data = str_to_bytes(message)<br><br>    reg = IV[:]<br>    <span class="hljs-comment"># Padding</span><br>    msg_len = <span class="hljs-built_in">len</span>(data)<br>    data += <span class="hljs-string">b&#x27;\x80&#x27;</span><br>    <span class="hljs-comment"># Pad to 56 mod 64</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-built_in">len</span>(data) % <span class="hljs-number">64</span> != <span class="hljs-number">56</span>:<br>        data += <span class="hljs-string">b&#x27;\x00&#x27;</span><br>    <span class="hljs-comment"># Append length in bits as 64-bit big-endian</span><br>    data += struct.pack(<span class="hljs-string">&#x27;&gt;Q&#x27;</span>, msg_len * <span class="hljs-number">8</span>)<br><br>    <span class="hljs-comment"># Process blocks</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(data), <span class="hljs-number">64</span>):<br>        compress(reg, data[i:i+<span class="hljs-number">64</span>])<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>.join(<span class="hljs-string">f&#x27;<span class="hljs-subst">&#123;v:08x&#125;</span>&#x27;</span> <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> reg)<br><br><br><span class="hljs-comment"># Test against browser-verified values</span><br>test_cases = &#123;<br>    <span class="hljs-string">&quot;0&quot;</span>: <span class="hljs-string">&quot;6cb40d1e1fee0dbbe28c97d57816501d89ecbbc1f8e3a8c1df21892ec8f868c3&quot;</span>,<br>    <span class="hljs-string">&quot;abc&quot;</span>: <span class="hljs-string">&quot;1fecc55c368568eb24f6d22e2a37246f06c348cca1b735049cb545c2326d36cb&quot;</span>,<br>    <span class="hljs-string">&quot;test&quot;</span>: <span class="hljs-string">&quot;38fbffd4e19cc051d85ff36c016d00accf9a0536f9833c4c677ad8659f4ccffb&quot;</span>,<br>    <span class="hljs-string">&quot;17741097605571&quot;</span>: <span class="hljs-string">&quot;adac3db429079e917b41a79b7dbdf50d6751f89082a8147f963e0f213bccab68&quot;</span>,<br>&#125;<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Testing modified SM3:&quot;</span>)<br>all_pass = <span class="hljs-literal">True</span><br><span class="hljs-keyword">for</span> msg, expected <span class="hljs-keyword">in</span> test_cases.items():<br>    result = sm3_digest(msg)<br>    ok = result == expected<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> ok:<br>        all_pass = <span class="hljs-literal">False</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;  sm3Digest(\&quot;<span class="hljs-subst">&#123;msg&#125;</span>\&quot;) = <span class="hljs-subst">&#123;result&#125;</span> <span class="hljs-subst">&#123;<span class="hljs-string">&#x27;✓&#x27;</span> <span class="hljs-keyword">if</span> ok <span class="hljs-keyword">else</span> <span class="hljs-string">&#x27;✗ expected: &#x27;</span> + expected&#125;</span>&quot;</span>)<br><br><span class="hljs-keyword">if</span> all_pass:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;\nAll tests passed! Now fetching page 1 data...\n&quot;</span>)<br><br>    session = requests.Session()<br>    session.headers.update(&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;yuanrenxue.project&#x27;</span>,<br>        <span class="hljs-string">&#x27;Referer&#x27;</span>: <span class="hljs-string">&#x27;https://match.yuanrenxue.cn/match/21&#x27;</span>,<br>        <span class="hljs-string">&#x27;Origin&#x27;</span>: <span class="hljs-string">&#x27;https://match.yuanrenxue.cn&#x27;</span>,<br>    &#125;)<br><br>    <span class="hljs-comment"># Need to get a session cookie first</span><br>    session.get(<span class="hljs-string">&#x27;https://match.yuanrenxue.cn/match/21&#x27;</span>)<br><br>    <span class="hljs-comment"># Get server timestamp</span><br>    time_resp = session.get(<span class="hljs-string">&#x27;https://match.yuanrenxue.cn/api/getTime&#x27;</span>)<br>    timestamp = time_resp.text.strip()<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Server timestamp: <span class="hljs-subst">&#123;timestamp&#125;</span>&quot;</span>)<br><br>    page = <span class="hljs-number">1</span><br>    token = sm3_digest(<span class="hljs-built_in">str</span>(timestamp) + <span class="hljs-built_in">str</span>(page))<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Token for page <span class="hljs-subst">&#123;page&#125;</span>: <span class="hljs-subst">&#123;token&#125;</span>&quot;</span>)<br><br>    resp = session.post(<br>        <span class="hljs-string">&#x27;https://match.yuanrenxue.cn/api/question/21&#x27;</span>,<br>        data=&#123;<br>            <span class="hljs-string">&#x27;page&#x27;</span>: page,<br>            <span class="hljs-string">&#x27;pageSize&#x27;</span>: <span class="hljs-number">10</span>,<br>            <span class="hljs-string">&#x27;kw&#x27;</span>: <span class="hljs-string">&#x27;&#x27;</span>,<br>            <span class="hljs-string">&#x27;token&#x27;</span>: token,<br>        &#125;,<br>        headers=&#123;<br>            <span class="hljs-string">&#x27;Accept-Time&#x27;</span>: <span class="hljs-built_in">str</span>(timestamp),<br>        &#125;<br>    )<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Response status: <span class="hljs-subst">&#123;resp.status_code&#125;</span>&quot;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Response: <span class="hljs-subst">&#123;resp.text&#125;</span>&quot;</span>)<br><span class="hljs-keyword">else</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;\nSome tests failed, not attempting API request.&quot;</span>)<br><br></code></pre></td></tr></table></figure>
+
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E9%85%8D%E7%BD%AE/" class="category-chain-item">技术配置</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Claude/">#Claude</a>
+      
+        <a href="/tags/MCP/">#MCP</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学第21题 — 魔改SM3逆向分析-Claude 分析</div>
+      <div>https://kingjem.github.io/2026/03/22/AI/猿人学第21题 — 魔改SM3逆向分析-Claude 分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月22日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/22/AI/js-reverse-vs-chrome-devtools/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

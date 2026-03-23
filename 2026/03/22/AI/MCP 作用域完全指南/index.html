@@ -1,0 +1,839 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="MCP 作用域完全指南 以 chrome-devtools-mcp 为例，深入理解 local &#x2F; project &#x2F; user 三种作用域的配置文件位置与优先级规则   什么是 MCP 作用域在 Claude Code 中，每一个 MCP Server 都必须归属于某个作用域（scope）。作用域决定了两件事：  配置被写入哪个文件 这个 Server 在哪些场景下生效  Claude Code">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MCP 作用域完全指南">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/22/AI/MCP%20%E4%BD%9C%E7%94%A8%E5%9F%9F%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="MCP 作用域完全指南 以 chrome-devtools-mcp 为例，深入理解 local &#x2F; project &#x2F; user 三种作用域的配置文件位置与优先级规则   什么是 MCP 作用域在 Claude Code 中，每一个 MCP Server 都必须归属于某个作用域（scope）。作用域决定了两件事：  配置被写入哪个文件 这个 Server 在哪些场景下生效  Claude Code">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-22T03:12:00.000Z">
+<meta property="article:modified_time" content="2026-03-22T03:12:55.371Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Claude">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="开发工具">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>MCP 作用域完全指南 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MCP 作用域完全指南"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-22 11:12" pubdate>
+          2026年3月22日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MCP 作用域完全指南</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="MCP-作用域完全指南"><a href="#MCP-作用域完全指南" class="headerlink" title="MCP 作用域完全指南"></a>MCP 作用域完全指南</h1><blockquote>
+<p>以 <code>chrome-devtools-mcp</code> 为例，深入理解 <code>local</code> / <code>project</code> / <code>user</code> 三种作用域的配置文件位置与优先级规则</p>
+</blockquote>
+<hr>
+<h2 id="什么是-MCP-作用域"><a href="#什么是-MCP-作用域" class="headerlink" title="什么是 MCP 作用域"></a>什么是 MCP 作用域</h2><p>在 Claude Code 中，每一个 MCP Server 都必须归属于某个<strong>作用域（scope）</strong>。作用域决定了两件事：</p>
+<ol>
+<li>配置被写入哪个文件</li>
+<li>这个 Server 在哪些场景下生效</li>
+</ol>
+<p>Claude Code 提供三种作用域，通过 <code>--scope</code>（或简写 <code>-s</code>）参数指定：</p>
+<table>
+<thead>
+<tr>
+<th>作用域</th>
+<th><code>-s</code> 参数</th>
+<th>写入文件</th>
+<th>生效范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>local</strong></td>
+<td>默认，可省略</td>
+<td><code>~/.claude.json</code>（项目子键）</td>
+<td>仅当前项目，私有</td>
+</tr>
+<tr>
+<td><strong>project</strong></td>
+<td><code>-s project</code></td>
+<td><code>项目根目录/.mcp.json</code></td>
+<td>当前项目，团队共享</td>
+</tr>
+<tr>
+<td><strong>user</strong></td>
+<td><code>-s user</code></td>
+<td><code>~/.claude.json</code>（顶层键）</td>
+<td>所有项目，跨项目全局</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="以-chrome-devtools-mcp-为例"><a href="#以-chrome-devtools-mcp-为例" class="headerlink" title="以 chrome-devtools-mcp 为例"></a>以 chrome-devtools-mcp 为例</h2><p><code>chrome-devtools-mcp</code> 让 Claude 能够控制 Chrome 浏览器、读取 Console 输出、执行 JavaScript、截图等，是前端开发的利器。下面展示三种作用域的完整命令：</p>
+<h3 id="local-scope（默认）"><a href="#local-scope（默认）" class="headerlink" title="local scope（默认）"></a>local scope（默认）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 不加 -s 参数，默认就是 local</span><br>claude mcp add chrome-devtools \<br>  -- npx -y chrome-devtools-mcp@latest --autoConnect<br></code></pre></td></tr></table></figure>
+
+<p>仅对当前项目生效，配置私有，不会被提交到 Git。适合包含敏感凭据或实验性的配置。</p>
+<h3 id="project-scope（团队共享）"><a href="#project-scope（团队共享）" class="headerlink" title="project scope（团队共享）"></a>project scope（团队共享）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude mcp add chrome-devtools -s project \<br>  -- npx -y chrome-devtools-mcp@latest --autoConnect<br></code></pre></td></tr></table></figure>
+
+<p>写入项目根目录的 <code>.mcp.json</code>，设计为提交到版本控制。团队所有成员打开该项目时都能使用相同的 MCP 工具。首次使用前 Claude Code 会提示确认。</p>
+<h3 id="user-scope（跨项目全局）"><a href="#user-scope（跨项目全局）" class="headerlink" title="user scope（跨项目全局）"></a>user scope（跨项目全局）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude mcp add chrome-devtools -s user \<br>  -- npx -y chrome-devtools-mcp@latest --autoConnect<br></code></pre></td></tr></table></figure>
+
+<p>全局生效，跨所有项目可用，只属于当前用户账户。适合个人常用工具。</p>
+<blockquote>
+<p><strong>关于 <code>--</code> 分隔符</strong>：双横线后面的所有内容都被视为传给 MCP server 的命令和参数，防止 <code>--autoConnect</code> 等参数被 <code>claude mcp add</code> 本身误解析。</p>
+</blockquote>
+<hr>
+<h2 id="配置文件写入位置"><a href="#配置文件写入位置" class="headerlink" title="配置文件写入位置"></a>配置文件写入位置</h2><p>执行上述命令后，配置实际写入哪里：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">~/<br>├── .claude/<br>│   └── settings.json          # 全局行为设置（非 MCP）<br>└── .claude.json               ← <span class="hljs-keyword">local</span> scope 和 <span class="hljs-keyword">user</span> scope 都写这里<br><br>~/my-project/<br>├── .mcp.json                  ← project scope 写这里，建议 git <span class="hljs-keyword">commit</span><br>└── .claude/<br>    └── settings.<span class="hljs-keyword">local</span>.json    # 项目本地设置（非 MCP）<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>容易混淆的地方</strong>：<code>local scope</code> 和 <code>user scope</code> 都写入 <code>~/.claude.json</code>（Home 目录），区别在于文件内的 JSON 结构不同——local 存在对应项目路径的子键下，user 存在顶层 <code>mcpServers</code> 键下。</p>
+</blockquote>
+<h3 id="claude-json-内部结构示意"><a href="#claude-json-内部结构示意" class="headerlink" title="~/.claude.json 内部结构示意"></a><code>~/.claude.json</code> 内部结构示意</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;mcpServers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-comment">// user scope —— 所有项目生效</span><br>    <span class="hljs-attr">&quot;chrome-devtools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;-y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;chrome-devtools-mcp@latest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;--autoConnect&quot;</span><span class="hljs-punctuation">]</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;projects&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;/Users/king/my-project&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;mcpServers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-comment">// local scope —— 仅 my-project 生效</span><br>        <span class="hljs-attr">&quot;chrome-devtools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>          <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx&quot;</span><span class="hljs-punctuation">,</span><br>          <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;-y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;chrome-devtools-mcp@latest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;--autoConnect&quot;</span><span class="hljs-punctuation">]</span><br>        <span class="hljs-punctuation">&#125;</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="mcp-json（project-scope）"><a href="#mcp-json（project-scope）" class="headerlink" title=".mcp.json（project scope）"></a><code>.mcp.json</code>（project scope）</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;mcpServers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;chrome-devtools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;-y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;chrome-devtools-mcp@latest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;--autoConnect&quot;</span><span class="hljs-punctuation">]</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="优先级规则"><a href="#优先级规则" class="headerlink" title="优先级规则"></a>优先级规则</h2><p>当同一个 Server 名称在多个作用域都有配置时，Claude Code 按以下顺序决定使用哪个：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">local  &gt;  project  &gt;  <span class="hljs-keyword">user</span><br><span class="hljs-title">（最高）              （最低）</span><br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>作用域</th>
+<th>配置位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1（最高）</td>
+<td>local</td>
+<td><code>~/.claude.json</code> → <code>projects[&quot;/path&quot;]</code> → <code>mcpServers</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>project</td>
+<td><code>.mcp.json</code> → <code>mcpServers</code></td>
+</tr>
+<tr>
+<td>3（最低）</td>
+<td>user</td>
+<td><code>~/.claude.json</code> → <code>mcpServers</code>（顶层）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>：你在 user scope 配置了 chrome-devtools 的正式版，又在某个项目的 local scope 配置了测试版——在该项目内，<strong>local scope 的配置会覆盖 user scope</strong>，其他项目仍使用正式版。</p>
+<blockquote>
+<p><strong><code>.mcp.json</code> 继承</strong>：Claude Code 会从当前目录向上搜寻所有父目录的 <code>.mcp.json</code> 并合并加载，子目录可以继承父目录的项目级配置。</p>
+</blockquote>
+<hr>
+<h2 id="如何选择作用域"><a href="#如何选择作用域" class="headerlink" title="如何选择作用域"></a>如何选择作用域</h2><table>
+<thead>
+<tr>
+<th>使用场景</th>
+<th>推荐作用域</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>个人实验、含敏感 Token 的配置</td>
+<td><code>local</code></td>
+<td>不进 Git，只影响当前项目</td>
+</tr>
+<tr>
+<td>团队统一工具链（如 chrome-devtools）</td>
+<td><code>project</code></td>
+<td>提交 <code>.mcp.json</code>，所有人自动获得</td>
+</tr>
+<tr>
+<td>个人日常工具（如笔记、搜索）</td>
+<td><code>user</code></td>
+<td>跨项目复用，无需重复添加</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="验证与管理命令"><a href="#验证与管理命令" class="headerlink" title="验证与管理命令"></a>验证与管理命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看所有已配置的 MCP servers</span><br>claude mcp list<br><br><span class="hljs-comment"># 查看某个 server 的详细信息（含 scope）</span><br>claude mcp get chrome-devtools<br><br><span class="hljs-comment"># 删除 project scope 的配置</span><br>claude mcp remove chrome-devtools -s project<br><br><span class="hljs-comment"># 从 Claude Desktop 导入配置</span><br>claude mcp add-from-claude-desktop<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>已知 Bug</strong>：目前 <code>claude mcp list</code> 存在已知问题——project scope 的 server 可能不显示在列表中，但实际上是正常工作的。可以用 <code>claude mcp get &lt;name&gt;</code> 单独确认。</p>
+</blockquote>
+<hr>
+<h2 id="TL-DR-速查"><a href="#TL-DR-速查" class="headerlink" title="TL;DR 速查"></a>TL;DR 速查</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">local</span>   → ~/.claude.json（项目子键）   仅当前项目 · 私有 · 最高优先级<br>project → .mcp.json（项目根目录）      团队共享 · 可提交 Git · 次优先级<br><span class="hljs-keyword">user</span>    → ~/.claude.json（顶层键）      全局 · 跨项目 · 最低优先级<br><br>优先级：<span class="hljs-keyword">local</span> &gt; project &gt; <span class="hljs-keyword">user</span><br>（同名配置以最高优先级的 scope 为准）<br></code></pre></td></tr></table></figure>
+
+<hr>
+<p><em>参考文档：<a target="_blank" rel="noopener" href="https://code.claude.com/docs/en/mcp">Claude Code MCP 官方文档</a></em></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E9%85%8D%E7%BD%AE/" class="category-chain-item">技术配置</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Claude/">#Claude</a>
+      
+        <a href="/tags/MCP/">#MCP</a>
+      
+        <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">#开发工具</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MCP 作用域完全指南</div>
+      <div>https://kingjem.github.io/2026/03/22/AI/MCP 作用域完全指南/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月22日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/22/AI/js-reverse-vs-chrome-devtools/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/21/AI/Claude-Code-MCP-%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" title="Claude Code 逆向MCP 工具配置指南">
+                        <span class="hidden-mobile">Claude Code 逆向MCP 工具配置指南</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

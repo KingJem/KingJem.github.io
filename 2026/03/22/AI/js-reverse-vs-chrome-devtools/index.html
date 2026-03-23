@@ -1,0 +1,869 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="js-reverse vs chrome-devtools MCP 功能对比功能重合对比表   功能领域 chrome-devtools js-reverse 重合情况    页面导航&#x2F;管理 navigate_page, new_page, list_pages, select_page, close_page navigate_page, new_page, list_pages, select">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ruhai&#39;s blogs">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/22/AI/js-reverse-vs-chrome-devtools/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="js-reverse vs chrome-devtools MCP 功能对比功能重合对比表   功能领域 chrome-devtools js-reverse 重合情况    页面导航&#x2F;管理 navigate_page, new_page, list_pages, select_page, close_page navigate_page, new_page, list_pages, select">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-22T03:39:06.812Z">
+<meta property="article:modified_time" content="2026-03-22T03:39:06.812Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="python go java Android js">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-22 11:39" pubdate>
+          2026年3月22日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="js-reverse-vs-chrome-devtools-MCP-功能对比"><a href="#js-reverse-vs-chrome-devtools-MCP-功能对比" class="headerlink" title="js-reverse vs chrome-devtools MCP 功能对比"></a>js-reverse vs chrome-devtools MCP 功能对比</h1><h2 id="功能重合对比表"><a href="#功能重合对比表" class="headerlink" title="功能重合对比表"></a>功能重合对比表</h2><table>
+<thead>
+<tr>
+<th>功能领域</th>
+<th>chrome-devtools</th>
+<th>js-reverse</th>
+<th>重合情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>页面导航/管理</td>
+<td><code>navigate_page</code>, <code>new_page</code>, <code>list_pages</code>, <code>select_page</code>, <code>close_page</code></td>
+<td><code>navigate_page</code>, <code>new_page</code>, <code>list_pages</code>, <code>select_page</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>截图</td>
+<td><code>take_screenshot</code></td>
+<td><code>take_screenshot</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>点击/输入</td>
+<td><code>click</code>, <code>fill</code>, <code>type_text</code>, <code>press_key</code>, <code>hover</code>, <code>drag</code></td>
+<td><code>click_element</code>, <code>type_text</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>网络请求</td>
+<td><code>list_network_requests</code>, <code>get_network_request</code></td>
+<td><code>list_network_requests</code>, <code>get_network_request</code>, <code>get_request_initiator</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>控制台</td>
+<td><code>list_console_messages</code>, <code>get_console_message</code></td>
+<td><code>list_console_messages</code>, <code>get_console_message</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>JS 执行</td>
+<td><code>evaluate_script</code></td>
+<td><code>evaluate_script</code></td>
+<td><strong>重合</strong></td>
+</tr>
+<tr>
+<td>DOM 快照</td>
+<td><code>take_snapshot</code></td>
+<td><code>get_dom_structure</code>, <code>query_dom</code></td>
+<td><strong>部分重合</strong></td>
+</tr>
+<tr>
+<td>性能分析</td>
+<td><code>performance_start_trace</code>, <code>performance_stop_trace</code>, <code>performance_analyze_insight</code></td>
+<td><code>get_performance_metrics</code></td>
+<td><strong>部分重合</strong></td>
+</tr>
+<tr>
+<td>Lighthouse 审计</td>
+<td><code>lighthouse_audit</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>内存快照</td>
+<td><code>take_memory_snapshot</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>表单填充</td>
+<td><code>fill_form</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>设备模拟</td>
+<td><code>emulate</code>, <code>resize_page</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>对话框处理</td>
+<td><code>handle_dialog</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>文件上传</td>
+<td><code>upload_file</code></td>
+<td>—</td>
+<td>chrome-devtools 独有</td>
+</tr>
+<tr>
+<td>等待条件</td>
+<td><code>wait_for</code></td>
+<td><code>wait_for_element</code></td>
+<td><strong>部分重合</strong></td>
+</tr>
+<tr>
+<td>断点调试</td>
+<td>—</td>
+<td><code>set_breakpoint</code>, <code>set_breakpoint_on_text</code>, <code>remove_breakpoint</code>, <code>list_breakpoints</code>, <code>pause</code>, <code>resume</code>, <code>step_into</code>, <code>step_out</code>, <code>step_over</code>, <code>get_paused_info</code>, <code>evaluate_on_callframe</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>函数 Hook</td>
+<td>—</td>
+<td><code>hook_function</code>, <code>unhook_function</code>, <code>create_hook</code>, <code>inject_hook</code>, <code>list_hooks</code>, <code>remove_hook</code>, <code>get_hook_data</code>, <code>trace_function</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>代码反混淆</td>
+<td>—</td>
+<td><code>deobfuscate_code</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>脚本分析</td>
+<td>—</td>
+<td><code>list_scripts</code>, <code>get_script_source</code>, <code>search_in_scripts</code>, <code>search_in_sources</code>, <code>find_in_script</code>, <code>summarize_code</code>, <code>understand_code</code>, <code>collect_code</code>, <code>analyze_target</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>反检测 (Stealth)</td>
+<td>—</td>
+<td><code>inject_stealth</code>, <code>list_stealth_features</code>, <code>list_stealth_presets</code>, <code>inject_preload_script</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>WebSocket 分析</td>
+<td>—</td>
+<td><code>list_websocket_connections</code>, <code>get_websocket_message</code>, <code>get_websocket_messages</code>, <code>analyze_websocket_messages</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>加密检测</td>
+<td>—</td>
+<td><code>detect_crypto</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>XHR 断点</td>
+<td>—</td>
+<td><code>break_on_xhr</code>, <code>remove_xhr_breakpoint</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>会话状态管理</td>
+<td>—</td>
+<td><code>save_session_state</code>, <code>load_session_state</code>, <code>restore_session_state</code>, <code>dump_session_state</code>, <code>delete_session_state</code>, <code>list_session_states</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>导出与报告</td>
+<td>—</td>
+<td><code>export_session_report</code>, <code>export_rebuild_bundle</code>, <code>collection_diff</code>, <code>diff_env_requirements</code>, <code>record_reverse_evidence</code>, <code>risk_panel</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>存储读取</td>
+<td>—</td>
+<td><code>get_storage</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>Frame 管理</td>
+<td>—</td>
+<td><code>list_frames</code>, <code>select_frame</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>事件监控</td>
+<td>—</td>
+<td><code>monitor_events</code>, <code>stop_monitor</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>UA 设置</td>
+<td>—</td>
+<td><code>set_user_agent</code></td>
+<td>js-reverse 独有</td>
+</tr>
+<tr>
+<td>浏览器健康检查</td>
+<td>—</td>
+<td><code>check_browser_health</code></td>
+<td>js-reverse 独有</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li><strong>基础浏览器操作层面有大量重合</strong>：页面管理、点击输入、网络请求、控制台、截图、JS 执行等功能两者都提供。</li>
+<li><strong>chrome-devtools</strong> 偏向 <strong>前端测试与性能审计</strong>：Lighthouse、内存快照、设备模拟、表单填充、文件上传等。</li>
+<li><strong>js-reverse</strong> 偏向 <strong>逆向工程与安全分析</strong>：断点调试、函数 Hook、代码反混淆、反检测注入、WebSocket 深度分析、加密算法检测、会话状态持久化、脚本源码搜索与分析等。</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>https://kingjem.github.io/2026/03/22/AI/js-reverse-vs-chrome-devtools/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月22日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/22/AI/%E7%8C%BF%E4%BA%BA%E5%AD%A6%E7%AC%AC21%E9%A2%98%20%E2%80%94%20%E9%AD%94%E6%94%B9SM3%E9%80%86%E5%90%91%E5%88%86%E6%9E%90-Claude%20%E5%88%86%E6%9E%90/" title="猿人学第21题 — 魔改SM3逆向分析-Claude 分析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猿人学第21题 — 魔改SM3逆向分析-Claude 分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/22/AI/MCP%20%E4%BD%9C%E7%94%A8%E5%9F%9F%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/" title="MCP 作用域完全指南">
+                        <span class="hidden-mobile">MCP 作用域完全指南</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

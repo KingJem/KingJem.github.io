@@ -16,12 +16,12 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &amp;#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
+    <meta name="description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
 <meta property="og:type" content="article">
 <meta property="og:title" content="转载- frida检测及其应对方法">
 <meta property="og:url" content="https://kingjem.github.io/2024/03/05/%E9%80%86%E5%90%91/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91--frida%E6%A3%80%E6%B5%8B%E5%8F%8A%E5%85%B6%E5%BA%94%E5%AF%B9%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &amp;#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
+<meta property="og:description" content="1.检测原理1.1 进程名检测当你的手机上启动了frida-server，在当前app的进程中就有相应的痕迹。  123456789101112131415public boolean checkRunningProcesses() &#123;  boolean returnValue &#x3D; false;  &#x2F;&#x2F; Get currently running application processe">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s2.loli.net/2024/03/05/f4igulUQ7Wh3rkx.png">
 <meta property="og:image" content="https://s2.loli.net/2024/03/05/8qOvVJfHne19Lir.png">
@@ -95,7 +95,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 5.4.2"></head>
+<meta name="generator" content="Hexo 7.0.0"></head>
 
 
 <body>
@@ -366,7 +366,7 @@
 </ul>
 <p><img src="https://s2.loli.net/2024/03/05/M84p3aJDFRoNIwY.png" srcset="/img/loading.gif" lazyload alt="image-20230308144040636"></p>
 <p>对上述的线程ID进行比较，发现由于frida的运行新增了的线程ID：</p>
-<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#123;&#x27;<span class="hljs-number">2616</span>3&#x27;, &#x27;<span class="hljs-number">2616</span>4&#x27;, &#x27;<span class="hljs-number">2616</span>6&#x27;, &#x27;<span class="hljs-number">2616</span>7&#x27;, &#x27;<span class="hljs-number">2616</span>5&#x27;&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#123;&#x27;<span class="hljs-number">2616</span>3&#x27;<span class="hljs-punctuation">,</span> &#x27;<span class="hljs-number">2616</span>4&#x27;<span class="hljs-punctuation">,</span> &#x27;<span class="hljs-number">2616</span>6&#x27;<span class="hljs-punctuation">,</span> &#x27;<span class="hljs-number">2616</span>7&#x27;<span class="hljs-punctuation">,</span> &#x27;<span class="hljs-number">2616</span>5&#x27;&#125;<br></code></pre></td></tr></table></figure>
 
 
 
