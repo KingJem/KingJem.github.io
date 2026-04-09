@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="简介Scrapling 是一个自适应的网络爬虫框架，能够处理从单个请求到大规模爬取的所有场景。它的解析器可以学习网站的变化，并在页面更新时自动重新定位元素。它的获取器可以开箱即用地绕过 Cloudflare Turnstile 等反爬虫系统。它的 Spider 框架支持并发、多会话爬取，具备暂停&#x2F;恢复和自动代理轮换功能。 核心特性 自适应解析：网站结构变化后仍能定位元素 反爬虫绕过：内置 Stea">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapling：自适应现代网络爬虫框架">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/17/Scrapling%EF%BC%9A%E8%87%AA%E9%80%82%E5%BA%94%E7%8E%B0%E4%BB%A3%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB%E6%A1%86%E6%9E%B6/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="简介Scrapling 是一个自适应的网络爬虫框架，能够处理从单个请求到大规模爬取的所有场景。它的解析器可以学习网站的变化，并在页面更新时自动重新定位元素。它的获取器可以开箱即用地绕过 Cloudflare Turnstile 等反爬虫系统。它的 Spider 框架支持并发、多会话爬取，具备暂停&#x2F;恢复和自动代理轮换功能。 核心特性 自适应解析：网站结构变化后仍能定位元素 反爬虫绕过：内置 Stea">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-17T05:20:00.000Z">
+<meta property="article:modified_time" content="2026-03-17T05:21:00.003Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Playwright">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Scrapling">
+<meta property="article:tag" content="反爬虫">
+<meta property="article:tag" content="爬虫框架">
+<meta property="article:tag" content="网络抓取">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Scrapling：自适应现代网络爬虫框架 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Scrapling：自适应现代网络爬虫框架"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-17 13:20" pubdate>
+          2026年3月17日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          12k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          97 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Scrapling：自适应现代网络爬虫框架</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Scrapling 是一个自适应的网络爬虫框架，能够处理从单个请求到大规模爬取的所有场景。它的解析器可以学习网站的变化，并在页面更新时自动重新定位元素。它的获取器可以开箱即用地绕过 Cloudflare Turnstile 等反爬虫系统。它的 Spider 框架支持并发、多会话爬取，具备暂停/恢复和自动代理轮换功能。</p>
+<h2 id="核心特性"><a href="#核心特性" class="headerlink" title="核心特性"></a>核心特性</h2><ul>
+<li>自适应解析：网站结构变化后仍能定位元素</li>
+<li>反爬虫绕过：内置 StealthyFetcher 绕过 Cloudflare</li>
+<li>多会话支持：HTTP 请求和浏览器自动化统一接口</li>
+<li>暂停/恢复：基于检查点的爬取持久化</li>
+<li>流式模式：实时流式传输抓取结果</li>
+<li>完整异步支持：所有组件支持 async/await</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="基础安装"><a href="#基础安装" class="headerlink" title="基础安装"></a>基础安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install scrapling<br></code></pre></td></tr></table></figure>
+
+<h3 id="完整安装（包含获取器和浏览器）"><a href="#完整安装（包含获取器和浏览器）" class="headerlink" title="完整安装（包含获取器和浏览器）"></a>完整安装（包含获取器和浏览器）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;scrapling[fetchers]&quot;</span><br>scrapling install<br></code></pre></td></tr></table></figure>
+
+<h3 id="安装所有功能"><a href="#安装所有功能" class="headerlink" title="安装所有功能"></a>安装所有功能</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;scrapling[all]&quot;</span><br>scrapling install<br></code></pre></td></tr></table></figure>
+
+<h3 id="Docker-安装"><a href="#Docker-安装" class="headerlink" title="Docker 安装"></a>Docker 安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker pull pyd4vinci/scrapling<br><span class="hljs-comment"># 或 GitHub Registry</span><br>docker pull ghcr.io/d4vinci/scrapling:latest<br></code></pre></td></tr></table></figure>
+
+<h2 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h2><h3 id="简单-HTTP-请求"><a href="#简单-HTTP-请求" class="headerlink" title="简单 HTTP 请求"></a>简单 HTTP 请求</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br><span class="hljs-comment"># 创建获取器</span><br>fetcher = Fetcher()<br><br><span class="hljs-comment"># 获取页面</span><br>response = fetcher.fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br><br><span class="hljs-comment"># 解析数据</span><br>title = response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get()<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Title: <span class="hljs-subst">&#123;title&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="使用请求头伪装"><a href="#使用请求头伪装" class="headerlink" title="使用请求头伪装"></a>使用请求头伪装</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>fetcher = Fetcher()<br><br><span class="hljs-comment"># 自定义请求头</span><br>response = fetcher.fetch(<br>    <span class="hljs-string">&#x27;https://example.com&#x27;</span>,<br>    headers=&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36&#x27;</span>,<br>        <span class="hljs-string">&#x27;Accept-Language&#x27;</span>: <span class="hljs-string">&#x27;en-US,en;q=0.9&#x27;</span>,<br>    &#125;<br>)<br><br><span class="hljs-built_in">print</span>(response.status_code)<br><span class="hljs-built_in">print</span>(response.css(<span class="hljs-string">&#x27;h1::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h2 id="高级获取器"><a href="#高级获取器" class="headerlink" title="高级获取器"></a>高级获取器</h2><h3 id="StealthyFetcher-反爬虫获取器"><a href="#StealthyFetcher-反爬虫获取器" class="headerlink" title="StealthyFetcher - 反爬虫获取器"></a>StealthyFetcher - 反爬虫获取器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> StealthyFetcher<br><br><span class="hljs-comment"># 启用自适应模式</span><br>StealthyFetcher.adaptive = <span class="hljs-literal">True</span><br><br><span class="hljs-comment"># 获取页面（自动绕过 Cloudflare）</span><br>page = StealthyFetcher.fetch(<br>    <span class="hljs-string">&#x27;https://example.com&#x27;</span>,<br>    headless=<span class="hljs-literal">True</span>,<br>    network_idle=<span class="hljs-literal">True</span><br>)<br><br><span class="hljs-comment"># 提取数据</span><br>products = page.css(<span class="hljs-string">&#x27;.product&#x27;</span>, auto_save=<span class="hljs-literal">True</span>)<br><span class="hljs-keyword">for</span> product <span class="hljs-keyword">in</span> products:<br>    name = product.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get()<br>    price = product.css(<span class="hljs-string">&#x27;.price::text&#x27;</span>).get()<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;name&#125;</span>: <span class="hljs-subst">&#123;price&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="DynamicFetcher-动态页面获取"><a href="#DynamicFetcher-动态页面获取" class="headerlink" title="DynamicFetcher - 动态页面获取"></a>DynamicFetcher - 动态页面获取</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> DynamicFetcher<br><br><span class="hljs-comment"># 获取动态加载的页面</span><br>page = DynamicFetcher.fetch(<br>    <span class="hljs-string">&#x27;https://example.com&#x27;</span>,<br>    headless=<span class="hljs-literal">False</span>,  <span class="hljs-comment"># 显示浏览器窗口</span><br>    wait_for=<span class="hljs-string">&#x27;.loaded&#x27;</span>,  <span class="hljs-comment"># 等待特定元素加载</span><br>    timeout=<span class="hljs-number">30000</span><br>)<br><br><span class="hljs-comment"># 等待并点击元素</span><br>page.click(<span class="hljs-string">&#x27;#load-more&#x27;</span>)<br>page.wait_for_selector(<span class="hljs-string">&#x27;.new-items&#x27;</span>)<br><br><span class="hljs-comment"># 提取数据</span><br>items = page.css(<span class="hljs-string">&#x27;.item&#x27;</span>)<br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items:<br>    <span class="hljs-built_in">print</span>(item.css(<span class="hljs-string">&#x27;.title::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h3 id="异步获取"><a href="#异步获取" class="headerlink" title="异步获取"></a>异步获取</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> AsyncFetcher<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch_multiple</span>():<br>    fetcher = AsyncFetcher()<br>    <br>    <span class="hljs-comment"># 并发获取多个页面</span><br>    urls = [<br>        <span class="hljs-string">&#x27;https://example.com/page1&#x27;</span>,<br>        <span class="hljs-string">&#x27;https://example.com/page2&#x27;</span>,<br>        <span class="hljs-string">&#x27;https://example.com/page3&#x27;</span>,<br>    ]<br>    <br>    tasks = [fetcher.fetch(url) <span class="hljs-keyword">for</span> url <span class="hljs-keyword">in</span> urls]<br>    responses = <span class="hljs-keyword">await</span> asyncio.gather(*tasks)<br>    <br>    <span class="hljs-keyword">for</span> response <span class="hljs-keyword">in</span> responses:<br>        <span class="hljs-built_in">print</span>(response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get())<br><br><span class="hljs-comment"># 运行</span><br>asyncio.run(fetch_multiple())<br></code></pre></td></tr></table></figure>
+
+<h2 id="会话管理"><a href="#会话管理" class="headerlink" title="会话管理"></a>会话管理</h2><h3 id="FetcherSession-HTTP-会话"><a href="#FetcherSession-HTTP-会话" class="headerlink" title="FetcherSession - HTTP 会话"></a>FetcherSession - HTTP 会话</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> FetcherSession<br><br><span class="hljs-comment"># 创建会话（自动管理 cookies）</span><br><span class="hljs-keyword">with</span> FetcherSession() <span class="hljs-keyword">as</span> session:<br>    <span class="hljs-comment"># 登录</span><br>    login_response = session.post(<br>        <span class="hljs-string">&#x27;https://example.com/login&#x27;</span>,<br>        data=&#123;<span class="hljs-string">&#x27;username&#x27;</span>: <span class="hljs-string">&#x27;user&#x27;</span>, <span class="hljs-string">&#x27;password&#x27;</span>: <span class="hljs-string">&#x27;pass&#x27;</span>&#125;<br>    )<br>    <br>    <span class="hljs-comment"># 后续请求自动携带登录状态</span><br>    profile = session.fetch(<span class="hljs-string">&#x27;https://example.com/profile&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(profile.css(<span class="hljs-string">&#x27;.username::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h3 id="StealthySession-隐身会话"><a href="#StealthySession-隐身会话" class="headerlink" title="StealthySession - 隐身会话"></a>StealthySession - 隐身会话</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> StealthySession<br><br><span class="hljs-keyword">with</span> StealthySession() <span class="hljs-keyword">as</span> session:<br>    <span class="hljs-comment"># 所有请求共享浏览器上下文</span><br>    page1 = session.fetch(<span class="hljs-string">&#x27;https://example.com/page1&#x27;</span>)<br>    page2 = session.fetch(<span class="hljs-string">&#x27;https://example.com/page2&#x27;</span>)<br>    <br>    <span class="hljs-comment"># 提取数据</span><br>    data1 = page1.css(<span class="hljs-string">&#x27;.data::text&#x27;</span>).getall()<br>    data2 = page2.css(<span class="hljs-string">&#x27;.data::text&#x27;</span>).getall()<br></code></pre></td></tr></table></figure>
+
+<h3 id="DynamicSession-动态会话"><a href="#DynamicSession-动态会话" class="headerlink" title="DynamicSession - 动态会话"></a>DynamicSession - 动态会话</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> DynamicSession<br><br><span class="hljs-keyword">with</span> DynamicSession(headless=<span class="hljs-literal">False</span>) <span class="hljs-keyword">as</span> session:<br>    <span class="hljs-comment"># 第一个页面</span><br>    page1 = session.fetch(<span class="hljs-string">&#x27;https://example.com/login&#x27;</span>)<br>    page1.fill(<span class="hljs-string">&#x27;#username&#x27;</span>, <span class="hljs-string">&#x27;myuser&#x27;</span>)<br>    page1.fill(<span class="hljs-string">&#x27;#password&#x27;</span>, <span class="hljs-string">&#x27;mypass&#x27;</span>)<br>    page1.click(<span class="hljs-string">&#x27;#submit&#x27;</span>)<br>    <br>    <span class="hljs-comment"># 登录后访问其他页面</span><br>    page2 = session.fetch(<span class="hljs-string">&#x27;https://example.com/dashboard&#x27;</span>)<br>    <span class="hljs-built_in">print</span>(page2.css(<span class="hljs-string">&#x27;.welcome::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h2 id="自适应解析"><a href="#自适应解析" class="headerlink" title="自适应解析"></a>自适应解析</h2><h3 id="基础-CSS-选择器"><a href="#基础-CSS-选择器" class="headerlink" title="基础 CSS 选择器"></a>基础 CSS 选择器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>response = Fetcher().fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br><br><span class="hljs-comment"># 单个元素</span><br>title = response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get()<br><br><span class="hljs-comment"># 多个元素</span><br>links = response.css(<span class="hljs-string">&#x27;a::attr(href)&#x27;</span>).getall()<br><br><span class="hljs-comment"># 嵌套选择</span><br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.css(<span class="hljs-string">&#x27;.product&#x27;</span>):<br>    name = item.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get()<br>    price = item.css(<span class="hljs-string">&#x27;.price::text&#x27;</span>).get()<br>    link = item.css(<span class="hljs-string">&#x27;a::attr(href)&#x27;</span>).get()<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;name&#125;</span>: <span class="hljs-subst">&#123;price&#125;</span> - <span class="hljs-subst">&#123;link&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="XPath-选择器"><a href="#XPath-选择器" class="headerlink" title="XPath 选择器"></a>XPath 选择器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>response = Fetcher().fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br><br><span class="hljs-comment"># XPath 选择</span><br>title = response.xpath(<span class="hljs-string">&#x27;//title/text()&#x27;</span>).get()<br><br><span class="hljs-comment"># 属性选择</span><br>links = response.xpath(<span class="hljs-string">&#x27;//a/@href&#x27;</span>).getall()<br><br><span class="hljs-comment"># 条件选择</span><br>items = response.xpath(<span class="hljs-string">&#x27;//div[@class=&quot;product&quot;][@data-available=&quot;true&quot;]&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="自适应选择（网站结构变化后仍能工作）"><a href="#自适应选择（网站结构变化后仍能工作）" class="headerlink" title="自适应选择（网站结构变化后仍能工作）"></a>自适应选择（网站结构变化后仍能工作）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> StealthyFetcher<br><br>StealthyFetcher.adaptive = <span class="hljs-literal">True</span><br><br>page = StealthyFetcher.fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br><br><span class="hljs-comment"># 首次抓取时保存元素特征</span><br>products = page.css(<span class="hljs-string">&#x27;.product&#x27;</span>, auto_save=<span class="hljs-literal">True</span>)<br><br><span class="hljs-comment"># 网站结构变化后，使用 adaptive=True 重新定位</span><br><span class="hljs-comment"># 即使 CSS 类名改变也能找到元素</span><br>products = page.css(<span class="hljs-string">&#x27;.product&#x27;</span>, adaptive=<span class="hljs-literal">True</span>)<br><br><span class="hljs-keyword">for</span> product <span class="hljs-keyword">in</span> products:<br>    <span class="hljs-built_in">print</span>(product.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h3 id="查找相似元素"><a href="#查找相似元素" class="headerlink" title="查找相似元素"></a>查找相似元素</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>response = Fetcher().fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br><br><span class="hljs-comment"># 找到一个元素</span><br>first_item = response.css(<span class="hljs-string">&#x27;.item&#x27;</span>)[<span class="hljs-number">0</span>]<br><br><span class="hljs-comment"># 查找相似元素</span><br>similar_items = first_item.find_similar()<br><br><span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> similar_items:<br>    <span class="hljs-built_in">print</span>(item.css(<span class="hljs-string">&#x27;.title::text&#x27;</span>).get())<br></code></pre></td></tr></table></figure>
+
+<h2 id="Spider-框架"><a href="#Spider-框架" class="headerlink" title="Spider 框架"></a>Spider 框架</h2><h3 id="基础-Spider"><a href="#基础-Spider" class="headerlink" title="基础 Spider"></a>基础 Spider</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">MySpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;demo&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-comment"># 提取数据</span><br>        <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.css(<span class="hljs-string">&#x27;.product&#x27;</span>):<br>            <span class="hljs-keyword">yield</span> &#123;<br>                <span class="hljs-string">&quot;title&quot;</span>: item.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get(),<br>                <span class="hljs-string">&quot;price&quot;</span>: item.css(<span class="hljs-string">&#x27;.price::text&#x27;</span>).get(),<br>                <span class="hljs-string">&quot;link&quot;</span>: item.css(<span class="hljs-string">&#x27;a::attr(href)&#x27;</span>).get(),<br>            &#125;<br>        <br>        <span class="hljs-comment"># 跟踪下一页</span><br>        next_page = response.css(<span class="hljs-string">&#x27;a.next::attr(href)&#x27;</span>).get()<br>        <span class="hljs-keyword">if</span> next_page:<br>            <span class="hljs-keyword">yield</span> response.follow(next_page)<br><br><span class="hljs-comment"># 启动爬虫</span><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    MySpider().start()<br></code></pre></td></tr></table></figure>
+
+<h3 id="多会话-Spider"><a href="#多会话-Spider" class="headerlink" title="多会话 Spider"></a>多会话 Spider</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">MultiSessionSpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;multi_session&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    <span class="hljs-comment"># 配置会话</span><br>    custom_settings = &#123;<br>        <span class="hljs-string">&#x27;CONCURRENT_SESSIONS&#x27;</span>: <span class="hljs-number">3</span>,<br>        <span class="hljs-string">&#x27;SESSION_TYPE&#x27;</span>: <span class="hljs-string">&#x27;stealthy&#x27;</span>,  <span class="hljs-comment"># 或 &#x27;dynamic&#x27;, &#x27;fetcher&#x27;</span><br>    &#125;<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-comment"># 根据需要使用不同会话</span><br>        session_id = response.meta.get(<span class="hljs-string">&#x27;session_id&#x27;</span>)<br>        <br>        <span class="hljs-keyword">yield</span> &#123;<br>            <span class="hljs-string">&quot;url&quot;</span>: response.url,<br>            <span class="hljs-string">&quot;session&quot;</span>: session_id,<br>            <span class="hljs-string">&quot;title&quot;</span>: response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get(),<br>        &#125;<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    MultiSessionSpider().start()<br></code></pre></td></tr></table></figure>
+
+<h3 id="流式输出"><a href="#流式输出" class="headerlink" title="流式输出"></a>流式输出</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">StreamingSpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;streaming&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/products&quot;</span>]<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-keyword">for</span> product <span class="hljs-keyword">in</span> response.css(<span class="hljs-string">&#x27;.product&#x27;</span>):<br>            <span class="hljs-keyword">yield</span> &#123;<br>                <span class="hljs-string">&quot;name&quot;</span>: product.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get(),<br>                <span class="hljs-string">&quot;price&quot;</span>: product.css(<span class="hljs-string">&#x27;.price::text&#x27;</span>).get(),<br>            &#125;<br><br><span class="hljs-comment"># 流式获取结果</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    spider = StreamingSpider()<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> spider.stream():<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Received: <span class="hljs-subst">&#123;item&#125;</span>&quot;</span>)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">import</span> asyncio<br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+
+<h3 id="暂停和恢复"><a href="#暂停和恢复" class="headerlink" title="暂停和恢复"></a>暂停和恢复</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ResumableSpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;resumable&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    <span class="hljs-comment"># 启用检查点</span><br>    custom_settings = &#123;<br>        <span class="hljs-string">&#x27;CHECKPOINT_ENABLED&#x27;</span>: <span class="hljs-literal">True</span>,<br>        <span class="hljs-string">&#x27;CHECKPOINT_DIR&#x27;</span>: <span class="hljs-string">&#x27;./checkpoints&#x27;</span>,<br>    &#125;<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.css(<span class="hljs-string">&#x27;.item&#x27;</span>):<br>            <span class="hljs-keyword">yield</span> &#123;<br>                <span class="hljs-string">&quot;title&quot;</span>: item.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get(),<br>                <span class="hljs-string">&quot;url&quot;</span>: item.css(<span class="hljs-string">&#x27;a::attr(href)&#x27;</span>).get(),<br>            &#125;<br>        <br>        <span class="hljs-comment"># 跟踪分页</span><br>        next_page = response.css(<span class="hljs-string">&#x27;a.next::attr(href)&#x27;</span>).get()<br>        <span class="hljs-keyword">if</span> next_page:<br>            <span class="hljs-keyword">yield</span> response.follow(next_page)<br><br><span class="hljs-comment"># 首次运行</span><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    spider = ResumableSpider()<br>    <br>    <span class="hljs-keyword">try</span>:<br>        spider.start()<br>    <span class="hljs-keyword">except</span> KeyboardInterrupt:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Spider paused. Run again to resume.&quot;</span>)<br>    <br>    <span class="hljs-comment"># 再次运行会自动从检查点恢复</span><br>    <span class="hljs-comment"># spider.start()</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="代理管理"><a href="#代理管理" class="headerlink" title="代理管理"></a>代理管理</h2><h3 id="基础代理"><a href="#基础代理" class="headerlink" title="基础代理"></a>基础代理</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>fetcher = Fetcher()<br><br><span class="hljs-comment"># 单次请求代理</span><br>response = fetcher.fetch(<br>    <span class="hljs-string">&#x27;https://example.com&#x27;</span>,<br>    proxy=<span class="hljs-string">&#x27;http://user:pass@proxy.example.com:8080&#x27;</span><br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="代理轮换"><a href="#代理轮换" class="headerlink" title="代理轮换"></a>代理轮换</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><span class="hljs-keyword">from</span> scrapling.proxy <span class="hljs-keyword">import</span> ProxyRotator<br><br><span class="hljs-comment"># 创建代理轮换器</span><br>rotator = ProxyRotator([<br>    <span class="hljs-string">&#x27;http://proxy1.example.com:8080&#x27;</span>,<br>    <span class="hljs-string">&#x27;http://proxy2.example.com:8080&#x27;</span>,<br>    <span class="hljs-string">&#x27;http://proxy3.example.com:8080&#x27;</span>,<br>])<br><br>fetcher = Fetcher()<br><br><span class="hljs-comment"># 每次请求自动轮换代理</span><br><span class="hljs-keyword">for</span> url <span class="hljs-keyword">in</span> urls:<br>    response = fetcher.fetch(url, proxy=rotator.get_proxy())<br>    <span class="hljs-built_in">print</span>(response.status_code)<br></code></pre></td></tr></table></figure>
+
+<h3 id="Spider-代理配置"><a href="#Spider-代理配置" class="headerlink" title="Spider 代理配置"></a>Spider 代理配置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProxySpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;proxy&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    custom_settings = &#123;<br>        <span class="hljs-string">&#x27;PROXY_LIST&#x27;</span>: [<br>            <span class="hljs-string">&#x27;http://proxy1.example.com:8080&#x27;</span>,<br>            <span class="hljs-string">&#x27;http://proxy2.example.com:8080&#x27;</span>,<br>        ],<br>        <span class="hljs-string">&#x27;PROXY_ROTATION&#x27;</span>: <span class="hljs-string">&#x27;cyclic&#x27;</span>,  <span class="hljs-comment"># 或 &#x27;random&#x27;</span><br>    &#125;<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-keyword">yield</span> &#123;<br>            <span class="hljs-string">&quot;url&quot;</span>: response.url,<br>            <span class="hljs-string">&quot;title&quot;</span>: response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get(),<br>        &#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="数据导出"><a href="#数据导出" class="headerlink" title="数据导出"></a>数据导出</h2><h3 id="JSON-导出"><a href="#JSON-导出" class="headerlink" title="JSON 导出"></a>JSON 导出</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ExportSpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;export&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.css(<span class="hljs-string">&#x27;.product&#x27;</span>):<br>            <span class="hljs-keyword">yield</span> &#123;<br>                <span class="hljs-string">&quot;name&quot;</span>: item.css(<span class="hljs-string">&#x27;h2::text&#x27;</span>).get(),<br>                <span class="hljs-string">&quot;price&quot;</span>: item.css(<span class="hljs-string">&#x27;.price::text&#x27;</span>).get(),<br>            &#125;<br><br><span class="hljs-comment"># 运行并导出</span><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    spider = ExportSpider()<br>    result = spider.start()<br>    <br>    <span class="hljs-comment"># 导出为 JSON</span><br>    result.items.to_json(<span class="hljs-string">&#x27;products.json&#x27;</span>)<br>    <br>    <span class="hljs-comment"># 导出为 JSONL</span><br>    result.items.to_jsonl(<span class="hljs-string">&#x27;products.jsonl&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="自定义-Pipeline"><a href="#自定义-Pipeline" class="headerlink" title="自定义 Pipeline"></a>自定义 Pipeline</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> scrapling.spiders <span class="hljs-keyword">import</span> Spider, Response<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomPipeline</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-variable language_">self</span>.items = []<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">process_item</span>(<span class="hljs-params">self, item, spider</span>):<br>        <span class="hljs-comment"># 处理每个 item</span><br>        item[<span class="hljs-string">&#x27;processed&#x27;</span>] = <span class="hljs-literal">True</span><br>        <span class="hljs-variable language_">self</span>.items.append(item)<br>        <span class="hljs-keyword">return</span> item<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">close_spider</span>(<span class="hljs-params">self, spider</span>):<br>        <span class="hljs-comment"># 爬虫结束时执行</span><br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Total items: <span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(self.items)&#125;</span>&quot;</span>)<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">PipelineSpider</span>(<span class="hljs-title class_ inherited__">Spider</span>):<br>    name = <span class="hljs-string">&quot;pipeline&quot;</span><br>    start_urls = [<span class="hljs-string">&quot;https://example.com/&quot;</span>]<br>    <br>    custom_settings = &#123;<br>        <span class="hljs-string">&#x27;ITEM_PIPELINES&#x27;</span>: [CustomPipeline],<br>    &#125;<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">parse</span>(<span class="hljs-params">self, response: Response</span>):<br>        <span class="hljs-keyword">yield</span> &#123;<span class="hljs-string">&quot;title&quot;</span>: response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get()&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="命令行工具"><a href="#命令行工具" class="headerlink" title="命令行工具"></a>命令行工具</h2><h3 id="快速抓取"><a href="#快速抓取" class="headerlink" title="快速抓取"></a>快速抓取</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 无需编写代码，直接抓取 URL</span><br>scrapling fetch https://example.com<br><br><span class="hljs-comment"># 保存到文件</span><br>scrapling fetch https://example.com -o output.html<br><br><span class="hljs-comment"># 使用 stealth 模式</span><br>scrapling fetch https://example.com --stealth<br></code></pre></td></tr></table></figure>
+
+<h3 id="交互式-Shell"><a href="#交互式-Shell" class="headerlink" title="交互式 Shell"></a>交互式 Shell</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动交互式 shell</span><br>scrapling shell https://example.com<br><br><span class="hljs-comment"># 在 shell 中可以使用 response 对象</span><br>&gt;&gt;&gt; response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get()<br>&gt;&gt;&gt; response.css(<span class="hljs-string">&#x27;a::attr(href)&#x27;</span>).getall()<br></code></pre></td></tr></table></figure>
+
+<h3 id="提取命令"><a href="#提取命令" class="headerlink" title="提取命令"></a>提取命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 使用 CSS 选择器提取数据</span><br>scrapling extract https://example.com <span class="hljs-string">&quot;h2::text&quot;</span><br><br><span class="hljs-comment"># 提取属性</span><br>scrapling extract https://example.com <span class="hljs-string">&quot;a::attr(href)&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="与-BeautifulSoup-对比"><a href="#与-BeautifulSoup-对比" class="headerlink" title="与 BeautifulSoup 对比"></a>与 BeautifulSoup 对比</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># BeautifulSoup</span><br><span class="hljs-keyword">from</span> bs4 <span class="hljs-keyword">import</span> BeautifulSoup<br><span class="hljs-keyword">import</span> requests<br><br>response = requests.get(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br>soup = BeautifulSoup(response.text, <span class="hljs-string">&#x27;html.parser&#x27;</span>)<br>title = soup.find(<span class="hljs-string">&#x27;title&#x27;</span>).text<br><br><span class="hljs-comment"># Scrapling</span><br><span class="hljs-keyword">from</span> scrapling.fetchers <span class="hljs-keyword">import</span> Fetcher<br><br>response = Fetcher().fetch(<span class="hljs-string">&#x27;https://example.com&#x27;</span>)<br>title = response.css(<span class="hljs-string">&#x27;title::text&#x27;</span>).get()<br><br><span class="hljs-comment"># Scrapling 优势：</span><br><span class="hljs-comment"># 1. 内置请求功能，无需额外导入</span><br><span class="hljs-comment"># 2. 支持 CSS 和 XPath 选择器</span><br><span class="hljs-comment"># 3. 自适应解析，网站变化后仍能工作</span><br><span class="hljs-comment"># 4. 内置反爬虫绕过</span><br><span class="hljs-comment"># 5. 完整的异步支持</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h2><p>Scrapling 在性能上优于大多数 Python 爬虫库：</p>
+<ul>
+<li>JSON 序列化：比标准库快 10 倍</li>
+<li>内存效率：优化的数据结构和延迟加载</li>
+<li>并发处理：内置高效的并发控制</li>
+</ul>
+<h2 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/D4Vinci/Scrapling">GitHub 仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://scrapling.readthedocs.io/">官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://pypi.org/project/scrapling/">PyPI 包</a></li>
+<li><a target="_blank" rel="noopener" href="https://hub.docker.com/r/pyd4vinci/scrapling">Docker 镜像</a></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Scrapling 是一个功能全面的现代爬虫框架，它结合了 Requests 的简洁、BeautifulSoup 的易用、Scrapy 的强大，以及 Playwright 的浏览器自动化能力。其自适应解析功能特别适合需要长期维护的爬虫项目，而内置的反爬虫绕过能力则让开发者可以专注于数据提取逻辑。</p>
+<hr>
+<blockquote>
+<p>提示：Scrapling 需要 Python 3.10 或更高版本。对于需要绕过 Cloudflare 等强反爬虫保护的网站，建议使用 StealthyFetcher 或 DynamicFetcher。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/" class="category-chain-item">爬虫开发</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+        <a href="/tags/Playwright/">#Playwright</a>
+      
+        <a href="/tags/Scrapling/">#Scrapling</a>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB%E6%A1%86%E6%9E%B6/">#爬虫框架</a>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8F%96/">#网络抓取</a>
+      
+        <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Scrapling：自适应现代网络爬虫框架</div>
+      <div>https://kingjem.github.io/2026/03/17/Scrapling：自适应现代网络爬虫框架/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月17日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" title="curl-impersonate JA3 指纹原理与复现">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">curl-impersonate JA3 指纹原理与复现</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" title="BrowserForge：智能浏览器指纹与请求头生成器">
+                        <span class="hidden-mobile">BrowserForge：智能浏览器指纹与请求头生成器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

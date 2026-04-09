@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="简介BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 Apify fingerprint-suite 的 Python 重新实现。 核心特性 🎯 真实流量模拟 - 使用贝叶斯生成网络模拟实际网络流量 ⚡ 极速运行 - 运行时仅需 0.1-0.2 毫秒 👤 简单易用 - 对人类友好的 API 设计 🔧">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BrowserForge：智能浏览器指纹与请求头生成器">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="简介BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 Apify fingerprint-suite 的 Python 重新实现。 核心特性 🎯 真实流量模拟 - 使用贝叶斯生成网络模拟实际网络流量 ⚡ 极速运行 - 运行时仅需 0.1-0.2 毫秒 👤 简单易用 - 对人类友好的 API 设计 🔧">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-17T03:25:00.000Z">
+<meta property="article:modified_time" content="2026-03-17T03:26:11.329Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="BrowserForge">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="反检测">
+<meta property="article:tag" content="指纹生成">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="请求头">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>BrowserForge：智能浏览器指纹与请求头生成器 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="BrowserForge：智能浏览器指纹与请求头生成器"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-17 11:25" pubdate>
+          2026年3月17日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          67 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">BrowserForge：智能浏览器指纹与请求头生成器</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 <a target="_blank" rel="noopener" href="https://github.com/apify/fingerprint-suite">Apify fingerprint-suite</a> 的 Python 重新实现。</p>
+<h2 id="核心特性"><a href="#核心特性" class="headerlink" title="核心特性"></a>核心特性</h2><ul>
+<li>🎯 <strong>真实流量模拟</strong> - 使用贝叶斯生成网络模拟实际网络流量</li>
+<li>⚡ <strong>极速运行</strong> - 运行时仅需 0.1-0.2 毫秒</li>
+<li>👤 <strong>简单易用</strong> - 对人类友好的 API 设计</li>
+<li>🔧 <strong>高度可定制</strong> - 支持浏览器、操作系统、设备、区域、HTTP 版本等定制</li>
+<li>🛡️ <strong>类型安全</strong> - 使用 Python 类型注解编写</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 基础安装</span><br>pip install browserforge<br><br><span class="hljs-comment"># 完整安装（包含所有依赖）</span><br>pip install browserforge[all]<br></code></pre></td></tr></table></figure>
+
+<h2 id="生成请求头"><a href="#生成请求头" class="headerlink" title="生成请求头"></a>生成请求头</h2><h3 id="基础用法"><a href="#基础用法" class="headerlink" title="基础用法"></a>基础用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-comment"># 创建生成器</span><br>headers = HeaderGenerator()<br><br><span class="hljs-comment"># 生成请求头</span><br>result = headers.generate()<br><span class="hljs-built_in">print</span>(result)<br></code></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">&#123;<br>    <span class="hljs-string">&#x27;sec-ch-ua&#x27;</span>: <span class="hljs-string">&#x27;&quot;Chromium&quot;;v=&quot;142&quot;, &quot;Google Chrome&quot;;v=&quot;142&quot;, &quot;Not_A Brand&quot;;v=&quot;99&quot;&#x27;</span>,<br>    <span class="hljs-string">&#x27;sec-ch-ua-mobile&#x27;</span>: <span class="hljs-string">&#x27;?0&#x27;</span>,<br>    <span class="hljs-string">&#x27;sec-ch-ua-platform&#x27;</span>: <span class="hljs-string">&#x27;&quot;Windows&quot;&#x27;</span>,<br>    <span class="hljs-string">&#x27;Upgrade-Insecure-Requests&#x27;</span>: <span class="hljs-string">&#x27;1&#x27;</span>,<br>    <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36&#x27;</span>,<br>    <span class="hljs-string">&#x27;Accept&#x27;</span>: <span class="hljs-string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8&#x27;</span>,<br>    <span class="hljs-string">&#x27;Sec-Fetch-Site&#x27;</span>: <span class="hljs-string">&#x27;?1&#x27;</span>,<br>    <span class="hljs-string">&#x27;Sec-Fetch-Mode&#x27;</span>: <span class="hljs-string">&#x27;same-site&#x27;</span>,<br>    <span class="hljs-string">&#x27;Sec-Fetch-User&#x27;</span>: <span class="hljs-string">&#x27;document&#x27;</span>,<br>    <span class="hljs-string">&#x27;Sec-Fetch-Dest&#x27;</span>: <span class="hljs-string">&#x27;navigate&#x27;</span>,<br>    <span class="hljs-string">&#x27;Accept-Encoding&#x27;</span>: <span class="hljs-string">&#x27;gzip, deflate, br, zstd&#x27;</span>,<br>    <span class="hljs-string">&#x27;Accept-Language&#x27;</span>: <span class="hljs-string">&#x27;en-US;q=1.0, en;q=0.9, de;q=0.8&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="与-requests-集成"><a href="#与-requests-集成" class="headerlink" title="与 requests 集成"></a>与 requests 集成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-comment"># 创建会话</span><br>session = requests.Session()<br><br><span class="hljs-comment"># 生成请求头</span><br>generator = HeaderGenerator()<br>session.headers = generator.generate()<br><br><span class="hljs-comment"># 发送请求</span><br>response = session.get(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br><span class="hljs-built_in">print</span>(response.status_code)<br></code></pre></td></tr></table></figure>
+
+<h3 id="与-aiohttp-集成"><a href="#与-aiohttp-集成" class="headerlink" title="与 aiohttp 集成"></a>与 aiohttp 集成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> aiohttp<br><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>():<br>    generator = HeaderGenerator()<br>    headers = generator.generate()<br>    <br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> aiohttp.ClientSession(headers=headers) <span class="hljs-keyword">as</span> session:<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> session.get(<span class="hljs-string">&quot;https://example.com&quot;</span>) <span class="hljs-keyword">as</span> response:<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> response.text()<br><br><span class="hljs-comment"># 运行</span><br>result = asyncio.run(fetch())<br></code></pre></td></tr></table></figure>
+
+<h2 id="约束条件配置"><a href="#约束条件配置" class="headerlink" title="约束条件配置"></a>约束条件配置</h2><h3 id="单一约束"><a href="#单一约束" class="headerlink" title="单一约束"></a>单一约束</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-comment"># 指定特定浏览器和操作系统</span><br>headers = HeaderGenerator(<br>    browser=<span class="hljs-string">&#x27;chrome&#x27;</span>,<br>    os=<span class="hljs-string">&#x27;windows&#x27;</span>,<br>    device=<span class="hljs-string">&#x27;desktop&#x27;</span>,<br>    locale=<span class="hljs-string">&#x27;en-US&#x27;</span>,<br>    http_version=<span class="hljs-number">2</span><br>)<br><br>result = headers.generate()<br></code></pre></td></tr></table></figure>
+
+<h3 id="多约束选择"><a href="#多约束选择" class="headerlink" title="多约束选择"></a>多约束选择</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-comment"># 从多个选项中选择（基于真实频率）</span><br>headers = HeaderGenerator(<br>    browser=(<span class="hljs-string">&#x27;chrome&#x27;</span>, <span class="hljs-string">&#x27;firefox&#x27;</span>, <span class="hljs-string">&#x27;safari&#x27;</span>, <span class="hljs-string">&#x27;edge&#x27;</span>),<br>    os=(<span class="hljs-string">&#x27;windows&#x27;</span>, <span class="hljs-string">&#x27;macos&#x27;</span>, <span class="hljs-string">&#x27;linux&#x27;</span>, <span class="hljs-string">&#x27;android&#x27;</span>, <span class="hljs-string">&#x27;ios&#x27;</span>),<br>    device=(<span class="hljs-string">&#x27;desktop&#x27;</span>, <span class="hljs-string">&#x27;mobile&#x27;</span>),<br>    locale=(<span class="hljs-string">&#x27;en-US&#x27;</span>, <span class="hljs-string">&#x27;en&#x27;</span>, <span class="hljs-string">&#x27;de&#x27;</span>),<br>    http_version=<span class="hljs-number">2</span><br>)<br><br><span class="hljs-comment"># 每次 generate() 会根据真实分布随机选择</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">5</span>):<br>    <span class="hljs-built_in">print</span>(headers.generate()[<span class="hljs-string">&#x27;User-Agent&#x27;</span>])<br></code></pre></td></tr></table></figure>
+
+<h3 id="浏览器版本控制"><a href="#浏览器版本控制" class="headerlink" title="浏览器版本控制"></a>浏览器版本控制</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator, Browser<br><br><span class="hljs-comment"># 指定浏览器版本范围</span><br>browsers = [<br>    Browser(name=<span class="hljs-string">&#x27;chrome&#x27;</span>, min_version=<span class="hljs-number">140</span>, max_version=<span class="hljs-number">145</span>),<br>    Browser(name=<span class="hljs-string">&#x27;firefox&#x27;</span>, min_version=<span class="hljs-number">144</span>),<br>    Browser(name=<span class="hljs-string">&#x27;edge&#x27;</span>, max_version=<span class="hljs-number">140</span>, http_version=<span class="hljs-number">1</span>),<br>]<br><br>headers = HeaderGenerator(browser=browsers)<br>result = headers.generate()<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&#x27;User-Agent&#x27;</span>])<br></code></pre></td></tr></table></figure>
+
+<h3 id="基于现有-User-Agent-生成"><a href="#基于现有-User-Agent-生成" class="headerlink" title="基于现有 User-Agent 生成"></a>基于现有 User-Agent 生成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br>headers = HeaderGenerator()<br><br><span class="hljs-comment"># 基于单个 User-Agent</span><br>result = headers.generate(<br>    user_agent=<span class="hljs-string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36&#x27;</span><br>)<br><br><span class="hljs-comment"># 基于多个 User-Agent（按频率选择）</span><br>result = headers.generate(<br>    user_agent=(<br>        <span class="hljs-string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0&#x27;</span>,<br>        <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36&#x27;</span><br>    )<br>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="生成浏览器指纹"><a href="#生成浏览器指纹" class="headerlink" title="生成浏览器指纹"></a>生成浏览器指纹</h2><h3 id="基础用法-1"><a href="#基础用法-1" class="headerlink" title="基础用法"></a>基础用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.fingerprints <span class="hljs-keyword">import</span> FingerprintGenerator<br><br><span class="hljs-comment"># 创建指纹生成器</span><br>fingerprints = FingerprintGenerator()<br><br><span class="hljs-comment"># 生成指纹</span><br>fp = fingerprints.generate()<br><span class="hljs-built_in">print</span>(fp)<br></code></pre></td></tr></table></figure>
+
+<h3 id="指纹结构"><a href="#指纹结构" class="headerlink" title="指纹结构"></a>指纹结构</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python">Fingerprint(<br>    screen=ScreenFingerprint(<br>        availHeight=<span class="hljs-number">784</span>,<br>        availWidth=<span class="hljs-number">1440</span>,<br>        availTop=<span class="hljs-number">25</span>,<br>        availLeft=<span class="hljs-number">0</span>,<br>        colorDepth=<span class="hljs-number">30</span>,<br>        height=<span class="hljs-number">900</span>,<br>        pixelDepth=<span class="hljs-number">30</span>,<br>        width=<span class="hljs-number">1440</span>,<br>        devicePixelRatio=<span class="hljs-number">2</span>,<br>        pageXOffset=<span class="hljs-number">0</span>,<br>        pageYOffset=<span class="hljs-number">0</span>,<br>        innerHeight=<span class="hljs-number">0</span>,<br>        outerHeight=<span class="hljs-number">718</span>,<br>        outerWidth=<span class="hljs-number">1440</span>,<br>        innerWidth=<span class="hljs-number">0</span>,<br>        screenX=<span class="hljs-number">0</span>,<br>        clientWidth=<span class="hljs-number">0</span>,<br>        clientHeight=<span class="hljs-number">19</span>,<br>        hasHDR=<span class="hljs-literal">True</span><br>    ),<br>    navigator=NavigatorFingerprint(<br>        userAgent=<span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36&#x27;</span>,<br>        userAgentData=&#123;<span class="hljs-string">&#x27;architecture&#x27;</span>: <span class="hljs-string">&#x27;arm&#x27;</span>, <span class="hljs-string">&#x27;bitness&#x27;</span>: <span class="hljs-string">&#x27;64&#x27;</span>, ...&#125;,<br>        <span class="hljs-comment"># ... 更多属性</span><br>    ),<br>    <span class="hljs-comment"># ... 其他指纹信息</span><br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="屏幕约束"><a href="#屏幕约束" class="headerlink" title="屏幕约束"></a>屏幕约束</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.fingerprints <span class="hljs-keyword">import</span> FingerprintGenerator, Screen<br><br><span class="hljs-comment"># 定义屏幕约束</span><br>screen = Screen(<br>    min_width=<span class="hljs-number">1920</span>,<br>    max_width=<span class="hljs-number">2560</span>,<br>    min_height=<span class="hljs-number">1080</span>,<br>    max_height=<span class="hljs-number">1440</span><br>)<br><br>fingerprints = FingerprintGenerator(screen=screen)<br>fp = fingerprints.generate()<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Screen: <span class="hljs-subst">&#123;fp.screen.width&#125;</span>x<span class="hljs-subst">&#123;fp.screen.height&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="高级选项"><a href="#高级选项" class="headerlink" title="高级选项"></a>高级选项</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.fingerprints <span class="hljs-keyword">import</span> FingerprintGenerator<br><br>fingerprints = FingerprintGenerator(<br>    screen=<span class="hljs-literal">None</span>,           <span class="hljs-comment"># 屏幕约束</span><br>    strict=<span class="hljs-literal">False</span>,        <span class="hljs-comment"># 约束过严时是否抛出异常</span><br>    mock_webrtc=<span class="hljs-literal">False</span>,   <span class="hljs-comment"># 是否模拟 WebRTC</span><br>    slim=<span class="hljs-literal">False</span>,          <span class="hljs-comment"># 是否禁用性能密集型规避</span><br>)<br><br><span class="hljs-comment"># 生成时覆盖选项</span><br>fp = fingerprints.generate(<br>    mock_webrtc=<span class="hljs-literal">True</span>,    <span class="hljs-comment"># 启用 WebRTC 模拟</span><br>    slim=<span class="hljs-literal">True</span>            <span class="hljs-comment"># 轻量模式</span><br>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="完整示例：爬虫请求轮换"><a href="#完整示例：爬虫请求轮换" class="headerlink" title="完整示例：爬虫请求轮换"></a>完整示例：爬虫请求轮换</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">StealthCrawler</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-variable language_">self</span>.generator = HeaderGenerator(<br>            browser=(<span class="hljs-string">&#x27;chrome&#x27;</span>, <span class="hljs-string">&#x27;firefox&#x27;</span>, <span class="hljs-string">&#x27;edge&#x27;</span>),<br>            os=(<span class="hljs-string">&#x27;windows&#x27;</span>, <span class="hljs-string">&#x27;macos&#x27;</span>, <span class="hljs-string">&#x27;linux&#x27;</span>),<br>            device=<span class="hljs-string">&#x27;desktop&#x27;</span><br>        )<br>        <span class="hljs-variable language_">self</span>.session = requests.Session()<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">self, url: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>        <span class="hljs-string">&quot;&quot;&quot;使用随机请求头获取页面&quot;&quot;&quot;</span><br>        <span class="hljs-comment"># 每次请求更换请求头</span><br>        <span class="hljs-variable language_">self</span>.session.headers = <span class="hljs-variable language_">self</span>.generator.generate()<br>        <br>        <span class="hljs-keyword">try</span>:<br>            response = <span class="hljs-variable language_">self</span>.session.get(url, timeout=<span class="hljs-number">30</span>)<br>            response.raise_for_status()<br>            <span class="hljs-keyword">return</span> response.text<br>        <span class="hljs-keyword">except</span> requests.RequestException <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Request failed: <span class="hljs-subst">&#123;e&#125;</span>&quot;</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span><br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">crawl</span>(<span class="hljs-params">self, urls: <span class="hljs-built_in">list</span></span>):<br>        <span class="hljs-string">&quot;&quot;&quot;批量爬取&quot;&quot;&quot;</span><br>        results = []<br>        <span class="hljs-keyword">for</span> url <span class="hljs-keyword">in</span> urls:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Fetching: <span class="hljs-subst">&#123;url&#125;</span>&quot;</span>)<br>            content = <span class="hljs-variable language_">self</span>.fetch(url)<br>            <span class="hljs-keyword">if</span> content:<br>                results.append(content)<br>            time.sleep(<span class="hljs-number">2</span>)  <span class="hljs-comment"># 礼貌延迟</span><br>        <span class="hljs-keyword">return</span> results<br><br><span class="hljs-comment"># 使用示例</span><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    crawler = StealthCrawler()<br>    urls = [<br>        <span class="hljs-string">&quot;https://example.com/page1&quot;</span>,<br>        <span class="hljs-string">&quot;https://example.com/page2&quot;</span>,<br>        <span class="hljs-string">&quot;https://example.com/page3&quot;</span>,<br>    ]<br>    results = crawler.crawl(urls)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Successfully fetched <span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(results)&#125;</span> pages&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="与-Playwright-Selenium-集成"><a href="#与-Playwright-Selenium-集成" class="headerlink" title="与 Playwright/Selenium 集成"></a>与 Playwright/Selenium 集成</h2><h3 id="Playwright-集成"><a href="#Playwright-集成" class="headerlink" title="Playwright 集成"></a>Playwright 集成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> playwright.sync_api <span class="hljs-keyword">import</span> sync_playwright<br><span class="hljs-keyword">from</span> browserforge.fingerprints <span class="hljs-keyword">import</span> FingerprintGenerator<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-comment"># 生成指纹</span><br>    generator = FingerprintGenerator()<br>    fp = generator.generate()<br>    <br>    <span class="hljs-keyword">with</span> sync_playwright() <span class="hljs-keyword">as</span> p:<br>        <span class="hljs-comment"># 使用指纹中的 User-Agent</span><br>        browser = p.chromium.launch()<br>        context = browser.new_context(<br>            user_agent=fp.navigator.userAgent,<br>            viewport=&#123;<span class="hljs-string">&#x27;width&#x27;</span>: fp.screen.width, <span class="hljs-string">&#x27;height&#x27;</span>: fp.screen.height&#125;<br>        )<br>        <br>        page = context.new_page()<br>        page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>        <br>        browser.close()<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
+
+<h3 id="Selenium-集成"><a href="#Selenium-集成" class="headerlink" title="Selenium 集成"></a>Selenium 集成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> selenium <span class="hljs-keyword">import</span> webdriver<br><span class="hljs-keyword">from</span> selenium.webdriver.chrome.options <span class="hljs-keyword">import</span> Options<br><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> HeaderGenerator<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_driver</span>():<br>    <span class="hljs-comment"># 生成请求头</span><br>    generator = HeaderGenerator()<br>    headers = generator.generate()<br>    <br>    <span class="hljs-comment"># 配置 Chrome</span><br>    options = Options()<br>    options.add_argument(<span class="hljs-string">f&quot;--user-agent=<span class="hljs-subst">&#123;headers[<span class="hljs-string">&#x27;User-Agent&#x27;</span>]&#125;</span>&quot;</span>)<br>    options.add_argument(<span class="hljs-string">&quot;--disable-blink-features=AutomationControlled&quot;</span>)<br>    <br>    driver = webdriver.Chrome(options=options)<br>    <span class="hljs-keyword">return</span> driver<br><br><span class="hljs-comment"># 使用</span><br>driver = create_driver()<br>driver.get(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>driver.quit()<br></code></pre></td></tr></table></figure>
+
+<h2 id="参数参考"><a href="#参数参考" class="headerlink" title="参数参考"></a>参数参考</h2><h3 id="HeaderGenerator-参数"><a href="#HeaderGenerator-参数" class="headerlink" title="HeaderGenerator 参数"></a>HeaderGenerator 参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>browser</code></td>
+<td>str/list/Browser</td>
+<td>浏览器类型</td>
+</tr>
+<tr>
+<td><code>os</code></td>
+<td>str/list</td>
+<td>操作系统</td>
+</tr>
+<tr>
+<td><code>device</code></td>
+<td>str/list</td>
+<td>设备类型</td>
+</tr>
+<tr>
+<td><code>locale</code></td>
+<td>str/list</td>
+<td>语言区域</td>
+</tr>
+<tr>
+<td><code>http_version</code></td>
+<td>1/2</td>
+<td>HTTP 版本</td>
+</tr>
+<tr>
+<td><code>strict</code></td>
+<td>bool</td>
+<td>约束过严时是否报错</td>
+</tr>
+</tbody></table>
+<h3 id="Browser-对象"><a href="#Browser-对象" class="headerlink" title="Browser 对象"></a>Browser 对象</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> browserforge.headers <span class="hljs-keyword">import</span> Browser<br><br>browser = Browser(<br>    name=<span class="hljs-string">&#x27;chrome&#x27;</span>,        <span class="hljs-comment"># 浏览器名称</span><br>    min_version=<span class="hljs-number">140</span>,      <span class="hljs-comment"># 最小版本</span><br>    max_version=<span class="hljs-number">145</span>,      <span class="hljs-comment"># 最大版本</span><br>    http_version=<span class="hljs-number">2</span>        <span class="hljs-comment"># HTTP 版本</span><br>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/daijro/browserforge">GitHub 仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://pypi.org/project/browserforge/">PyPI 包</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apify/fingerprint-suite">Apify fingerprint-suite</a> (原始 Node.js 实现)</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>BrowserForge 是一个轻量级但功能强大的指纹和请求头生成工具，特别适合需要模拟真实浏览器环境的爬虫和自动化任务。它的贝叶斯生成网络确保了生成的指纹符合真实世界的分布，而极快的运行速度使其适合高频请求场景。</p>
+<hr>
+<blockquote>
+<p>💡 <strong>提示</strong>：BrowserForge 是 Camoufox 的底层指纹生成库，两者结合使用可以获得更完整的反检测浏览器解决方案。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="category-chain-item">网络请求</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/BrowserForge/">#BrowserForge</a>
+      
+        <a href="/tags/%E6%8C%87%E7%BA%B9%E7%94%9F%E6%88%90/">#指纹生成</a>
+      
+        <a href="/tags/%E8%AF%B7%E6%B1%82%E5%A4%B4/">#请求头</a>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>BrowserForge：智能浏览器指纹与请求头生成器</div>
+      <div>https://kingjem.github.io/2026/03/17/BrowserForge：智能浏览器指纹与请求头生成器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月17日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/17/Scrapling%EF%BC%9A%E8%87%AA%E9%80%82%E5%BA%94%E7%8E%B0%E4%BB%A3%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB%E6%A1%86%E6%9E%B6/" title="Scrapling：自适应现代网络爬虫框架">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Scrapling：自适应现代网络爬虫框架</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/17/Camoufox%EF%BC%9A%E5%BC%80%E6%BA%90%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7/" title="Camoufox：开源反检测浏览器与指纹注入工具">
+                        <span class="hidden-mobile">Camoufox：开源反检测浏览器与指纹注入工具</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

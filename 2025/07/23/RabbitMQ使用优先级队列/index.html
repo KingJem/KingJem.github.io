@@ -73,7 +73,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.3.0"></head>
+<meta name="generator" content="Hexo 8.1.1"></head>
 
 
 <body>
@@ -210,7 +210,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          747 字
+          737 字
         
       </span>
     
@@ -275,7 +275,7 @@
 
 
 
-<p><code>channel.queue_declare(queue=&#39;test&#39;, arguments=&#123;&quot;x-max-priority&quot;: 10&#125;)</code>  在声明队列的时候声明最大优先级.</p>
+<p><code>channel.queue_declare(queue=&#39;test&#39;, arguments={&quot;x-max-priority&quot;: 10})</code>  在声明队列的时候声明最大优先级.</p>
 <p>在发布消息的时候通过<code>properties=pika.BasicProperties(priority=5)</code> 针对不同的消息来设置不同的优先级. </p>
 <p>消费的时候,不同优先级,优先级高的先被消费,相同优先级的,会按照<code>FIFO</code>的顺序.</p>
 

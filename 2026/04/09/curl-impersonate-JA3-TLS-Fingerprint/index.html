@@ -1,0 +1,1207 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="curl-impersonate JA3 指纹原理与复现前言本文通过实际抓包验证，深入分析 curl-impersonate 的 TLS 指纹生成机制，并完整复现了 curl_chrome110 的 JA3 哈希计算全过程。  环境说明：curl-impersonate 安装于 &#x2F;root&#x2F;PycharmProjects&#x2F;python-api&#x2F;curl-impersonate&#x2F;  一、curl-i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="curl-impersonate JA3 指纹原理与复现">
+<meta property="og:url" content="https://kingjem.github.io/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="curl-impersonate JA3 指纹原理与复现前言本文通过实际抓包验证，深入分析 curl-impersonate 的 TLS 指纹生成机制，并完整复现了 curl_chrome110 的 JA3 哈希计算全过程。  环境说明：curl-impersonate 安装于 &#x2F;root&#x2F;PycharmProjects&#x2F;python-api&#x2F;curl-impersonate&#x2F;  一、curl-i">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-09T03:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-09T07:34:24.411Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="JA3">
+<meta property="article:tag" content="JA4">
+<meta property="article:tag" content="TLS">
+<meta property="article:tag" content="curl-impersonate">
+<meta property="article:tag" content="反爬虫">
+<meta property="article:tag" content="网络爬虫">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>curl-impersonate JA3 指纹原理与复现 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="curl-impersonate JA3 指纹原理与复现"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-04-09 11:00" pubdate>
+          2026年4月9日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          66 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">curl-impersonate JA3 指纹原理与复现</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="curl-impersonate-JA3-指纹原理与复现"><a href="#curl-impersonate-JA3-指纹原理与复现" class="headerlink" title="curl-impersonate JA3 指纹原理与复现"></a>curl-impersonate JA3 指纹原理与复现</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文通过实际抓包验证，深入分析 curl-impersonate 的 TLS 指纹生成机制，并完整复现了 curl_chrome110 的 JA3 哈希计算全过程。</p>
+<blockquote>
+<p>环境说明：curl-impersonate 安装于 <code>/root/PycharmProjects/python-api/curl-impersonate/</code></p>
+</blockquote>
+<h2 id="一、curl-impersonate-核心原理"><a href="#一、curl-impersonate-核心原理" class="headerlink" title="一、curl-impersonate 核心原理"></a>一、curl-impersonate 核心原理</h2><p>curl-impersonate 是一个魔改版 curl，在标准 curl 基础上添加了一系列自定义 flag 来模拟特定浏览器的 TLS 和 HTTP 指纹。</p>
+<h3 id="1-1-TLS-指纹层级"><a href="#1-1-TLS-指纹层级" class="headerlink" title="1.1 TLS 指纹层级"></a>1.1 TLS 指纹层级</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">┌─────────────────────────────────────────────┐<br>│                  TLS 指纹                    │<br>├──────────────┬──────────────┬────────────────┤<br>│  TLS 版本    │ Cipher 套件  │  TLS 扩展顺序    │<br>│  <span class="hljs-number">1.2</span> / <span class="hljs-number">1.3</span>  │  JA3 核心    │  Chrome 特有     │<br>└──────────────┴──────────────┴────────────────┘<br>                    ↓<br>┌─────────────────────────────────────────────┐<br>│               HTTP/<span class="hljs-number">2</span> 指纹                    │<br>├──────────────┬──────────────┬────────────────┤<br>│ Pseudo-<span class="hljs-keyword">header</span>│  SETTINGS   │  ALPS 扩展      │<br>│   顺序        │  帧顺序      │  (Chrome 私有)  │<br>└──────────────┴──────────────┴────────────────┘<br>                    ↓<br>┌─────────────────────────────────────────────┐<br>│               HTTP <span class="hljs-keyword">Header</span> 指纹               │<br>├──────────────┬──────────────┬────────────────┤<br>│  sec-ch-ua  │ <span class="hljs-keyword">User</span>-Agent  │ Accept-<span class="hljs-keyword">Language</span> │<br>└──────────────┴──────────────┴────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-2-curl-chrome110-完整配置"><a href="#1-2-curl-chrome110-完整配置" class="headerlink" title="1.2 curl_chrome110 完整配置"></a>1.2 curl_chrome110 完整配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/usr/bin/env bash</span><br><span class="hljs-built_in">dir</span>=<span class="hljs-variable">$&#123;0%/*&#125;</span><br><br><span class="hljs-string">&quot;<span class="hljs-variable">$dir</span>/curl-impersonate-chrome&quot;</span> \<br>    --ciphers TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,ECDHE-ECDSA-AES128-GCM-SHA256,ECDHE-RSA-AES128-GCM-SHA256,ECDHE-ECDSA-AES256-GCM-SHA384,ECDHE-RSA-AES256-GCM-SHA384,ECDHE-ECDSA-CHACHA20-POLY1305,ECDHE-RSA-CHACHA20-POLY1305,ECDHE-RSA-AES128-SHA,ECDHE-RSA-AES256-SHA,AES128-GCM-SHA256,AES256-GCM-SHA384,AES128-SHA,AES256-SHA \<br>    -H <span class="hljs-string">&#x27;sec-ch-ua: &quot;Chromium&quot;;v=&quot;110&quot;, &quot;Not A(Brand&quot;;v=&quot;24&quot;, &quot;Google Chrome&quot;;v=&quot;110&quot;&#x27;</span> \<br>    -H <span class="hljs-string">&#x27;sec-ch-ua-mobile: ?0&#x27;</span> \<br>    -H <span class="hljs-string">&#x27;sec-ch-ua-platform: &quot;Windows&quot;&#x27;</span> \<br>    -H <span class="hljs-string">&#x27;Upgrade-Insecure-Requests: 1&#x27;</span> \<br>    -H <span class="hljs-string">&#x27;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36&#x27;</span> \<br>    --http2 --http2-no-server-push --false-start \<br>    --tlsv1.2 --no-npn --alps --tls-permute-extensions \<br>    --cert-compression brotli \<br>    <span class="hljs-string">&quot;<span class="hljs-variable">$@</span>&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="1-3-关键-Flag-解析"><a href="#1-3-关键-Flag-解析" class="headerlink" title="1.3 关键 Flag 解析"></a>1.3 关键 Flag 解析</h3><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--ciphers</code></td>
+<td>TLS 加密套件列表，决定 JA3 哈希</td>
+</tr>
+<tr>
+<td><code>--cert-compression brotli</code></td>
+<td>证书压缩算法（Chrome 特有）</td>
+</tr>
+<tr>
+<td><code>--false-start</code></td>
+<td>TLS False Start（Chrome 性能优化）</td>
+</tr>
+<tr>
+<td><code>--alps</code></td>
+<td>ALPS 扩展（HTTP/2 早期加密，Chrome 私有）</td>
+</tr>
+<tr>
+<td><code>--tls-permute-extensions</code></td>
+<td>打乱 TLS 扩展顺序（BoringSSL 特性）</td>
+</tr>
+<tr>
+<td><code>--http2-no-server-push</code></td>
+<td>禁用 HTTP/2 Server Push</td>
+</tr>
+</tbody></table>
+<h2 id="二、JA3-哈希算法详解"><a href="#二、JA3-哈希算法详解" class="headerlink" title="二、JA3 哈希算法详解"></a>二、JA3 哈希算法详解</h2><h3 id="2-1-JA3-生成公式"><a href="#2-1-JA3-生成公式" class="headerlink" title="2.1 JA3 生成公式"></a>2.1 JA3 生成公式</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">JA3 = MD5(<br>  TLS版本 +<br>  Cipher数量 +<br>  Cipher列表(Hex IANA, comma分隔) +<br>  <span class="hljs-keyword">Extension</span>数量 +<br>  <span class="hljs-keyword">Extension</span>列表(<span class="hljs-type">Decimal</span> ID, dash分隔) +<br>  椭圆曲线(<span class="hljs-type">Decimal</span> ID, comma分隔) +<br>  椭圆曲线点格式<br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-2-TLS-版本字段"><a href="#2-2-TLS-版本字段" class="headerlink" title="2.2 TLS 版本字段"></a>2.2 TLS 版本字段</h3><table>
+<thead>
+<tr>
+<th>TLS 版本</th>
+<th>Hex 值</th>
+<th>JA3 中表示</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TLS 1.0</td>
+<td>0x0301</td>
+<td>769</td>
+</tr>
+<tr>
+<td>TLS 1.1</td>
+<td>0x0302</td>
+<td>770</td>
+</tr>
+<tr>
+<td>TLS 1.2</td>
+<td>0x0303</td>
+<td>771</td>
+</tr>
+<tr>
+<td>TLS 1.3</td>
+<td>0x0304</td>
+<td>772</td>
+</tr>
+</tbody></table>
+<p>Chrome 110 使用 TLS 1.2，所以版本字段为 <code>771</code>。</p>
+<h3 id="2-3-Cipher-Suites（15个）"><a href="#2-3-Cipher-Suites（15个）" class="headerlink" title="2.3 Cipher Suites（15个）"></a>2.3 Cipher Suites（15个）</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>IANA 名称</th>
+<th>Hex 值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>TLS_AES_128_GCM_SHA256</td>
+<td>1301</td>
+</tr>
+<tr>
+<td>2</td>
+<td>TLS_AES_256_GCM_SHA384</td>
+<td>1302</td>
+</tr>
+<tr>
+<td>3</td>
+<td>TLS_CHACHA20_POLY1305_SHA256</td>
+<td>1303</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ECDHE-ECDSA-AES128-GCM-SHA256</td>
+<td>c02c</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ECDHE-RSA-AES128-GCM-SHA256</td>
+<td>c02f</td>
+</tr>
+<tr>
+<td>6</td>
+<td>ECDHE-ECDSA-AES256-GCM-SHA384</td>
+<td>c024</td>
+</tr>
+<tr>
+<td>7</td>
+<td>ECDHE-RSA-AES256-GCM-SHA384</td>
+<td>c02b</td>
+</tr>
+<tr>
+<td>8</td>
+<td>ECDHE-ECDSA-CHACHA20-POLY1305</td>
+<td>cca9</td>
+</tr>
+<tr>
+<td>9</td>
+<td>ECDHE-RSA-CHACHA20-POLY1305</td>
+<td>cca8</td>
+</tr>
+<tr>
+<td>10</td>
+<td>ECDHE-RSA-AES128-SHA</td>
+<td>c013</td>
+</tr>
+<tr>
+<td>11</td>
+<td>ECDHE-RSA-AES256-SHA</td>
+<td>c014</td>
+</tr>
+<tr>
+<td>12</td>
+<td>AES128-GCM-SHA256</td>
+<td>009c</td>
+</tr>
+<tr>
+<td>13</td>
+<td>AES256-GCM-SHA384</td>
+<td>009d</td>
+</tr>
+<tr>
+<td>14</td>
+<td>AES128-SHA</td>
+<td>002f</td>
+</tr>
+<tr>
+<td>15</td>
+<td>AES256-SHA</td>
+<td>0035</td>
+</tr>
+</tbody></table>
+<h3 id="2-4-TLS-Extensions（16个，真实顺序）"><a href="#2-4-TLS-Extensions（16个，真实顺序）" class="headerlink" title="2.4 TLS Extensions（16个，真实顺序）"></a>2.4 TLS Extensions（16个，真实顺序）</h3><p>Chrome 110 在 ClientHello 中发送的扩展顺序：</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>23</td>
+<td>ALPN</td>
+<td>应用层协议协商</td>
+</tr>
+<tr>
+<td>13</td>
+<td>supported_versions</td>
+<td>TLS 1.3 版本支持</td>
+</tr>
+<tr>
+<td>51</td>
+<td>key_share</td>
+<td>TLS 1.3 密钥共享</td>
+</tr>
+<tr>
+<td>5</td>
+<td>status_request</td>
+<td>OCSP 证书状态请求</td>
+</tr>
+<tr>
+<td>65281</td>
+<td>0xff01</td>
+<td>GREASE（Chrome 随机插入）</td>
+</tr>
+<tr>
+<td>0</td>
+<td>server_name</td>
+<td>SNI 主机名</td>
+</tr>
+<tr>
+<td>27</td>
+<td>compress_certificate</td>
+<td>证书压缩</td>
+</tr>
+<tr>
+<td>43</td>
+<td>supported_versions</td>
+<td>TLS 1.2 客户端版本</td>
+</tr>
+<tr>
+<td>16</td>
+<td>encrypt_then_mac</td>
+<td>加密后 MAC</td>
+</tr>
+<tr>
+<td>10</td>
+<td>supported_signature_algorithms</td>
+<td>支持的签名算法</td>
+</tr>
+<tr>
+<td>45</td>
+<td>psk_exchange_modes</td>
+<td>PSK 交换模式</td>
+</tr>
+<tr>
+<td>17513</td>
+<td>0x4469</td>
+<td>GREASE</td>
+</tr>
+<tr>
+<td>18</td>
+<td>signed_certificate_timestamp</td>
+<td>SCT 时间戳</td>
+</tr>
+<tr>
+<td>35</td>
+<td>session_ticket</td>
+<td>会话票据</td>
+</tr>
+<tr>
+<td>11</td>
+<td>use_srtp</td>
+<td>SRTP 媒体加密</td>
+</tr>
+<tr>
+<td>21</td>
+<td>padding</td>
+<td>填充</td>
+</tr>
+</tbody></table>
+<h3 id="2-5-椭圆曲线"><a href="#2-5-椭圆曲线" class="headerlink" title="2.5 椭圆曲线"></a>2.5 椭圆曲线</h3><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>29</td>
+<td>X25519</td>
+</tr>
+<tr>
+<td>23</td>
+<td>secp256r1</td>
+</tr>
+<tr>
+<td>24</td>
+<td>secp384r1</td>
+</tr>
+</tbody></table>
+<h2 id="三、实际验证"><a href="#三、实际验证" class="headerlink" title="三、实际验证"></a>三、实际验证</h2><h3 id="3-1-抓取真实-TLS-指纹"><a href="#3-1-抓取真实-TLS-指纹" class="headerlink" title="3.1 抓取真实 TLS 指纹"></a>3.1 抓取真实 TLS 指纹</h3><p>使用 curl_chrome110 访问 Browserleaks：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./curl_chrome110 <span class="hljs-string">&quot;https://tls.browserleaks.com/json&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>返回结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;ja4&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;t13d1516h2_8daaf6152771_e5627efa2ab1&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;ja3_hash&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;7005d6191e610731aab6434cfa305597&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;ja3_text&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,23-13-51-5-65281-0-27-43-16-10-45-17513-18-35-11-21,29-23-24,0&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;ja3n_hash&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;aa56c057ad164ec4fdcb7a5a283be9fc&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;ja3n_text&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-5-10-11-13-16-18-21-23-27-35-43-45-51-17513-65281,29-23-24,0&quot;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-JA3-与-JA3n-的区别"><a href="#3-2-JA3-与-JA3n-的区别" class="headerlink" title="3.2 JA3 与 JA3n 的区别"></a>3.2 JA3 与 JA3n 的区别</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>JA3</th>
+<th>JA3n</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Extension 顺序</td>
+<td>ClientHello 真实顺序</td>
+<td>按 ID 从小到大排序</td>
+</tr>
+<tr>
+<td>用途</td>
+<td>追踪特定浏览器配置</td>
+<td>简化版指纹匹配</td>
+</tr>
+</tbody></table>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">JA3n</span> extensions:  <span class="hljs-number">0</span>-<span class="hljs-number">5</span>-<span class="hljs-number">10</span>-<span class="hljs-number">11</span>-<span class="hljs-number">13</span>-<span class="hljs-number">16</span>-<span class="hljs-number">18</span>-<span class="hljs-number">21</span>-<span class="hljs-number">23</span>-<span class="hljs-number">27</span>-<span class="hljs-number">35</span>-<span class="hljs-number">43</span>-<span class="hljs-number">45</span>-<span class="hljs-number">51</span>-<span class="hljs-number">17513</span>-<span class="hljs-number">65281</span>  (排序)<br><span class="hljs-attribute">JA3</span>  extensions: <span class="hljs-number">23</span>-<span class="hljs-number">13</span>-<span class="hljs-number">51</span>-<span class="hljs-number">5</span>-<span class="hljs-number">65281</span>-<span class="hljs-number">0</span>-<span class="hljs-number">27</span>-<span class="hljs-number">43</span>-<span class="hljs-number">16</span>-<span class="hljs-number">10</span>-<span class="hljs-number">45</span>-<span class="hljs-number">17513</span>-<span class="hljs-number">18</span>-<span class="hljs-number">35</span>-<span class="hljs-number">11</span>-<span class="hljs-number">21</span>  (真实顺序)<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-3-Chrome-109-GREASE-随机化"><a href="#3-3-Chrome-109-GREASE-随机化" class="headerlink" title="3.3 Chrome 109+ GREASE 随机化"></a>3.3 Chrome 109+ GREASE 随机化</h3><p>Chrome 109 (2022年1月) 引入重大变化：<strong>GREASE 值从固定改为随机</strong>。</p>
+<h4 id="Chrome-109-之前的-GREASE"><a href="#Chrome-109-之前的-GREASE" class="headerlink" title="Chrome 109 之前的 GREASE"></a>Chrome 109 之前的 GREASE</h4><p>Chrome 在 ClientHello 中插入固定的 GREASE 扩展值，JA3 指纹是<strong>稳定的</strong>：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs subunit">Chrome 109之前: JA3 = 771,4865<span class="hljs-string">-4866</span>-...,23<span class="hljs-string">-13</span><span class="hljs-string">-51</span><span class="hljs-string">-5</span><span class="hljs-string">-65281</span><span class="hljs-string">-0</span><span class="hljs-string">-27</span>-...  (固定)<br>                                   ↑ 固定 GREASE 值 0xff01 (65281)<br></code></pre></td></tr></table></figure>
+
+<h4 id="Chrome-109-之后的-GREASE"><a href="#Chrome-109-之后的-GREASE" class="headerlink" title="Chrome 109 之后的 GREASE"></a>Chrome 109 之后的 GREASE</h4><p>每次连接 GREASE 值从池中<strong>随机选择</strong>，导致同一个版本的浏览器每次请求 JA3 都不同：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs subunit">Chrome 109之后: JA3 = 771,0a0a<span class="hljs-string">-4865</span><span class="hljs-string">-4866</span>-...,23<span class="hljs-string">-13</span><span class="hljs-string">-51</span><span class="hljs-string">-0</span>a0a<span class="hljs-string">-5</span><span class="hljs-string">-65281</span><span class="hljs-string">-0</span><span class="hljs-string">-27</span>-...  (随机)<br>                                   ↑ 随机插入一个 GREASE 值 (0a0a, 1a1a, 2a2a...)<br></code></pre></td></tr></table></figure>
+
+<p>GREASE 值池（Chrome 定义的保留值）：</p>
+<table>
+<thead>
+<tr>
+<th>GREASE 值</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x0a0a</td>
+<td>Application Settings</td>
+</tr>
+<tr>
+<td>0x1a1a</td>
+<td>Reserved (GREASE)</td>
+</tr>
+<tr>
+<td>0x2a2a</td>
+<td>Reserved (GREASE)</td>
+</tr>
+<tr>
+<td>0x3a3a</td>
+<td>Reserved (GREASE)</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>0xFAFA</td>
+<td>Reserved (GREASE)</td>
+</tr>
+</tbody></table>
+<h4 id="实际影响"><a href="#实际影响" class="headerlink" title="实际影响"></a>实际影响</h4><table>
+<thead>
+<tr>
+<th>对比</th>
+<th>Chrome 109 之前</th>
+<th>Chrome 109 之后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JA3 稳定性</td>
+<td>固定，可用于识别</td>
+<td>每次不同，指纹库匹配失效</td>
+</tr>
+<tr>
+<td>JA3 Hash 数量</td>
+<td>1个/浏览器版本</td>
+<td>N个/浏览器版本</td>
+</tr>
+<tr>
+<td>反爬策略</td>
+<td>匹配 JA3 Hash</td>
+<td>需要 JA3n 或多维度指纹</td>
+</tr>
+</tbody></table>
+<p>这就是为什么 curl-impersonate 的 <code>curl_chrome110</code> 在 Section 3.1 的返回中，JA3n（扩展排序后）是稳定的，而 JA3 依赖 GREASE 注入来模拟随机化。</p>
+<hr>
+<h3 id="3-4-JA4-哈希格式"><a href="#3-4-JA4-哈希格式" class="headerlink" title="3.4 JA4 哈希格式"></a>3.4 JA4 哈希格式</h3><p>JA4 是 2022 年发布的升级版指纹标准，比 JA3 更易读，且<strong>不受 GREASE 随机化影响</strong>：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">t13d1516h2_8daaf6152771_e5627efa2ab1<br></code></pre></td></tr></table></figure>
+
+<p>JA4 各字段含义（以 <code>t13d1516h2_8daaf6152771_e5627efa2ab1</code> 为例）：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>位置</th>
+<th>含义</th>
+<th>示例值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>p</code></td>
+<td>1字符</td>
+<td>传输协议</td>
+<td><code>t</code>=TLS over TCP, <code>q</code>=QUIC, <code>d</code>=DTLS</td>
+</tr>
+<tr>
+<td><code>v</code></td>
+<td>2字符</td>
+<td>TLS 版本</td>
+<td><code>13</code>=1.3, <code>12</code>=1.2, <code>10</code>=1.0</td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td>1字符</td>
+<td>SNI 有无</td>
+<td><code>d</code>=有域名, <code>i</code>=无 SNI</td>
+</tr>
+<tr>
+<td><code>c</code></td>
+<td>2字符</td>
+<td>密码套件数量</td>
+<td><code>15</code>=15个</td>
+</tr>
+<tr>
+<td><code>e</code></td>
+<td>2字符</td>
+<td>扩展数量</td>
+<td><code>16</code>=16个</td>
+</tr>
+<tr>
+<td><code>a</code></td>
+<td>2字符</td>
+<td>ALPN 首尾字符</td>
+<td><code>h2</code>=http/2, <code>h3</code>=http/3</td>
+</tr>
+<tr>
+<td><code>_</code></td>
+<td>分隔符</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td>12字符</td>
+<td>密码套件列表的 SHA256 前12位</td>
+<td><code>8daaf6152771</code></td>
+</tr>
+<tr>
+<td><code>_</code></td>
+<td>分隔符</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>d</code></td>
+<td>12字符</td>
+<td>扩展列表+签名算法的 SHA256 前12位</td>
+<td><code>e5627efa2ab1</code></td>
+</tr>
+</tbody></table>
+<p><strong>b 字段计算示例</strong>（15个密码套件按十六进制排序后哈希）：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs llvm">原始顺序: <span class="hljs-number">1301</span><span class="hljs-punctuation">,</span><span class="hljs-number">1302</span><span class="hljs-punctuation">,</span><span class="hljs-number">1303</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span>b<span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span>f<span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span><span class="hljs-keyword">c</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">030</span><span class="hljs-punctuation">,</span>cca<span class="hljs-number">9</span><span class="hljs-punctuation">,</span>cca<span class="hljs-number">8</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">013</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">014</span><span class="hljs-punctuation">,</span><span class="hljs-number">009</span><span class="hljs-keyword">c</span><span class="hljs-punctuation">,</span><span class="hljs-number">009</span>d<span class="hljs-punctuation">,</span><span class="hljs-number">002</span>f<span class="hljs-punctuation">,</span><span class="hljs-number">0035</span><br>排序后:   <span class="hljs-number">002</span>f<span class="hljs-punctuation">,</span><span class="hljs-number">0035</span><span class="hljs-punctuation">,</span><span class="hljs-number">009</span><span class="hljs-keyword">c</span><span class="hljs-punctuation">,</span><span class="hljs-number">009</span>d<span class="hljs-punctuation">,</span><span class="hljs-number">1301</span><span class="hljs-punctuation">,</span><span class="hljs-number">1302</span><span class="hljs-punctuation">,</span><span class="hljs-number">1303</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">013</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">014</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span>b<span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span><span class="hljs-keyword">c</span><span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">02</span>f<span class="hljs-punctuation">,</span><span class="hljs-keyword">c</span><span class="hljs-number">030</span><span class="hljs-punctuation">,</span>cca<span class="hljs-number">8</span><span class="hljs-punctuation">,</span>cca<span class="hljs-number">9</span><br>SHA<span class="hljs-number">256</span>:   <span class="hljs-number">8</span>daaf<span class="hljs-number">6152771</span>...<br></code></pre></td></tr></table></figure>
+
+<p><strong>c 字段计算示例</strong>（扩展按十六进制排序、去 SNI/ALPN 后再加签名算法哈希）：</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs x86asm">原始扩展: <span class="hljs-number">001b</span>,<span class="hljs-number">0000</span>,<span class="hljs-number">0033</span>,<span class="hljs-number">0010</span>,<span class="hljs-number">4469</span>,<span class="hljs-number">0017</span>,<span class="hljs-number">002d</span>,<span class="hljs-number">000d</span>,<span class="hljs-number">0005</span>,<span class="hljs-number">0023</span>,<span class="hljs-number">0012</span>,002b,ff01,<span class="hljs-number">000b</span>,000a,<span class="hljs-number">0015</span><br>排序去重: <span class="hljs-number">0005</span>,000a,<span class="hljs-number">000b</span>,<span class="hljs-number">000d</span>,<span class="hljs-number">0012</span>,<span class="hljs-number">0015</span>,<span class="hljs-number">0017</span>,<span class="hljs-number">001b</span>,<span class="hljs-number">0023</span>,002b,<span class="hljs-number">002d</span>,<span class="hljs-number">0033</span>,<span class="hljs-number">4469</span>,ff01<br>加签名:   <span class="hljs-number">0005</span>,000a,<span class="hljs-number">000b</span>,<span class="hljs-number">000d</span>,<span class="hljs-number">0012</span>,<span class="hljs-number">0015</span>,<span class="hljs-number">0017</span>,<span class="hljs-number">001b</span>,<span class="hljs-number">0023</span>,002b,<span class="hljs-number">002d</span>,<span class="hljs-number">0033</span>,<span class="hljs-number">4469</span>,ff01_0403,<span class="hljs-number">0804</span>,<span class="hljs-number">0401</span>...<br><span class="hljs-symbol">SHA256:</span>   e5627efa2ab1...<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>关键设计</strong>：GREASE 值在计算 b 和 c 字段时会被<strong>忽略</strong>（不参与排序和哈希），因此 Chrome 109+ 的 GREASE 随机化对 JA4 <strong>没有影响</strong>，这是 JA4 优于 JA3 的核心原因。</p>
+</blockquote>
+<p>JA4 的设计目标：</p>
+<ol>
+<li><strong>人类可读</strong> — 不需要解码十六进制</li>
+<li><strong>GREASE 免疫</strong> — 不受 Chrome 109+ 随机 GREASE 影响</li>
+<li><strong>可组合</strong> — 各字段独立，可做细粒度匹配</li>
+<li><strong>协议无关</strong> — 支持 TLS、QUIC、HTTP/2、HTTP/3</li>
+</ol>
+<h2 id="四、Python-复现代码"><a href="#四、Python-复现代码" class="headerlink" title="四、Python 复现代码"></a>四、Python 复现代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> hashlib<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">compute_ja3n</span>(<span class="hljs-params">ciphers_hex, extensions_ids_sorted, curves</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    计算 JA3n 哈希（标准 Salesforce JA3 算法）</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    ja3n_str = (<br>        <span class="hljs-string">&quot;771,&quot;</span>                                          <span class="hljs-comment"># TLS 1.2</span><br>        <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(ciphers_hex)&#125;</span>,&quot;</span><br>        <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-string">&#x27;,&#x27;</span>.join(ciphers_hex)&#125;</span>,&quot;</span><br>        <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(extensions_ids_sorted)&#125;</span>,&quot;</span><br>        <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-string">&#x27;-&#x27;</span>.join(<span class="hljs-built_in">str</span>(e) <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> extensions_ids_sorted)&#125;</span>,&quot;</span><br>        <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;<span class="hljs-string">&#x27;-&#x27;</span>.join(<span class="hljs-built_in">str</span>(c) <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> curves)&#125;</span>,&quot;</span><br>        <span class="hljs-string">&quot;0&quot;</span><br>    )<br>    <span class="hljs-keyword">return</span> hashlib.md5(ja3n_str.encode()).hexdigest()<br><br><span class="hljs-comment"># curl_chrome110 的 JA3n</span><br>ciphers = [<span class="hljs-string">&quot;1301&quot;</span>,<span class="hljs-string">&quot;1302&quot;</span>,<span class="hljs-string">&quot;1303&quot;</span>,<span class="hljs-string">&quot;c02c&quot;</span>,<span class="hljs-string">&quot;c02f&quot;</span>,<span class="hljs-string">&quot;c024&quot;</span>,<span class="hljs-string">&quot;c02b&quot;</span>,<br>           <span class="hljs-string">&quot;cca9&quot;</span>,<span class="hljs-string">&quot;cca8&quot;</span>,<span class="hljs-string">&quot;c013&quot;</span>,<span class="hljs-string">&quot;c014&quot;</span>,<span class="hljs-string">&quot;009c&quot;</span>,<span class="hljs-string">&quot;009d&quot;</span>,<span class="hljs-string">&quot;002f&quot;</span>,<span class="hljs-string">&quot;0035&quot;</span>]<br>extensions = [<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,<span class="hljs-number">10</span>,<span class="hljs-number">11</span>,<span class="hljs-number">13</span>,<span class="hljs-number">16</span>,<span class="hljs-number">18</span>,<span class="hljs-number">21</span>,<span class="hljs-number">23</span>,<span class="hljs-number">27</span>,<span class="hljs-number">35</span>,<span class="hljs-number">43</span>,<span class="hljs-number">45</span>,<span class="hljs-number">51</span>,<span class="hljs-number">65281</span>,<span class="hljs-number">17513</span>]<br>curves = [<span class="hljs-number">29</span>,<span class="hljs-number">23</span>,<span class="hljs-number">24</span>]<br><br>ja3n_hash = compute_ja3n(ciphers, extensions, curves)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;JA3n: <span class="hljs-subst">&#123;ja3n_hash&#125;</span>&quot;</span>)  <span class="hljs-comment"># aa56c057ad164ec4fdcb7a5a283be9fc ✅</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="五、相关工具与仓库"><a href="#五、相关工具与仓库" class="headerlink" title="五、相关工具与仓库"></a>五、相关工具与仓库</h2><h3 id="5-1-核心工具"><a href="#5-1-核心工具" class="headerlink" title="5.1 核心工具"></a>5.1 核心工具</h3><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>Stars</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/lexiforest/curl_cffi">lexiforest/curl_cffi</a></td>
+<td>5373</td>
+<td>Python 版 curl-impersonate，推荐使用</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/salesforce/ja3">salesforce/ja3</a></td>
+<td>3085</td>
+<td>原始 JA3 规范与实现</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/FoxIO-LLC/ja4">FoxIO-LLC/ja4</a></td>
+<td>1851</td>
+<td>JA4 升级版指纹</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-curl-cffi-使用示例"><a href="#5-2-curl-cffi-使用示例" class="headerlink" title="5.2 curl_cffi 使用示例"></a>5.2 curl_cffi 使用示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> curl_cffi <span class="hljs-keyword">import</span> requests<br><br><span class="hljs-comment"># 直接模拟 Chrome 110</span><br>response = requests.get(<br>    <span class="hljs-string">&quot;https://tls.browserleaks.com/json&quot;</span>,<br>    impersonate=<span class="hljs-string">&quot;chrome110&quot;</span><br>)<br><span class="hljs-built_in">print</span>(response.json())<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-指纹查询网站"><a href="#5-3-指纹查询网站" class="headerlink" title="5.3 指纹查询网站"></a>5.3 指纹查询网站</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://browserleaks.com/ja3">https://browserleaks.com/ja3</a> - 在线 JA3/JA4 检测</li>
+<li><a target="_blank" rel="noopener" href="https://ja3er.com/">https://ja3er.com</a> - JA3 哈希数据库</li>
+</ul>
+<h2 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h2><ol>
+<li><strong>JA3 哈希 = TLS ClientHello 的指纹</strong>，由 cipher 套件、扩展列表、椭圆曲线等字段计算得出</li>
+<li><strong>Chrome 109 之前</strong>：同一浏览器版本的 JA3 固定，全球一致</li>
+<li><strong>Chrome 109 之后</strong>：GREASE 值随机化，同一版本每次请求 JA3 都不同，JA3 Hash 匹配失效</li>
+<li><strong>JA3n 是 JA3 的排序版本</strong>，将扩展按 ID 排序后计算哈希，更稳定</li>
+<li><strong>JA4 是升级版指纹</strong>，人类可读、不受 GREASE 影响、支持多协议</li>
+<li><strong>curl-impersonate 预置脚本已覆盖主流浏览器版本</strong>，直接使用即可复现真实浏览器指纹</li>
+<li><strong>Python 推荐用 curl_cffi</strong>，比 bash 脚本更易于集成到项目</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/lwthiker/curl-impersonate">curl-impersonate GitHub</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/salesforce/ja3">Salesforce JA3 规范</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml">IANA TLS Cipher Suite Registry</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="category-chain-item">网络安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
+      
+        <a href="/tags/TLS/">#TLS</a>
+      
+        <a href="/tags/JA3/">#JA3</a>
+      
+        <a href="/tags/JA4/">#JA4</a>
+      
+        <a href="/tags/curl-impersonate/">#curl-impersonate</a>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/">#网络爬虫</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>curl-impersonate JA3 指纹原理与复现</div>
+      <div>https://kingjem.github.io/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年4月9日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/17/Scrapling%EF%BC%9A%E8%87%AA%E9%80%82%E5%BA%94%E7%8E%B0%E4%BB%A3%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB%E6%A1%86%E6%9E%B6/" title="Scrapling：自适应现代网络爬虫框架">
+                        <span class="hidden-mobile">Scrapling：自适应现代网络爬虫框架</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

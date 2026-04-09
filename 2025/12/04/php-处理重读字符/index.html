@@ -1,0 +1,714 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="在处理国际化文本、生成 URL 别名（Slug）或进行文本搜索时，我们经常需要将带有重音符号的字符（如 Á、ñ、ü）转换为其基础的 ASCII 字符（如 A、n、u）。 本文档将通过一个 PHP 示例函数 remove_accents，详细解释如何利用 Symfony 的 Polyfill 库和 Unicode 标准化（Normalization）来实现这一功能。 1. 代码示例以下是核心功能的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP如何使用 Unicode 标准化移除字符串中的重音符号">
+<meta property="og:url" content="https://kingjem.github.io/2025/12/04/php-%E5%A4%84%E7%90%86%E9%87%8D%E8%AF%BB%E5%AD%97%E7%AC%A6/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="在处理国际化文本、生成 URL 别名（Slug）或进行文本搜索时，我们经常需要将带有重音符号的字符（如 Á、ñ、ü）转换为其基础的 ASCII 字符（如 A、n、u）。 本文档将通过一个 PHP 示例函数 remove_accents，详细解释如何利用 Symfony 的 Polyfill 库和 Unicode 标准化（Normalization）来实现这一功能。 1. 代码示例以下是核心功能的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-04T05:45:30.000Z">
+<meta property="article:modified_time" content="2026-04-09T10:14:28.222Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="python go java Android js">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>PHP如何使用 Unicode 标准化移除字符串中的重音符号 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="PHP如何使用 Unicode 标准化移除字符串中的重音符号"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-04 13:45" pubdate>
+          2025年12月4日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">PHP如何使用 Unicode 标准化移除字符串中的重音符号</h1>
+            
+            <div class="markdown-body">
+              
+              <p>在处理国际化文本、生成 URL 别名（Slug）或进行文本搜索时，我们经常需要将带有重音符号的字符（如 <code>Á</code>、<code>ñ</code>、<code>ü</code>）转换为其基础的 ASCII 字符（如 <code>A</code>、<code>n</code>、<code>u</code>）。</p>
+<p>本文档将通过一个 PHP 示例函数 <code>remove_accents</code>，详细解释如何利用 Symfony 的 Polyfill 库和 Unicode 标准化（Normalization）来实现这一功能。</p>
+<h2 id="1-代码示例"><a href="#1-代码示例" class="headerlink" title="1. 代码示例"></a>1. 代码示例</h2><p>以下是核心功能的 PHP 代码实现：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;vendor/autoload.php&#x27;</span>; <span class="hljs-comment">// 确保加载了 Composer 自动加载文件</span><br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Polyfill</span>\<span class="hljs-title">Intl</span>\<span class="hljs-title">Normalizer</span>\<span class="hljs-title">Normalizer</span>;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 移除字符串中的重音符号</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> string $string 输入的包含重音字符的字符串</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> array|string|null 返回去除重音后的字符串</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">remove_accents</span>(<span class="hljs-params"><span class="hljs-variable">$string</span></span>): <span class="hljs-title">array</span>|<span class="hljs-title">string</span>|<span class="hljs-title">null</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">// 步骤 1: Unicode 标准化 (分解模式)</span><br>    <span class="hljs-comment">// 将字符分解为 基字符 + 组合字符 (例如: &#x27;Á&#x27; -&gt; &#x27;A&#x27; + &#x27;◌́&#x27;)</span><br>    <span class="hljs-variable">$normalized</span> = <span class="hljs-title class_">Normalizer</span>::<span class="hljs-title function_ invoke__">normalize</span>(<span class="hljs-variable">$string</span>, <span class="hljs-title class_">Normalizer</span>::<span class="hljs-variable constant_">FORM_D</span>);<br>    <br>    <span class="hljs-comment">// (可选) 打印标准化后的中间结果用于调试</span><br>    <span class="hljs-comment">// 注意：在终端中可能看起来没有变化，但底层字节已经改变</span><br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Normalized (NFD): &quot;</span> . <span class="hljs-variable">$normalized</span> . PHP_EOL;<br><br>    <span class="hljs-comment">// 步骤 2: 使用正则表达式移除组合字符 (重音符号)</span><br>    <span class="hljs-comment">// \p&#123;Mn&#125; 匹配任何 &quot;Mark, Nonspacing&quot; (非间距标记)</span><br>    <span class="hljs-comment">// /u 修饰符开启 UTF-8 模式</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-title function_ invoke__">preg_replace</span>(<span class="hljs-string">&#x27;/\p&#123;Mn&#125;+/u&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-variable">$normalized</span>);<br>&#125;<br><br><span class="hljs-comment">// 测试用例</span><br><span class="hljs-variable">$text</span> = <span class="hljs-string">&quot;Árbol rascador para Gatos&quot;</span>;<br><br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Original: &quot;</span> . <span class="hljs-variable">$text</span> . PHP_EOL;<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Result:   &quot;</span> . <span class="hljs-title function_ invoke__">remove_accents</span>(<span class="hljs-variable">$text</span>) . PHP_EOL;<br></code></pre></td></tr></table></figure>
+
+<p><strong>预期输出：</strong></p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">Original:</span> Árbol rascador para Gatos<br><span class="hljs-symbol">Result:</span>   Arbol rascador para Gatos<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-原理解析"><a href="#2-原理解析" class="headerlink" title="2. 原理解析"></a>2. 原理解析</h2><p>这个函数的工作原理可以分为两个关键步骤：<strong>标准化 (Normalization)</strong> 和 **过滤 (Filtering)**。</p>
+<h3 id="步骤-1-Unicode-标准化-Normalization-Form-D-NFD"><a href="#步骤-1-Unicode-标准化-Normalization-Form-D-NFD" class="headerlink" title="步骤 1: Unicode 标准化 (Normalization Form D - NFD)"></a>步骤 1: Unicode 标准化 (Normalization Form D - NFD)</h3><figure class="highlight nsis"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nsis"><span class="hljs-variable">$normalized</span> = <span class="hljs-params">Normal</span><span class="hljs-title function_">izer::normalize</span>(<span class="hljs-variable">$string</span>, <span class="hljs-params">Normal</span><span class="hljs-title function_">izer::FORM_D</span>)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>什么是 NFD？</strong> Unicode 允许用两种方式表示同一个带重音的字符：<ol>
+<li>**预组合字符 (Precomposed Character)**：例如 <code>Á</code> (U+00C1)，它是一个单独的代码点。</li>
+<li>**分解字符 (Decomposed Characters)**：例如 <code>A</code> (U+0041) + <code>´</code> (U+0301，结合锐音符)。这两个代码点组合在一起显示时，看起来也是 <code>Á</code>。</li>
+</ol>
+</li>
+<li><strong><code>Normalizer::FORM_D</code> 的作用</strong>： 它将字符串中的所有“预组合字符”强制分解为“基字符”加上“组合字符”。<ul>
+<li>输入：<code>Á</code></li>
+<li>NFD 处理后：<code>A</code> + <code>◌́</code> (非间距重音符)</li>
+</ul>
+</li>
+</ul>
+<h3 id="步骤-2-正则替换-Regular-Expression-Replacement"><a href="#步骤-2-正则替换-Regular-Expression-Replacement" class="headerlink" title="步骤 2: 正则替换 (Regular Expression Replacement)"></a>步骤 2: 正则替换 (Regular Expression Replacement)</h3><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">preg_replace(<span class="hljs-string">&#x27;/\p&#123;Mn&#125;+/u&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, $normalized)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>**<code>\p{Mn}</code>**：这是一个 Unicode 属性转义。<ul>
+<li><code>p</code> 代表 “Property” (属性)。</li>
+<li><code>Mn</code> 代表 “Mark, Nonspacing” (标记，非间距)。这正是 NFD 分解出来的那些重音符号、变音符所属的类别。</li>
+</ul>
+</li>
+<li>**<code>+</code>**：匹配一个或多个连续的非间距标记。</li>
+<li>**<code>/u</code>**：这是一个非常重要的修饰符，告诉 PHP 的 PCRE 引擎将模式字符串视为 UTF-8 编码，这对于处理多字节的 Unicode 字符是必须的。</li>
+</ul>
+<p><strong>结果</strong>： 通过将所有属于 <code>Mn</code> 类别的字符替换为空字符串，我们就只剩下了纯净的基字符（例如 <code>A</code>），从而实现了“去除重音”的效果。</p>
+<h2 id="3-依赖项"><a href="#3-依赖项" class="headerlink" title="3. 依赖项"></a>3. 依赖项</h2><p>此脚本使用了 <code>Symfony\Polyfill\Intl\Normalizer\Normalizer</code>。这是一个 Polyfill 库，用于在系统缺少原生 PHP <code>intl</code> 扩展时提供 <code>Normalizer</code> 类。</p>
+<p>如果你没有安装它，可以通过 Composer 安装：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs angelscript">composer require symfony/polyfill-<span class="hljs-built_in">int</span>l-normalizer<br></code></pre></td></tr></table></figure>
+
+<p>如果你的环境已经安装并启用了 PHP <code>intl</code> 扩展</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>PHP如何使用 Unicode 标准化移除字符串中的重音符号</div>
+      <div>https://kingjem.github.io/2025/12/04/php-处理重读字符/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月4日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/19/python%E5%86%99%E8%BD%BB%E9%87%8F%E7%89%88redis/" title="python写轻量版redis">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">python写轻量版redis</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="traefik 配置教程">
+                        <span class="hidden-mobile">traefik 配置教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

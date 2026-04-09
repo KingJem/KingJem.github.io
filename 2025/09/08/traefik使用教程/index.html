@@ -24,7 +24,7 @@
 <meta property="og:description" content="简单配置最简单的docker-compose 配置  文件名为 docker-compose.base.yaml 123456789services:  traefik:    image: traefik:v3.5    ports:      - &quot;8080:8080&quot;    command:      - &quot;--api&#x3D;true&quot;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-09-07T20:24:30.000Z">
-<meta property="article:modified_time" content="2025-09-17T08:25:55.529Z">
+<meta property="article:modified_time" content="2025-09-17T10:25:57.666Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="traefik ">
 <meta property="article:tag" content="云原生">
@@ -74,7 +74,7 @@
   <script  src="/js/color-schema.js" ></script>
 
   
-<meta name="generator" content="Hexo 7.3.0"></head>
+<meta name="generator" content="Hexo 8.1.1"></head>
 
 
 <body>
@@ -310,7 +310,7 @@
 <li>和上使用<code>localhost</code> 域名相比,只改动了一个<code>docker.local</code> 的域名</li>
 <li>由于<code>docker.local</code> 在公共DNS 中查询不到,需要手动配置</li>
 </ul>
-<p>如果没有特殊指定,docker-compose 中拆创建的网络格式为<code>&#123;project_name&#125;_default</code></p>
+<p>如果没有特殊指定,docker-compose 中拆创建的网络格式为<code>{project_name}_default</code></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">❯ docker network ls<br>NETWORK ID     NAME                   DRIVER    SCOPE<br>26659d36dd60   traefik-demo_default   bridge    local<br></code></pre></td></tr></table></figure>
 
 <p>使用命令查看网关</p>
@@ -445,6 +445,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/12/04/php-%E5%A4%84%E7%90%86%E9%87%8D%E8%AF%BB%E5%AD%97%E7%AC%A6/" title="PHP如何使用 Unicode 标准化移除字符串中的重音符号">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">PHP如何使用 Unicode 标准化移除字符串中的重音符号</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

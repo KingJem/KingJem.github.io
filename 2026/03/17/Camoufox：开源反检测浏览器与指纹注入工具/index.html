@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="简介Camoufox 是一个开源的反检测浏览器，基于 Firefox 构建，提供强大的指纹注入功能。它能够在不注入 JavaScript 的情况下修改设备指纹，使其对反爬虫系统不可见。 核心特性🎭 反检测能力 对反爬虫系统不可见 - 绕过主流反爬虫检测 指纹注入与轮换 - 无需 JavaScript 注入即可修改指纹 底层 C++ 实现 - 直接修改设备信息，不留痕迹  🔧 指纹修改能力">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Camoufox：开源反检测浏览器与指纹注入工具">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/17/Camoufox%EF%BC%9A%E5%BC%80%E6%BA%90%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="简介Camoufox 是一个开源的反检测浏览器，基于 Firefox 构建，提供强大的指纹注入功能。它能够在不注入 JavaScript 的情况下修改设备指纹，使其对反爬虫系统不可见。 核心特性🎭 反检测能力 对反爬虫系统不可见 - 绕过主流反爬虫检测 指纹注入与轮换 - 无需 JavaScript 注入即可修改指纹 底层 C++ 实现 - 直接修改设备信息，不留痕迹  🔧 指纹修改能力">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-17T03:25:00.000Z">
+<meta property="article:modified_time" content="2026-03-17T03:25:38.039Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Camoufox">
+<meta property="article:tag" content="Playwright">
+<meta property="article:tag" content="反检测浏览器">
+<meta property="article:tag" content="指纹注入">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="自动化">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Camoufox：开源反检测浏览器与指纹注入工具 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Camoufox：开源反检测浏览器与指纹注入工具"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-17 11:25" pubdate>
+          2026年3月17日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Camoufox：开源反检测浏览器与指纹注入工具</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Camoufox 是一个开源的反检测浏览器，基于 Firefox 构建，提供强大的指纹注入功能。它能够在不注入 JavaScript 的情况下修改设备指纹，使其对反爬虫系统不可见。</p>
+<h2 id="核心特性"><a href="#核心特性" class="headerlink" title="核心特性"></a>核心特性</h2><h3 id="🎭-反检测能力"><a href="#🎭-反检测能力" class="headerlink" title="🎭 反检测能力"></a>🎭 反检测能力</h3><ul>
+<li><strong>对反爬虫系统不可见</strong> - 绕过主流反爬虫检测</li>
+<li><strong>指纹注入与轮换</strong> - 无需 JavaScript 注入即可修改指纹</li>
+<li><strong>底层 C++ 实现</strong> - 直接修改设备信息，不留痕迹</li>
+</ul>
+<h3 id="🔧-指纹修改能力"><a href="#🔧-指纹修改能力" class="headerlink" title="🔧 指纹修改能力"></a>🔧 指纹修改能力</h3><table>
+<thead>
+<tr>
+<th>指纹类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Navigator 属性</td>
+<td>设备、操作系统、硬件、浏览器信息</td>
+</tr>
+<tr>
+<td>屏幕属性</td>
+<td>尺寸、分辨率、窗口、视口</td>
+</tr>
+<tr>
+<td>地理位置</td>
+<td>经纬度、时区、区域设置</td>
+</tr>
+<tr>
+<td>WebRTC</td>
+<td>协议级别的 IP 欺骗</td>
+</tr>
+<tr>
+<td>语音</td>
+<td>语音、播放速率等</td>
+</tr>
+<tr>
+<td>WebGL</td>
+<td>参数、扩展、上下文属性</td>
+</tr>
+<tr>
+<td>字体</td>
+<td>字体欺骗与反指纹</td>
+</tr>
+</tbody></table>
+<h3 id="⚡-性能优化"><a href="#⚡-性能优化" class="headerlink" title="⚡ 性能优化"></a>⚡ 性能优化</h3><ul>
+<li><strong>类人的鼠标移动</strong> - 自然的鼠标轨迹</li>
+<li><strong>广告拦截</strong> - 内置广告拦截功能</li>
+<li><strong>无 CSS 动画</strong> - 减少资源消耗</li>
+<li><strong>内存优化</strong> - 精简并优化内存使用</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="Python-包安装"><a href="#Python-包安装" class="headerlink" title="Python 包安装"></a>Python 包安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装 camoufox 包（推荐带 geoip）</span><br>pip install -U camoufox[geoip]<br><br><span class="hljs-comment"># 下载 Camoufox 浏览器</span><br><span class="hljs-comment"># Windows</span><br>camoufox fetch<br><br><span class="hljs-comment"># MacOS &amp; Linux</span><br>python3 -m camoufox fetch<br></code></pre></td></tr></table></figure>
+
+<h3 id="CLI-命令"><a href="#CLI-命令" class="headerlink" title="CLI 命令"></a>CLI 命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 显示帮助</span><br>python -m camoufox --<span class="hljs-built_in">help</span><br><br><span class="hljs-comment"># 获取最新版本</span><br>python -m camoufox fetch<br><br><span class="hljs-comment"># 显示可执行文件路径</span><br>python -m camoufox path<br><br><span class="hljs-comment"># 移除所有下载文件</span><br>python -m camoufox remove<br><br><span class="hljs-comment"># 启动 Playwright 服务器</span><br>python -m camoufox server<br><br><span class="hljs-comment"># 打开 Playwright inspector</span><br>python -m camoufox <span class="hljs-built_in">test</span><br><br><span class="hljs-comment"># 显示当前版本</span><br>python -m camoufox version<br></code></pre></td></tr></table></figure>
+
+<h2 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h2><h3 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a>简单示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><br><span class="hljs-comment"># 启动 Camoufox</span><br><span class="hljs-keyword">with</span> Camoufox() <span class="hljs-keyword">as</span> fox:<br>    page = fox.new_page()<br>    page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>    <span class="hljs-built_in">print</span>(page.title())<br></code></pre></td></tr></table></figure>
+
+<h3 id="使用指纹注入"><a href="#使用指纹注入" class="headerlink" title="使用指纹注入"></a>使用指纹注入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><span class="hljs-keyword">from</span> camoufox.fingerprints <span class="hljs-keyword">import</span> Fingerprint<br><br><span class="hljs-comment"># 创建自定义指纹</span><br>fingerprint = Fingerprint(<br>    os=<span class="hljs-string">&#x27;windows&#x27;</span>,<br>    browser=<span class="hljs-string">&#x27;firefox&#x27;</span>,<br>    device=<span class="hljs-string">&#x27;desktop&#x27;</span><br>)<br><br><span class="hljs-keyword">with</span> Camoufox(fingerprint=fingerprint) <span class="hljs-keyword">as</span> fox:<br>    page = fox.new_page()<br>    page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="代理配置"><a href="#代理配置" class="headerlink" title="代理配置"></a>代理配置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><br><span class="hljs-comment"># 使用代理（自动计算地理位置和时区）</span><br><span class="hljs-keyword">with</span> Camoufox(<br>    proxy=<span class="hljs-string">&#x27;http://user:pass@proxy.example.com:8080&#x27;</span><br>) <span class="hljs-keyword">as</span> fox:<br>    page = fox.new_page()<br>    page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="高级配置"><a href="#高级配置" class="headerlink" title="高级配置"></a>高级配置</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><span class="hljs-keyword">from</span> camoufox.fingerprints <span class="hljs-keyword">import</span> Fingerprint<br><br><span class="hljs-comment"># 详细配置</span><br>fingerprint = Fingerprint(<br>    os=<span class="hljs-string">&#x27;macos&#x27;</span>,<br>    browser=<span class="hljs-string">&#x27;chrome&#x27;</span>,<br>    device=<span class="hljs-string">&#x27;desktop&#x27;</span>,<br>    locale=<span class="hljs-string">&#x27;en-US&#x27;</span>,<br>    screen=&#123;<span class="hljs-string">&#x27;width&#x27;</span>: <span class="hljs-number">1920</span>, <span class="hljs-string">&#x27;height&#x27;</span>: <span class="hljs-number">1080</span>&#125;<br>)<br><br><span class="hljs-keyword">with</span> Camoufox(<br>    fingerprint=fingerprint,<br>    headless=<span class="hljs-literal">False</span>,  <span class="hljs-comment"># 显示浏览器窗口</span><br>    proxy=<span class="hljs-string">&#x27;http://proxy.example.com:8080&#x27;</span>,<br>    humanize=<span class="hljs-literal">True</span>,   <span class="hljs-comment"># 启用类人行为</span><br>) <span class="hljs-keyword">as</span> fox:<br>    page = fox.new_page()<br>    <br>    <span class="hljs-comment"># 类人鼠标移动</span><br>    page.mouse.move(<span class="hljs-number">100</span>, <span class="hljs-number">200</span>)<br>    page.mouse.click(<span class="hljs-number">150</span>, <span class="hljs-number">250</span>)<br>    <br>    page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>    page.wait_for_timeout(<span class="hljs-number">2000</span>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="与-Playwright-集成"><a href="#与-Playwright-集成" class="headerlink" title="与 Playwright 集成"></a>与 Playwright 集成</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> playwright.sync_api <span class="hljs-keyword">import</span> sync_playwright<br><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-keyword">with</span> sync_playwright() <span class="hljs-keyword">as</span> p:<br>        <span class="hljs-comment"># 使用 Camoufox 启动浏览器</span><br>        browser = Camoufox().launch()<br>        <br>        context = browser.new_context()<br>        page = context.new_page()<br>        <br>        page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>        <br>        <span class="hljs-comment"># 正常 Playwright 操作</span><br>        page.fill(<span class="hljs-string">&quot;input[name=&#x27;search&#x27;]&quot;</span>, <span class="hljs-string">&quot;Camoufox&quot;</span>)<br>        page.click(<span class="hljs-string">&quot;button[type=&#x27;submit&#x27;]&quot;</span>)<br>        <br>        browser.close()<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
+
+<h2 id="指纹轮换策略"><a href="#指纹轮换策略" class="headerlink" title="指纹轮换策略"></a>指纹轮换策略</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox <span class="hljs-keyword">import</span> Camoufox<br><span class="hljs-keyword">from</span> camoufox.fingerprints <span class="hljs-keyword">import</span> FingerprintGenerator<br><br><span class="hljs-comment"># 创建指纹生成器</span><br>generator = FingerprintGenerator()<br><br><span class="hljs-comment"># 批量任务，每次使用不同指纹</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    fingerprint = generator.generate(<br>        os=(<span class="hljs-string">&#x27;windows&#x27;</span>, <span class="hljs-string">&#x27;macos&#x27;</span>, <span class="hljs-string">&#x27;linux&#x27;</span>),<br>        browser=(<span class="hljs-string">&#x27;chrome&#x27;</span>, <span class="hljs-string">&#x27;firefox&#x27;</span>, <span class="hljs-string">&#x27;edge&#x27;</span>),<br>        device=<span class="hljs-string">&#x27;desktop&#x27;</span><br>    )<br>    <br>    <span class="hljs-keyword">with</span> Camoufox(fingerprint=fingerprint) <span class="hljs-keyword">as</span> fox:<br>        page = fox.new_page()<br>        page.goto(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>        <span class="hljs-comment"># 执行任务...</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="为什么基于-Firefox？"><a href="#为什么基于-Firefox？" class="headerlink" title="为什么基于 Firefox？"></a>为什么基于 Firefox？</h2><p>Camoufox 选择 Firefox 而非 Chromium 的原因：</p>
+<ol>
+<li><strong>Chrome 专有特性</strong> - Chrome 包含 Chromium 没有的功能，反爬虫系统可以检测</li>
+<li><strong>CDP 广泛使用</strong> - Chrome DevTools Protocol 是常见检测目标</li>
+<li><strong>Juggler 更低层</strong> - Firefox 的 Juggler 比 CDP 更底层，不易泄露</li>
+<li><strong>指纹研究更多</strong> - Firefox 的指纹抵抗研究比 Chromium 更成熟</li>
+</ol>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><blockquote>
+<p>⚠️ <strong>2026 版本警告</strong>：Camoufox 正在积极开发中，最新版本是实验性的（可能有破坏性变更）。预览版本可用，但不适合生产环境。</p>
+</blockquote>
+<h2 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a>相关资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://camoufox.com/">官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://camoufox.com/python">Python 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ultrafunkamsterdam/camoufox">GitHub 仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://pypi.org/project/camoufox/">PyPI 包</a></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Camoufox 是一个强大的反检测浏览器解决方案，通过底层 C++ 实现指纹注入，避免了 JavaScript 注入留下的痕迹。结合 BrowserForge 的指纹生成能力，可以创建高度真实的浏览器环境，有效绕过反爬虫检测。</p>
+<hr>
+<blockquote>
+<p>💡 <strong>提示</strong>：Camoufox 使用 <a target="_blank" rel="noopener" href="https://github.com/daijro/browserforge">BrowserForge</a> 在底层生成指纹，模拟真实世界流量的设备特征分布。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+      
+        <a href="/tags/Camoufox/">#Camoufox</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+      
+        <a href="/tags/%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5/">#指纹注入</a>
+      
+        <a href="/tags/Playwright/">#Playwright</a>
+      
+        <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">#自动化</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Camoufox：开源反检测浏览器与指纹注入工具</div>
+      <div>https://kingjem.github.io/2026/03/17/Camoufox：开源反检测浏览器与指纹注入工具/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月17日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" title="BrowserForge：智能浏览器指纹与请求头生成器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">BrowserForge：智能浏览器指纹与请求头生成器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/17/%E8%B7%B3%E8%BF%87%E5%AE%89%E8%A3%85-Visual-C-%E8%BF%90%E8%A1%8C%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="跳过安装 Visual C++ 运行库的问题与解决方案">
+                        <span class="hidden-mobile">跳过安装 Visual C++ 运行库的问题与解决方案</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
