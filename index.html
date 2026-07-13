@@ -215,6 +215,341 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" target="_self">
+          Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" target="_self">
+        <div>
+          
+          前言在受限网络里抓一个只对海外开放、且做了证书固定（SSL Pinning）的 Android App，常规「装个 CA + 开个代理」是不够的。这篇把一套跑通的组合记录下来：  VpnService&#x2F;TUN 转发：把手机（或指定 App）的流量喂给 mitmproxy； mitmweb upstream 模式 + pproxy：mitmproxy 负责解密，pproxy 负责把出口换到干净的海外
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-07-13 16:40" pubdate>
+              2026-07-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+            
+              <a href="/tags/mitmproxy/">#mitmproxy</a>
+            
+              <a href="/tags/mitmweb/">#mitmweb</a>
+            
+              <a href="/tags/pproxy/">#pproxy</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
+            
+              <a href="/tags/SSL-Pinning/">#SSL Pinning</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/07/10/browser-kernels-guide/" target="_self">
+          反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/07/10/browser-kernels-guide/" target="_self">
+        <div>
+          
+          前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的要求差异很大，选错内核直接卡死。 本文把
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-07-10 12:00" pubdate>
+              2026-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/Camoufox/">#Camoufox</a>
+            
+              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+            
+              <a href="/tags/ruyipage/">#ruyipage</a>
+            
+              <a href="/tags/DrissionPage/">#DrissionPage</a>
+            
+              <a href="/tags/CloakBrowser/">#CloakBrowser</a>
+            
+              <a href="/tags/curl-cffi/">#curl_cffi</a>
+            
+              <a href="/tags/%E6%8C%87%E7%BA%B9/">#指纹</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/06/23/MobaXterm-RDP%E7%BB%8FSOCKS5%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91-gost/" target="_self">
+          MobaXterm RDP 经 SOCKS5 代理转发（gost + WSL）
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/06/23/MobaXterm-RDP%E7%BB%8FSOCKS5%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91-gost/" target="_self">
+        <div>
+          
+          背景一批 RDP 服务器（107.150.x.x、152.32.x.x 等，端口 3389）只能通过本地的SOCKS5&#x2F;HTTP 代理 127.0.0.1:7890（Clash&#x2F;mihomo 混合端口）访问。目标是让MobaXterm 里的这些 RDP 会话走这个代理，并且能把其中一台分享给局域网内的同事使用。 关键结论：MobaXterm 的 RDP 不支持 SOCKS 代理查证 .mxtses
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-23 18:40" pubdate>
+              2026-06-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/MobaXterm/">#MobaXterm</a>
+            
+              <a href="/tags/RDP/">#RDP</a>
+            
+              <a href="/tags/gost/">#gost</a>
+            
+              <a href="/tags/WSL/">#WSL</a>
+            
+              <a href="/tags/%E4%BB%A3%E7%90%86/">#代理</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/06/05/%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86/" target="_self">
+          设置代理
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/06/05/%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86/" target="_self">
+        <div>
+          
+          12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910010110210
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-05 10:37" pubdate>
+              2026-06-05
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/05/07/obscura-%E5%9F%BA%E4%BA%8E-webrtc-%E6%B5%81%E9%87%8F%E5%B0%81%E8%A3%85%E7%9A%84%E5%8F%AF%E6%8F%92%E6%8B%94%E4%BC%A0%E8%BE%93/" target="_self">
+          Obscura — Rust 编写的轻量级无头浏览器
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/05/07/obscura-%E5%9F%BA%E4%BA%8E-webrtc-%E6%B5%81%E9%87%8F%E5%B0%81%E8%A3%85%E7%9A%84%E5%8F%AF%E6%8F%92%E6%8B%94%E4%BC%A0%E8%BE%93/" target="_self">
+        <div>
+          
+          什么是 ObscuraObscura 是一个用 Rust 编写的开源无头浏览器引擎，专为 web scraping 和 AI agent 自动化场景设计。它通过 V8 引擎执行真实的 JavaScript，支持 Chrome DevTools Protocol (CDP)，可作为 Puppeteer 和 Playwright 的替代方案直接使用。 核心优势对比   指标 Obscura Headl
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-05-07 14:30" pubdate>
+              2026-05-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%B7%A5%E5%85%B7/" class="category-chain-item">工具</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Rust/">#Rust</a>
+            
+              <a href="/tags/Headless-Browser/">#Headless Browser</a>
+            
+              <a href="/tags/Web-Scraping/">#Web Scraping</a>
+            
+              <a href="/tags/CDP/">#CDP</a>
+            
+              <a href="/tags/AI-Agent/">#AI Agent</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" target="_self">
           curl-impersonate JA3 指纹原理与复现
         </a>
@@ -852,41 +1187,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-          <i class="index-pin iconfont icon-top" title="Pin on top"></i>
-        
-        <a href="/2025/07/24/%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E7%9B%AE%E5%BD%95/" target="_self">
-          书籍阅读目录.md
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/07/24/%E4%B9%A6%E7%B1%8D%E9%98%85%E8%AF%BB%E7%9B%AE%E5%BD%95/" target="_self">
-        <div>
-          
-          2025年阅读书单                                LangChain 入门指南构建高可复用、可扩展的 LLM 应用程序 (李特丽) (Z-Library)  LangChain 和提示词两本书 张一鸣 小米
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-07-24 10:00" pubdate>
-              2025-07-24
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
         <a href="/2025/07/23/RabbitMQ%E4%BD%BF%E7%94%A8%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97/" target="_self">
           RabbitMQ使用优先级队列
         </a>
@@ -998,177 +1298,6 @@
               <a href="/tags/RabbmitMQ/">#RabbmitMQ</a>
             
               <a href="/tags/pika/">#pika</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2025/06/23/chromium/chrouim%E7%BC%96%E8%AF%91-1-%E4%BB%A3%E7%A0%81%E6%8B%89%E5%8F%96/" target="_self">
-          chromium编译(1)-代码拉取
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/06/23/chromium/chrouim%E7%BC%96%E8%AF%91-1-%E4%BB%A3%E7%A0%81%E6%8B%89%E5%8F%96/" target="_self">
-        <div>
-          
-          笔者编译浏览器环境是在Mac电脑上，安装好了git和xcode 克隆仓库下载dep_tools 并且导出到环境变量 12git clone https:&#x2F;&#x2F;chromium.googlesource.com&#x2F;chromium&#x2F;tools&#x2F;depot_tools &#x2F;opt&#x2F;depot_toolsexport PATH&#x3D;$PATH:&#x2F;opt&#x2F;depot_tools    拉取代码配置信息12gclie
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-06-23 14:30" pubdate>
-              2025-06-23
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/chromium%E7%BC%96%E8%AF%91/">#chromium编译</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2025/06/23/%E9%98%BF%E9%87%8C%E4%BA%91%E9%80%9A%E8%BF%87sdk%E6%B7%BB%E5%8A%A0%E5%AE%89%E5%85%A8%E7%BB%84/" target="_self">
-          阿里云通过sdk添加安全组
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/06/23/%E9%98%BF%E9%87%8C%E4%BA%91%E9%80%9A%E8%BF%87sdk%E6%B7%BB%E5%8A%A0%E5%AE%89%E5%85%A8%E7%BB%84/" target="_self">
-        <div>
-          
-          1. 阿里云申请秘钥&lt;accessKeyId&gt;, &lt;accessSecret&gt;: 前往 https:&#x2F;&#x2F;ram.console.aliyun.com&#x2F;manage&#x2F;ak 添加 accessKey 2. 安装sdk12pip install aliyun-python-sdk-corepip install aliyun-python-sdk-ecs    123456789
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-06-23 13:33" pubdate>
-              2025-06-23
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2025/06/07/python/Redis-stack%20%E4%BD%BF%E7%94%A8/" target="_self">
-          Redis-Stack 使用
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/06/07/python/Redis-stack%20%E4%BD%BF%E7%94%A8/" target="_self">
-        <div>
-          
-          Redis-Stack 使用1. Redis-Stack 是什么Redis-Stack 是一个包含了各种 Redis 模块的综合性发行版，旨在简化开发者的使用和部署。它不仅仅是经典的 Redis 数据库，还集成了 Redis 最受欢迎的扩展功能，例如：  RedisJSON：支持存储、更新和检索 JSON 文档，让 Redis 不仅仅是键值存储，还能高效处理半结构化数据。 RedisSearch：
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-06-07 00:00" pubdate>
-              2025-06-07
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="category-chain-item">开发环境搭建</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2025/05/25/docker/%E4%BD%BF%E7%94%A8docker%20%E8%BF%90%E8%A1%8Cdp/" target="_self">
-          docker运行dp可视化教程
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/05/25/docker/%E4%BD%BF%E7%94%A8docker%20%E8%BF%90%E8%A1%8Cdp/" target="_self">
-        <div>
-          
-          docker运行dp可视化教程可在web界面可视化linux终端，对dp运行的浏览器进行手动处理机器验证。 拉取镜像并运行该镜像包含：vnc，web可视化，谷歌浏览器，python3.8 12345命令：docker run -name dp -d -p 6080:80 -p 5900:5900 -e VNC_PASSWORD&#x3D;mypassword -e HTTP_PASSWORD&#x3D;mypassw
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-05-25 00:00" pubdate>
-              2025-05-25
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
-              <a href="/tags/docker/">#docker</a>
-            
-              <a href="/tags/dp/">#dp</a>
             
           </div>
         
