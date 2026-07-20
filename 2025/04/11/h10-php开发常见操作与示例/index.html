@@ -1,0 +1,852 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文档整理了详细说明了 PHP 开发中的基础语法、数据库查询、迁移管理、消息队列管理、模型查询、文件处理以及代码规范检查等内容，包含具体代码示例和中文说明，适合快速参考和学习。 基础语法字符串操作explode 和 implode用于字符串分割与合并，类似于 Python 的 split 和 join。 1234$data &#x3D; &#x27;1 of 4 &#x27;;$array &#x3D; explod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="H10 PHP 开发常见操作与示例">
+<meta property="og:url" content="https://kingjem.github.io/2025/04/11/h10-php%E5%BC%80%E5%8F%91%E5%B8%B8%E8%A7%81%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A4%BA%E4%BE%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文档整理了详细说明了 PHP 开发中的基础语法、数据库查询、迁移管理、消息队列管理、模型查询、文件处理以及代码规范检查等内容，包含具体代码示例和中文说明，适合快速参考和学习。 基础语法字符串操作explode 和 implode用于字符串分割与合并，类似于 Python 的 split 和 join。 1234$data &#x3D; &#x27;1 of 4 &#x27;;$array &#x3D; explod">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-11T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.188Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="Yii">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>H10 PHP 开发常见操作与示例 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="H10 PHP 开发常见操作与示例"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-11 12:00" pubdate>
+          2025年4月11日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">H10 PHP 开发常见操作与示例</h1>
+            
+            <div class="markdown-body">
+              
+              <p>本文档整理了详细说明了 PHP 开发中的基础语法、数据库查询、迁移管理、消息队列管理、模型查询、文件处理以及代码规范检查等内容，包含具体代码示例和中文说明，适合快速参考和学习。</p>
+<h2 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h2><h3 id="字符串操作"><a href="#字符串操作" class="headerlink" title="字符串操作"></a>字符串操作</h3><h4 id="explode-和-implode"><a href="#explode-和-implode" class="headerlink" title="explode 和 implode"></a>explode 和 implode</h4><p>用于字符串分割与合并，类似于 Python 的 <code>split</code> 和 <code>join</code>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$data</span> = <span class="hljs-string">&#x27;1 of 4 &#x27;</span>;<br><span class="hljs-variable">$array</span> = <span class="hljs-title function_ invoke__">explode</span>(<span class="hljs-string">&#x27;of&#x27;</span>, <span class="hljs-variable">$data</span>); <span class="hljs-comment">// 分割字符串为数组 [&#x27;1 &#x27;, &#x27; 4 &#x27;]</span><br><span class="hljs-variable">$string</span> = <span class="hljs-title function_ invoke__">implode</span>(<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-variable">$array</span>); <span class="hljs-comment">// 拼接数组为字符串 &#x27;1 4 &#x27;</span><br><span class="hljs-title function_ invoke__">var_dump</span>(<span class="hljs-variable">$array</span>, <span class="hljs-variable">$string</span>);<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>explode</code> 将字符串按指定分隔符分割成数组，适用于解析固定格式的字符串。</li>
+<li><code>implode</code> 将数组元素拼接成字符串，常用于生成特定格式的输出。</li>
+</ul>
+<h4 id="str-replace-和-trim"><a href="#str-replace-和-trim" class="headerlink" title="str_replace 和 trim"></a>str_replace 和 trim</h4><p>字符串替换与去除首尾空白。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$text</span> = <span class="hljs-string">&#x27;  Hello, World!  &#x27;</span>;<br><span class="hljs-variable">$replaced</span> = <span class="hljs-title function_ invoke__">str_replace</span>(<span class="hljs-string">&#x27;World&#x27;</span>, <span class="hljs-string">&#x27;PHP&#x27;</span>, <span class="hljs-variable">$text</span>); <span class="hljs-comment">// 替换 &#x27;World&#x27; 为 &#x27;PHP&#x27;</span><br><span class="hljs-variable">$trimmed</span> = <span class="hljs-title function_ invoke__">trim</span>(<span class="hljs-variable">$text</span>); <span class="hljs-comment">// 去除首尾空格</span><br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$replaced</span> . PHP_EOL; <span class="hljs-comment">// 输出:   Hello, PHP!</span><br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$trimmed</span> . PHP_EOL; <span class="hljs-comment">// 输出: Hello, World!</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>str_replace</code> 支持批量替换，常用于文本清理或格式化。</li>
+<li><code>trim</code> 可指定去除的字符集，如 <code>trim($text, &quot; \t\n\r&quot;)</code>。</li>
+</ul>
+<h3 id="输出与换行"><a href="#输出与换行" class="headerlink" title="输出与换行"></a>输出与换行</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">echo</span> <span class="hljs-string">&#x27;Hello world&#x27;</span> . PHP_EOL; <span class="hljs-comment">// 输出并换行</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>PHP_EOL</code> 是 PHP 内置的换行符常量，跨平台兼容（Windows 为 <code>\r\n</code>，Unix 为 <code>\n</code>）。</p>
+<h3 id="数组定义"><a href="#数组定义" class="headerlink" title="数组定义"></a>数组定义</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$test</span> = [<br>    <span class="hljs-string">&#x27;ref&#x27;</span> =&gt; <span class="hljs-string">&#x27;test1&#x27;</span>,<br>    <span class="hljs-string">&#x27;ref2&#x27;</span> =&gt; <span class="hljs-string">&#x27;test2&#x27;</span><br>];<br><span class="hljs-title function_ invoke__">print_r</span>(<span class="hljs-variable">$test</span>);<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br>PHP 数组支持键值对，类似 Python 的字典，常用于配置或数据传递。</p>
+<h3 id="三元表达式"><a href="#三元表达式" class="headerlink" title="三元表达式"></a>三元表达式</h3><p>简洁的条件判断语法。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$condition</span> = <span class="hljs-literal">true</span>;<br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$condition</span> ? <span class="hljs-string">&quot;true&quot;</span> : <span class="hljs-string">&quot;false&quot;</span>; <span class="hljs-comment">// 输出: true</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br>三元表达式适合简单的条件赋值或输出，避免冗长的 <code>if-else</code>。</p>
+<h3 id="JSON-编码"><a href="#JSON-编码" class="headerlink" title="JSON 编码"></a>JSON 编码</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$test</span> = [<span class="hljs-string">&#x27;ref&#x27;</span> =&gt; <span class="hljs-string">&#x27;test1&#x27;</span>, <span class="hljs-string">&#x27;ref2&#x27;</span> =&gt; <span class="hljs-string">&#x27;test2&#x27;</span>];<br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">json_encode</span>(<span class="hljs-variable">$test</span>); <span class="hljs-comment">// 输出: &#123;&quot;ref&quot;:&quot;test1&quot;,&quot;ref2&quot;:&quot;test2&quot;&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>json_encode</code> 将 PHP 数组或对象转为 JSON 字符串，常用于 API 数据返回。</p>
+<h3 id="文件读写"><a href="#文件读写" class="headerlink" title="文件读写"></a>文件读写</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment">// 读取文件</span><br><span class="hljs-variable">$content</span> = <span class="hljs-title function_ invoke__">file_get_contents</span>(<span class="hljs-string">&#x27;example.txt&#x27;</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$content</span>;<br><br><span class="hljs-comment">// 写入文件</span><br><span class="hljs-variable">$data</span> = <span class="hljs-string">&#x27;Hello, PHP!&#x27;</span>;<br><span class="hljs-title function_ invoke__">file_put_contents</span>(<span class="hljs-string">&#x27;output.txt&#x27;</span>, <span class="hljs-variable">$data</span>);<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>file_get_contents</code> 读取整个文件到字符串，适合小型文件。</li>
+<li><code>file_put_contents</code> 写入内容到文件，覆盖原有内容，支持追加模式（<code>FILE_APPEND</code>）。</li>
+</ul>
+<h3 id="HTML-解码"><a href="#HTML-解码" class="headerlink" title="HTML 解码"></a>HTML 解码</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$encoded</span> = <span class="hljs-string">&#x27;&amp;lt;div&amp;gt;Hello&amp;lt;/div&amp;gt;&#x27;</span>;<br><span class="hljs-variable">$decoded</span> = <span class="hljs-title function_ invoke__">html_entity_decode</span>(<span class="hljs-variable">$encoded</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$decoded</span>; <span class="hljs-comment">// 输出: &lt;div&gt;Hello&lt;/div&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>html_entity_decode</code> 将 HTML 实体（如 <code>&amp;lt;</code>）转换为对应字符，适用于显示用户输入或外部数据。</p>
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><h4 id="preg-match-和-preg-match-all"><a href="#preg-match-和-preg-match-all" class="headerlink" title="preg_match 和 preg_match_all"></a>preg_match 和 preg_match_all</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$text</span> = <span class="hljs-string">&#x27;Contact: foo@example.com, bar@example.com&#x27;</span>;<br><span class="hljs-title function_ invoke__">preg_match</span>(<span class="hljs-string">&#x27;/[a-z]+@example\.com/&#x27;</span>, <span class="hljs-variable">$text</span>, <span class="hljs-variable">$match</span>);<br><span class="hljs-title function_ invoke__">print_r</span>(<span class="hljs-variable">$match</span>); <span class="hljs-comment">// 输出: [&#x27;foo@example.com&#x27;]</span><br><br><span class="hljs-title function_ invoke__">preg_match_all</span>(<span class="hljs-string">&#x27;/[a-z]+@example\.com/&#x27;</span>, <span class="hljs-variable">$text</span>, <span class="hljs-variable">$matches</span>);<br><span class="hljs-title function_ invoke__">print_r</span>(<span class="hljs-variable">$matches</span>); <span class="hljs-comment">// 输出: [[&#x27;foo@example.com&#x27;, &#x27;bar@example.com&#x27;]]</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>preg_match</code> 匹配一次，返回第一个结果。</li>
+<li><code>preg_match_all</code> 匹配所有结果，返回数组，常用于批量提取。</li>
+</ul>
+<h3 id="数组操作"><a href="#数组操作" class="headerlink" title="数组操作"></a>数组操作</h3><h4 id="array-map"><a href="#array-map" class="headerlink" title="array_map"></a>array_map</h4><p>对数组每个元素应用回调函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$numbers</span> = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];<br><span class="hljs-variable">$squared</span> = <span class="hljs-title function_ invoke__">array_map</span>(fn(<span class="hljs-variable">$n</span>) =&gt; <span class="hljs-variable">$n</span> * <span class="hljs-variable">$n</span>, <span class="hljs-variable">$numbers</span>);<br><span class="hljs-title function_ invoke__">print_r</span>(<span class="hljs-variable">$squared</span>); <span class="hljs-comment">// 输出: [1, 4, 9]</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>array_map</code> 适合批量转换数据，回调函数支持匿名函数（PHP 7.4+）。</p>
+<h4 id="array-filter"><a href="#array-filter" class="headerlink" title="array_filter"></a>array_filter</h4><p>过滤数组元素。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$numbers</span> = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>];<br><span class="hljs-variable">$evens</span> = <span class="hljs-title function_ invoke__">array_filter</span>(<span class="hljs-variable">$numbers</span>, fn(<span class="hljs-variable">$n</span>) =&gt; <span class="hljs-variable">$n</span> % <span class="hljs-number">2</span> === <span class="hljs-number">0</span>);<br><span class="hljs-title function_ invoke__">print_r</span>(<span class="hljs-variable">$evens</span>); <span class="hljs-comment">// 输出: [2, 4]</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>array_filter</code> 根据回调函数的返回值保留元素，适用于数据筛选。</p>
+<h4 id="in-array"><a href="#in-array" class="headerlink" title="in_array"></a>in_array</h4><p>检查元素是否存在于数组。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$fruits</span> = [<span class="hljs-string">&#x27;apple&#x27;</span>, <span class="hljs-string">&#x27;banana&#x27;</span>];<br><span class="hljs-keyword">if</span> (<span class="hljs-title function_ invoke__">in_array</span>(<span class="hljs-string">&#x27;apple&#x27;</span>, <span class="hljs-variable">$fruits</span>)) &#123;<br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&#x27;Found apple&#x27;</span>; <span class="hljs-comment">// 输出: Found apple</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：<br><code>in_array</code> 支持严格模式（<code>strict =&gt; true</code>），可检查类型和值。</p>
+<h2 id="查询数据库"><a href="#查询数据库" class="headerlink" title="查询数据库"></a>查询数据库</h2><h3 id="PostgreSQL-查询"><a href="#PostgreSQL-查询" class="headerlink" title="PostgreSQL 查询"></a>PostgreSQL 查询</h3><p><strong>注意</strong>：<br>PostgreSQL 中列名若包含大写字母，必须用双引号（<code>&quot;&quot;</code>）包裹。</p>
+<h4 id="示例查询"><a href="#示例查询" class="headerlink" title="示例查询"></a>示例查询</h4><p>查询 <code>AmzProductDetails1</code> 表中与特定 ASIN 相关的记录。</p>
+<figure class="highlight postgresql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs postgresql"><span class="hljs-keyword">SELECT</span> *<br><span class="hljs-keyword">FROM</span> &quot;AmzProductDetails1&quot;<br><span class="hljs-keyword">WHERE</span> &quot;AmzProduct_id&quot; <span class="hljs-keyword">IN</span> (<br>    <span class="hljs-keyword">SELECT</span> id <br>    <span class="hljs-keyword">FROM</span> &quot;AmzProduct1&quot; <br>    <span class="hljs-keyword">WHERE</span> asin = <span class="hljs-string">&#x27;B0D6NSD57S&#x27;</span><br>);<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>子查询获取 <code>AmzProduct1</code> 表中符合条件的 <code>id</code>。</li>
+<li>主查询根据 <code>AmzProduct_id</code> 关联查询详细信息。</li>
+<li>双引号确保列名大小写正确，避免语法错误。</li>
+</ul>
+<p><strong>访问数据库</strong>：</p>
+<ul>
+<li>网址：<a target="_blank" rel="noopener" href="https://members.helium10.com/admin/database/index/">https://members.helium10.com/admin/database/index/</a></li>
+<li>权限：联系 @ivan 申请。</li>
+</ul>
+<h2 id="Migrate-管理和使用"><a href="#Migrate-管理和使用" class="headerlink" title="Migrate 管理和使用"></a>Migrate 管理和使用</h2><p>数据库迁移用于管理表结构变更，确保开发与生产环境一致。</p>
+<h3 id="1-创建迁移文件"><a href="#1-创建迁移文件" class="headerlink" title="1. 创建迁移文件"></a>1. 创建迁移文件</h3><p>在 Docker 容器中运行命令生成迁移文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker exec -it systems_background /app/src/yii migrate/create mod_AmzInfluencerPost1_add_heart_count_columns<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>命令格式：<code>migrate/create &lt;迁移名称&gt;</code>。</li>
+<li>迁移名称应清晰描述变更内容，如添加字段、修改表结构等。</li>
+</ul>
+<h3 id="2-编辑迁移文件"><a href="#2-编辑迁移文件" class="headerlink" title="2. 编辑迁移文件"></a>2. 编辑迁移文件</h3><p>生成的文件位于项目迁移目录，需实现 <code>up</code> 和 <code>down</code> 方法。</p>
+<h4 id="示例迁移文件"><a href="#示例迁移文件" class="headerlink" title="示例迁移文件"></a>示例迁移文件</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">use</span> <span class="hljs-title">yii</span>\<span class="hljs-title">db</span>\<span class="hljs-title">Migration</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">m250411_mod_AmzInfluencerPost1_add_heart_count_columns</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Migration</span></span><br><span class="hljs-class"></span>&#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">safeUp</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-variable language_">$this</span>-&gt;<span class="hljs-title function_ invoke__">addColumn</span>(<span class="hljs-string">&#x27;AmzInfluencerPost1&#x27;</span>, <span class="hljs-string">&#x27;heart_count&#x27;</span>, <span class="hljs-variable">$this</span>-&gt;<span class="hljs-keyword">integer</span>()-&gt;<span class="hljs-title function_ invoke__">defaultValue</span>(<span class="hljs-number">0</span>));<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">safeDown</span>(<span class="hljs-params"></span>)</span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-variable language_">$this</span>-&gt;<span class="hljs-title function_ invoke__">dropColumn</span>(<span class="hljs-string">&#x27;AmzInfluencerPost1&#x27;</span>, <span class="hljs-string">&#x27;heart_count&#x27;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>注意事项</strong>：</p>
+<ol>
+<li>方法需返回 <code>true</code>（成功）或 <code>false</code>（失败）。</li>
+<li>使用 <code>safeUp</code> 和 <code>safeDown</code> 执行事务操作，确保数据一致性。</li>
+<li>创建索引时避免在 <code>safeUp</code> 中执行，可能导致事务错误，建议使用 <code>up</code>。</li>
+</ol>
+<h3 id="3-应用或回退迁移"><a href="#3-应用或回退迁移" class="headerlink" title="3. 应用或回退迁移"></a>3. 应用或回退迁移</h3><p>执行迁移命令更新数据库。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">应用所有未执行的迁移</span><br>docker exec -it systems_background /app/src/yii migrate<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">回退最近 3 次迁移</span><br>docker exec -it systems_background /app/src/yii migrate/down 3<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>migrate</code> 默认执行 <code>up</code>，应用新迁移。</li>
+<li><code>migrate/down &lt;n&gt;</code> 回退指定次数的迁移，执行 <code>down</code> 方法。</li>
+</ul>
+<h2 id="RabbitMQ-管理界面"><a href="#RabbitMQ-管理界面" class="headerlink" title="RabbitMQ 管理界面"></a>RabbitMQ 管理界面</h2><p>访问 RabbitMQ 管理界面查看队列状态、消息堆积等。</p>
+<ul>
+<li><strong>地址</strong>：<a target="_blank" rel="noopener" href="http://192.168.127.100:15673/#/queues">http://192.168.127.100:15673/#/queues</a></li>
+<li><strong>说明</strong>：用于监控消息队列，排查延迟或阻塞问题。</li>
+</ul>
+<h2 id="PHPCS-和-PHPCBF-代码检查"><a href="#PHPCS-和-PHPCBF-代码检查" class="headerlink" title="PHPCS 和 PHPCBF 代码检查"></a>PHPCS 和 PHPCBF 代码检查</h2><p>确保代码符合规范，提高可读性和维护性。</p>
+<h3 id="PHPCS-检查代码"><a href="#PHPCS-检查代码" class="headerlink" title="PHPCS 检查代码"></a>PHPCS 检查代码</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">vendor/bin/phpcs --standard=PSR12 .<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>--standard=PSR12</code> 指定 PSR-12 编码规范。</li>
+<li>输出代码风格问题，如缩进、命名等。</li>
+</ul>
+<h3 id="PHPCBF-自动修复"><a href="#PHPCBF-自动修复" class="headerlink" title="PHPCBF 自动修复"></a>PHPCBF 自动修复</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">vendor/bin/phpcbf --standard=PSR12 .<br></code></pre></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>自动修复可修复的问题（如空格、换行）。</li>
+<li>复杂问题需手动调整。</li>
+</ul>
+<h2 id="在线工具"><a href="#在线工具" class="headerlink" title="在线工具"></a>在线工具</h2><p>以下工具提高开发效率，适合快速格式化或转换数据。</p>
+<ol>
+<li><p><strong>JSON 转 PHP 数组</strong></p>
+<ul>
+<li>网址：<a target="_blank" rel="noopener" href="https://uutool.cn/json2php/">https://uutool.cn/json2php/</a></li>
+<li>功能：将 JSON 字符串转为 PHP 数组代码。</li>
+</ul>
+</li>
+<li><p><strong>JSON 格式化</strong></p>
+<ul>
+<li>网址：<a target="_blank" rel="noopener" href="https://spidertools.cn/#/formatJSON">https://spidertools.cn/#/formatJSON</a></li>
+<li>功能：美化 JSON 数据，检查语法错误。</li>
+</ul>
+</li>
+<li><p><strong>HTML 渲染</strong></p>
+<ul>
+<li>网址：<a target="_blank" rel="noopener" href="https://spidertools.cn/#/renderHtml">https://spidertools.cn/#/renderHtml</a></li>
+<li>功能：在线预览 HTML 代码效果。</li>
+</ul>
+</li>
+<li><p><strong>CSV 转 JSON</strong></p>
+<ul>
+<li>网址：<a target="_blank" rel="noopener" href="https://tableconvert.com/zh-cn/csv-to-json">https://tableconvert.com/zh-cn/csv-to-json</a></li>
+<li>功能：将 CSV 文件转为 JSON 格式，适合数据导入</li>
+</ul>
+</li>
+</ol>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%BC%80%E5%8F%91/" class="category-chain-item">开发</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/PHP/">#PHP</a>
+      
+        <a href="/tags/Yii/">#Yii</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>H10 PHP 开发常见操作与示例</div>
+      <div>https://kingjem.github.io/2025/04/11/h10-php开发常见操作与示例/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月11日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/04/27/js/sojson%20v7%E7%BD%91%E7%AB%99%E9%80%86%E5%90%91/" title="sojson v7网站逆向">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">sojson v7网站逆向</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/24/PX3%20%E5%8F%82%E6%95%B0%E7%94%9F%E6%88%90%E4%B9%8B%20wasm%20b%20%E5%87%BD%E6%95%B0%E4%B8%AD%E5%8F%82%E6%95%B0D%20%E7%9A%84%E7%94%9F%E6%88%90/" title="PX3 参数生成之 wasm 函数中的参数D 的生成">
+                        <span class="hidden-mobile">PX3 参数生成之 wasm 函数中的参数D 的生成</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

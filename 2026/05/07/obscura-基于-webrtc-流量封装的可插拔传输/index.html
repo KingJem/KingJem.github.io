@@ -1,0 +1,965 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="什么是 ObscuraObscura 是一个用 Rust 编写的开源无头浏览器引擎，专为 web scraping 和 AI agent 自动化场景设计。它通过 V8 引擎执行真实的 JavaScript，支持 Chrome DevTools Protocol (CDP)，可作为 Puppeteer 和 Playwright 的替代方案直接使用。 核心优势对比   指标 Obscura Headl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Obscura — Rust 编写的轻量级无头浏览器">
+<meta property="og:url" content="https://kingjem.github.io/2026/05/07/obscura-%E5%9F%BA%E4%BA%8E-webrtc-%E6%B5%81%E9%87%8F%E5%B0%81%E8%A3%85%E7%9A%84%E5%8F%AF%E6%8F%92%E6%8B%94%E4%BC%A0%E8%BE%93/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="什么是 ObscuraObscura 是一个用 Rust 编写的开源无头浏览器引擎，专为 web scraping 和 AI agent 自动化场景设计。它通过 V8 引擎执行真实的 JavaScript，支持 Chrome DevTools Protocol (CDP)，可作为 Puppeteer 和 Playwright 的替代方案直接使用。 核心优势对比   指标 Obscura Headl">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-07T06:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.188Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="CDP">
+<meta property="article:tag" content="Headless Browser">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="Web Scraping">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Obscura — Rust 编写的轻量级无头浏览器 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Obscura — Rust 编写的轻量级无头浏览器"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-05-07 14:30" pubdate>
+          2026年5月7日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Obscura — Rust 编写的轻量级无头浏览器</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="什么是-Obscura"><a href="#什么是-Obscura" class="headerlink" title="什么是 Obscura"></a>什么是 Obscura</h2><p><a target="_blank" rel="noopener" href="https://github.com/h4ckf0r0day/obscura">Obscura</a> 是一个用 Rust 编写的开源无头浏览器引擎，专为 web scraping 和 AI agent 自动化场景设计。它通过 V8 引擎执行真实的 JavaScript，支持 Chrome DevTools Protocol (CDP)，可作为 Puppeteer 和 Playwright 的替代方案直接使用。</p>
+<h3 id="核心优势对比"><a href="#核心优势对比" class="headerlink" title="核心优势对比"></a>核心优势对比</h3><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>Obscura</th>
+<th>Headless Chrome</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内存占用</td>
+<td><strong>30 MB</strong></td>
+<td>200+ MB</td>
+</tr>
+<tr>
+<td>二进制大小</td>
+<td><strong>70 MB</strong></td>
+<td>300+ MB</td>
+</tr>
+<tr>
+<td>抗检测</td>
+<td><strong>内置</strong></td>
+<td>无</td>
+</tr>
+<tr>
+<td>页面加载</td>
+<td><strong>85 ms</strong></td>
+<td>~500 ms</td>
+</tr>
+<tr>
+<td>启动时间</td>
+<td><strong>即时</strong></td>
+<td>~2s</td>
+</tr>
+</tbody></table>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="下载二进制"><a href="#下载二进制" class="headerlink" title="下载二进制"></a>下载二进制</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Linux x86_64</span><br>curl -LO https://github.com/h4ckf0r0day/obscura/releases/latest/download/obscura-x86_64-linux.tar.gz<br>tar xzf obscura-x86_64-linux.tar.gz<br><br><span class="hljs-comment"># macOS Apple Silicon</span><br>curl -LO https://github.com/h4ckf0r0day/obscura/releases/latest/download/obscura-aarch64-macos.tar.gz<br>tar xzf obscura-aarch64-macos.tar.gz<br></code></pre></td></tr></table></figure>
+
+<p>无需安装 Chrome、Node.js 或任何依赖。tar.gz 包内含 <code>obscura</code> 和 <code>obscura-worker</code> 两个文件，放在同一目录下即可使用 <code>scrape</code> 并行命令。</p>
+<h3 id="源码编译"><a href="#源码编译" class="headerlink" title="源码编译"></a>源码编译</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/h4ckf0r0day/obscura.git<br><span class="hljs-built_in">cd</span> obscura<br>cargo build --release<br><br><span class="hljs-comment"># 开启 stealth 模式（抗检测 + 追踪器拦截）</span><br>cargo build --release --features stealth<br></code></pre></td></tr></table></figure>
+
+<p>需要 Rust 1.75+。首次编译约 5 分钟（V8 从源码编译，之后会缓存）。</p>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><h3 id="obscura-fetch-—-获取单个页面"><a href="#obscura-fetch-—-获取单个页面" class="headerlink" title="obscura fetch — 获取单个页面"></a><code>obscura fetch</code> — 获取单个页面</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 获取页面标题</span><br>obscura fetch https://example.com --<span class="hljs-built_in">eval</span> <span class="hljs-string">&quot;document.title&quot;</span><br><br><span class="hljs-comment"># 提取所有链接</span><br>obscura fetch https://example.com --dump links<br><br><span class="hljs-comment"># 渲染 JS 并输出 HTML</span><br>obscura fetch https://news.ycombinator.com --dump html<br><br><span class="hljs-comment"># 等待动态内容加载</span><br>obscura fetch https://example.com --wait-until networkidle0<br><br><span class="hljs-comment"># 设置超时</span><br>obscura fetch https://example.com --<span class="hljs-built_in">timeout</span> 10<br></code></pre></td></tr></table></figure>
+
+<h3 id="obscura-serve-—-启动-CDP-Server"><a href="#obscura-serve-—-启动-CDP-Server" class="headerlink" title="obscura serve — 启动 CDP Server"></a><code>obscura serve</code> — 启动 CDP Server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">obscura serve --port 9222<br><br><span class="hljs-comment"># 开启 stealth 模式</span><br>obscura serve --port 9222 --stealth<br></code></pre></td></tr></table></figure>
+
+<p>启动后可通过 WebSocket 连接 <code>ws://127.0.0.1:9222/devtools/browser</code>，然后用 Puppeteer&#x2F;Playwright 控制浏览器。</p>
+<h3 id="obscura-scrape-—-并行抓取"><a href="#obscura-scrape-—-并行抓取" class="headerlink" title="obscura scrape — 并行抓取"></a><code>obscura scrape</code> — 并行抓取</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">obscura scrape url1 url2 url3 \<br>  --concurrency 25 \<br>  --<span class="hljs-built_in">eval</span> <span class="hljs-string">&quot;document.querySelector(&#x27;h1&#x27;).textContent&quot;</span> \<br>  --format json<br></code></pre></td></tr></table></figure>
+
+<h2 id="配合-Puppeteer-使用"><a href="#配合-Puppeteer-使用" class="headerlink" title="配合 Puppeteer 使用"></a>配合 Puppeteer 使用</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install puppeteer-core<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> puppeteer <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;puppeteer-core&#x27;</span>;<br><br><span class="hljs-keyword">const</span> browser = <span class="hljs-keyword">await</span> puppeteer.<span class="hljs-title function_">connect</span>(&#123;<br>  <span class="hljs-attr">browserWSEndpoint</span>: <span class="hljs-string">&#x27;ws://127.0.0.1:9222/devtools/browser&#x27;</span>,<br>&#125;);<br><br><span class="hljs-keyword">const</span> page = <span class="hljs-keyword">await</span> browser.<span class="hljs-title function_">newPage</span>();<br><span class="hljs-keyword">await</span> page.<span class="hljs-title function_">goto</span>(<span class="hljs-string">&#x27;https://news.ycombinator.com&#x27;</span>);<br><br><span class="hljs-keyword">const</span> stories = <span class="hljs-keyword">await</span> page.<span class="hljs-title function_">evaluate</span>(<span class="hljs-function">() =&gt;</span><br>  <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;.titleline &gt; a&#x27;</span>))<br>    .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">a</span> =&gt;</span> (&#123; <span class="hljs-attr">title</span>: a.<span class="hljs-property">textContent</span>, <span class="hljs-attr">url</span>: a.<span class="hljs-property">href</span> &#125;))<br>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(stories);<br><br><span class="hljs-keyword">await</span> browser.<span class="hljs-title function_">disconnect</span>();<br></code></pre></td></tr></table></figure>
+
+<h2 id="配合-Playwright-使用"><a href="#配合-Playwright-使用" class="headerlink" title="配合 Playwright 使用"></a>配合 Playwright 使用</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install playwright-core<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; chromium &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;playwright-core&#x27;</span>;<br><br><span class="hljs-keyword">const</span> browser = <span class="hljs-keyword">await</span> chromium.<span class="hljs-title function_">connectOverCDP</span>(&#123;<br>  <span class="hljs-attr">endpointURL</span>: <span class="hljs-string">&#x27;ws://127.0.0.1:9222&#x27;</span>,<br>&#125;);<br><br><span class="hljs-keyword">const</span> page = <span class="hljs-keyword">await</span> browser.<span class="hljs-title function_">newContext</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">ctx</span> =&gt;</span> ctx.<span class="hljs-title function_">newPage</span>());<br><span class="hljs-keyword">await</span> page.<span class="hljs-title function_">goto</span>(<span class="hljs-string">&#x27;https://en.wikipedia.org/wiki/Web_scraping&#x27;</span>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-keyword">await</span> page.<span class="hljs-title function_">title</span>());<br><br><span class="hljs-keyword">await</span> browser.<span class="hljs-title function_">close</span>();<br></code></pre></td></tr></table></figure>
+
+<h3 id="表单提交与登录"><a href="#表单提交与登录" class="headerlink" title="表单提交与登录"></a>表单提交与登录</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">await</span> page.<span class="hljs-title function_">goto</span>(<span class="hljs-string">&#x27;https://quotes.toscrape.com/login&#x27;</span>);<br><span class="hljs-keyword">await</span> page.<span class="hljs-title function_">evaluate</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#username&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;admin&#x27;</span>;<br>  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;#password&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;admin&#x27;</span>;<br>  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;form&#x27;</span>).<span class="hljs-title function_">submit</span>();<br>&#125;);<br><span class="hljs-comment">// Obscura 会处理 POST、跟随 302 重定向、维持 cookies</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Stealth-模式"><a href="#Stealth-模式" class="headerlink" title="Stealth 模式"></a>Stealth 模式</h2><p>编译时加上 <code>--features stealth</code>，运行时加 <code>--stealth</code> 即可启用。</p>
+<h3 id="抗指纹"><a href="#抗指纹" class="headerlink" title="抗指纹"></a>抗指纹</h3><ul>
+<li>每次会话随机化 GPU、屏幕、Canvas、Audio、电池指纹</li>
+<li>真实的 <code>navigator.userAgentData</code> (Chrome 145，高熵值)</li>
+<li><code>event.isTrusted = true</code>（浏览器原生事件标记）</li>
+<li>隐藏内部属性（<code>Object.keys(window)</code> 不暴露内部信息）</li>
+<li><code>Function.prototype.toString()</code> 伪装为 <code>[native code]</code></li>
+<li><code>navigator.webdriver = undefined</code>（与真实 Chrome 一致）</li>
+</ul>
+<h3 id="追踪器拦截"><a href="#追踪器拦截" class="headerlink" title="追踪器拦截"></a>追踪器拦截</h3><ul>
+<li>覆盖 3,520 个域名</li>
+<li>自动拦截 analytics、ads、telemetry、fingerprinting 脚本</li>
+</ul>
+<h2 id="CDP-API-支持范围"><a href="#CDP-API-支持范围" class="headerlink" title="CDP API 支持范围"></a>CDP API 支持范围</h2><table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>支持的方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Target</strong></td>
+<td>createTarget, closeTarget, attachToTarget, createBrowserContext, disposeBrowserContext</td>
+</tr>
+<tr>
+<td><strong>Page</strong></td>
+<td>navigate, getFrameTree, addScriptToEvaluateOnNewDocument, lifecycleEvents</td>
+</tr>
+<tr>
+<td><strong>Runtime</strong></td>
+<td>evaluate, callFunctionOn, getProperties, addBinding</td>
+</tr>
+<tr>
+<td><strong>DOM</strong></td>
+<td>getDocument, querySelector, querySelectorAll, getOuterHTML, resolveNode</td>
+</tr>
+<tr>
+<td><strong>Network</strong></td>
+<td>enable, setCookies, getCookies, setExtraHTTPHeaders, setUserAgentOverride</td>
+</tr>
+<tr>
+<td><strong>Fetch</strong></td>
+<td>enable, continueRequest, fulfillRequest, failRequest（实时拦截）</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>getCookies, setCookies, deleteCookies</td>
+</tr>
+<tr>
+<td><strong>Input</strong></td>
+<td>dispatchMouseEvent, dispatchKeyEvent</td>
+</tr>
+<tr>
+<td><strong>LP</strong></td>
+<td>getMarkdown（DOM 转 Markdown）</td>
+</tr>
+</tbody></table>
+<h2 id="CLI-速查"><a href="#CLI-速查" class="headerlink" title="CLI 速查"></a>CLI 速查</h2><h3 id="obscura-serve"><a href="#obscura-serve" class="headerlink" title="obscura serve"></a><code>obscura serve</code></h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--port</code></td>
+<td><code>9222</code></td>
+<td>WebSocket 端口</td>
+</tr>
+<tr>
+<td><code>--proxy</code></td>
+<td>—</td>
+<td>HTTP&#x2F;SOCKS5 代理 URL</td>
+</tr>
+<tr>
+<td><code>--stealth</code></td>
+<td>off</td>
+<td>抗检测 + 追踪拦截</td>
+</tr>
+<tr>
+<td><code>--workers</code></td>
+<td><code>1</code></td>
+<td>并行 worker 进程数</td>
+</tr>
+<tr>
+<td><code>--obey-robots</code></td>
+<td>off</td>
+<td>遵守 robots.txt</td>
+</tr>
+</tbody></table>
+<h3 id="obscura-fetch"><a href="#obscura-fetch" class="headerlink" title="obscura fetch &lt;URL&gt;"></a><code>obscura fetch &lt;URL&gt;</code></h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--dump</code></td>
+<td><code>html</code></td>
+<td>输出格式：html &#x2F; text &#x2F; links</td>
+</tr>
+<tr>
+<td><code>--eval</code></td>
+<td>—</td>
+<td>要执行的 JavaScript 表达式</td>
+</tr>
+<tr>
+<td><code>--wait-until</code></td>
+<td><code>load</code></td>
+<td>等待时机：load &#x2F; domcontentloaded &#x2F; networkidle0</td>
+</tr>
+<tr>
+<td><code>--timeout</code></td>
+<td><code>30</code></td>
+<td>最大导航时间（秒）</td>
+</tr>
+<tr>
+<td><code>--selector</code></td>
+<td>—</td>
+<td>等待 CSS 选择器出现</td>
+</tr>
+<tr>
+<td><code>--stealth</code></td>
+<td>off</td>
+<td>抗检测模式</td>
+</tr>
+<tr>
+<td><code>--quiet</code></td>
+<td>off</td>
+<td>隐藏 banner 输出</td>
+</tr>
+</tbody></table>
+<h3 id="obscura-scrape"><a href="#obscura-scrape" class="headerlink" title="obscura scrape &lt;URL...&gt;"></a><code>obscura scrape &lt;URL...&gt;</code></h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--concurrency</code></td>
+<td><code>10</code></td>
+<td>并行 worker 数</td>
+</tr>
+<tr>
+<td><code>--eval</code></td>
+<td>—</td>
+<td>每页执行的 JS 表达式</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td><code>json</code></td>
+<td>输出格式：json &#x2F; text</td>
+</tr>
+</tbody></table>
+<h2 id="性能基准"><a href="#性能基准" class="headerlink" title="性能基准"></a>性能基准</h2><table>
+<thead>
+<tr>
+<th>页面类型</th>
+<th>Obscura</th>
+<th>Chrome</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>静态 HTML</td>
+<td><strong>51 ms</strong></td>
+<td>~500 ms</td>
+</tr>
+<tr>
+<td>JS + XHR + fetch</td>
+<td><strong>84 ms</strong></td>
+<td>~800 ms</td>
+</tr>
+<tr>
+<td>动态脚本</td>
+<td><strong>78 ms</strong></td>
+<td>~700 ms</td>
+</tr>
+</tbody></table>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p>Obscura 适合以下场景：</p>
+<ul>
+<li><strong>AI Agent 自动化</strong>：需要真实浏览器环境执行 JavaScript 的 AI 代理</li>
+<li><strong>大规模 Web Scraping</strong>：低内存 + 并行抓取，资源消耗远低于 Puppeteer&#x2F;Playwright + Chrome</li>
+<li><strong>需要抗检测的场景</strong>：内置 stealth 模式，无需额外配置</li>
+<li><strong>CDP 工具链</strong>：已有 Puppeteer&#x2F;Playwright 代码可零成本迁移</li>
+</ul>
+<p>不适用于需要完整浏览器 UI 交互的场景（如复杂表单、文件上传、浏览器扩展等）。</p>
+<hr>
+<p><em>项目地址: <a target="_blank" rel="noopener" href="https://github.com/h4ckf0r0day/obscura">github.com&#x2F;h4ckf0r0day&#x2F;obscura</a>，Apache 2.0 开源协议</em></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%B7%A5%E5%85%B7/" class="category-chain-item">工具</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Rust/">#Rust</a>
+      
+        <a href="/tags/Headless-Browser/">#Headless Browser</a>
+      
+        <a href="/tags/Web-Scraping/">#Web Scraping</a>
+      
+        <a href="/tags/CDP/">#CDP</a>
+      
+        <a href="/tags/AI-Agent/">#AI Agent</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Obscura — Rust 编写的轻量级无头浏览器</div>
+      <div>https://kingjem.github.io/2026/05/07/obscura-基于-webrtc-流量封装的可插拔传输/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年5月7日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/06/05/%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86/" title="设置代理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">设置代理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/04/11/phpbrew%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本">
+                        <span class="hidden-mobile">phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,822 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="什么是 phpbrewphpbrew 是一个 PHP 版本管理工具，允许你在同一台机器上安装、编译、切换多个 PHP 版本。它从源码编译 PHP，因此你可以自由定制扩展和编译参数，非常适合需要测试不同 PHP 版本兼容性的开发者。 与之类似的还有 phpenv（rbenv 风格）和 phpenv，但 phpbrew 功能最全面，支持的 PHP 版本最广。 安装 phpbrew依赖要求 Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="phpbrew 使用教程 — 在 Linux&#x2F;macOS 上管理多个 PHP 版本">
+<meta property="og:url" content="https://kingjem.github.io/2026/04/11/phpbrew%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="什么是 phpbrewphpbrew 是一个 PHP 版本管理工具，允许你在同一台机器上安装、编译、切换多个 PHP 版本。它从源码编译 PHP，因此你可以自由定制扩展和编译参数，非常适合需要测试不同 PHP 版本兼容性的开发者。 与之类似的还有 phpenv（rbenv 风格）和 phpenv，但 phpbrew 功能最全面，支持的 PHP 版本最广。 安装 phpbrew依赖要求 Linux">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-11T15:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.188Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="开发工具">
+<meta property="article:tag" content="环境管理">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-04-11 23:30" pubdate>
+          2026年4月11日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="什么是-phpbrew"><a href="#什么是-phpbrew" class="headerlink" title="什么是 phpbrew"></a>什么是 phpbrew</h2><p>phpbrew 是一个 PHP 版本管理工具，允许你在同一台机器上安装、编译、切换多个 PHP 版本。它从源码编译 PHP，因此你可以自由定制扩展和编译参数，非常适合需要测试不同 PHP 版本兼容性的开发者。</p>
+<p>与之类似的还有 <code>phpenv</code>（rbenv 风格）和 <code>phpenv</code>，但 phpbrew 功能最全面，支持的 PHP 版本最广。</p>
+<h2 id="安装-phpbrew"><a href="#安装-phpbrew" class="headerlink" title="安装 phpbrew"></a>安装 phpbrew</h2><h3 id="依赖要求"><a href="#依赖要求" class="headerlink" title="依赖要求"></a>依赖要求</h3><ul>
+<li>Linux 或 macOS</li>
+<li>PHP 7.2+（作为 phpbrew 自身运行时）</li>
+<li>curl、git、gcc&#x2F;make 等编译工具</li>
+<li>autoconf、automake、libtool 等库（编译 PHP 时需要）</li>
+</ul>
+<p>以 Ubuntu&#x2F;Debian 为例，提前安装编译依赖：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt update<br><span class="hljs-built_in">sudo</span> apt install -y \<br>  php-cli php-json \<br>  autoconf automake libtool re2c bison \<br>  libxml2-dev libsqlite3-dev libcurl4-openssl-dev \<br>  libonig-dev libicu-dev libzip-dev \<br>  libgd-dev libxpm-dev libfreetype6-dev<br></code></pre></td></tr></table></figure>
+
+<h3 id="方式一：官方安装脚本（推荐）"><a href="#方式一：官方安装脚本（推荐）" class="headerlink" title="方式一：官方安装脚本（推荐）"></a>方式一：官方安装脚本（推荐）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -L -O https://github.com/phpbrew/phpbrew/releases/latest/download/phpbrew.phar<br><span class="hljs-built_in">chmod</span> +x phpbrew.phar<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mv</span> phpbrew.phar /usr/local/bin/phpbrew<br></code></pre></td></tr></table></figure>
+
+<h3 id="方式二：直接克隆仓库"><a href="#方式二：直接克隆仓库" class="headerlink" title="方式二：直接克隆仓库"></a>方式二：直接克隆仓库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/phpbrew/phpbrew.git<br><span class="hljs-built_in">cd</span> phpbrew<br>phpbrew.phar install<br></code></pre></td></tr></table></figure>
+
+<p>安装完成后，需要在 shell 配置文件中初始化。编辑 <code>~/.bashrc</code> 或 <code>~/.zshrc</code>，添加：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> PHPBREW_ROOT=<span class="hljs-string">&quot;<span class="hljs-variable">$HOME</span>/.phpbrew&quot;</span><br><span class="hljs-built_in">source</span> <span class="hljs-string">&quot;<span class="hljs-variable">$PHPBREW_ROOT</span>/bashrc&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>然后重新加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> ~/.bashrc   <span class="hljs-comment"># 或 source ~/.zshrc</span><br></code></pre></td></tr></table></figure>
+
+<p>运行 <code>phpbrew version</code> 验证安装成功。</p>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p>首次使用需要初始化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew init<br></code></pre></td></tr></table></figure>
+
+<p>这会在 <code>$PHPBREW_ROOT</code>（默认为 <code>~/.phpbrew</code>）下创建必要目录，并在 <code>~/.phpbrew/init</code> 生成环境变量配置。</p>
+<h2 id="查看可用-PHP-版本"><a href="#查看可用-PHP-版本" class="headerlink" title="查看可用 PHP 版本"></a>查看可用 PHP 版本</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew known          <span class="hljs-comment"># 列出当前可用版本</span><br>phpbrew known --more   <span class="hljs-comment"># 显示更多旧版本</span><br>phpbrew known --old    <span class="hljs-comment"># 显示 PHP 5.3 之前的远古版本</span><br>phpbrew known -u       <span class="hljs-comment"># 更新版本列表</span><br></code></pre></td></tr></table></figure>
+
+<p>输出类似：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs subunit">Known PHP versions:<br>  php<span class="hljs-string">-8</span>.3.0<br>  php<span class="hljs-string">-8</span>.2.0<br>  php<span class="hljs-string">-8</span>.1.0<br>  php<span class="hljs-string">-8</span>.0.0<br>  php<span class="hljs-string">-7</span>.4.0<br>  ...<br></code></pre></td></tr></table></figure>
+
+<h2 id="安装-PHP"><a href="#安装-PHP" class="headerlink" title="安装 PHP"></a>安装 PHP</h2><h3 id="基本安装"><a href="#基本安装" class="headerlink" title="基本安装"></a>基本安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.2.0<br></code></pre></td></tr></table></figure>
+
+<p>这会从 PHP 官网下载源码，configure、make、make install，全程自动化。</p>
+<h3 id="指定编译变体（variants）"><a href="#指定编译变体（variants）" class="headerlink" title="指定编译变体（variants）"></a>指定编译变体（variants）</h3><p>phpbrew 使用”变体”（variant）机制来组合常用扩展。常用变体：</p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>default</code></td>
+<td>默认常用扩展集（bcmath、curl、json、opcache、pdo、readline…）</td>
+</tr>
+<tr>
+<td><code>mb</code></td>
+<td>mbstring + mbregex，多字节字符串支持</td>
+</tr>
+<tr>
+<td><code>dbs</code></td>
+<td>sqlite + mysql + pgsql，数据库支持</td>
+</tr>
+<tr>
+<td><code>fpm</code></td>
+<td>编译 PHP-FPM（用于配合 Nginx&#x2F;Apache）</td>
+</tr>
+<tr>
+<td><code>phpdbg</code></td>
+<td>编译 phpdbg 调试器</td>
+</tr>
+<tr>
+<td><code>opcache</code></td>
+<td>Zend OPcache</td>
+</tr>
+<tr>
+<td><code>all</code></td>
+<td>几乎所有扩展（测试兼容性用，编译慢）</td>
+</tr>
+</tbody></table>
+<p>安装带常用扩展的 PHP：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.2.0 +default +mb +fpm +opcache<br></code></pre></td></tr></table></figure>
+
+<p>安装极简版（仅 CLI）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.2.0 +minimal<br></code></pre></td></tr></table></figure>
+
+<h3 id="从已有版本继承变体"><a href="#从已有版本继承变体" class="headerlink" title="从已有版本继承变体"></a>从已有版本继承变体</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.1.0 --like=php-8.2.0<br></code></pre></td></tr></table></figure>
+
+<p>这样 8.1.0 会自动继承 8.2.0 安装时使用的变体组合。</p>
+<h3 id="编译加速"><a href="#编译加速" class="headerlink" title="编译加速"></a>编译加速</h3><p>多核机器加 <code>-j</code> 参数并行编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.2.0 +default -j$(<span class="hljs-built_in">nproc</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="安装后运行测试"><a href="#安装后运行测试" class="headerlink" title="安装后运行测试"></a>安装后运行测试</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.2.0 +default --<span class="hljs-built_in">test</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="常见编译问题处理"><a href="#常见编译问题处理" class="headerlink" title="常见编译问题处理"></a>常见编译问题处理</h3><p><strong>缺少库</strong>：安装时缺什么库，系统会报错。根据错误信息安装对应 dev 包即可。</p>
+<p><strong>Visual C++ 运行库（Windows 下特有）</strong>：Linux&#x2F;macOS 无此问题。</p>
+<p><strong>并发冲突</strong>：某些扩展组合会冲突，如 mcrypt + sodium。通常去掉冲突扩展即可。</p>
+<h2 id="已安装版本列表"><a href="#已安装版本列表" class="headerlink" title="已安装版本列表"></a>已安装版本列表</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew list<br></code></pre></td></tr></table></figure>
+
+<p>如果还没安装任何版本，会提示：<code>Please install at least one PHP with your preferred version.</code></p>
+<h2 id="切换-PHP-版本"><a href="#切换-PHP-版本" class="headerlink" title="切换 PHP 版本"></a>切换 PHP 版本</h2><h3 id="临时切换（仅当前-shell-生效）"><a href="#临时切换（仅当前-shell-生效）" class="headerlink" title="临时切换（仅当前 shell 生效）"></a>临时切换（仅当前 shell 生效）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew use php-8.2.0<br></code></pre></td></tr></table></figure>
+
+<p>退出当前 shell 后失效，恢复系统默认或 phpbrew 默认版本。</p>
+<h3 id="永久切换（全局默认）"><a href="#永久切换（全局默认）" class="headerlink" title="永久切换（全局默认）"></a>永久切换（全局默认）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew switch php-8.2.0<br></code></pre></td></tr></table></figure>
+
+<p>会将版本写入 <code>~/.phpbrew/init</code>，每次新开 shell 自动加载。</p>
+<h3 id="关闭-phpbrew，切回系统-PHP"><a href="#关闭-phpbrew，切回系统-PHP" class="headerlink" title="关闭 phpbrew，切回系统 PHP"></a>关闭 phpbrew，切回系统 PHP</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew off<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看当前使用中的版本"><a href="#查看当前使用中的版本" class="headerlink" title="查看当前使用中的版本"></a>查看当前使用中的版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew use<br><span class="hljs-comment"># 或</span><br>phpbrew current<br></code></pre></td></tr></table></figure>
+
+<h2 id="FPM-管理"><a href="#FPM-管理" class="headerlink" title="FPM 管理"></a>FPM 管理</h2><p>phpbrew 内置了 php-fpm 的启停管理（前提是编译时加了 <code>+fpm</code> 变体）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew fpm start          <span class="hljs-comment"># 启动</span><br>phpbrew fpm stop           <span class="hljs-comment"># 停止</span><br>phpbrew fpm restart        <span class="hljs-comment"># 重启</span><br>phpbrew fpm <span class="hljs-built_in">test</span>           <span class="hljs-comment"># 测试配置</span><br>phpbrew fpm config         <span class="hljs-comment"># 编辑 php-fpm.conf</span><br>phpbrew fpm info           <span class="hljs-comment"># 查看 php-fpm 配置信息</span><br>phpbrew fpm module         <span class="hljs-comment"># 列出已编译的 fpm 模块</span><br>phpbrew fpm current        <span class="hljs-comment"># 查看当前 fpm 进程状态</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="编辑-php-ini"><a href="#编辑-php-ini" class="headerlink" title="编辑 php.ini"></a>编辑 php.ini</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew config           <span class="hljs-comment"># 用 $EDITOR 打开当前版本的 php.ini</span><br>phpbrew config --sapi cli <span class="hljs-comment"># 仅编辑 CLI 的 php.ini</span><br>phpbrew config --sapi fpm <span class="hljs-comment"># 仅编辑 FPM 的 php.ini</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="清理构建产物"><a href="#清理构建产物" class="headerlink" title="清理构建产物"></a>清理构建产物</h2><p>安装后删除源码目录节省空间（保留已编译的 php 目录）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew purge php-8.2.0<br><span class="hljs-comment"># 或</span><br>phpbrew purge php-8.2.0 --build<br><span class="hljs-comment"># --build 仅删源码，保留已安装的二进制</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="删除已安装的-PHP-版本"><a href="#删除已安装的-PHP-版本" class="headerlink" title="删除已安装的 PHP 版本"></a>删除已安装的 PHP 版本</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew purge php-8.1.0 php-8.0.0   <span class="hljs-comment"># 同时删除多个版本</span><br></code></pre></td></tr></table></figure>
+
+<p>注意：正在使用中的版本无法被 purge，需要先 <code>phpbrew switch</code> 到其他版本。</p>
+<h2 id="批量操作：each"><a href="#批量操作：each" class="headerlink" title="批量操作：each"></a>批量操作：each</h2><p>对所有已安装版本执行同一命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew each php -v           <span class="hljs-comment"># 所有版本的 php -v</span><br>phpbrew each <span class="hljs-string">&quot;php -m | grep opcache&quot;</span>   <span class="hljs-comment"># 检查各版本是否装了 opcache</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="phpbrewrc：项目级-PHP-版本锁定"><a href="#phpbrewrc：项目级-PHP-版本锁定" class="headerlink" title=".phpbrewrc：项目级 PHP 版本锁定"></a>.phpbrewrc：项目级 PHP 版本锁定</h2><p>在项目根目录放一个 <code>.phpbrewrc</code> 文件，内容如：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">php</span>-<span class="hljs-number">8</span>.<span class="hljs-number">2</span>.<span class="hljs-number">0</span> +default +mb<br></code></pre></td></tr></table></figure>
+
+<p>进入该目录时，phpbrew 会自动切换到指定版本（需要 <code>$PHPBREW_RC_ENABLE=1</code>）。</p>
+<h2 id="常见使用场景"><a href="#常见使用场景" class="headerlink" title="常见使用场景"></a>常见使用场景</h2><h3 id="场景一：测试项目在不同-PHP-版本的兼容性"><a href="#场景一：测试项目在不同-PHP-版本的兼容性" class="headerlink" title="场景一：测试项目在不同 PHP 版本的兼容性"></a>场景一：测试项目在不同 PHP 版本的兼容性</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-7.4.0 +default +mb +fpm<br>phpbrew install php-8.0.0 +default +mb +fpm<br>phpbrew install php-8.1.0 +default +mb +fpm<br>phpbrew install php-8.2.0 +default +mb +fpm<br><br><span class="hljs-comment"># 快速切换测试</span><br>phpbrew switch php-7.4.0 &amp;&amp; php composer install &amp;&amp; php vendor/bin/phpunit<br>phpbrew switch php-8.2.0 &amp;&amp; php composer install &amp;&amp; php vendor/bin/phpunit<br></code></pre></td></tr></table></figure>
+
+<h3 id="场景二：本地多项目，不同版本需求"><a href="#场景二：本地多项目，不同版本需求" class="headerlink" title="场景二：本地多项目，不同版本需求"></a>场景二：本地多项目，不同版本需求</h3><p>项目 A 需要 PHP 7.4，项目 B 需要 PHP 8.2，通过 <code>.phpbrewrc</code> 在各自目录下自动切换。</p>
+<h3 id="场景三：开发时用-phpdbg-调试"><a href="#场景三：开发时用-phpdbg-调试" class="headerlink" title="场景三：开发时用 phpdbg 调试"></a>场景三：开发时用 phpdbg 调试</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">phpbrew install php-8.1.0 +default +phpdbg<br>phpbrew switch php-8.1.0<br>phpdbg -qrr /path/to/script.php<br></code></pre></td></tr></table></figure>
+
+<h2 id="完整工作流示例"><a href="#完整工作流示例" class="headerlink" title="完整工作流示例"></a>完整工作流示例</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 安装两个版本</span><br>phpbrew install php-8.2.0 +default +mb +fpm +opcache<br>phpbrew install php-8.1.0 +default +mb<br><br><span class="hljs-comment"># 2. 切换到 8.2 作为默认</span><br>phpbrew switch php-8.2.0<br><br><span class="hljs-comment"># 3. 确认当前版本</span><br>php -v<br><br><span class="hljs-comment"># 4. 编辑 php.ini 打开 OPcache</span><br>phpbrew config<br><span class="hljs-comment"># 在 php.ini 中设置 opcache.enable=1</span><br><br><span class="hljs-comment"># 5. 需要测试 8.1 时</span><br>phpbrew switch php-8.1.0<br><br><span class="hljs-comment"># 6. 不需要时清理</span><br>phpbrew purge php-8.1.0<br></code></pre></td></tr></table></figure>
+
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><p><strong>Q: 编译时提示 “mbregex” 冲突？</strong><br>A: 去掉 <code>mbregex</code> 变体，单独使用 <code>mbstring</code> 即可。</p>
+<p><strong>Q: macOS 上编译失败？</strong><br>A: 确保安装 Command Line Tools（<code>xcode-select --install</code>）和 Homebrew 依赖库。</p>
+<p><strong>Q: 如何让 phpbrew 使用代理？</strong><br>A: <code>phpbrew install php-8.2.0 --http-proxy=http://127.0.0.1:7890</code></p>
+<p><strong>Q: phpbrew 自身需要 PHP 多少版本？</strong><br>A: phpbrew 需要 PHP 7.2+ 作为运行时解释器。</p>
+<h2 id="卸载-phpbrew"><a href="#卸载-phpbrew" class="headerlink" title="卸载 phpbrew"></a>卸载 phpbrew</h2><p>如果不再需要 phpbrew，清理步骤：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 移除 phpbrew 主程序</span><br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">rm</span> /usr/local/bin/phpbrew<br><br><span class="hljs-comment"># 2. 删除配置和已安装的 PHP 版本</span><br><span class="hljs-built_in">rm</span> -rf ~/.phpbrew<br><br><span class="hljs-comment"># 3. 从 shell 配置中移除初始化代码</span><br><span class="hljs-comment"># 从 ~/.bashrc 或 ~/.zshrc 中删除以下内容：</span><br><span class="hljs-comment">#   export PHPBREW_ROOT=&quot;$HOME/.phpbrew&quot;</span><br><span class="hljs-comment">#   source &quot;$PHPBREW_ROOT/bashrc&quot;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<p>phpbrew 是本地 PHP 环境管理的利器，尤其适合需要同时维护多个项目、对接不同 PHP 版本依赖的场景。建议安装完 PHP 后顺手 <code>phpbrew switch</code> 设好默认版本，配合 <code>.phpbrewrc</code> 实现项目级自动切换，可以大幅减少版本相关的扯皮时间。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/PHP/">#PHP</a>
+      
+        <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">#开发工具</a>
+      
+        <a href="/tags/%E7%8E%AF%E5%A2%83%E7%AE%A1%E7%90%86/">#环境管理</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>phpbrew 使用教程 — 在 Linux/macOS 上管理多个 PHP 版本</div>
+      <div>https://kingjem.github.io/2026/04/11/phpbrew使用教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年4月11日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/05/07/obscura-%E5%9F%BA%E4%BA%8E-webrtc-%E6%B5%81%E9%87%8F%E5%B0%81%E8%A3%85%E7%9A%84%E5%8F%AF%E6%8F%92%E6%8B%94%E4%BC%A0%E8%BE%93/" title="Obscura — Rust 编写的轻量级无头浏览器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Obscura — Rust 编写的轻量级无头浏览器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" title="curl-impersonate JA3 指纹原理与复现">
+                        <span class="hidden-mobile">curl-impersonate JA3 指纹原理与复现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

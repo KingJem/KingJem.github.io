@@ -1,0 +1,823 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="前言在受限网络里抓一个**只对海外开放、且做了证书固定（SSL Pinning）**的 Android App，常规「装个 CA + 开个代理」是不够的。这篇把一套跑通的组合记录下来：  VpnService&#x2F;TUN 转发：把手机（或指定 App）的流量喂给 mitmproxy； mitmweb upstream 模式 + pproxy：mitmproxy 负责解密，pproxy 负责把">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning">
+<meta property="og:url" content="https://kingjem.github.io/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="前言在受限网络里抓一个**只对海外开放、且做了证书固定（SSL Pinning）**的 Android App，常规「装个 CA + 开个代理」是不够的。这篇把一套跑通的组合记录下来：  VpnService&#x2F;TUN 转发：把手机（或指定 App）的流量喂给 mitmproxy； mitmweb upstream 模式 + pproxy：mitmproxy 负责解密，pproxy 负责把">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-13T08:40:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.185Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="SSL Pinning">
+<meta property="article:tag" content="mitmproxy">
+<meta property="article:tag" content="mitmweb">
+<meta property="article:tag" content="pproxy">
+<meta property="article:tag" content="抓包">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-13 16:40" pubdate>
+          2026年7月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          61 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在受限网络里抓一个**只对海外开放、且做了证书固定（SSL Pinning）**的 Android App，常规「装个 CA + 开个代理」是不够的。这篇把一套跑通的组合记录下来：</p>
+<ul>
+<li><strong>VpnService&#x2F;TUN 转发</strong>：把手机（或指定 App）的流量喂给 mitmproxy；</li>
+<li><strong>mitmweb upstream 模式 + pproxy</strong>：mitmproxy 负责解密，pproxy 负责把出口换到<strong>干净的海外 IP</strong>；</li>
+<li><strong>系统 CA 信任（root）</strong>：让 App 信任 mitmproxy 的证书；</li>
+<li><strong>Frida 17 解 SSL Pinning</strong>：搞定 App 内置的证书固定。</li>
+</ul>
+<blockquote>
+<p>⚠️ 下文所有 <code>IP:PORT</code>、账号密码、包名都用<strong>占位符</strong>，替换成你自己的。仅用于<strong>授权范围内</strong>的调试。</p>
+</blockquote>
+<h2 id="整体链路"><a href="#整体链路" class="headerlink" title="整体链路"></a>整体链路</h2><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs stata">手机 <span class="hljs-keyword">App</span>（已绕过 pinning）<br>   │  VpnService TUN（全局 / 仅指定 <span class="hljs-keyword">App</span>）<br>   ▼<br>mihomo/Clash 内核  ──►  http:<span class="hljs-comment">//127.0.0.1:8080   （经 adb reverse 到 PC）</span><br>                              │<br>                        mitmweb（upstream 模式，解密 HTTPS）<br>                              │  http:<span class="hljs-comment">//127.0.0.1:8888</span><br>                              ▼<br>                        pproxy（http → 上游代理）<br>                              │<br>                              ▼<br>                        海外 HTTP/SOCKS5 代理  ──►  外网（干净的海外出口）<br></code></pre></td></tr></table></figure>
+
+<p>关键点：<strong>mitmproxy 只管解密，出口交给 pproxy 链</strong>。这样解密和「换 IP」解耦，出口想换哪国换哪国。</p>
+<h2 id="组件与环境"><a href="#组件与环境" class="headerlink" title="组件与环境"></a>组件与环境</h2><ul>
+<li>PC：Windows（miniforge&#x2F;Python 均可）、<code>mitmproxy</code>、<code>pproxy</code>、<code>frida-tools</code>、<code>objection</code>、Node（给 <code>frida-compile</code> 用）。</li>
+<li>手机：<strong>已 root</strong>（KernelSU&#x2F;Magisk），装好 <code>frida-server</code>。</li>
+<li>转发端：任意基于 VpnService 的转发器（Clash.Meta &#x2F; 自建的 mihomo 壳都行），把流量转到 <code>http://&lt;PC&gt;:8080</code>。</li>
+</ul>
+<hr>
+<h2 id="Step-1-·-手机流量转发到-mitmproxy"><a href="#Step-1-·-手机流量转发到-mitmproxy" class="headerlink" title="Step 1 · 手机流量转发到 mitmproxy"></a>Step 1 · 手机流量转发到 mitmproxy</h2><p>用 VpnService 建 TUN，把（全局或指定 App 的）流量转发到上游 <code>http://&lt;PC_IP&gt;:8080</code>（即 mitmweb）。</p>
+<p><strong>公司网络连不上 PC？</strong> 内网常有防火墙&#x2F;AP 隔离，PC 的 <code>8080</code> 手机直连不通。用 <strong>adb 反向隧道</strong>走 adb 通道，绕过网络层：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb reverse tcp:8080 tcp:8080<br><span class="hljs-comment"># 转发器里上游填 127.0.0.1:8080 即可（走的是 adb 通道，防火墙/隔离都绕开）</span><br></code></pre></td></tr></table></figure>
+
+<p>DNS 建议用 <code>redir-host</code>（或 <code>fake-ip</code> + sniffer），保证上游看到的是<strong>真实域名</strong>而非 fake-ip。</p>
+<h2 id="Step-2-·-mitmweb（upstream）-pproxy-换海外出口"><a href="#Step-2-·-mitmweb（upstream）-pproxy-换海外出口" class="headerlink" title="Step 2 · mitmweb（upstream）+ pproxy 换海外出口"></a>Step 2 · mitmweb（upstream）+ pproxy 换海外出口</h2><h3 id="2-1-pproxy：把出口换成海外代理"><a href="#2-1-pproxy：把出口换成海外代理" class="headerlink" title="2.1 pproxy：把出口换成海外代理"></a>2.1 pproxy：把出口换成海外代理</h3><p><code>pproxy</code> 是纯 Python 代理，能把本地 HTTP 监听转发到任意上游（http &#x2F; socks5）。<strong>上游代理跑在能连通目标节点的机器上</strong>（比如带全局代理&#x2F;WARP 的 Windows 主机，而不是 WSL——见踩坑）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 上游是 HTTP 代理</span><br>python -m pproxy -l <span class="hljs-string">&quot;http://:8888&quot;</span> -r <span class="hljs-string">&quot;http://&lt;US_PROXY_IP&gt;:&lt;PORT&gt;#&lt;user&gt;:&lt;pass&gt;&quot;</span><br><br><span class="hljs-comment"># 上游是 SOCKS5 代理（注意 pproxy 的鉴权语法是 #user:pass 结尾，不是 user:pass@host）</span><br>python -m pproxy -l <span class="hljs-string">&quot;http://:8888&quot;</span> -r <span class="hljs-string">&quot;socks5://&lt;US_PROXY_IP&gt;:&lt;PORT&gt;#&lt;user&gt;:&lt;pass&gt;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>先单独验证 pproxy 出口是不是想要的地区：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -x http://127.0.0.1:8888 https://ipinfo.io/json<br>curl -x http://127.0.0.1:8888 <span class="hljs-string">&quot;http://ip-api.com/json&quot;</span>   <span class="hljs-comment"># 两个库都查，见踩坑</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-2-mitmweb：上游模式，负责解密"><a href="#2-2-mitmweb：上游模式，负责解密" class="headerlink" title="2.2 mitmweb：上游模式，负责解密"></a>2.2 mitmweb：上游模式，负责解密</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 让 mitmweb 把解密后的流量交给 pproxy</span><br>mitmweb --mode upstream:http://127.0.0.1:8888<br></code></pre></td></tr></table></figure>
+
+<p>如果上游代理本身就是 <strong>HTTP 代理</strong>，也可以<strong>省掉 pproxy</strong>，让 mitmweb 直连：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mitmweb --mode upstream:http://&lt;US_PROXY_IP&gt;:&lt;PORT&gt; --upstream-auth &lt;user&gt;:&lt;pass&gt;<br></code></pre></td></tr></table></figure>
+
+<p>验证整条链：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -x http://127.0.0.1:8080 <span class="hljs-string">&quot;http://ip-api.com/json&quot;</span>   <span class="hljs-comment"># 应显示海外出口</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Step-3-·-让-App-信任-mitmproxy-的-CA（root）"><a href="#Step-3-·-让-App-信任-mitmproxy-的-CA（root）" class="headerlink" title="Step 3 · 让 App 信任 mitmproxy 的 CA（root）"></a>Step 3 · 让 App 信任 mitmproxy 的 CA（root）</h2><p>Android 7+ App 默认不信任用户证书；Android 14 系统证书库搬进了不可写的 Conscrypt APEX。所以要抓<strong>别家 App</strong>，得把 mitmproxy 的 CA 装进<strong>系统证书库</strong>——非 root 做不到。</p>
+<ul>
+<li>Root 设备用 <strong>MoveCertificate</strong>（Magisk&#x2F;KernelSU 模块）最省事：把 <code>~/.mitmproxy/mitmproxy-ca-cert.cer</code> 以用户证书方式导入，模块会在开机时把它注入 APEX 系统库，重启生效。</li>
+<li>验证：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell <span class="hljs-string">&quot;su -c &#x27;ls /apex/com.android.conscrypt/cacerts/ | wc -l; \</span><br><span class="hljs-string">  grep -l -i mitmproxy /apex/com.android.conscrypt/cacerts/* 2&gt;/dev/null&#x27;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>系统信任搞定后，<strong>不做 pinning 的 App</strong> 就能被解密了。做了 pinning 的看下一步。</p>
+<h2 id="Step-4-·-Frida-17-解-SSL-Pinning（重点）"><a href="#Step-4-·-Frida-17-解-SSL-Pinning（重点）" class="headerlink" title="Step 4 · Frida 17 解 SSL Pinning（重点）"></a>Step 4 · Frida 17 解 SSL Pinning（重点）</h2><p>App 报 <code>Client TLS handshake failed ... certificate unknown</code>，就是<strong>证书固定</strong>：CA 装了也没用，App 只认自己钉死的证书。用 Frida 动态 hook 掉校验。</p>
+<h3 id="4-1-起-frida-server（版本要和-PC-端-frida-对上）"><a href="#4-1-起-frida-server（版本要和-PC-端-frida-对上）" class="headerlink" title="4.1 起 frida-server（版本要和 PC 端 frida 对上）"></a>4.1 起 frida-server（版本要和 PC 端 frida 对上）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 下载对应架构/版本的 frida-server（如 android-arm64），push 到设备</span><br>adb push frida-server /data/local/tmp/frida-server<br>adb shell <span class="hljs-string">&quot;su -c &#x27;chmod 755 /data/local/tmp/frida-server; \</span><br><span class="hljs-string">  nohup /data/local/tmp/frida-server &gt;/dev/null 2&gt;&amp;1 &amp;&#x27;&quot;</span><br>frida-ps -U   <span class="hljs-comment"># 能列出进程即 OK</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-⚠️-Frida-17-的坑：脚本里没有全局-Java-了"><a href="#4-2-⚠️-Frida-17-的坑：脚本里没有全局-Java-了" class="headerlink" title="4.2 ⚠️ Frida 17 的坑：脚本里没有全局 Java 了"></a>4.2 ⚠️ Frida 17 的坑：脚本里没有全局 <code>Java</code> 了</h3><p>Frida 17 把 Java&#x2F;ObjC bridge 从内核里移除了，裸脚本写 <code>Java.perform(...)</code> 会直接报：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xquery">ReferenceError: <span class="hljs-string">&#x27;Java&#x27;</span> <span class="hljs-literal">is</span><span class="hljs-built_in"> not</span> defined<br></code></pre></td></tr></table></figure>
+
+<p>两种解法：</p>
+<p><strong>方案 A：objection（最省事，推荐交互式用）</strong><br>objection 的 agent 已经把 <code>frida-java-bridge</code> 编译进去了，天然兼容 Frida 17：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># objection 1.12+：explore→start，-g→-n；它是 attach 到运行中的进程</span><br>objection -n &lt;package&gt; start<br><span class="hljs-comment"># 进入 REPL 后：</span><br>android sslpinning <span class="hljs-built_in">disable</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>方案 B：自写脚本 + frida-compile 打包 bridge（可常驻&#x2F;自动化）</strong><br>脚本顶部显式 import，再用 <code>frida-compile</code> 把 <code>frida-java-bridge</code> 打进去：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// unpin.js —— 覆盖常见 pinning 机制</span><br><span class="hljs-keyword">import</span> <span class="hljs-title class_">Java</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;frida-java-bridge&quot;</span>;<br><br><span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">const</span> <span class="hljs-title function_">log</span> = m =&gt; <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[unpin] &quot;</span> + m);<br><br>  <span class="hljs-comment">// 1) 用「全信任」TrustManager 覆盖 SSLContext.init</span><br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">X509TM</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;javax.net.ssl.X509TrustManager&quot;</span>);<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">SSLContext</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;javax.net.ssl.SSLContext&quot;</span>);<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">TrustAll</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">registerClass</span>(&#123;<br>      <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;org.example.TrustAll&quot;</span>,<br>      <span class="hljs-attr">implements</span>: [<span class="hljs-variable constant_">X509TM</span>],<br>      <span class="hljs-attr">methods</span>: &#123;<br>        <span class="hljs-title function_">checkClientTrusted</span>(<span class="hljs-params"></span>) &#123;&#125;,<br>        <span class="hljs-title function_">checkServerTrusted</span>(<span class="hljs-params"></span>) &#123;&#125;,<br>        <span class="hljs-title function_">getAcceptedIssuers</span>(<span class="hljs-params"></span>) &#123; <span class="hljs-keyword">return</span> []; &#125;<br>      &#125;<br>    &#125;);<br>    <span class="hljs-keyword">const</span> tms = [<span class="hljs-title class_">TrustAll</span>.$new()];<br>    <span class="hljs-keyword">const</span> init = <span class="hljs-title class_">SSLContext</span>.<span class="hljs-property">init</span>.<span class="hljs-title function_">overload</span>(<br>      <span class="hljs-string">&quot;[Ljavax.net.ssl.KeyManager;&quot;</span>, <span class="hljs-string">&quot;[Ljavax.net.ssl.TrustManager;&quot;</span>, <span class="hljs-string">&quot;java.security.SecureRandom&quot;</span>);<br>    init.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">km, tm, sr</span>) &#123; init.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, km, tms, sr); &#125;;<br>    <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;SSLContext.init hooked&quot;</span>);<br>  &#125; <span class="hljs-keyword">catch</span> (e) &#123; <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;SSLContext skip: &quot;</span> + e); &#125;<br><br>  <span class="hljs-comment">// 2) OkHttp3 CertificatePinner.check -&gt; no-op（最常见）</span><br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CP</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;okhttp3.CertificatePinner&quot;</span>);<br>    [<span class="hljs-string">&quot;check&quot;</span>, <span class="hljs-string">&quot;check$okhttp&quot;</span>].<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">mn</span> =&gt;</span> &#123;<br>      <span class="hljs-keyword">if</span> (<span class="hljs-variable constant_">CP</span>[mn]) <span class="hljs-variable constant_">CP</span>[mn].<span class="hljs-property">overloads</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">ov</span> =&gt;</span> &#123;<br>        ov.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123; <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;OkHttp CertificatePinner.&quot;</span> + mn + <span class="hljs-string">&quot; bypassed&quot;</span>); &#125;;<br>      &#125;);<br>    &#125;);<br>  &#125; <span class="hljs-keyword">catch</span> (e) &#123;&#125;<br><br>  <span class="hljs-comment">// 3) Conscrypt TrustManagerImpl.verifyChain -&gt; 直接返回链</span><br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">TMI</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.android.org.conscrypt.TrustManagerImpl&quot;</span>);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-variable constant_">TMI</span>.<span class="hljs-property">verifyChain</span>) <span class="hljs-variable constant_">TMI</span>.<span class="hljs-property">verifyChain</span>.<span class="hljs-property">implementation</span> =<br>      <span class="hljs-keyword">function</span> (<span class="hljs-params">chain, anchors, host</span>) &#123; <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;verifyChain bypassed: &quot;</span> + host); <span class="hljs-keyword">return</span> chain; &#125;;<br>  &#125; <span class="hljs-keyword">catch</span> (e) &#123;&#125;<br><br>  <span class="hljs-comment">// 4) X509TrustManagerExtensions.checkServerTrusted -&gt; 返回 List（注意返回类型是 List 不是数组）</span><br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">Ext</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;android.net.http.X509TrustManagerExtensions&quot;</span>);<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">ArrayList</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;java.util.ArrayList&quot;</span>);<br>    <span class="hljs-title class_">Ext</span>.<span class="hljs-property">checkServerTrusted</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">chain, authType, host</span>) &#123;<br>      <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;X509TrustManagerExtensions bypassed: &quot;</span> + host);<br>      <span class="hljs-keyword">const</span> list = <span class="hljs-title class_">ArrayList</span>.$new();<br>      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; chain.<span class="hljs-property">length</span>; i++) list.<span class="hljs-title function_">add</span>(chain[i]);<br>      <span class="hljs-keyword">return</span> list;<br>    &#125;;<br>  &#125; <span class="hljs-keyword">catch</span> (e) &#123;&#125;<br><br>  <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;pinning bypass installed&quot;</span>);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>打包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm init -y<br>npm install frida-compile frida-java-bridge<br>npx frida-compile unpin.js -o unpin.compiled.js<br></code></pre></td></tr></table></figure>
+
+<p>用一个常驻的 Python 驱动 <strong>spawn</strong> 目标 App（在任何 TLS 连接之前就装好 hook，比 attach 更稳）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># spawn_unpin.py</span><br><span class="hljs-keyword">import</span> frida, time<br>PKG = <span class="hljs-string">&quot;&lt;package&gt;&quot;</span><br>dev = frida.get_usb_device(timeout=<span class="hljs-number">10</span>)<br>pid = dev.spawn([PKG])<br>session = dev.attach(pid)<br>script = session.create_script(<span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;unpin.compiled.js&quot;</span>, encoding=<span class="hljs-string">&quot;utf-8&quot;</span>).read())<br>script.on(<span class="hljs-string">&quot;message&quot;</span>, <span class="hljs-keyword">lambda</span> m, d: <span class="hljs-built_in">print</span>(m.get(<span class="hljs-string">&quot;payload&quot;</span>) <span class="hljs-keyword">or</span> m))<br>script.load()<br>dev.resume(pid)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;resumed; unpinning resident&quot;</span>)<br><span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>    time.sleep(<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">python -u spawn_unpin.py<br><span class="hljs-comment"># 日志持续刷 [unpin] OkHttp CertificatePinner.check$okhttp bypassed 即成功</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><ul>
+<li>转发器内核日志：<code>[TCP] ... host:443 match ... using PROXY[upstream]</code>，<strong>无 503&#x2F;超时</strong>；</li>
+<li>Frida 日志：<code>OkHttp CertificatePinner.check bypassed</code> 持续输出；</li>
+<li>mitmweb：能看到该 App 的<strong>明文</strong>请求，不再 <code>certificate unknown</code>；</li>
+<li>出口：<code>curl -x http://127.0.0.1:8080 http://ip-api.com/json</code> 显示目标地区。</li>
+</ul>
+<h2 id="踩坑总结"><a href="#踩坑总结" class="headerlink" title="踩坑总结"></a>踩坑总结</h2><ol>
+<li><p><strong>gost&#x2F;pproxy 放在 WSL 里连不上上游节点</strong>：WSL2 有独立 NAT，公司网络下常常到不了外部节点（<code>i/o timeout</code>），而 Windows 主机能到（走 WARP 等）。<strong>把代理进程放到能连通节点的机器上</strong>（一般是 Windows 主机），或改 <code>.wslconfig</code> 的 <code>networkingMode=mirrored</code> 也未必覆盖到全部路由。</p>
+</li>
+<li><p><strong>出口 IP 的地理定位不一致</strong>：同一个 IP，<code>ipinfo</code>（用运营商 geofeed）可能判美国，<code>ip-api</code>&#x2F;MaxMind（偏注册地）可能判别国。选节点时<strong>多库都查</strong>，挑「都判成目标国」的干净 IP（<code>proxy:false, hosting:false</code> 更佳），否则 App 里蹦出的地址会和你以为的出口对不上。</p>
+</li>
+<li><p><strong>Frida 17 移除全局 <code>Java</code></strong>：裸脚本报 <code>Java is not defined</code>。要么用 objection（agent 已内置 bridge），要么 <code>frida-compile</code> 把 <code>frida-java-bridge</code> 打进脚本。</p>
+</li>
+<li><p><strong>objection 是交互式 REPL</strong>，需要真终端，不方便脚本化常驻；要自动化&#x2F;常驻就走「frida-compile + Python 驱动 spawn」。</p>
+</li>
+<li><p><strong>pproxy 鉴权语法</strong>是 <code>scheme://host:port#user:pass</code>（<code>#</code> 结尾），不是 <code>user:pass@host</code>。</p>
+</li>
+<li><p><strong>mitmproxy 只解密、不负责出口能否连通</strong>：上游连不上时 mitmweb 会回 <code>502/503</code>，App 就报错——先用 <code>curl -x</code> 把 pproxy→上游 这一段单独验通再说。</p>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>mitmproxy upstream 模式：<a target="_blank" rel="noopener" href="https://docs.mitmproxy.org/stable/concepts-modes/">https://docs.mitmproxy.org/stable/concepts-modes/</a></li>
+<li>pproxy：<a target="_blank" rel="noopener" href="https://github.com/qwj/python-proxy">https://github.com/qwj/python-proxy</a></li>
+<li>Frida：<a target="_blank" rel="noopener" href="https://frida.re/">https://frida.re/</a>　objection：<a target="_blank" rel="noopener" href="https://github.com/sensepost/objection">https://github.com/sensepost/objection</a></li>
+<li>Android 14 系统证书注入 &#x2F; MoveCertificate：<a target="_blank" rel="noopener" href="https://github.com/ys1231/MoveCertificate">https://github.com/ys1231/MoveCertificate</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+      
+        <a href="/tags/mitmproxy/">#mitmproxy</a>
+      
+        <a href="/tags/mitmweb/">#mitmweb</a>
+      
+        <a href="/tags/pproxy/">#pproxy</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/SSL-Pinning/">#SSL Pinning</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning</div>
+      <div>https://kingjem.github.io/2026/07/13/Android抓包实战-mitmweb-pproxy美国出口-frida解SSLPinning/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月13日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/07/20/AI/js-reverse-vs-chrome-devtools/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/" title="eCapture 使用方法">
+                        <span class="hidden-mobile">eCapture 使用方法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

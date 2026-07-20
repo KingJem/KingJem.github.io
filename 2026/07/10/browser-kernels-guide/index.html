@@ -1,0 +1,926 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="反检测浏览器内核实战：ruyipage &#x2F; DrissionPage &#x2F; camoufox &#x2F; CloakBrowser">
+<meta property="og:url" content="https://kingjem.github.io/2026/07/10/browser-kernels-guide/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-10T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.186Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Camoufox">
+<meta property="article:tag" content="CloakBrowser">
+<meta property="article:tag" content="DrissionPage">
+<meta property="article:tag" content="curl_cffi">
+<meta property="article:tag" content="ruyipage">
+<meta property="article:tag" content="反检测浏览器">
+<meta property="article:tag" content="指纹">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-10 12:00" pubdate>
+          2026年7月10日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          83 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 cookie 池架构里，思路是「<strong>真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放</strong>」。<br>浏览器内核负责<strong>过质询、拿真实会话</strong>，回放侧用 <code>curl_cffi</code> 的 <code>impersonate</code> 复刻内核的 TLS&#x2F;JA3 指纹。<br>不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的要求差异很大，选错内核直接卡死。</p>
+<p>本文把项目里在用的四个内核 —— <strong>ruyipage &#x2F; DrissionPage(dp) &#x2F; camoufox（官方 + 三方 fork）&#x2F; CloakBrowser</strong> ——<br>的原生用法与工程封装用法整理清楚，并给出选型顺序和回放侧指纹对齐表。</p>
+<blockquote>
+<p>环境说明：全部跑在 conda 的 <code>py310</code> 环境<br>（<code>C:/Users/YanchuangJin/miniforge3/envs/py310/python.exe</code>，装了 ruyipage &#x2F; camoufox &#x2F; cloakbrowser &#x2F; curl_cffi &#x2F; DrissionPage）。</p>
+</blockquote>
+<h2 id="四内核速览"><a href="#四内核速览" class="headerlink" title="四内核速览"></a>四内核速览</h2><table>
+<thead>
+<tr>
+<th>内核</th>
+<th>基座</th>
+<th>反检测强度</th>
+<th>典型能解</th>
+<th>回放 impersonate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DrissionPage (dp)</strong></td>
+<td>本机 Chrome</td>
+<td>★★☆☆☆（CDP 可被检测）</td>
+<td>静默 JS 挑战</td>
+<td><code>chrome150</code>（对齐本机 Chrome 大版本）</td>
+</tr>
+<tr>
+<td><strong>ruyipage</strong></td>
+<td>Firefox 151</td>
+<td>★★★☆☆</td>
+<td>CF Managed&#x2F;Turnstile、Fastly、Akamai 部分</td>
+<td><code>firefox151</code></td>
+</tr>
+<tr>
+<td><strong>camoufox</strong></td>
+<td>反检测 Firefox</td>
+<td>★★★★☆</td>
+<td>CF 自适应 JA3 严格质询（onbuy）</td>
+<td><code>firefox*</code> + <strong>采集时实际 UA</strong></td>
+</tr>
+<tr>
+<td><strong>CloakBrowser</strong></td>
+<td>隐身 Chromium</td>
+<td>★★★★★（击败 CDP 检测）</td>
+<td>Chrome 类站点最硬的一档</td>
+<td><code>chrome146</code>（免费版）</td>
+</tr>
+</tbody></table>
+<p><strong>升级顺序</strong>：Chrome 类站点被拦 → <code>dp → cloak</code>；Firefox 类质询更硬 → <code>ruyipage → camoufox</code>。</p>
+<p>工程上四者统一为同一个后端接口（<code>spiders/cookie_pool/backends/</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># backends/__init__.py</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_backend</span>(<span class="hljs-params">name</span>):<br>    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">in</span> (<span class="hljs-string">&quot;cloak&quot;</span>, <span class="hljs-string">&quot;cloakbrowser&quot;</span>): ...<br>    <span class="hljs-keyword">if</span> name == <span class="hljs-string">&quot;ruyipage&quot;</span>: ...<br>    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">in</span> (<span class="hljs-string">&quot;drissionpage&quot;</span>, <span class="hljs-string">&quot;dp&quot;</span>): ...<br>    <span class="hljs-keyword">if</span> name == <span class="hljs-string">&quot;camoufox&quot;</span>: ...<br><br><span class="hljs-comment"># 每个后端模块只暴露两个函数：</span><br><span class="hljs-comment">#   available() -&gt; bool            当前环境能否用</span><br><span class="hljs-comment">#   async fetch(**kw) -&gt; dict      返回 &#123;cookies, ua, blocked, block_marker, ready, page_len&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>站点接入只需在 <code>SiteConfig</code> 里写 <code>backend=&quot;ruyipage&quot;</code> &#x2F; <code>&quot;camoufox&quot;</code> &#x2F; …，<strong>通常不改实现代码</strong>。</p>
+<hr>
+<h2 id="1-DrissionPage（dp）——-驱动本机-Chrome"><a href="#1-DrissionPage（dp）——-驱动本机-Chrome" class="headerlink" title="1. DrissionPage（dp）—— 驱动本机 Chrome"></a>1. DrissionPage（dp）—— 驱动本机 Chrome</h2><p>最轻量：直接驱动<strong>本机已安装的 Chrome</strong>（实测 Chrome 150.0.7871.47），适合「必须真实本机 Chrome 环境」的静默 JS 挑战。<br>缺点是走 CDP，指纹上能被检测出自动化（Chrome 类硬站会被 Access Denied，此时升级到 CloakBrowser）。</p>
+<h3 id="原生用法"><a href="#原生用法" class="headerlink" title="原生用法"></a>原生用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> DrissionPage <span class="hljs-keyword">import</span> ChromiumPage, ChromiumOptions<br><br>co = ChromiumOptions()<br>co.set_paths(local_port=<span class="hljs-number">9222</span>, user_data_path=<span class="hljs-string">r&quot;D:\tmp\dp_profile&quot;</span>,<br>             browser_path=<span class="hljs-string">r&quot;C:\Program Files\Google\Chrome\Application\chrome.exe&quot;</span>)<br>co.headless(<span class="hljs-literal">True</span>)          <span class="hljs-comment"># 4.x；3.x 是 set_headless(True)</span><br>co.no_imgs(<span class="hljs-literal">True</span>)           <span class="hljs-comment"># 4.x；3.x 是 set_no_imgs(True)</span><br><br>page = ChromiumPage(co)    <span class="hljs-comment"># 用位置参数，3.x/4.x 通用</span><br>page.get(<span class="hljs-string">&quot;https://example.com&quot;</span>)<br>cookies = page.cookies(all_domains=<span class="hljs-literal">True</span>)   <span class="hljs-comment"># 4.x；3.x 是 page.get_cookies(as_dict=True, all_domains=True)</span><br>page.quit()<br></code></pre></td></tr></table></figure>
+
+<h3 id="DrissionPage-3-x-4-x-接口差异（项目里用-shim-抹平）"><a href="#DrissionPage-3-x-4-x-接口差异（项目里用-shim-抹平）" class="headerlink" title="DrissionPage 3.x &#x2F; 4.x 接口差异（项目里用 shim 抹平）"></a>DrissionPage 3.x &#x2F; 4.x 接口差异（项目里用 shim 抹平）</h3><p>py310 装的是 <strong>3.2.30</strong>、系统 Python 是 <strong>4.1.1.4</strong>，两版接口不兼容，工程里在 <code>_dp_core.py</code> 统一：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>3.x</th>
+<th>4.x</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>headless</td>
+<td><code>set_headless(on)</code></td>
+<td><code>headless(on)</code></td>
+</tr>
+<tr>
+<td>禁图</td>
+<td><code>set_no_imgs(on)</code></td>
+<td><code>no_imgs(on)</code></td>
+</tr>
+<tr>
+<td>取 cookie</td>
+<td><code>page.get_cookies(as_dict=True, all_domains=True)</code></td>
+<td><code>page.cookies(all_domains=True)</code>（由 property 变 method）</td>
+</tr>
+<tr>
+<td>构造首参</td>
+<td><code>addr_driver_opts</code></td>
+<td><code>addr_or_opts</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li>构造统一用<strong>位置参数</strong> <code>ChromiumPage(co)</code>；路径统一走 <code>set_paths(local_port=, user_data_path=, browser_path=)</code>。</li>
+<li>认证代理走本机中继 <code>spiders/common/browser_proxy.configure_chromium_proxy</code><br>—— <strong>Chrome 137+ 不再支持账密代理直连</strong>，必须本地起中继。</li>
+<li>坑：① 控制台 GBK 编码不能 <code>print</code> ✓&#x2F;✗，输出用 ASCII；② 3.x 关浏览器时 <code>_recv_loop</code> 会打一条<br><code>JSONDecodeError</code>（CDP websocket 收到空消息），是 teardown 噪音、不影响结果。</li>
+</ul>
+<p>工程后端只需：<code>backend=&quot;drissionpage&quot;</code>（别名 <code>dp</code>）。</p>
+<hr>
+<h2 id="2-ruyipage-——-Firefox-151-指纹内核"><a href="#2-ruyipage-——-Firefox-151-指纹内核" class="headerlink" title="2. ruyipage —— Firefox 151 指纹内核"></a>2. ruyipage —— Firefox 151 指纹内核</h2><p>深度打补丁的 Firefox 151，支持智能指纹（geo 探测 + fpfile 注入 + BiDi 仿真），<br>静默 JS 挑战（浏览器自动 reload 就过，无验证码）和 CF Managed&#x2F;Turnstile 都能处理。</p>
+<blockquote>
+<p>查 API <strong>首选本地 METADATA</strong>（含完整中文示例，别凭记忆）：<br><code>.../envs/py310/Lib/site-packages/ruyipage-1.2.43.dist-info/METADATA</code><br>与 PyPI 发布页 <a target="_blank" rel="noopener" href="https://pypi.org/project/ruyipage/">https://pypi.org/project/ruyipage/</a>。</p>
+</blockquote>
+<h3 id="原生用法（手动-profile-代理-fpfile）"><a href="#原生用法（手动-profile-代理-fpfile）" class="headerlink" title="原生用法（手动 profile + 代理 + fpfile）"></a>原生用法（手动 profile + 代理 + fpfile）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> ruyipage <span class="hljs-keyword">import</span> FirefoxOptions, FirefoxPage<br><span class="hljs-keyword">from</span> ruyipage._runtime.installer <span class="hljs-keyword">import</span> get_executable_path<br><br>opts = FirefoxOptions()<br>opts.set_browser_path(get_executable_path())<br>opts.set_pref(<span class="hljs-string">&quot;permissions.default.image&quot;</span>, <span class="hljs-number">2</span>)   <span class="hljs-comment"># 禁图</span><br>opts.headless(<span class="hljs-literal">True</span>)<br>opts.set_profile(<span class="hljs-string">r&quot;D:\tmp\ruyi_profile&quot;</span>)         <span class="hljs-comment"># 独立 profile = 每次全新会话</span><br>opts.set_proxy(<span class="hljs-string">&quot;http://host:port&quot;</span>)<br><span class="hljs-comment"># 账密代理：写 fpfile 里的 httpauth.username/password，走 BiDi 自动应答 407</span><br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;fp.txt&quot;</span>, <span class="hljs-string">&quot;w&quot;</span>) <span class="hljs-keyword">as</span> f:<br>    f.write(<span class="hljs-string">&quot;httpauth.username:USER\nhttpauth.password:PWD\n&quot;</span>)<br>opts.set_fpfile(<span class="hljs-string">&quot;fp.txt&quot;</span>)<br><br>page = FirefoxPage(opts)<br>page.get(<span class="hljs-string">&quot;https://target.com&quot;</span>, timeout=<span class="hljs-number">60</span>)<br>html = page.html<br>cookies = page.cookies(as_dict=<span class="hljs-literal">False</span>)<br>page.quit(force=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="智能指纹一站式（geo-敏感站必备）"><a href="#智能指纹一站式（geo-敏感站必备）" class="headerlink" title="智能指纹一站式（geo 敏感站必备）"></a>智能指纹一站式（geo 敏感站必备）</h3><p>数据中心代理地理不固定时，<strong>出口 IP 的国家&#x2F;时区</strong>要和浏览器指纹对齐，否则 Akamai 之类会在搜索页弹挑战。<br><code>apply_smart_fingerprint</code> 经代理做一次 geo 查询，自动对齐 locale &#x2F; timezone &#x2F; geolocation：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> ruyipage <span class="hljs-keyword">import</span> apply_smart_fingerprint<br>fp_ctx = apply_smart_fingerprint(<br>    opts, proxy_host=host, proxy_port=port, proxy_user=u, proxy_pwd=p,<br>    require_country=<span class="hljs-literal">None</span>,          <span class="hljs-comment"># 对齐 IP 实际国家即可，不强制某国（否则 CountryMismatchError）</span><br>    userdir=profile_dir,<br>    fpfile_name=<span class="hljs-string">&quot;ruyi_fp.txt&quot;</span>,<br>)<br>page = FirefoxPage(opts)<br>fp_ctx.apply_emulation(page, set_geolocation=<span class="hljs-literal">True</span>, set_locale=<span class="hljs-literal">True</span>, set_timezone=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="工程实战里的几个关键坑（-ruyi-core-py）"><a href="#工程实战里的几个关键坑（-ruyi-core-py）" class="headerlink" title="工程实战里的几个关键坑（_ruyi_core.py）"></a>工程实战里的几个关键坑（<code>_ruyi_core.py</code>）</h3><ul>
+<li><strong>每次采集用独立临时 profile，用完删</strong>：ruyipage 自建的临时 profile 「通常」才清理、不保证，长跑会在 C 盘堆积。</li>
+<li><strong>fpfile 必须落在本次唯一 profile 目录内</strong>：多分片并行时若共用固定路径，两进程会互相覆盖代理凭据 → 407。</li>
+<li><strong>强杀 Firefox 进程树</strong>：<code>page.quit()</code> 只 terminate 启动器（geckodriver），<strong>不杀 Firefox 子进程</strong><br>—— Windows 杀父不杀子，每次残留一组 <code>firefox.exe</code>。用本次唯一 profile 目录名精准定位进程树 kill。</li>
+<li><strong>CF 质询框在跨源独立 context</strong>，不在 <code>document.querySelectorAll(&#39;iframe&#39;)</code> 里；必须走<br><code>browsingContext.getTree</code>（BiDi）检测，再交 <code>handle_cloudflare_challenge</code> 处理。</li>
+<li><strong>锁 UA 不抖动</strong>：复制包内 <code>fingerprints.json</code> 把 <code>firefox_minor_jitter</code> 锁成 <code>[0]</code>，<br>让采集端 UA 恒为 151，和回放 <code>curl_cffi firefox151</code> 精确对齐。</li>
+</ul>
+<p>工程后端：<code>backend=&quot;ruyipage&quot;</code>（或 <code>turnstile</code> &#x3D; ruyipage + CF Managed 处理）。</p>
+<hr>
+<h2 id="3-camoufox-——-反检测-Firefox（官方-三方-fork）"><a href="#3-camoufox-——-反检测-Firefox（官方-三方-fork）" class="headerlink" title="3. camoufox —— 反检测 Firefox（官方 + 三方 fork）"></a>3. camoufox —— 反检测 Firefox（官方 + 三方 fork）</h2><p>对 Firefox 深度打补丁、<strong>不注入 JS 即可改指纹</strong>，比 ruyipage&#x2F;invisible 更「像真人」。<br>onbuy 的 Cloudflare 自适应 JA3 严格质询就是靠它解的（ruyipage 被升级成交互式解不出、dp 的 JA3 curl 又回放不了）。</p>
+<h3 id="3-1-官方版（pip）"><a href="#3-1-官方版（pip）" class="headerlink" title="3.1 官方版（pip）"></a>3.1 官方版（pip）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;camoufox[geoip]&quot;</span>       <span class="hljs-comment"># geoip extra 会带本地 mmdb</span><br>python -m camoufox fetch            <span class="hljs-comment"># 下载浏览器二进制（官方 FF135，约 700MB）</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox.async_api <span class="hljs-keyword">import</span> AsyncCamoufox   <span class="hljs-comment"># 同步版：from camoufox.sync_api import Camoufox</span><br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> AsyncCamoufox(headless=<span class="hljs-literal">True</span>, humanize=<span class="hljs-literal">True</span>,<br>                         geoip=<span class="hljs-literal">True</span>, locale=<span class="hljs-string">&quot;en-US&quot;</span>) <span class="hljs-keyword">as</span> browser:<br>    page = <span class="hljs-keyword">await</span> browser.new_page()<br>    <span class="hljs-keyword">await</span> page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>, wait_until=<span class="hljs-string">&quot;domcontentloaded&quot;</span>)<br>    html = <span class="hljs-keyword">await</span> page.content()<br>    jar  = &#123;c[<span class="hljs-string">&quot;name&quot;</span>]: c[<span class="hljs-string">&quot;value&quot;</span>] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-keyword">await</span> page.context.cookies()&#125;<br>    ua   = <span class="hljs-keyword">await</span> page.evaluate(<span class="hljs-string">&quot;navigator.userAgent&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p><strong>geoip 三态</strong>（关键）：</p>
+<ul>
+<li><code>geoip=True</code>：经出口探测 <code>api.ipify.org</code> 得真实 IP 再本地查地理。<strong>出口能自由访问 ipify 时用它</strong>。</li>
+<li><code>geoip=&quot;209.146.101.43&quot;</code>：直接对指定 IP 做本地 mmdb 查询，<strong>跳过被墙 &#x2F; 被拦的 ipify</strong>（推荐做法）。</li>
+<li><code>geoip=False</code>：不做地理对齐（指纹可能不一致，触发风控）。</li>
+</ul>
+<p><strong>WebRTC 处理</strong>（重要，SOCKS 代理场景防真实 IP 泄漏）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">Camoufox(<br>    proxy=&#123;<span class="hljs-string">&quot;server&quot;</span>: <span class="hljs-string">&quot;socks5://127.0.0.1:1080&quot;</span>&#125;,<br>    block_webrtc=<span class="hljs-literal">True</span>,                       <span class="hljs-comment"># 禁 WebRTC，防 UDP 泄漏真实 IP</span><br>    firefox_user_prefs=&#123;                     <span class="hljs-comment"># 或强制 WebRTC 只走代理（更接近整机 VPN）</span><br>        <span class="hljs-string">&quot;media.peerconnection.ice.proxy_only&quot;</span>: <span class="hljs-literal">True</span>,<br>        <span class="hljs-string">&quot;media.peerconnection.ice.default_address_only&quot;</span>: <span class="hljs-literal">True</span>,<br>        <span class="hljs-string">&quot;network.proxy.socks_remote_dns&quot;</span>: <span class="hljs-literal">True</span>,<br>    &#125;,<br>)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>实测：SOCKS 只代理 TCP，Firefox 的 WebRTC(UDP) 不走 SOCKS 会泄漏真实 IP、与出口不一致 → 触发 Akamai 行为质询。<br><code>block_webrtc=True</code> 能消除泄漏；但要 WebRTC 真报代理 IP（PDP 那种更严检测），需<strong>整机 TUN 模式</strong>（Clash&#x2F;sing-box）而非浏览器代理。</p>
+</blockquote>
+<h3 id="3-2-⚠️-playwright-版本必须钉-1-51-0"><a href="#3-2-⚠️-playwright-版本必须钉-1-51-0" class="headerlink" title="3.2 ⚠️ playwright 版本必须钉 1.51.0"></a>3.2 ⚠️ playwright 版本必须钉 1.51.0</h3><p>camoufox（FF135）<strong>必须搭 <code>playwright==1.51.0</code></strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;playwright==1.51.0&quot;</span><br><span class="hljs-comment"># camoufox 用自己 fetch 的浏览器，无需 playwright install firefox</span><br></code></pre></td></tr></table></figure>
+
+<p>用 1.60 打开会报 JS 错的真实站点会崩：<code>Page.goto: Connection closed while reading from the driver</code>，<br>stderr 顶部是 Node 崩溃横幅。<strong>根因</strong>：camoufox FF135 的 juggler 发的 <code>pageerror</code> 事件没有 <code>location</code> 字段，<br>而 playwright 1.60 的 driver 去读 <code>pageError.location.url</code> → TypeError → 整个 Node driver 崩。</p>
+<blockquote>
+<p>Windows 上跑 camoufox&#x2F;playwright 前必须<br><code>asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())</code>，否则起子进程 <code>NotImplementedError</code>。</p>
+</blockquote>
+<h3 id="3-3-三方-fork（coryking-camoufox）-自定义构建"><a href="#3-3-三方-fork（coryking-camoufox）-自定义构建" class="headerlink" title="3.3 三方 fork（coryking&#x2F;camoufox）+ 自定义构建"></a>3.3 三方 fork（coryking&#x2F;camoufox）+ 自定义构建</h3><p>官方内核只到 FF135；要更高版本（FF142 &#x2F; FF150）的反检测构建，用三方 fork：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;git+https://github.com/coryking/camoufox.git@v142.0.1-fork.27#subdirectory=pythonlib&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>配合自编译的全隐身内核，用 <code>executable_path</code> 直接指到 <code>camoufox.exe</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox.sync_api <span class="hljs-keyword">import</span> Camoufox<br><span class="hljs-keyword">from</span> camoufox.addons <span class="hljs-keyword">import</span> DefaultAddons<br><br><span class="hljs-keyword">with</span> Camoufox(<br>    executable_path=<span class="hljs-string">r&quot;C:\...\camoufox150_build\camoufox.exe&quot;</span>,<br>    os=<span class="hljs-string">&quot;windows&quot;</span>, ff_version=<span class="hljs-number">150</span>,<br>    humanize=<span class="hljs-literal">True</span>, geoip=<span class="hljs-literal">True</span>, locale=[<span class="hljs-string">&quot;en-US&quot;</span>, <span class="hljs-string">&quot;en&quot;</span>],<br>    window=(<span class="hljs-number">1366</span>, <span class="hljs-number">768</span>),<br>    exclude_addons=[DefaultAddons.UBO],<br>    i_know_what_im_doing=<span class="hljs-literal">True</span>,           <span class="hljs-comment"># 用自定义 executable_path 必须加</span><br>) <span class="hljs-keyword">as</span> b:<br>    page = b.new_page(no_viewport=<span class="hljs-literal">True</span>)  <span class="hljs-comment"># no_viewport 避开新版 playwright 传 isMobile 与旧内核不匹配</span><br>    page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>覆盖 <code>camoufox path</code>（<code>AppData\Local\camoufox\camoufox\Cache</code>）成 fork 内核后，需补 <code>version.json</code><br>（release 落在 <code>[beta.19, 1)</code> 区间才 <code>is_supported</code>）。</li>
+<li>Linux 无 X 环境用 <code>headless=&quot;virtual&quot;</code>（自带 Xvfb 真实渲染，无 headless 特征），需先 <code>apt install xvfb</code>。</li>
+</ul>
+<h3 id="3-4-回放侧的坑：每会话随机-UA"><a href="#3-4-回放侧的坑：每会话随机-UA" class="headerlink" title="3.4 回放侧的坑：每会话随机 UA"></a>3.4 回放侧的坑：每会话随机 UA</h3><p>camoufox <strong>每个会话随机 UA</strong>，所以回放<strong>必须用采集时的实际 UA</strong>（不能硬编码）：采集后回传<br><code>navigator.userAgent</code>，消费端 <code>consumer.session</code> 用 <code>entry[&quot;ua&quot;]</code> 设 <code>curl_cffi</code> 的请求头，<br><code>impersonate</code> 用 <code>firefox*</code> 对齐 JA3。</p>
+<p>工程后端：<code>backend=&quot;camoufox&quot;</code>。</p>
+<hr>
+<h2 id="4-CloakBrowser-——-反检测最强的隐身-Chromium"><a href="#4-CloakBrowser-——-反检测最强的隐身-Chromium" class="headerlink" title="4. CloakBrowser —— 反检测最强的隐身 Chromium"></a>4. CloakBrowser —— 反检测最强的隐身 Chromium</h2><p>源码级指纹补丁的隐身 Chromium：<strong>击败 CDP 检测、无 headless 泄漏、Windows 原生 GPU 直通、过 incognito 检测</strong><br>（”passes every bot detection test”）。实测反检测强度最高 —— bloomingdales 的 Akamai 上，它是<strong>唯一</strong>能拿到<br>真实首页（1.58MB）的内核（dp&#x2F;普通 Chrome 被 Access Denied、ruyipage&#x2F;invisible&#x2F;camoufox 卡 sec-cpt 行为质询）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install -U cloakbrowser        <span class="hljs-comment"># 实测 0.4.9</span><br><span class="hljs-comment"># 免费版内核 Chrome146；Pro 版 Chrome148 + 最新反爬补丁（cloakbrowser.dev 7 天试用）</span><br><span class="hljs-comment"># 首次 launch 自动拉内核二进制；启动会打印 free-tier banner（stdout 噪音，无害）</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="原生用法-1"><a href="#原生用法-1" class="headerlink" title="原生用法"></a>原生用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> cloakbrowser <span class="hljs-keyword">import</span> launch_async<br><span class="hljs-keyword">from</span> tools.trans_proxy <span class="hljs-keyword">import</span> proxy_to_playwright<br><br>browser = <span class="hljs-keyword">await</span> launch_async(<br>    proxy=proxy_to_playwright(<span class="hljs-string">&quot;http://user:pwd@host:port&quot;</span>),  <span class="hljs-comment"># None=直连</span><br>    headless=<span class="hljs-literal">False</span>,<br>    humanize=<span class="hljs-literal">True</span>,<br>    geoip=<span class="hljs-literal">True</span>,        <span class="hljs-comment"># 有代理时按出口 IP 地理对齐指纹（CloakBrowser 自带）</span><br>    args=[<span class="hljs-string">&#x27;--blink-settings=imagesEnabled=false&#x27;</span>],           <span class="hljs-comment"># 禁图</span><br>)<br>ctx  = <span class="hljs-keyword">await</span> browser.new_context()<br>page = <span class="hljs-keyword">await</span> ctx.new_page()<br><span class="hljs-keyword">await</span> page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>, wait_until=<span class="hljs-string">&quot;domcontentloaded&quot;</span>, timeout=<span class="hljs-number">120000</span>)<br>html = <span class="hljs-keyword">await</span> page.content()<br>jar  = &#123;c[<span class="hljs-string">&quot;name&quot;</span>]: c[<span class="hljs-string">&quot;value&quot;</span>] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-keyword">await</span> page.context.cookies()&#125;<br><span class="hljs-keyword">await</span> browser.close()<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>回放 <code>curl_cffi</code> 用 <strong><code>chrome146</code></strong>（对齐免费版内核大版本；Pro 版对齐 <code>chrome148</code>）。</li>
+<li>限制：CloakBrowser 也解不了 bloomingdales 深层页（search&#x2F;PDP）的 Akamai 硬拒 —— 它只放行首页，<br>这是站点策略层面的（非内核能解）。</li>
+</ul>
+<p>工程后端：<code>backend=&quot;cloak&quot;</code>（别名 <code>cloakbrowser</code>）。</p>
+<hr>
+<h2 id="5-回放侧指纹对齐（curl-cffi）"><a href="#5-回放侧指纹对齐（curl-cffi）" class="headerlink" title="5. 回放侧指纹对齐（curl_cffi）"></a>5. 回放侧指纹对齐（curl_cffi）</h2><p>内核采完 cookie，回放要用 <code>curl_cffi</code> 复刻<strong>同一内核的 TLS&#x2F;JA3 指纹</strong>，否则同 IP 同 cookie 也会被拦：</p>
+<table>
+<thead>
+<tr>
+<th>采集内核</th>
+<th>回放 <code>impersonate</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ruyipage (FF151)</td>
+<td><code>firefox151</code></td>
+</tr>
+<tr>
+<td>camoufox (FF135&#x2F;自定义)</td>
+<td><code>firefox*</code> + <strong>采集时实际 UA</strong></td>
+</tr>
+<tr>
+<td>DrissionPage (本机 Chrome150)</td>
+<td><code>chrome150</code></td>
+</tr>
+<tr>
+<td>CloakBrowser (免费 Chrome146)</td>
+<td><code>chrome146</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>本地装的是 <strong>KingJem 自编译的 curl_cffi fork</strong>（curl-impersonate + curl_cffi 0.15.5），<br>含 <code>chrome141-150</code>（无 147）&#x2F; <code>firefox144-153</code> &#x2F; brave 等新指纹；标准版 <code>curl_cffi</code> 没有这些。<br><strong>部署前先探测目标机器有没有这个 fork</strong>，否则回放报 <code>ImpersonateError</code>。</p>
+</blockquote>
+<h2 id="6-选型决策"><a href="#6-选型决策" class="headerlink" title="6. 选型决策"></a>6. 选型决策</h2><ol>
+<li><strong>先按防护类型定基座</strong>：Chrome 类站点走 dp&#x2F;cloak；Firefox 更能过的质询走 ruyipage&#x2F;camoufox。</li>
+<li><strong>按被拦程度升级</strong>：<ul>
+<li>Chrome 侧：<code>dp（本机 Chrome）→ cloak（隐身 Chromium）</code></li>
+<li>Firefox 侧：<code>ruyipage（FF151）→ camoufox（反检测 FF，含 fork）</code></li>
+</ul>
+</li>
+<li><strong>geo 敏感站</strong>：数据中心代理务必开 geoip 对齐（camoufox <code>geoip=</code>；ruyipage <code>apply_smart_fingerprint</code>）。</li>
+<li><strong>代理下防 WebRTC 泄漏</strong>：camoufox <code>block_webrtc</code> &#x2F; <code>ice.proxy_only</code>；要过最严的 PDP 需整机 TUN 路由。</li>
+<li><strong>回放对齐指纹与 UA</strong>：impersonate 对齐内核大版本；camoufox 还要带采集时的实际 UA。</li>
+</ol>
+<p>这套内核 + 回放的组合，覆盖了项目里绝大多数受反爬保护的零售站点；剩下极少数（如 bloomingdales 深层页）<br>是站点策略层面的硬拒，非换内核能解，需换数据源或真人桌面 + 整机 TUN 环境。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+      
+        <a href="/tags/Camoufox/">#Camoufox</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+      
+        <a href="/tags/ruyipage/">#ruyipage</a>
+      
+        <a href="/tags/DrissionPage/">#DrissionPage</a>
+      
+        <a href="/tags/CloakBrowser/">#CloakBrowser</a>
+      
+        <a href="/tags/curl-cffi/">#curl_cffi</a>
+      
+        <a href="/tags/%E6%8C%87%E7%BA%B9/">#指纹</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</div>
+      <div>https://kingjem.github.io/2026/07/10/browser-kernels-guide/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月10日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/" title="eCapture 使用方法">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">eCapture 使用方法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/06/23/MobaXterm-RDP%E7%BB%8FSOCKS5%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91-gost/" title="MobaXterm RDP 经 SOCKS5 代理转发（gost + WSL）">
+                        <span class="hidden-mobile">MobaXterm RDP 经 SOCKS5 代理转发（gost + WSL）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

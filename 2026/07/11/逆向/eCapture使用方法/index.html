@@ -1,0 +1,846 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="eCapture 使用方法eCapture 是一款基于 eBPF 的流量观测工具，核心用途是直接抓取 TLS&#x2F;SSL 明文内容，而不需要像传统 MITM 那样安装 CA 证书。它适合做 Android App 抓包、Go 程序网络分析、以及一些主机侧审计场景。 我自己用下来，最重要的结论只有一个：先判断目标用的是什么 TLS 实现，再决定用哪个模块。选错模块，后面怎么折腾都抓不到。 1.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eCapture 使用方法">
+<meta property="og:url" content="https://kingjem.github.io/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="eCapture 使用方法eCapture 是一款基于 eBPF 的流量观测工具，核心用途是直接抓取 TLS&#x2F;SSL 明文内容，而不需要像传统 MITM 那样安装 CA 证书。它适合做 Android App 抓包、Go 程序网络分析、以及一些主机侧审计场景。 我自己用下来，最重要的结论只有一个：先判断目标用的是什么 TLS 实现，再决定用哪个模块。选错模块，后面怎么折腾都抓不到。 1.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-11T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.193Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="GoTLS">
+<meta property="article:tag" content="eBPF">
+<meta property="article:tag" content="eCapture">
+<meta property="article:tag" content="抓包">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>eCapture 使用方法 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="eCapture 使用方法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-11 12:00" pubdate>
+          2026年7月11日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          23 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">eCapture 使用方法</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="eCapture-使用方法"><a href="#eCapture-使用方法" class="headerlink" title="eCapture 使用方法"></a>eCapture 使用方法</h1><p>eCapture 是一款基于 eBPF 的流量观测工具，核心用途是直接抓取 TLS&#x2F;SSL 明文内容，而不需要像传统 MITM 那样安装 CA 证书。它适合做 Android App 抓包、Go 程序网络分析、以及一些主机侧审计场景。</p>
+<p>我自己用下来，最重要的结论只有一个：<strong>先判断目标用的是什么 TLS 实现，再决定用哪个模块</strong>。选错模块，后面怎么折腾都抓不到。</p>
+<h2 id="1-eCapture-能做什么"><a href="#1-eCapture-能做什么" class="headerlink" title="1. eCapture 能做什么"></a>1. eCapture 能做什么</h2><p>官方仓库里支持的内容大致分几类：</p>
+<ul>
+<li><code>tls</code>：抓 OpenSSL &#x2F; BoringSSL &#x2F; LibreSSL &#x2F; GnuTLS &#x2F; NSS 的 TLS 明文</li>
+<li><code>gotls</code>：抓 Go <code>crypto/tls</code></li>
+<li><code>bash</code> &#x2F; <code>zsh</code>：主机命令审计</li>
+<li><code>mysql</code>：数据库查询审计</li>
+</ul>
+<p>它的优势是不用装 CA，不依赖浏览器证书链，适合一些“证书装了也没用”的场景。</p>
+<h2 id="2-运行前提"><a href="#2-运行前提" class="headerlink" title="2. 运行前提"></a>2. 运行前提</h2><p>官方说明里，eCapture 支持 Linux &#x2F; Android，CPU 架构主要是 <code>amd64</code> 和 <code>aarch64</code>。Android 上通常需要 root，或者满足对应的系统能力要求。</p>
+<p>几个常见前提：</p>
+<ul>
+<li>Linux 或 Android</li>
+<li>内核版本满足要求</li>
+<li>目标进程确实走的是标准 TLS 库</li>
+<li>如果要抓 Go 程序，最好能拿到未过度裁剪的 ELF</li>
+</ul>
+<h2 id="3-安装方式"><a href="#3-安装方式" class="headerlink" title="3. 安装方式"></a>3. 安装方式</h2><p>最直接的方式是去官方 release 下载预编译包，解压后直接运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture --<span class="hljs-built_in">help</span><br></code></pre></td></tr></table></figure>
+
+<p>如果是容器环境，也可以用官方镜像：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker pull gojue/ecapture:latest<br>docker run --<span class="hljs-built_in">rm</span> --privileged=<span class="hljs-literal">true</span> --net=host gojue/ecapture --<span class="hljs-built_in">help</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="4-最常用的两个模块"><a href="#4-最常用的两个模块" class="headerlink" title="4. 最常用的两个模块"></a>4. 最常用的两个模块</h2><h3 id="4-1-tls-模块"><a href="#4-1-tls-模块" class="headerlink" title="4.1 tls 模块"></a>4.1 tls 模块</h3><p>如果目标 App 或服务使用的是 OpenSSL、BoringSSL 这类常见 TLS 库，优先试 <code>tls</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture tls<br></code></pre></td></tr></table></figure>
+
+<p>如果想看更偏文本的输出，可以用文本模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture tls -m text<br></code></pre></td></tr></table></figure>
+
+<p>这个模块适合：</p>
+<ul>
+<li>浏览器</li>
+<li>curl &#x2F; wget</li>
+<li>大多数 C&#x2F;C++ 网络程序</li>
+<li>部分 Android App</li>
+</ul>
+<h3 id="4-2-gotls-模块"><a href="#4-2-gotls-模块" class="headerlink" title="4.2 gotls 模块"></a>4.2 gotls 模块</h3><p>如果目标是 Go 写的程序，尤其是 <code>crypto/tls</code>，要用 <code>gotls</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture gotls --elfpath=/path/to/binary --hex<br></code></pre></td></tr></table></figure>
+
+<p>这个模块最容易踩坑的地方是：</p>
+<ul>
+<li>二进制被 strip 了</li>
+<li>Go 版本和 eCapture 解析逻辑不匹配</li>
+<li>目标 ELF 的符号和函数范围不完整</li>
+</ul>
+<p>如果遇到解析失败，先别急着怀疑 eCapture 本身，先检查目标文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">readelf -S /path/to/binary | grep gopclntab<br>strings /path/to/binary | grep -E <span class="hljs-string">&#x27;crypto/tls|go1\.&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="5-Android-场景怎么用"><a href="#5-Android-场景怎么用" class="headerlink" title="5. Android 场景怎么用"></a>5. Android 场景怎么用</h2><p>Android 上抓包，核心是先判断 App 的网络栈。</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>适合模块</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Java &#x2F; Kotlin App 走系统 TLS</td>
+<td><code>tls</code></td>
+</tr>
+<tr>
+<td>Go 编写的 App，例如一些代理、工具类程序</td>
+<td><code>gotls</code></td>
+</tr>
+<tr>
+<td>自定义加密 &#x2F; 自研网络协议</td>
+<td>eCapture 不一定能直接看到明文</td>
+</tr>
+</tbody></table>
+<h3 id="5-1-先确认进程是谁"><a href="#5-1-先确认进程是谁" class="headerlink" title="5.1 先确认进程是谁"></a>5.1 先确认进程是谁</h3><p>先找包名和进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell ps -A | grep your.package.name<br></code></pre></td></tr></table></figure>
+
+<p>如果是自己调试的设备，也可以直接看前台应用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell dumpsys window | grep mCurrentFocus<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-抓-Go-程序的-TLS"><a href="#5-2-抓-Go-程序的-TLS" class="headerlink" title="5.2 抓 Go 程序的 TLS"></a>5.2 抓 Go 程序的 TLS</h3><p>如果目标是 Go 程序，常见思路是把 <code>libclash.so</code>、主程序或相关 ELF 拿出来，再用 <code>gotls</code> 跑。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture gotls --elfpath=/data/local/tmp/libclash.so --hex<br></code></pre></td></tr></table></figure>
+
+<p>我自己的经验是，<strong>Go 程序比普通 TLS 程序更容易失败</strong>，原因通常不是网络没走通，而是：</p>
+<ul>
+<li>目标二进制被裁剪</li>
+<li>编译优化把函数边界打散了</li>
+<li>eCapture 需要的 Go 运行时信息不完整</li>
+</ul>
+<h2 id="6-一个实用的排查顺序"><a href="#6-一个实用的排查顺序" class="headerlink" title="6. 一个实用的排查顺序"></a>6. 一个实用的排查顺序</h2><p>如果你只是想快速判断能不能抓到，建议按这个顺序：</p>
+<ol>
+<li>先确认目标是不是标准 TLS</li>
+<li>再决定用 <code>tls</code> 还是 <code>gotls</code></li>
+<li>先用最简单的命令跑起来</li>
+<li>再加过滤条件、输出格式和路径参数</li>
+<li>最后再考虑代理链、重放和二次分析</li>
+</ol>
+<p>这样比一开始就把 Clash、代理、证书、重放全叠上去更稳。</p>
+<h2 id="7-常见问题"><a href="#7-常见问题" class="headerlink" title="7. 常见问题"></a>7. 常见问题</h2><h3 id="7-1-为什么-tls-抓不到-Go-程序"><a href="#7-1-为什么-tls-抓不到-Go-程序" class="headerlink" title="7.1 为什么 tls 抓不到 Go 程序"></a>7.1 为什么 <code>tls</code> 抓不到 Go 程序</h3><p>因为 <code>tls</code> 针对的是 OpenSSL &#x2F; BoringSSL 这类库，不是 Go 标准库。</p>
+<h3 id="7-2-为什么-gotls-报错"><a href="#7-2-为什么-gotls-报错" class="headerlink" title="7.2 为什么 gotls 报错"></a>7.2 为什么 <code>gotls</code> 报错</h3><p>最常见的是目标 ELF 不完整、符号被 strip、或者 Go 版本兼容性不好。这个时候先换一个更干净的二进制，或者确认 <code>.gopclntab</code> 是否存在。</p>
+<h3 id="7-3-为什么-Android-上看起来没有任何输出"><a href="#7-3-为什么-Android-上看起来没有任何输出" class="headerlink" title="7.3 为什么 Android 上看起来没有任何输出"></a>7.3 为什么 Android 上看起来没有任何输出</h3><p>常见原因有三个：</p>
+<ul>
+<li>权限不够</li>
+<li>内核不支持当前 hook</li>
+<li>目标 App 根本没走你以为的那条 TLS 路径</li>
+</ul>
+<h2 id="8-我的使用建议"><a href="#8-我的使用建议" class="headerlink" title="8. 我的使用建议"></a>8. 我的使用建议</h2><p>如果你要在 Android 上做 App 抓包，我建议先按这个优先级试：</p>
+<ol>
+<li>标准 App 先试 <code>tls</code></li>
+<li>Go 程序再试 <code>gotls</code></li>
+<li>目标复杂时再结合代理、日志和重放工具</li>
+</ol>
+<p>eCapture 不是“万能解密器”，它更像是一个很强的观测点。抓到明文的前提，始终是目标真的走了它能 hook 到的那一层。</p>
+<h2 id="9-可以直接复制的命令"><a href="#9-可以直接复制的命令" class="headerlink" title="9. 可以直接复制的命令"></a>9. 可以直接复制的命令</h2><p>如果你只想先跑通流程，可以直接从这几条开始。</p>
+<h3 id="9-1-Linux-上先看帮助"><a href="#9-1-Linux-上先看帮助" class="headerlink" title="9.1 Linux 上先看帮助"></a>9.1 Linux 上先看帮助</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture --<span class="hljs-built_in">help</span><br><span class="hljs-built_in">sudo</span> ecapture tls -h<br><span class="hljs-built_in">sudo</span> ecapture gotls -h<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-2-抓一个标准-TLS-程序"><a href="#9-2-抓一个标准-TLS-程序" class="headerlink" title="9.2 抓一个标准 TLS 程序"></a>9.2 抓一个标准 TLS 程序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture tls -m text<br></code></pre></td></tr></table></figure>
+
+<p>然后在另一个终端发一个 HTTPS 请求：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://example.com<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-3-抓-Go-TLS-程序"><a href="#9-3-抓-Go-TLS-程序" class="headerlink" title="9.3 抓 Go TLS 程序"></a>9.3 抓 Go TLS 程序</h3><p>先找到目标 ELF，再把路径传给 <code>gotls</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> ecapture gotls --elfpath=/path/to/target_binary --hex<br></code></pre></td></tr></table></figure>
+
+<h3 id="9-4-Android-设备上的最小流程"><a href="#9-4-Android-设备上的最小流程" class="headerlink" title="9.4 Android 设备上的最小流程"></a>9.4 Android 设备上的最小流程</h3><p>先确认前台应用或进程名：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell dumpsys window | grep mCurrentFocus<br>adb shell ps -A | grep your.package.name<br></code></pre></td></tr></table></figure>
+
+<p>如果设备已 root，可以直接在手机端跑：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">su -c <span class="hljs-string">&#x27;ecapture tls -m text&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>如果是 Go 程序，先把 ELF 放到手机可读路径，再跑：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb push libclash.so /data/local/tmp/<br>su -c <span class="hljs-string">&#x27;ecapture gotls --elfpath=/data/local/tmp/libclash.so --hex&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/gojue/ecapture">eCapture 官方仓库</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/eCapture/">#eCapture</a>
+      
+        <a href="/tags/eBPF/">#eBPF</a>
+      
+        <a href="/tags/GoTLS/">#GoTLS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>eCapture 使用方法</div>
+      <div>https://kingjem.github.io/2026/07/11/逆向/eCapture使用方法/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月11日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" title="Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/10/browser-kernels-guide/" title="反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser">
+                        <span class="hidden-mobile">反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

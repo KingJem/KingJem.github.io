@@ -1,0 +1,1322 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Ruhai&#39;s blogs">
+<meta property="og:url" content="https://kingjem.github.io/page/4/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="python go java Android js">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="好好学习，天天向上！ -- 《xxx》"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/python/%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4%E5%BA%93/" target="_self">
+          python日期时间库
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/python/%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4%E5%BA%93/" target="_self">
+        <div>
+          
+          time 模块本地时间和utc时间time.localtime time.gtime[secs] 会返回一个struct_time 时间元组，属性为只读,可以通过索引取值。 12345678910111213141516In [10]: time.localtime()Out[10]: time.struct_time(tm_year&#x3D;2023, tm_mon&#x3D;2, tm_mday&#x3D;25, tm
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 03:05" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/python/">#python</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/software/%E4%BD%BF%E7%94%A8CloudFlare-%E7%9A%84DoH%E6%9C%8D%E5%8A%A1%E8%BF%9B%E8%A1%8CDNS%E6%9F%A5%E8%AF%A2/" target="_self">
+          使用CloudFlare 的DoH服务进行DNS查询
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/software/%E4%BD%BF%E7%94%A8CloudFlare-%E7%9A%84DoH%E6%9C%8D%E5%8A%A1%E8%BF%9B%E8%A1%8CDNS%E6%9F%A5%E8%AF%A2/" target="_self">
+        <div>
+          
+          一般而言，dns 使用的是http协议，在连接之前将域名转化为ip, 通讯过程对于，dns服务器之间是透明，为什么不使用，https协议，因为当时还没有https。 而 DoH （DNS over HTTPS）即使用安全的 HTTPS 协议运行 DNS ，主要目的是增强用户的安全性和隐私性，dns 解析过程中的域名对于isp 不再可见，防止了DNS劫持和DNS污染。 以下代码是使用python
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 03:05" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/DNS/" class="category-chain-item">DNS</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/DoH/">#DoH</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/%E9%80%86%E5%90%91/%E9%80%97%E6%B8%B8%E7%BD%91%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B%E9%80%86%E5%90%91/" target="_self">
+          逗游网登录流程逆向
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/%E9%80%86%E5%90%91/%E9%80%97%E6%B8%B8%E7%BD%91%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B%E9%80%86%E5%90%91/" target="_self">
+        <div>
+          
+          目标网址： aHR0cHM6Ly93d3cuZG95by5jbi9wYXNzcG9ydC9sb2dpbgo&#x3D;     1234567891011121314151617181920212223242526272829303132333435$(&quot;.login_submit&quot;).click(function()&#123;	$(&quot;.login_grey[nam
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 03:05" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/js%E9%80%86%E5%90%91/">#js逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/software/filewall/" target="_self">
+          firewall
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/software/filewall/" target="_self">
+        <div>
+          
+          设置alias fwc&#x3D;firewall-cmd 123456789101112131415161718192021222324252627282930313233343536373839404142fwc --list-all # 获取所有规则 public (active)  target: default  icmp-block-inversion: no  interfaces:
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 00:00" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/linux/">#linux</a>
+            
+              <a href="/tags/%E9%98%B2%E7%81%AB%E5%A2%99/">#防火墙</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/python/lxml%E8%A7%A3%E6%9E%90html%E7%9A%84%E4%B8%8D%E5%90%8C%E5%AE%9E%E4%BE%8B%E5%8C%96%E7%B1%BB%E7%9A%84%E6%AF%94%E8%BE%83/" target="_self">
+          lxml解析html的不同实例化类的比较
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/python/lxml%E8%A7%A3%E6%9E%90html%E7%9A%84%E4%B8%8D%E5%90%8C%E5%AE%9E%E4%BE%8B%E5%8C%96%E7%B1%BB%E7%9A%84%E6%AF%94%E8%BE%83/" target="_self">
+        <div>
+          
+          lxml.etree._Element 对象1234567891011121314151617from lxml import etreestring &#x3D; &#x27;&lt;div class&#x3D;&quot;post&quot; id&#x3D;&quot;123&quot;&gt;&lt;p class&#x3D;&quot;para&quot;&gt;abc&lt;a href&#x3D;&quot;&#x2F;to-go&amp;quot
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 00:00" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/%E8%A7%A3%E6%9E%90/">#解析</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/09/14/%E9%80%86%E5%90%91/ast_summary/" target="_self">
+          利用AST对抗JavaScript混淆
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/09/14/%E9%80%86%E5%90%91/ast_summary/" target="_self">
+        <div>
+          
+          利用AST对抗JavaScript混淆：核心知识总结本文档旨在总结通过分析ast.html及其中的相关链接，梳理出的利用抽象语法树（AST）对抗JavaScript混淆的核心技术与资源。 1. 核心概念：什么是AST？AST (Abstract Syntax Tree)，即抽象语法树，是源代码语法结构的一种树状表示。它以树的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构。 对于
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-15 00:00" pubdate>
+              2024-09-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/js/" class="category-chain-item">js</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ast/">#ast</a>
+            
+              <a href="/tags/js/">#js</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/01/software/OpenVPN%20%E5%92%8CClash%20%E6%B5%81%E9%87%8F%E5%88%86%E6%B5%81%20/" target="_self">
+          OpenVPN 和Clash 流量分流
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/08/01/software/OpenVPN%20%E5%92%8CClash%20%E6%B5%81%E9%87%8F%E5%88%86%E6%B5%81%20/" target="_self">
+        <div>
+          
+          docker-compose.yaml 12345678910111213141516version: &quot;3&quot;services:  openvpn:    image: curve25519xsalsa20poly1305&#x2F;openvpn-socks5    restart: always    cap_add:      - NET_ADMIN    ports:
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-02 06:40" pubdate>
+              2024-08-02
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/clash/">#clash</a>
+            
+              <a href="/tags/openvpn/">#openvpn</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/06/26/%E9%80%86%E5%90%91/%E7%9C%8B%E7%9C%8B%E6%96%B0%E9%97%BB%E6%90%9C%E7%B4%A2/" target="_self">
+          看看新闻逆向
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/06/26/%E9%80%86%E5%90%91/%E7%9C%8B%E7%9C%8B%E6%96%B0%E9%97%BB%E6%90%9C%E7%B4%A2/" target="_self">
+        <div>
+          
+          12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697989910010110210
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-06-27 06:14" pubdate>
+              2024-06-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JS-%E9%80%86%E5%90%91/">#JS 逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/05/15/software/%E9%80%9A%E8%BF%87%20WireGuard%20%E4%BD%BF%E7%94%A8%20Cloudflare%20WARP+%20%E6%B5%81%E9%87%8F/" target="_self">
+          通过 WireGuard 使用 Cloudflare WARP+ 流量
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/05/15/software/%E9%80%9A%E8%BF%87%20WireGuard%20%E4%BD%BF%E7%94%A8%20Cloudflare%20WARP+%20%E6%B5%81%E9%87%8F/" target="_self">
+        <div>
+          
+          通过 WireGuard 使用 Cloudflare WARP+ 流量核心步骤核心思想是利用你自己的 WARP+ 账户密钥（Key），通过工具生成 WireGuard 的配置文件，从而让 WireGuard 客户端通过 WARP+ 的网络访问互联网。 生成 WireGuard 配置文件你可以使用 wgcf 工具或在线服务来生成配置文件。  wgcf: 一个用于与 Cloudflare WARP A
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-15 20:19" pubdate>
+              2024-05-15
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Cloudflare/">#Cloudflare</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/05/08/chrome%E6%8F%92%E4%BB%B6%E9%80%86%E5%90%91/" target="_self">
+          chrome插件逆向
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/05/08/chrome%E6%8F%92%E4%BB%B6%E9%80%86%E5%90%91/" target="_self">
+        <div>
+          
+          123456789chrome:&#x2F;&#x2F;extensions&#x2F; 查看插件idchrome:&#x2F;&#x2F;version&#x2F;  查看chrome 资料存放地址mac 下地址 &#x2F;Users&#x2F;king&#x2F;Library&#x2F;Application Support&#x2F;Google&#x2F;Chrome&#x2F;Profile 1进入 Extentins 目录找到对应的id 使用vscode 打开页面
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-09 07:53" pubdate>
+              2024-05-09
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/chrome%E6%8F%92%E4%BB%B6%E9%80%86%E5%90%91/">#chrome插件逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/22/jsrpc-%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E5%92%8C%E4%BB%A3%E7%A0%81%E4%BF%AE%E6%94%B9/" target="_self">
+          jsrpc 框架使用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/22/jsrpc-%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E5%92%8C%E4%BB%A3%E7%A0%81%E4%BF%AE%E6%94%B9/" target="_self">
+        <div>
+          
+          jsrpc 框架运行报错 修改代码如下，修改一些函数为async  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-22 09:55" pubdate>
+              2024-03-22
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/07/jsdom_alternatives_summary/" target="_self">
+          JSDOM 替代方案：总结与比较
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/07/jsdom_alternatives_summary/" target="_self">
+        <div>
+          
+          JSDOM 替代方案：总结与比较原始笔记指出了 jsdom 的性能问题，并提出了几种替代方案。本文档对这些替代方案进行了总结和扩展，提供了更详细的比较，以帮助您选择适合工作的工具。 为什么需要替代方案jsdom 是一个在 Node.js 中模拟浏览器环境的强大工具。然而，它对 Web标准的高度保真度是以牺牲性能为代价的。对于不需要完整浏览器环境的任务，例如服务器端渲染（SSR）或自动化测试，更轻量
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-08 00:00" pubdate>
+              2024-03-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/js%E9%80%86%E5%90%91/" class="category-chain-item">js逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JSDOM/">#JSDOM</a>
+            
+              <a href="/tags/Happy-DOM/">#Happy DOM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/05/linux/Mac%20%E5%B9%B3%E5%8F%B0%E4%B8%8B%E4%BD%BF%E7%94%A8orbstack%20%E4%B8%AD%E7%9A%84k8s%20%E9%83%A8%E7%BD%B2flask%20%E5%BA%94%E7%94%A8/" target="_self">
+          Mac 平台下使用orbstack 中的k8s 部署flask 应用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/05/linux/Mac%20%E5%B9%B3%E5%8F%B0%E4%B8%8B%E4%BD%BF%E7%94%A8orbstack%20%E4%B8%AD%E7%9A%84k8s%20%E9%83%A8%E7%BD%B2flask%20%E5%BA%94%E7%94%A8/" target="_self">
+        <div>
+          
+          安装本文使用orbstack 中的minikube 也可以是用在线的k8s playground  1https:&#x2F;&#x2F;labs.play-with-k8s.com&#x2F;    部署应用kubectl 基础知识kubectl 命令的常见格式是：kubectl 操作资源 这会对指定的资源（类似 node 或 deployment）执行指定的操作（类似 create、describe 或 delete）。
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 15:40" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/%E9%80%86%E5%90%91/%E5%94%AF%E5%93%81%E4%BC%9A%E6%90%9C%E7%B4%A2%E6%8E%A5%E5%8F%A3%E9%80%86%E5%90%91/" target="_self">
+          唯品会搜索接口逆向
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/%E9%80%86%E5%90%91/%E5%94%AF%E5%93%81%E4%BC%9A%E6%90%9C%E7%B4%A2%E6%8E%A5%E5%8F%A3%E9%80%86%E5%90%91/" target="_self">
+        <div>
+          
+          使用小黄鸟电脑版配合手机抓包 ![image-20240229111942491](&#x2F;Users&#x2F;king&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20240229111942491.png) 搜索之前会有个设备注册的动作  搜索接口为https:&#x2F;&#x2F;mapi.appvip
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:40" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">#安卓逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/%E9%80%86%E5%90%91/%E8%BD%A6%E6%99%BA%E8%B5%A2unidbg%E8%B0%83%E7%94%A8/" target="_self">
+          车智赢unidbg调用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/%E9%80%86%E5%90%91/%E8%BD%A6%E6%99%BA%E8%B5%A2unidbg%E8%B0%83%E7%94%A8/" target="_self">
+        <div>
+          
+          12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667package demo;import com.github.unidbg.AndroidEmulator;import com.github.uni
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:40" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">#安卓逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/software/mmdb%E6%95%B0%E6%8D%AE%E5%BA%93/" target="_self">
+          mmdb 数据库
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/software/mmdb%E6%95%B0%E6%8D%AE%E5%BA%93/" target="_self">
+        <div>
+          
+          mmdb 数据就是后缀名为.mmdb 的文件，它是MMDB（MaxMind DB）为MaxMind公司开发的一种轻量级的用于查询IP地址信息的格式和数据库文件。 MMDB数据库的设计只是简单的键值对，具有非常好的性能和扩展性。相比较传统的文本形式的IP数据库，MMDB更加适用于大型的数据查询。 因为MMDB数据库具备对IP地址的查询功能，所以在实际应用中，MMDB被广泛用于IP定位，可以帮助进行I
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:40" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/mmdb/">#mmdb</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/software/ideavimrc%E9%85%8D%E7%BD%AE%E5%92%8C%E8%A7%A3%E8%AF%BB/" target="_self">
+          ideavimrc配置和解读
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/software/ideavimrc%E9%85%8D%E7%BD%AE%E5%92%8C%E8%A7%A3%E8%AF%BB/" target="_self">
+        <div>
+          
+          ideavim配置ideavim 是jetbrains 官方实现的插件和jetbrain 旗下的平台结合的很紧密，也可以通过设置实现vim 和jetbrains 旗下产品的深度绑定，但是只是实现vim 的部分功能。 无法通过 souce ~&#x2F;.ideavimrc 来更新配置  必须通过再次打开软件来加载新的配置文件使其生效。 官方仓库 web-storm团队的一些入门介绍 Ideavim
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:40" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/vim/">#vim</a>
+            
+              <a href="/tags/ideavim%EF%BC%8Cjetbrains/">#ideavim，jetbrains</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/clash%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/" target="_self">
+          clash 分流规则
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/clash%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/" target="_self">
+        <div>
+          
+          Clash.Meta DNS 解析流程  https:&#x2F;&#x2F;wiki.metacubex.one&#x2F;config&#x2F;rules&#x2F;geox&#x2F;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:39" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/clash/">#clash</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/%E5%85%AC%E5%8F%B8gitlab%E5%92%8C%E4%B8%AA%E4%BA%BAgithub%E9%85%8D%E7%BD%AE/" target="_self">
+          公司gitlab和个人github配置
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/%E5%85%AC%E5%8F%B8gitlab%E5%92%8C%E4%B8%AA%E4%BA%BAgithub%E9%85%8D%E7%BD%AE/" target="_self">
+        <div>
+          
+          123456789101112131415#githubHost github.com	HostName github.com	User git	PreferredAuthentications publickey	IdentityFile ~&#x2F;.ssh&#x2F;id_rsa_github#company#输入公司ip端口，或者域名Host gitlab.com	HostName gitlab.miduc
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 07:39" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" class="category-chain-item">开发环境配置</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/git/">#git</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/03/04/docker/Orbstack%20%E9%85%8D%E7%BD%AEdocker%E7%8E%AF%E5%A2%83/" target="_self">
+          Orbstack 使用 docker 搭建各类开发环境
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/03/04/docker/Orbstack%20%E9%85%8D%E7%BD%AEdocker%E7%8E%AF%E5%A2%83/" target="_self">
+        <div>
+          
+          nginx-proxy-manager123456789101112131415version: &#x27;3.8&#x27;services:  app:    image: &#x27;jc21&#x2F;nginx-proxy-manager:latest&#x27;    restart: unless-stopped    ports:      - &#x27;80:80&#x27;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-05 00:00" pubdate>
+              2024-03-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/docker/" class="category-chain-item">docker</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/docker/">#docker</a>
+            
+              <a href="/tags/Orbstack/">#Orbstack</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/5/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        jQuery.ajax({
+          type: 'GET',
+          url: 'https://v1.hitokoto.cn/',
+          headers: {},
+          dataType: 'json',
+          success: function(result) {
+            var apiText;
+            if (result) {
+              var keys = 'hitokoto'.split(',');
+              if (result instanceof Array) {
+                result = result[0];
+              }
+              for (const k of keys) {
+                var value = result[k];
+                if (typeof value === 'string') {
+                  apiText = value;
+                  break;
+                } else if (value instanceof Object) {
+                  result = value;
+                }
+              }
+            }
+            apiText ? typing(apiText) : typing(text);
+          },
+          error: function(xhr, status, error) {
+            if (error) {
+              console.error('Failed to request https://v1.hitokoto.cn/:', error);
+            }
+            typing(text);
+          }
+        })
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

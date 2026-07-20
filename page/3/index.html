@@ -1,0 +1,1425 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Ruhai&#39;s blogs">
+<meta property="og:url" content="https://kingjem.github.io/page/3/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="python go java Android js">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="好好学习，天天向上！ -- 《xxx》"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/02/24/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web61%E9%A2%98%E5%AE%9E%E6%88%98/" target="_self">
+          猿人学Web-61 实战
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/02/24/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web61%E9%A2%98%E5%AE%9E%E6%88%98/" target="_self">
+        <div>
+          
+          1234567891011121314151617const C &#x3D; &quot;aiding1234567891&quot;;&#x2F;&#x2F; 截取前 16 字节作为密钥const validKey &#x3D; CryptoJS.enc.Utf8.parse(C.slice(0, 16));function X(k, n &#x3D; validKey) &#123;    const encrypted &#x3D; CryptoJ
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-24 08:47" pubdate>
+              2025-02-24
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/web%E9%80%86%E5%90%91/">#web逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/02/24/%E9%80%86%E5%90%91/akamai%20%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/" target="_self">
+          akamai 混淆解密
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/02/24/%E9%80%86%E5%90%91/akamai%20%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/" target="_self">
+        <div>
+          
+          akamai 混淆是怎么运行的以 &#39;\x34&#39;: wp()[CS(KW)](SQ, zk)  为例子， 这里CS(KW) 为rt SQ 值为25, zk 值为1409 wp()[CS(KW)](SQ, zk) &#x3D;&gt; wp()[&#39;rt&#39;](25,1409)    这里LTI有个 vt 属性，后面会用到 123456789101112131415161718xrI
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-24 08:47" pubdate>
+              2025-02-24
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/js%E9%80%86%E5%90%91/">#js逆向</a>
+            
+              <a href="/tags/akamai/">#akamai</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/02/11/linux/lightpanda%E4%BD%BF%E7%94%A8/" target="_self">
+          lightpanda使用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/02/11/linux/lightpanda%E4%BD%BF%E7%94%A8/" target="_self">
+        <div>
+          
+          1.缘起阮一峰老师的&lt;&lt;科技爱好者周刊（第 336 期）：面对 AI，互联网正在衰落&gt;&gt; 中提到了一个项目Lightpanda, 今天来一起看下这个项目怎么在爬虫中使用。 下载安装Linux1wget https:&#x2F;&#x2F;github.com&#x2F;lightpanda-io&#x2F;browser&#x2F;releases&#x2F;download&#x2F;nightly&#x2F;lightpanda-x86_64-li
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-12 02:31" pubdate>
+              2025-02-12
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BB%BF%E7%9C%9F/">#浏览器仿真</a>
+            
+              <a href="/tags/lightpanda/">#lightpanda</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/02/07/%E9%80%86%E5%90%91/happy-dom/" target="_self">
+          happy-dom 使用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/02/07/%E9%80%86%E5%90%91/happy-dom/" target="_self">
+        <div>
+          
+          使用 happy-dom 生成document12345678910111213141516171819202122232425262728import &#123; Window &#125; from &#x27;happy-dom&#x27;;&#x2F;&#x2F; Create a new Window objectconst window &#x3D; new Window();const domparser &#x3D;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-08 05:46" pubdate>
+              2025-02-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/js%E9%80%86%E5%90%91/" class="category-chain-item">js逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/happy-dom/">#happy-dom</a>
+            
+              <a href="/tags/jsdom/">#jsdom</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/01/15/laravel-tips/" target="_self">
+          Laravel Tips
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/01/15/laravel-tips/" target="_self">
+        <div>
+          
+          Useful packagesProduction(require) spatie&#x2F;laravel-data Powerful data objects, more ofter as DTO  spatie&#x2F;laravel-query-builder Easily build Eloquent queries from API requests  darkaonline&#x2F;l5-swagger Op
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-01-15 12:00" pubdate>
+              2025-01-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%B7%A5%E5%85%B7/" class="category-chain-item">工具</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/PHP/">#PHP</a>
+            
+              <a href="/tags/Laravel/">#Laravel</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/01/10/selenoid%E4%BD%BF%E7%94%A8/" target="_self">
+          Selenoid 使用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/01/10/selenoid%E4%BD%BF%E7%94%A8/" target="_self">
+        <div>
+          
+          docker-compose.yaml123456789101112131415161718version: &#x27;3&#x27;services:  selenoid:    image: &quot;aerokube&#x2F;selenoid&quot;    network_mode: bridge    ports:      - &quot;4444:4444&quot;    volum
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-01-10 12:00" pubdate>
+              2025-01-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%B7%A5%E5%85%B7/" class="category-chain-item">工具</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Docker/">#Docker</a>
+            
+              <a href="/tags/Selenium/">#Selenium</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/01/07/walmark-px3-cookie%E6%97%A0%E6%84%9F%E7%94%9F%E6%88%90%E6%96%B9%E5%BC%8F/" target="_self">
+          Walmark Px3 cookie 无感生成方式
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/01/07/walmark-px3-cookie%E6%97%A0%E6%84%9F%E7%94%9F%E6%88%90%E6%96%B9%E5%BC%8F/" target="_self">
+        <div>
+          
+          逻辑在 init.js 中，直接搜索 appID，往下面搜索有以上代码，下面是 t 里的值。 12345678910111213141516171819[    &#123;        &quot;t&quot;: &quot;PX12095&quot;,        &quot;d&quot;: &#123;            &quot;PX11645&quot;: &quot;h
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-01-07 16:01" pubdate>
+              2025-01-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/">#验证码</a>
+            
+              <a href="/tags/PX3/">#PX3</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/01/02/akamai-%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/" target="_self">
+          Akamai 混淆解密
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2025/01/02/akamai-%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/" target="_self">
+        <div>
+          
+          akamai 混淆是怎么运行的以 &#39;\x34&#39;: wp()[CS(KW)](SQ, zk)  为例子， 这里CS(KW) 为rt SQ 值为25, zk 值为1409 wp()[CS(KW)](SQ, zk) &#x3D;&gt; wp()[&#39;rt&#39;](25,1409)    这里 LTI 有个 vt 属性，后面会用到 123456789101112131415161718x
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-01-02 13:48" pubdate>
+              2025-01-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Akamai/">#Akamai</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/06/%E5%AE%89%E5%8D%93%E6%89%8B%E6%9C%BA%E5%AE%89%E8%A3%85Openwrt/" target="_self">
+          安卓手机安装Openwrt
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/12/06/%E5%AE%89%E5%8D%93%E6%89%8B%E6%9C%BA%E5%AE%89%E8%A3%85Openwrt/" target="_self">
+        <div>
+          
+          正戏开始更新源  apt-get update  你可以查看qemu有什么包，可以根据自己的需求安装模拟其他架构  apt search qemu  安装qemu工具包  apt install qemu-utils  当然，我的是arm64位架构的，模拟arm的性能损耗会更低 安装模拟aarch64架构的  apt install qemu-system-aarch64-headless  首先
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-06 08:48" pubdate>
+              2024-12-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Openwrt/" class="category-chain-item">Openwrt</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Openwrt/">#Openwrt</a>
+            
+              <a href="/tags/Termux/">#Termux</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/02/software/nc%20%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82/" target="_self">
+          NC 发送HTTP 报文请求
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/12/02/software/nc%20%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82/" target="_self">
+        <div>
+          
+          查找DNS地址首先查找httpbin.org 的dns 地址 123456789nslookup httpbin.orgServer:         10.255.255.254Address:        10.255.255.254#53Non-authoritative answer:Name:   httpbin.orgAddress: 18.213.123.165Name:   ht
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-03 00:00" pubdate>
+              2024-12-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/NetWorking/" class="category-chain-item">NetWorking</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/http/">#http</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/17/%E9%80%86%E5%90%91/2024-11-18-Sojsonv7-AST-%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7/" target="_self">
+          Sojsonv7 AST 反混淆工具
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/17/%E9%80%86%E5%90%91/2024-11-18-Sojsonv7-AST-%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7/" target="_self">
+        <div>
+          
+          之前在一个soJson v7 的混淆代码中，直接选择了硬扣代码，最近找到了一个直接可用的soJson v7  反混淆工具，试用了一下，解析出来的代码，确实清晰明了，推荐给有需求的朋友使用。 decode-js  SoJsonV7 加密的网站逆向
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-17 16:00" pubdate>
+              2024-11-17
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Sojsonv7/">#Sojsonv7</a>
+            
+              <a href="/tags/AST/">#AST</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/Tiktok/" target="_self">
+          Tiktok 手机抓包
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/Tiktok/" target="_self">
+        <div>
+          
+          简介抖音tiktok 有SSL pinning ,不是常见的SSL pinning通过Justtrustme 过不去这个， 设置代理查看电脑IP 设置上游代理 12mitmweb --mode upstream:http:&#x2F;&#x2F;127.0.0.1:10809 -p 9998  # upstream 暂时不支持socks5 代理      12345678910111213curl -x 127.0.
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%89%8B%E6%9C%BA%E6%8A%93%E5%8C%85/">#手机抓包</a>
+            
+              <a href="/tags/tiktok/">#tiktok</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP01%E5%AE%9E%E6%88%98/" target="_self">
+          猿人学APP01实战
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP01%E5%AE%9E%E6%88%98/" target="_self">
+        <div>
+          
+          环境说明：  Nexus 6P Android8.1 已root 抓包软件 Http Canary frida&#x3D;12.8.10  frida-tools&#x3D;5.4.0  objection&#x3D;1.8.4 猿人学APP 1.0.31 Flask&#x3D;1.1.3  分析思路先抓包看下是第一题怎么发的包 123post 请求 dst https:&#x2F;&#x2F;www.python-
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" class="category-chain-item">安卓逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/APP-%E9%80%86%E5%90%91/">#APP 逆向</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP/">#猿人学APP</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP02%E5%AE%9E%E6%88%98/" target="_self">
+          猿人学APP02实战
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP02%E5%AE%9E%E6%88%98/" target="_self">
+        <div>
+          
+          1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283function stringToByte(str) &#123;    const
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" class="category-chain-item">安卓逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/APP-%E9%80%86%E5%90%91/">#APP 逆向</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP/">#猿人学APP</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP09%E5%AE%9E%E6%88%98/" target="_self">
+          猿人学APP09-证书验证闯关
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP09%E5%AE%9E%E6%88%98/" target="_self">
+        <div>
+          
+          尝试平常常见的关键词 cert password  都搜索不到 不起作用 1objection -g  com.yuanrenxue.challenge  explore --startup-command &quot;android hooking watch class_method java.io.File.$init  –-dump-args –-dump-backtrace –-dump
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/APP%E9%80%86%E5%90%91/">#APP逆向</a>
+            
+              <a href="/tags/%E8%AF%81%E4%B9%A6%E9%80%86%E5%90%91/">#证书逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP10%E5%AE%9E%E6%88%98/" target="_self">
+          猿人学APP10-ReactNative
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6APP10%E5%AE%9E%E6%88%98/" target="_self">
+        <div>
+          
+          React Native 混合开发APP  没有找到文字提示的的组件，定位AndroidManifest.xml 搜索facebook 找到相关的信息com.yuanrenxue.challenge.activity.RNActivity  然后搜索该类找到RNActivity 审查代码 123456public final void OoooO() &#123;        this.f116
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/APP%E9%80%86%E5%90%91/">#APP逆向</a>
+            
+              <a href="/tags/reactNative/">#reactNative</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6%E7%BB%83%E4%B9%A0%E5%B9%B3%E5%8F%B0%E7%AC%AC%E4%B8%80%E9%A2%98/" target="_self">
+          猿人学练习平台第一题
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/14/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6%E7%BB%83%E4%B9%A0%E5%B9%B3%E5%8F%B0%E7%AC%AC%E4%B8%80%E9%A2%98/" target="_self">
+        <div>
+          
+          1234567891011121314151617181920212223242526272829303132333435363738394041424344import execjsjs &#x3D; &quot;&quot;&quot;var hexcase&#x3D;0;var b64pad&#x3D;&quot;&quot;;var chrsz&#x3D;16;function hex_md5(a)&#123;return bi
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-14 10:24" pubdate>
+              2024-11-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JS-%E9%80%86%E5%90%91/">#JS 逆向</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/13/python/python%20%E9%93%BE%E5%BC%8F%E4%BB%A3%E7%90%86%E4%BD%BF%E7%94%A8/" target="_self">
+          python 使用链式代理
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/13/python/python%20%E9%93%BE%E5%BC%8F%E4%BB%A3%E7%90%86%E4%BD%BF%E7%94%A8/" target="_self">
+        <div>
+          
+          一般情况下加代理只加一个，让真正访问目标网站的IP是代理的IP， 代理链的用法可以使用第一个代理跳出墙，第一个代理连接第二个代理，绕过复杂的网络环境。 12345678910111213141516171819202122232425262728293031323334353637import socketimport pyChainedProxy as socks #import pyChain
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-13 16:00" pubdate>
+              2024-11-13
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E4%BB%A3%E7%90%86/">#代理</a>
+            
+              <a href="/tags/%E9%93%BE%E5%BC%8F%E4%BB%A3%E7%90%86/">#链式代理</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/13/software/haproxy%E4%BD%BF%E7%94%A8/" target="_self">
+          使用haproxy 搭建正向代理
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/11/13/software/haproxy%E4%BD%BF%E7%94%A8/" target="_self">
+        <div>
+          
+          haproxy是负载均衡器，它可以将网络请求按一定算法均匀分布到各个代理服务器（这里指正向代理）上，防止压力都集中在某一个节点上，提高整体的服务的负载能力。 一下给出一个简短的haproxy搭建正向代理的最小化实例 检测脚本脚本check.sh 为检测代理可用性的脚本，haproxy 会定期调用这个脚本，传入代理的一些配置值，组装成curl 命令发请求，并且检查返回的响应码 12345678910
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-13 16:00" pubdate>
+              2024-11-13
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/haproxy/">#haproxy</a>
+            
+              <a href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/">#正向代理</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/13/linux/mac%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" target="_self">
+          mac开发环境配置
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2024/10/13/linux/mac%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" target="_self">
+        <div>
+          
+          Dotfile 管理.zshrc 文件是Oh My ZSH默认配置文件，其中会引用.zshrc.pre-oh-my-zsh .zshrc.pre-oh-my-zsh 文件是安装Oh My ZSH 时自动把你的 ~&#x2F;.zshrc 备份成这个名字 botdot 管理配置文件 123pip install dotbotdotbot -c &lt;path to configuration fi
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-14 03:05" pubdate>
+              2024-10-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/shell/">#shell</a>
+            
+              <a href="/tags/ohmyzsh/">#ohmyzsh</a>
+            
+              <a href="/tags/%E7%BB%88%E7%AB%AF/">#终端</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/#board">4</a><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        jQuery.ajax({
+          type: 'GET',
+          url: 'https://v1.hitokoto.cn/',
+          headers: {},
+          dataType: 'json',
+          success: function(result) {
+            var apiText;
+            if (result) {
+              var keys = 'hitokoto'.split(',');
+              if (result instanceof Array) {
+                result = result[0];
+              }
+              for (const k of keys) {
+                var value = result[k];
+                if (typeof value === 'string') {
+                  apiText = value;
+                  break;
+                } else if (value instanceof Object) {
+                  result = value;
+                }
+              }
+            }
+            apiText ? typing(apiText) : typing(text);
+          },
+          error: function(xhr, status, error) {
+            if (error) {
+              console.error('Failed to request https://v1.hitokoto.cn/:', error);
+            }
+            typing(text);
+          }
+        })
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

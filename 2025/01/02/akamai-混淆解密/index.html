@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="akamai 混淆是怎么运行的以 &#39;\x34&#39;: wp()[CS(KW)](SQ, zk)  为例子， 这里CS(KW) 为rt SQ 值为25, zk 值为1409 wp()[CS(KW)](SQ, zk) &#x3D;&gt; wp()[&#39;rt&#39;](25,1409)    这里 LTI 有个 vt 属性，后面会用到 123456789101112131415161718x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Akamai 混淆解密">
+<meta property="og:url" content="https://kingjem.github.io/2025/01/02/akamai-%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="akamai 混淆是怎么运行的以 &#39;\x34&#39;: wp()[CS(KW)](SQ, zk)  为例子， 这里CS(KW) 为rt SQ 值为25, zk 值为1409 wp()[CS(KW)](SQ, zk) &#x3D;&gt; wp()[&#39;rt&#39;](25,1409)    这里 LTI 有个 vt 属性，后面会用到 123456789101112131415161718x">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/3Bk1MZAaJRmr4lw.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/HDgs4FUrqzKcONp.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/08/kLaFheZP6qji1SD.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/rePmdoFiyu4E1xv.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/zZo6FYgyade5Pq4.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/08/CbsYJ4Dlu1AcMQp.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/fhHg7JdYoEXSl5m.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/NQCeZSi3kAaUpch.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/aFY7ribXNhjC5zd.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/SOyvdHjwAP4ITX9.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/02/mq1cQsozR5fSIjT.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/08/oeAj4iKRZSmUdpF.png">
+<meta property="og:image" content="https://s2.loli.net/2025/01/08/aVxJ1sM7lGRnepL.png">
+<meta property="article:published_time" content="2025-01-02T05:48:23.000Z">
+<meta property="article:modified_time" content="2026-07-20T15:40:05.186Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Akamai">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://s2.loli.net/2025/01/02/3Bk1MZAaJRmr4lw.png">
+  
+  
+  <title>Akamai 混淆解密 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Akamai 混淆解密"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-02 13:48" pubdate>
+          2025年1月2日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          12k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          101 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Akamai 混淆解密</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="akamai-混淆是怎么运行的"><a href="#akamai-混淆是怎么运行的" class="headerlink" title="akamai 混淆是怎么运行的"></a>akamai 混淆是怎么运行的</h2><p>以 <code>&#39;\x34&#39;: wp()[CS(KW)](SQ, zk)</code>  为例子， 这里<code>CS(KW)</code> 为<code>rt</code> <code>SQ</code> 值为<code>25</code>, <code>zk</code> 值为<code>1409</code></p>
+<p><code>wp()[CS(KW)](SQ, zk) =&gt; wp()[&#39;rt&#39;](25,1409)</code></p>
+<p><img src="https://s2.loli.net/2025/01/02/3Bk1MZAaJRmr4lw.png" srcset="/img/loading.gif" lazyload alt="image-20250102134823850"></p>
+<p><img src="https://s2.loli.net/2025/01/02/HDgs4FUrqzKcONp.png" srcset="/img/loading.gif" lazyload alt="image-20250102134841352"></p>
+<p><img src="https://s2.loli.net/2025/01/08/kLaFheZP6qji1SD.png" srcset="/img/loading.gif" lazyload alt="image-20250108160716740"></p>
+<p>这里 LTI 有个 vt 属性，后面会用到</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs javascript">xrI -= <span class="hljs-title class_">Rw</span>;<br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> <span class="hljs-title class_">TsI</span> = xW; <span class="hljs-title function_">qW</span>(<span class="hljs-title class_">TsI</span>, wrI.<span class="hljs-property">length</span>); ++<span class="hljs-title class_">TsI</span>) &#123;<br>    <span class="hljs-title function_">wp</span>()[wrI[<span class="hljs-title class_">TsI</span>]] = <span class="hljs-title function_">hD</span>(<span class="hljs-title function_">hc</span>(<span class="hljs-title class_">TsI</span>, <span class="hljs-variable constant_">FK</span>)) ? <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-keyword">return</span> jr.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, [<span class="hljs-variable constant_">M9</span>, <span class="hljs-variable language_">arguments</span>]);<br>    &#125;<br>    : <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">NBI</span> = wrI[<span class="hljs-title class_">TsI</span>];<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">zBI, PLI</span>) &#123;<br>            <span class="hljs-keyword">var</span> lsI = <span class="hljs-variable constant_">LTI</span>.<span class="hljs-title function_">call</span>(<span class="hljs-literal">null</span>, zBI, <span class="hljs-variable constant_">PLI</span>);<br>            <span class="hljs-title function_">wp</span>()[<span class="hljs-variable constant_">NBI</span>] = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>                <span class="hljs-keyword">return</span> lsI;<br>            &#125;<br>            ;<br>            <span class="hljs-keyword">return</span> lsI;<br>        &#125;<br>        ;<br>    &#125;();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2025/01/02/rePmdoFiyu4E1xv.png" srcset="/img/loading.gif" lazyload alt="image-20250102135157188"></p>
+<p><img src="https://s2.loli.net/2025/01/02/zZo6FYgyade5Pq4.png" srcset="/img/loading.gif" lazyload alt="image-20250102140010380"></p>
+<p>上面可以看到 <code>LTI.call(null, zBI, PLI);</code> 返回了结果之后赋值给了 lsI，<code>wp[&#39;rt&#39;]</code> 这个函数又被重新赋值成了 返回 lsI 值的函数，也就是 <code>wp[&#39;rt&#39;]()</code> 运行的时候可以直接返回这个函数本来要返回值的，不用再传入实参。</p>
+<p>往下跟栈，可以看到 <code>mKI</code> 这个函数， 这里的 XI 是一个控制数，</p>
+<p><img src="https://s2.loli.net/2025/01/08/CbsYJ4Dlu1AcMQp.png" srcset="/img/loading.gif" lazyload alt="image-20250108161141103"></p>
+<p><img src="https://s2.loli.net/2025/01/02/fhHg7JdYoEXSl5m.png" srcset="/img/loading.gif" lazyload alt="image-20250102140549191"></p>
+<p>这里 S71 是 mKi 的第二个参数，也就是上面的 arguments 参数</p>
+<p>往下面跟栈，可以看到这个参数值和这个最终运算出来的数据</p>
+<p><img src="https://s2.loli.net/2025/01/02/NQCeZSi3kAaUpch.png" srcset="/img/loading.gif" lazyload alt="image-20250102141722155"></p>
+<p><img src="https://s2.loli.net/2025/01/02/aFY7ribXNhjC5zd.png" srcset="/img/loading.gif" lazyload alt="image-20250102142317383"></p>
+<p>再往下跟栈可以看到返回了 <code>kTI</code> 这个值</p>
+<p>到这里整理下这个运行逻辑</p>
+<figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs zephir">wp()[<span class="hljs-string">&#x27;rt&#x27;</span>](<span class="hljs-number">25</span>,<span class="hljs-number">1409</span>) =&gt; <br>LTI.call(<span class="hljs-keyword">null</span>, zBI, PLI) =&gt;<br>LTI = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(vKI, S3I)</span> </span>&#123;<br>       <span class="hljs-keyword">return</span> mKI.apply(this, [xI, arguments]);<br>                    &#125; =&gt; <br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mKI</span> <span class="hljs-params">()</span></span>&#123;<br>  <span class="hljs-keyword">case</span> xI:<br>     计算出kTI 的值<br>  <span class="hljs-keyword">case</span> jp:<br>    <span class="hljs-keyword">return</span> kTI<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>计算 kTI 的值，最后用到了 jp 函数</p>
+<p><img src="https://s2.loli.net/2025/01/02/SOyvdHjwAP4ITX9.png" srcset="/img/loading.gif" lazyload alt="image-20250102142620025"></p>
+<p><img src="https://s2.loli.net/2025/01/02/mq1cQsozR5fSIjT.png" srcset="/img/loading.gif" lazyload alt="image-20250102171208026"></p>
+<p>函数 jp 控制数 w1 的函数逻辑为以下代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">jp</span>(<span class="hljs-params">x</span>) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(x[<span class="hljs-number">0</span>])<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>以下为整个加密的代码整理 <code>var rs = function mKI(xrI, S7I) {}</code> 第一个值为 switch 控制数，不同的 xrI 实际值会有不同的分支，S7I 为实际传入的参数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> rs = <span class="hljs-keyword">function</span> <span class="hljs-title function_">mKI</span>(<span class="hljs-params">xrI, S7I</span>) &#123;<br>    <span class="hljs-keyword">switch</span> (xrI) &#123;<br>        <span class="hljs-keyword">case</span> <span class="hljs-attr">xI</span>: &#123;<br>            <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">TDI</span> = <span class="hljs-variable constant_">S7I</span>[<span class="hljs-title class_">Dg</span>];<br>            <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">ASI</span> = <span class="hljs-variable constant_">S7I</span>[<span class="hljs-variable constant_">C1</span>];<br>            xrI = jg;<br>            <span class="hljs-keyword">var</span> kTI = <span class="hljs-title function_">vs</span>([], []);<br>            <span class="hljs-keyword">var</span> <span class="hljs-title class_">GcI</span> = <span class="hljs-title function_">MT</span>(<span class="hljs-title function_">hc</span>(<span class="hljs-variable constant_">ASI</span>, <span class="hljs-title class_">Sp</span>[<span class="hljs-title function_">hc</span>(<span class="hljs-title class_">Sp</span>.<span class="hljs-property">length</span>, nK)]), xv);<br>            <span class="hljs-keyword">var</span> <span class="hljs-title class_">UcI</span> = rCI[<span class="hljs-variable constant_">TDI</span>];<br>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> bTI = xW; <span class="hljs-title function_">qW</span>(bTI, <span class="hljs-title class_">UcI</span>.<span class="hljs-property">length</span>); bTI++) &#123;<br>                <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">LLI</span> = <span class="hljs-title class_">BcI</span>(<span class="hljs-title class_">UcI</span>, bTI);<br>                <span class="hljs-keyword">var</span> <span class="hljs-title class_">VsI</span> = <span class="hljs-title class_">BcI</span>(<span class="hljs-variable constant_">LTI</span>.<span class="hljs-property">vt</span>, <span class="hljs-title class_">GcI</span>++);<br>                kTI += <span class="hljs-title function_">jp</span>(w1, [<span class="hljs-title function_">xL</span>(<span class="hljs-title class_">VrI</span>(<span class="hljs-title function_">LXI</span>(<span class="hljs-variable constant_">LLI</span>), <span class="hljs-title function_">LXI</span>(<span class="hljs-title class_">VsI</span>)), <span class="hljs-title class_">VrI</span>(<span class="hljs-variable constant_">LLI</span>, <span class="hljs-title class_">VsI</span>))]);<br>            &#125;<br>        &#125;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> <span class="hljs-attr">jg</span>: &#123;<br>            xrI = E;<br>            <span class="hljs-keyword">return</span> kTI;<br>        &#125;<br>            <span class="hljs-keyword">break</span>;<br><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="精简运算"><a href="#精简运算" class="headerlink" title="精简运算"></a>精简运算</h2><p><code>xL(VrI(LXI(LLI), LXI(VsI)), VrI(LLI, VsI))</code> &#x3D;&gt; <code>(~LLI| ~VsI)&amp;(LLI| VsI)</code></p>
+<p><img src="https://s2.loli.net/2025/01/08/oeAj4iKRZSmUdpF.png" srcset="/img/loading.gif" lazyload alt="image-20250108164453808"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">jp</span>(<span class="hljs-params">x</span>) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(x[<span class="hljs-number">0</span>])<br>&#125;<br><br><span class="hljs-keyword">var</span> <span class="hljs-title class_">DcI</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">return</span> [<span class="hljs-string">&quot;&lt; \n\&#x27;&quot;</span>, <span class="hljs-string">&quot;,68_E+&amp;=^82.\u0016XR/\b =\r&quot;</span>, <span class="hljs-string">&quot;[M\x3f!7A\x07!9&quot;</span>, <span class="hljs-string">&quot;\u0003&gt;&lt;6\u00121,&gt;;[&#125;/$3\x40\u001d6(\u001e&quot;</span>, <span class="hljs-string">&quot;-7&amp;k\t:9\vPE/&quot;</span>, <span class="hljs-string">&quot;R.7&quot;</span>, <span class="hljs-string">&quot;O\f4\u0003\u001aUN\r\u0011 2\r:$6y\x00R,1\b`\u00054:\u0017nq.\u000e\&quot;:\r1&quot;</span>, <span class="hljs-string">&quot;)\u0012*74\x07\n2/Fq#(7&quot;</span>, <span class="hljs-string">&quot;;+XE&gt;:&quot;</span>, <span class="hljs-string">&quot;=B\u00058)\bTT,&quot;</span>, <span class="hljs-string">&quot;;&quot;</span>, <span class="hljs-string">&quot;\&#x27;66:S&quot;</span>, <span class="hljs-string">&quot;EN\f\u0013&amp;&gt;\u0017 +!+&quot;</span>, <span class="hljs-string">&quot;\&quot;X&quot;</span>, <span class="hljs-string">&quot;,tc\u001b-\u0010770\u0011DG$67^\r%\u0003\u0012_G3&quot;</span>, <span class="hljs-string">&quot;1#&lt;_L-;4U&quot;</span>, <span class="hljs-string">&quot;K\r#\u0015\u000fTL&quot;</span>, <span class="hljs-string">&quot;AM)\u0006&amp;=\r\u0018\&#x27;9)BJ&quot;</span>, <span class="hljs-string">&quot;\rCQ&gt;=\x3fi\u001a%3\tpG(\u0004=\u0015\v:!#\&#x27;YL\t3&gt;\x40&quot;</span>, <span class="hljs-string">&quot;\u001cTU\u001f\u000e!\&#x27;&quot;</span>, <span class="hljs-string">&quot;1!Dg+1:&quot;</span>, <span class="hljs-string">&quot;SU3\x00&quot;</span>, <span class="hljs-string">&quot;!7X&quot;</span>, <span class="hljs-string">&quot;\u0010$.&quot;</span>, <span class="hljs-string">&quot;:=_\u001c9=\u0016T&quot;</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-string">&quot; =\u00151;\\\&quot;&gt;&quot;</span>, <span class="hljs-string">&quot;A%&lt;&lt;I\v#&quot;</span>, <span class="hljs-string">&quot;\x40a&quot;</span>, <span class="hljs-string">&quot;=&quot;</span>, <span class="hljs-string">&quot;E~9\u000f&quot;</span>, <span class="hljs-string">&quot;Y#67Z\u000199[rN2\u0015*=\nt\u00062-D[:&amp;;C\u0006w\u0011\u0014UT0\u0004&quot;</span>, <span class="hljs-string">&quot;Q:3&lt;&quot;</span>, <span class="hljs-string">&quot;:e4&quot;</span>, <span class="hljs-string">&quot;\n;)\t&quot;</span>, <span class="hljs-string">&quot;:Yn%%7^+6/\u001e&quot;</span>, <span class="hljs-string">&quot;G,\u0015&quot;</span>, <span class="hljs-string">&quot;B623p&quot;</span>, <span class="hljs-string">&quot;nQ4\x00!\&#x27;\u00119&quot;</span>, <span class="hljs-string">&quot;)\u001e\u0012\u001d\u0004%/[G\u000f&gt;7A\r9(&quot;</span>, <span class="hljs-string">&quot;u&quot;</span>, <span class="hljs-string">&quot;x1et&quot;</span>, <span class="hljs-string">&quot;!\v.6=Bu+&amp;;^+82\u001dXS1&quot;</span>, <span class="hljs-string">&quot;6PU4&quot;</span>, <span class="hljs-string">&quot;\u0014&lt;\u001c&gt;\&#x27;4:\u0016r&amp;\&#x27;5E\u0006\n&quot;</span>, <span class="hljs-string">&quot;$-&gt; BG8\&#x27;\&quot;&quot;</span>, <span class="hljs-string">&quot;_\u0018;5\u000f&quot;</span>, <span class="hljs-string">&quot;\x3f/R&quot;</span>, <span class="hljs-string">&quot;\x00\u0016;!&lt;9WT/r\u0014\x40\t$4&quot;</span>, <span class="hljs-string">&quot;X\x07\u0004(\tXO;5.4&quot;</span>, <span class="hljs-string">&quot;EN)\u0002\&#x27;0\u001f:!2\&quot;&quot;</span>, <span class="hljs-string">&quot;\u0018Y\x40.\&quot; 7&#125;,*6^\u0001!9\tnD*\x00#&amp;\u001f \&#x27;&quot;</span>, <span class="hljs-string">&quot;I\u001e22\u000f&quot;</span>, <span class="hljs-string">&quot;\&#x27;04*YA&quot;</span>, <span class="hljs-string">&quot;\r5\u0015\177&quot;</span>, <span class="hljs-string">&quot;!X\t%(/B&quot;</span>, <span class="hljs-string">&quot;)\u0017$!8*S&quot;</span>, <span class="hljs-string">&quot;\u001c&quot;</span>, <span class="hljs-string">&quot;$,\u0002_O9\u0013\u00102\u001a0+#\&#x27;YL+&gt;\rFb0\u0014PE9\u0005&quot;</span>, <span class="hljs-string">&quot;(\&#x27;;\\x40\f\x073\bEe=\u0015.&quot;</span>, <span class="hljs-string">&quot;\x3f\x00#0\v8##+pr&quot;</span>, <span class="hljs-string">&quot;_\u001c6.\u000feH1\u0004&lt;\&#x27;\u001f92&quot;</span>, <span class="hljs-string">&quot;%\br\n&quot;</span>, <span class="hljs-string">&quot;\u0019 5&quot;</span>, <span class="hljs-string">&quot;iuX1\177&quot;</span>, <span class="hljs-string">&quot;$\u0017#&quot;</span>, <span class="hljs-string">&quot;\u001dAB&quot;</span>, <span class="hljs-string">&quot;\bXF2\x00# &quot;</span>, <span class="hljs-string">&quot;\u0002 /wzKq\u0012=sBy&gt;\177\u0015l$bu \u0014&quot;</span>, <span class="hljs-string">&quot;39\raH$\u0004#\u0001\u001f +8&quot;</span>, <span class="hljs-string">&quot;\x40,\u0013\u000e#*=/2&lt;&quot;</span>, <span class="hljs-string">&quot;G2&quot;</span>, <span class="hljs-string">&quot;N+!&amp;m\u0018%\u001d\u000eEN,\u000e&lt;\&#x27;*\x07&quot;</span>, <span class="hljs-string">&quot;=\rPH0)*:\u0019&lt;6&quot;</span>, <span class="hljs-string">&quot;8\u001e]U=;&quot;</span>, <span class="hljs-string">&quot;&gt;\u0010\u0015 4%&quot;</span>, <span class="hljs-string">&quot;\u001fAV&quot;</span>, <span class="hljs-string">&quot;R#04t&quot;</span>, <span class="hljs-string">&quot;\&#x27;\&#x27;9*&quot;</span>, <span class="hljs-string">&quot;:3\u000eBD8\u000e8=&quot;</span>, <span class="hljs-string">&quot;O9\u001f3B\u0001\&#x27;)\u0017PU5\u000e!\u0005\u001715$\vXC(&gt;7H&quot;</span>, <span class="hljs-string">&quot;=\u0018RD0\u0004=2\n=-9&quot;</span>, <span class="hljs-string">&quot;.=3x\x00%3\u000fEM97.\x3f&quot;</span>, <span class="hljs-string">&quot;mG&quot;</span>, <span class="hljs-string">&quot;8WN\x3f7&quot;</span>, <span class="hljs-string">&quot;R8=&amp;C\u001c.,\u001e&quot;</span>, <span class="hljs-string">&quot;0\u001650\u0016:&quot;</span>, <span class="hljs-string">&quot;&gt;=tP+$7&quot;</span>, <span class="hljs-string">&quot;~\u0003\u0011\&#x27;2\u0010 -:/E&quot;</span>, <span class="hljs-string">&quot;H:\u0015&quot;</span>, <span class="hljs-string">&quot;33\u001e&quot;</span>, <span class="hljs-string">&quot;/\u0018CH,\u0015&quot;</span>, <span class="hljs-string">&quot;\u000ef~&quot;</span>, <span class="hljs-string">&quot;!_\x00&quot;</span>, <span class="hljs-string">&quot;F/$&gt;&quot;</span>, <span class="hljs-string">&quot;\v\b!7\u0011#1w\u0003SF#3r|\u00046%\u001eC\u0001\f\r:4S=,w\nOL+\x3f;OH\u0015Z\u0001\u0010\b-!\u001f&amp;;&quot;</span>, <span class="hljs-string">&quot;\u0015\r%I\n3.\u0012GD.\&#x27;:=\u001d3\&#x27;5&quot;</span>, <span class="hljs-string">&quot;%\u0017606:S&quot;</span>, <span class="hljs-string">&quot;^&quot;</span>, <span class="hljs-string">&quot;3\u000f,\x3f\u00177)&quot;</span>, <span class="hljs-string">&quot;o])o##|N8)5%Pj=t[t-G\x40L5)[%5/&quot;</span>, <span class="hljs-string">&quot;\&#x27;!%+SL&quot;</span>, <span class="hljs-string">&quot;\u000e51#+&quot;</span>, <span class="hljs-string">&quot;z\x00\x07\u0012&quot;</span>, <span class="hljs-string">&quot;$)\u0019\\H(&quot;</span>, <span class="hljs-string">&quot;K.&quot;</span>, <span class="hljs-string">&quot;J\x07%1$BT&gt;\f&amp;\&#x27;&quot;</span>, <span class="hljs-string">&quot;\vPF98&quot;</span>, <span class="hljs-string">&quot;E:2/\u001eE&quot;</span>, <span class="hljs-string">&quot;Z\t;)\u001e~G&quot;</span>, <span class="hljs-string">&quot;\v2\n1&quot;</span>, <span class="hljs-string">&quot; \u001a1&quot;</span>, <span class="hljs-string">&quot;\x3f7FM&gt;&quot;</span>, <span class="hljs-string">&quot;\u0005&lt;:&quot;</span>, <span class="hljs-string">&quot;.\u001eVH/\u0015*!.&amp;-#!UM&amp;\u001a3B\f;9\t&quot;</span>, <span class="hljs-string">&quot;\u0018\x3f3\u0015T&quot;</span>, <span class="hljs-string">&quot;\u0011;\n 2m\u0012\u0019~e&quot;</span>, <span class="hljs-string">&quot;!\&#x27;+X\u0018&quot;</span>, <span class="hljs-string">&quot;h&quot;</span>, <span class="hljs-string">&quot;6(\u000fPB4$96\u0010 &quot;</span>, <span class="hljs-string">&quot; \x07:6\x3f+EK9\u0001\&quot;I\r443PR4&quot;</span>, <span class="hljs-string">&quot;\vb\u0010$\v&quot;</span>, <span class="hljs-string">&quot; 9\u000e&quot;</span>, <span class="hljs-string">&quot;\x0060&quot;</span>];<br>&#125;;<br>rCI = <span class="hljs-title class_">DcI</span>()<br><span class="hljs-keyword">let</span> <span class="hljs-variable constant_">LTI</span> = &#123;&#125;<br><span class="hljs-variable constant_">LTI</span>.<span class="hljs-property">vt</span> = <span class="hljs-string">&#x27;!\\aOS~TBWN6&quot;JRR,hW\\&#123;1!\\aOS~TBWN6&quot;JRR,hW\\&#123;1!\\aOS~TBWN6&quot;JRR,hW\\&#123;1!\\aOS~TBWN6&quot;JRR,hW\\&#123;1&#x27;</span><br><span class="hljs-keyword">var</span> <span class="hljs-title class_">BcI</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">KVI, hVI</span>) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable constant_">KVI</span>[<span class="hljs-string">&#x27;charCodeAt&#x27;</span>](hVI);<br>&#125;;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">dec</span>(<span class="hljs-params">S7I</span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">TDI</span> = <span class="hljs-variable constant_">S7I</span>[<span class="hljs-number">0</span>];<br>    <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">ASI</span> = <span class="hljs-variable constant_">S7I</span>[<span class="hljs-number">1</span>];<br>    <span class="hljs-keyword">var</span> kTI = <span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">GcI</span> = (<span class="hljs-variable constant_">ASI</span> - <span class="hljs-number">992</span>) % <span class="hljs-number">21</span><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">UcI</span> = rCI[<span class="hljs-variable constant_">TDI</span>];<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> bTI = <span class="hljs-number">0</span>; bTI &lt;<span class="hljs-title class_">UcI</span>.<span class="hljs-property">length</span>; bTI++) &#123;<br>        <span class="hljs-keyword">var</span> <span class="hljs-variable constant_">LLI</span> = <span class="hljs-title class_">BcI</span>(<span class="hljs-title class_">UcI</span>, bTI);<br>        <span class="hljs-keyword">var</span> <span class="hljs-title class_">VsI</span> = <span class="hljs-title class_">BcI</span>(<span class="hljs-variable constant_">LTI</span>.<span class="hljs-property">vt</span>, <span class="hljs-title class_">GcI</span>++);<br>        kTI += <span class="hljs-title function_">jp</span>( [(~<span class="hljs-variable constant_">LLI</span>| ~<span class="hljs-title class_">VsI</span>)&amp;(<span class="hljs-variable constant_">LLI</span>| <span class="hljs-title class_">VsI</span>)]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> kTI;<br>&#125;<br><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">dec</span>([<span class="hljs-number">25</span>, <span class="hljs-number">1409</span>])); <br><span class="hljs-comment">// 输出结果为 &quot;.&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2025/01/08/aVxJ1sM7lGRnepL.png" srcset="/img/loading.gif" lazyload alt="image-20250108164958314"></p>
+<p>只要带入参数的实际值，就可以计算出所有 <code>wp()</code> 开头的混淆，</p>
+<p>以下代码 <code>wp()[CS(KW)](25, 1409)</code> 和 <code>LTI.call(null, 25, 1409)</code> 实际值相等。</p>
+<p>其他如 <code>Yr()</code> 等函数的解密类似，不过会有点不一样，除了列表和解密的 key 之外，还可能会有类似的这种结构里 <code>var GcI = (ASI - 992) % 21</code> % 之后的数字不一样，或者是 jp 函数传入参数前的运算逻辑不一样。</p>
+<p>以下是一个函数的解密</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">let</span> vCI = &#123;<span class="hljs-attr">U7</span>: <span class="hljs-string">&quot;3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC3YTotqYT&#123; |C6G3$JC&quot;</span>&#125;;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">BcI</span>(<span class="hljs-params">KVI, hVI</span>) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable constant_">KVI</span>.<span class="hljs-title function_">charCodeAt</span>(hVI);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">jp</span>(<span class="hljs-params">x</span>) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(x);<br>&#125;<br><br><span class="hljs-keyword">let</span> <span class="hljs-variable constant_">RCI</span> = [<span class="hljs-string">&quot;\t&amp;\x00\u0019\u0018*1&quot;</span>, <span class="hljs-string">&quot;8\u0014A\u0018*X &quot;</span>, <span class="hljs-string">&quot;7VV,,A45\u0001\u0017\u0014&quot;</span>, <span class="hljs-string">&quot;,%\x40&quot;</span>, <span class="hljs-string">&quot;P6:\u001c\x00\u0003,7\u000fO\u000e&quot;</span>, <span class="hljs-string">&quot;\u0003O\b&quot;</span>, <span class="hljs-string">&quot;G*0&quot;</span>, <span class="hljs-string">&quot;4GV#3c+;\u0017\r7+;\u0016e\u000e1Y5\x40&quot;</span>, <span class="hljs-string">&quot;8\&quot;\u000e\u001d\u001d\u000e=\u001fT\u0014&quot;</span>, <span class="hljs-string">&quot;0S)Wi/0\x4083\n&quot;</span>, <span class="hljs-string">&quot;\u001d)b&gt;CA\b*G45\u001c\u001f&quot;</span>, <span class="hljs-string">&quot;\u001f\u0001\u0003&quot;</span>, <span class="hljs-string">&quot;lxWYZGKSJ~uAv&gt;,\177o&gt;3SeXH&amp;u58]&quot;</span>, <span class="hljs-string">&quot;* \u001c&quot;</span>, <span class="hljs-string">&quot;\fE\u001e(_3gA\&#x27;3\\+5\u001d\r\&quot;-;\tAK%$_&lt;t*\u0015\u0003-&lt;[p\u00106QjZJ&quot;</span>, <span class="hljs-string">&quot;\u0011V88\x3f\u0018\u0010 1\t\x00*&amp;D4ZK$cc5!\b\u001d\u001f&quot;</span>, <span class="hljs-string">&quot;.&amp;Q\u0002KT&quot;</span>, <span class="hljs-string">&quot;\x3fE\u001a\&quot;C+G\u0004\b1\\.\&#x27;\n\u0006Q\u00111\u0017P\u00191&quot;</span>, <span class="hljs-string">&quot;|\u001a\&quot;G1\u0006\n\x07\u00045 &quot;</span>, <span class="hljs-string">&quot;\&quot;C)8\u00162\u000477&quot;</span>, <span class="hljs-string">&quot;K$\u000fZ71&quot;</span>, <span class="hljs-string">&quot;\x3f\u001eV&quot;</span>, <span class="hljs-string">&quot;D\u0011&amp;&quot;</span>, <span class="hljs-string">&quot;\u0005d&quot;</span>, <span class="hljs-string">&quot;\u001d)B&quot;</span>, <span class="hljs-string">&quot;PH#&amp;]-\u0003\u0006\u0010\u00051&quot;</span>, <span class="hljs-string">&quot;\u0014/1\u0015T0*[.Gf#,^&lt; \u001d\u001d\u0012\u0018!\u000fO\f,E3&quot;</span>, <span class="hljs-string">&quot;5\u0003&gt;!\u0016E\u00127E&quot;</span>, <span class="hljs-string">&quot;zJ&lt;\&quot;_00O\u0015\u0005-1\u0016P\bcB(\u0013\x40/0G+!\f\x00\u0004+1[N\u0013-A8\&quot;Q51O\u001d\u001f* \u001aN\u001f&amp;\u0018MzJj,A=1\u001dT\u00056t\u0019E\\*B\&quot;AE(/Vut\u0001\u001b\001ft5\tR\u001d:\u0016(QN/ G*t\u0002\u0001\u0002-t\u0013A\n&amp;\u0016&amp;\u0013\177\u0019:^;;\u0003Z\u0018-1\tA\b,D\u001arj.V-&lt;\x00\u0010_&quot;</span>, <span class="hljs-string">&quot;41\v\u001d\u0010\u001d1\rI\u001f&amp;E&quot;</span>, <span class="hljs-string">&quot;\u001f,R\&quot;cK#-G\u0018 &quot;</span>, <span class="hljs-string">&quot;C\u000e&amp;W3V&quot;</span>, <span class="hljs-string">&quot;\x40#0C55\u0016&quot;</span>, <span class="hljs-string">&quot;\bE\u000f0_(]w&gt;,A83\n&quot;</span>, <span class="hljs-string">&quot;x\u0018W\u0019-\f&quot;</span>, <span class="hljs-string">&quot;\&#x27;\u001b\u0003&lt;\u0003\u001eB+*R\&quot;gV+ X0:\b1\t:1\vT\u0015,X&quot;</span>, <span class="hljs-string">&quot;C\u0018 i&amp;WK\\8\&#x27;\u0001\u0012\u0010nb\vF\u001f\u0019z*PB&amp;\u001cr+&amp;\u000e\r&quot;</span>, <span class="hljs-string">&quot;:\!\u001d\u0006\u00147 (C\u000e*F3&quot;</span>, <span class="hljs-string">&quot;\u0018A\u00125W4&quot;</span>, <span class="hljs-string">&quot;\u0013-B(FG\&quot;0G8&amp;/8&quot;</span>, <span class="hljs-string">&quot;\f\u0006\u0014=1\u0015T\u0015\&quot;Z4&quot;</span>, <span class="hljs-string">&quot;)5\bS&quot;</span>, <span class="hljs-string">&quot;\u0015\u0001)\u0019\u0012N\u00131`\&quot;AW#,]&quot;</span>, <span class="hljs-string">&quot;\tA\u0012&quot;</span>, <span class="hljs-string">&quot;\r\u0006\u0010/1&quot;</span>, <span class="hljs-string">&quot;$\&quot;C&quot;</span>, <span class="hljs-string">&quot;H\u001d1R0RV/\x00\\77\u001a\u0006\u0003&lt;:\u0018Y&quot;</span>, <span class="hljs-string">&quot;5h%&quot;</span>, <span class="hljs-string">&quot;\u001d&amp;Q\u0012=\u00187 \u001eG\u000e*S5GAj\u0013w\u001f&quot;</span>, <span class="hljs-string">&quot;W&gt;\&quot;A-\x00\u001d\u0015\u00122=\u0015G&quot;</span>, <span class="hljs-string">&quot;\u001eX\f,D3\x40&quot;</span>, <span class="hljs-string">&quot;W8 &quot;</span>, <span class="hljs-string">&quot;hlF\&#x27;lT&lt; 0\u0004\u0010+5\u0016SC7O7V\u0019&quot;</span>, <span class="hljs-string">&quot;7Y2PL\&#x27;,E&lt;&quot;</span>, <span class="hljs-string">&quot;\u0003\u001d\u0002-\u0012\u000eN\u001f7_(]W&quot;</span>, <span class="hljs-string">&quot;+.*1\u0017E\u0012*C*lQ$4A8$\u001f\u0011\u0015&quot;</span>, <span class="hljs-string">&quot;XA30&quot;</span>, <span class="hljs-string">&quot;\u000f/_$V&quot;</span>, <span class="hljs-string">&quot;$\u001eR\u001a\u0002B3A&quot;</span>, <span class="hljs-string">&quot;\u0019&quot;</span>, <span class="hljs-string">&quot;&lt;:\u000e\u0016\u001d&lt;0+L\t$_)&quot;</span>, <span class="hljs-string">&quot;\u0012&quot;</span>, <span class="hljs-string">&quot;41-;+R\u0015._3ZR/c^,\&#x27;\&quot;\u0003&lt; \u000eR\u0012cWgCV#.Z-=\u0019\u0011Q/5\u0017U\u0019m&quot;</span>, <span class="hljs-string">&quot;k&quot;</span>, <span class="hljs-string">&quot;\u001f&amp;_+&quot;</span>, <span class="hljs-string">&quot;\u0018L\u0015 ]&quot;</span>, <span class="hljs-string">&quot;p%6P1\u0011\u0019\u0011\u001f-&quot;</span>, <span class="hljs-string">&quot;8$\u001f\u0011\u001f=\u0017\u0013I\u0010\&#x27;&quot;</span>, <span class="hljs-string">&quot;D&lt;6B\u001e\u0002-;&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>, <span class="hljs-string">&quot;#VB+6_-&quot;</span>, <span class="hljs-string">&quot;\u001aU\b,U(^T&amp;&amp;G&lt;&quot;</span>, <span class="hljs-string">&quot;*\\Q9&amp;~6\&quot;\n0\u0010-5&quot;</span>, <span class="hljs-string">&quot;\u001c\u001403\u0013T&quot;</span>, <span class="hljs-string">&quot;*=\u0001E&quot;</span>, <span class="hljs-string">&quot;\u0001FJ)7Z6:&quot;</span>, <span class="hljs-string">&quot;\&#x27;\\vE\u001d(S5&quot;</span>, <span class="hljs-string">&quot;&amp;%\u001a\u0004\u001eE\u000e\x00Y)]A)7Z6:&quot;</span>, <span class="hljs-string">&quot;^*\u001c\u0006\u0010\u0015&lt;:&quot;</span>, <span class="hljs-string">&quot;4VG8&amp;G&quot;</span>, <span class="hljs-string">&quot;u;\vCF&quot;</span>, <span class="hljs-string">&quot;+\u0002\u001aL&quot;</span>, <span class="hljs-string">&quot;G\u00197t&amp;GP/1J&quot;</span>, <span class="hljs-string">&quot;\u001a6X$GM%-\u0013q3\n\x00Qpk\u0018O\u00127S)Gs#-W6#G(Y\u0005&#125;R\x00 8\u001e\u00041pNpkO(*75\u000fI\n&amp;\u0016$\\\\\x40/\u001fn\u0002\b\u0001T,\u0005)&quot;</span>, <span class="hljs-string">&quot;3\u001eT,\&quot;D&amp;^A&gt;&amp;A&quot;</span>, <span class="hljs-string">&quot; -&quot;</span>, <span class="hljs-string">&quot;+E8&quot;</span>, <span class="hljs-string">&quot;)7&quot;</span>, <span class="hljs-string">&quot;\u001de4Q\r&quot;</span>, <span class="hljs-string">&quot;%_+Vt+7[&quot;</span>, <span class="hljs-string">&quot;$7=\u000fY\\\u0013Z&amp;JA8&quot;</span>, <span class="hljs-string">&quot;B\t7B(]&quot;</span>, <span class="hljs-string">&quot;W8!&quot;</span>, <span class="hljs-string">&quot;_8:\b\u0001\u0010&gt;1&quot;</span>, <span class="hljs-string">&quot;%-^6!\u001c\u0011\u00156#\u0015&quot;</span>, <span class="hljs-string">&quot;\u0011\u00144&quot;</span>, <span class="hljs-string">&quot;5h$\u000f&quot;</span>, <span class="hljs-string">&quot;w&quot;</span>, <span class="hljs-string">&quot;6]&quot;</span>, <span class="hljs-string">&quot;9\u00017\u001953\u001et\u00053S&quot;</span>, <span class="hljs-string">&quot;^W\x07\&quot;K\r;\u001a\u0017\u0019\t;\u0012N\b0&quot;</span>, <span class="hljs-string">&quot;Z&quot;</span>, <span class="hljs-string">&quot;\u0016\u000eF\u001a&amp;D&quot;</span>, <span class="hljs-string">&quot;\x40&quot;</span>, <span class="hljs-string">&quot;\x07aE\&quot;]W%1l=5\u0015Sc&quot;</span>, <span class="hljs-string">&quot;\u0014\&quot;E\u0017AM&lt;\&quot;G&lt;\x00\x00\u001f\u00147&quot;</span>, <span class="hljs-string">&quot;3\u001eT#7S+VI/7A &quot;</span>, <span class="hljs-string">&quot;r/jC\v\u001egg(E$\v\u00102\u0006\u001c\u0017/&quot;</span>, <span class="hljs-string">&quot; Y)GA$7d0:\v\u0006&quot;</span>, <span class="hljs-string">&quot;\b9p\t&quot;</span>];<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">meth</span>(<span class="hljs-params">WVI</span>) &#123;<br>    <span class="hljs-keyword">let</span> hBI = <span class="hljs-variable constant_">WVI</span>[<span class="hljs-number">1</span>], <span class="hljs-variable constant_">G1I</span> = <span class="hljs-variable constant_">WVI</span>[<span class="hljs-number">2</span>], dDI = <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-title class_">VcI</span> = (hBI - <span class="hljs-number">379</span>) % <span class="hljs-number">18</span>;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable constant_">MVI</span> = <span class="hljs-variable constant_">RCI</span>[<span class="hljs-variable constant_">G1I</span>], gBI = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">while</span> (gBI &lt; <span class="hljs-variable constant_">MVI</span>.<span class="hljs-property">length</span>) &#123;<br>        <span class="hljs-keyword">let</span> mCI = <span class="hljs-title class_">BcI</span>(<span class="hljs-variable constant_">MVI</span>, gBI), <span class="hljs-variable constant_">RTI</span> = <span class="hljs-title class_">BcI</span>(vCI.<span class="hljs-property">U7</span>, <span class="hljs-title class_">VcI</span>++);<br>        dDI += <span class="hljs-title function_">jp</span>(~(mCI &amp; <span class="hljs-variable constant_">RTI</span>) &amp; (mCI | <span class="hljs-variable constant_">RTI</span>));<br>        gBI++;<br>    &#125;<br>    <span class="hljs-keyword">return</span> dDI;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">meth</span>([<span class="hljs-number">53</span>, <span class="hljs-number">990</span>, <span class="hljs-number">100</span>])); <span class="hljs-comment">// un</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">meth</span>([<span class="hljs-number">53</span>, <span class="hljs-number">637</span>, <span class="hljs-number">43</span>])); <span class="hljs-comment">// pass</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">meth</span>([<span class="hljs-number">53</span>, <span class="hljs-number">680</span>, <span class="hljs-number">81</span>])); <span class="hljs-comment">// secret</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">meth</span>([<span class="hljs-number">0</span>, <span class="hljs-number">680</span>, <span class="hljs-number">81</span>])); <span class="hljs-comment">// secret</span><br></code></pre></td></tr></table></figure>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Akamai/">#Akamai</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Akamai 混淆解密</div>
+      <div>https://kingjem.github.io/2025/01/02/akamai-混淆解密/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月2日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/07/walmark-px3-cookie%E6%97%A0%E6%84%9F%E7%94%9F%E6%88%90%E6%96%B9%E5%BC%8F/" title="Walmark Px3 cookie 无感生成方式">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Walmark Px3 cookie 无感生成方式</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/06/%E5%AE%89%E5%8D%93%E6%89%8B%E6%9C%BA%E5%AE%89%E8%A3%85Openwrt/" title="安卓手机安装Openwrt">
+                        <span class="hidden-mobile">安卓手机安装Openwrt</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
