@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">RabbitMQ使用优先级队列</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年7月23日 晚上
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pika<br><br>credentials = pika.PlainCredentials(<span class="hljs-string">&quot;guest&quot;</span>, <span class="hljs-string">&quot;guest&quot;</span>)<br>connection = pika.BlockingConnection(pika.ConnectionParameters(host=<span class="hljs-string">&#x27;localhost&#x27;</span>, credentials=credentials))<br>channel = connection.channel()<br><br>channel.queue_declare(queue=<span class="hljs-string">&#x27;test&#x27;</span>, arguments=&#123;<span class="hljs-string">&quot;x-max-priority&quot;</span>: <span class="hljs-number">10</span>&#125;)<br><br>channel.basic_publish(<br>    properties=pika.BasicProperties(priority=<span class="hljs-number">5</span>),<br>    exchange=<span class="hljs-string">&#x27;&#x27;</span>,<br>    routing_key=<span class="hljs-string">&#x27;test&#x27;</span>,<br>    body=<span class="hljs-string">&#x27;test&#x27;</span>.encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>)<br><br>connection.close()<br><br></code></pre></td></tr></table></figure>

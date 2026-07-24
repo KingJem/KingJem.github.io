@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">adb 常用命令</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年7月21日 下午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="adb-设置代理"><a href="#adb-设置代理" class="headerlink" title="adb 设置代理"></a>adb 设置代理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">设置代理：</span><br><br><br>adb shell settings put global http_proxy 127.0.0.1:8888<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">删除代理 重启后生效</span><br>adb shell settings delete global http_proxy<br><br>adb shell settings delete global global_http_proxy_host<br><br>adb shell settings delete global global_http_proxy_port<br></code></pre></td></tr></table></figure>

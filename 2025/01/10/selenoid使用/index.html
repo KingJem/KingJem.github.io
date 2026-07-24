@@ -270,6 +270,14 @@
             <!-- SEO header -->
             <h1 style="display: none">Selenoid 使用</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年4月16日 上午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="docker-compose-yaml"><a href="#docker-compose-yaml" class="headerlink" title="docker-compose.yaml"></a>docker-compose.yaml</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span><br><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">selenoid:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">&quot;aerokube/selenoid&quot;</span><br>    <span class="hljs-attr">network_mode:</span> <span class="hljs-string">bridge</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;4444:4444&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;$PWD:/etc/selenoid/&quot;</span> <span class="hljs-comment"># assumed current dir contains browsers.json</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span><br>  <span class="hljs-attr">selenoid-ui:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">&quot;aerokube/selenoid-ui&quot;</span><br>    <span class="hljs-attr">network_mode:</span> <span class="hljs-string">bridge</span><br>    <span class="hljs-attr">links:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">selenoid</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br>    <span class="hljs-attr">command:</span> [ <span class="hljs-string">&quot;--selenoid-uri&quot;</span>, <span class="hljs-string">&quot;http://selenoid:4444&quot;</span> ]<br></code></pre></td></tr></table></figure>

@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">docker-compose锚点写法</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年9月1日 下午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br> <span class="hljs-attr">version:</span> <span class="hljs-string">&quot;3.9&quot;</span><br><br><span class="hljs-attr">x-env:</span> <span class="hljs-string">&amp;default-env</span><br>  <span class="hljs-attr">APP_ENV:</span> <span class="hljs-string">production</span><br>  <span class="hljs-attr">APP_DEBUG:</span> <span class="hljs-string">&quot;false&quot;</span><br>  <span class="hljs-attr">TZ:</span> <span class="hljs-string">&quot;Asia/Shanghai&quot;</span><br><br><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">web:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">nginx:alpine</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8089:80&quot;</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-string">&lt;&lt;:</span> <span class="hljs-string">*default-env</span><br>      <span class="hljs-attr">POSTGRES_USER:</span> <span class="hljs-string">user</span><br>      <span class="hljs-attr">POSTGRES_PASSWORD:</span> <span class="hljs-string">password</span><br><br></code></pre></td></tr></table></figure>

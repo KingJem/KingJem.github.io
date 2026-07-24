@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">chromium编译(2)-打包安装包</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年8月29日 上午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="软件打包"><a href="#软件打包" class="headerlink" title="软件打包"></a>软件打包</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">autoninja -C out/Default &quot;chrome/installer/linux:unstable_deb&quot; # deb 包<br>autoninja -C out/Default &quot;chrome/installer/linux:unstable_rpm&quot; # rpm 包<br></code></pre></td></tr></table></figure>

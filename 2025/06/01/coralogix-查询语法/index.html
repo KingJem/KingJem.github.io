@@ -270,6 +270,14 @@
             <!-- SEO header -->
             <h1 style="display: none">Coralogix 查询语法</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年4月16日 上午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="DataPrime-查询语法"><a href="#DataPrime-查询语法" class="headerlink" title="DataPrime 查询语法"></a>DataPrime 查询语法</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs routeros">source logs <br>|<span class="hljs-built_in"> filter </span><span class="hljs-variable">$m</span>.severity == <span class="hljs-built_in">ERROR</span> <br>| groupby <span class="hljs-variable">$l</span>.subsystemname as<span class="hljs-built_in"> service </span>aggregate count() as error_count <br>| orderby <span class="hljs-variable">$d</span>.error_count desc <br>| limit 5<br></code></pre></td></tr></table></figure>

@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">猿人学web-13题</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年7月21日 下午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="破题"><a href="#破题" class="headerlink" title="破题"></a>破题</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-attr">success</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) &#123;<br>    <span class="hljs-keyword">var</span> s = <span class="hljs-string">&#x27;&lt;tr class=&quot;odd&quot;&gt;&#x27;</span>;<br>    ttf = data.<span class="hljs-property">woff</span>;<br>    $(<span class="hljs-string">&#x27;.font&#x27;</span>).<span class="hljs-title function_">text</span>(<span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;@font-face &#123; font-family:&quot;fonteditor&quot;;src: url(data:font/truetype;charset=utf-8;base64,&#x27;</span> + ttf + <span class="hljs-string">&#x27;); &#125;&#x27;</span>);<br>    datas = data.<span class="hljs-property">data</span>;<br>    $.<span class="hljs-title function_">each</span>(datas, <span class="hljs-keyword">function</span>(<span class="hljs-params">index, val</span>) &#123;<br>        <span class="hljs-keyword">var</span> html = <span class="hljs-string">&#x27;&lt;td class=&quot;info fonteditor&quot;&gt;&#x27;</span> + val.<span class="hljs-property">value</span> + <span class="hljs-string">&#x27;&lt;/td&gt;&#x27;</span>;<br>        s += html<br>    &#125;);<br>    $(<span class="hljs-string">&#x27;.data&#x27;</span>).<span class="hljs-title function_">text</span>(<span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">append</span>(s + <span class="hljs-string">&#x27;&lt;/tr&gt;&#x27;</span>)<br>&#125;<br><br></code></pre></td></tr></table></figure>
@@ -348,9 +356,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/02/24/PX3%20%E5%8F%82%E6%95%B0%E7%94%9F%E6%88%90%E4%B9%8B%20wasm%20b%20%E5%87%BD%E6%95%B0%E4%B8%AD%E5%8F%82%E6%95%B0D%20%E7%9A%84%E7%94%9F%E6%88%90/" title="PX3 参数生成之 wasm 函数中的参数D 的生成">
+                      <a href="/2025/02/24/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web61%E9%A2%98%E5%AE%9E%E6%88%98/" title="猿人学Web-61 实战">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">PX3 参数生成之 wasm 函数中的参数D 的生成</span>
+                        <span class="hidden-mobile">猿人学Web-61 实战</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -358,8 +366,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/02/24/%E7%8C%BF%E4%BA%BA%E5%AD%A6/%E7%8C%BF%E4%BA%BA%E5%AD%A6Web61%E9%A2%98%E5%AE%9E%E6%88%98/" title="猿人学Web-61 实战">
-                        <span class="hidden-mobile">猿人学Web-61 实战</span>
+                      <a href="/2025/02/24/%E9%80%86%E5%90%91/akamai%20%E6%B7%B7%E6%B7%86%E8%A7%A3%E5%AF%86/" title="akamai 混淆解密">
+                        <span class="hidden-mobile">akamai 混淆解密</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

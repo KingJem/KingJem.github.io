@@ -270,6 +270,14 @@
             <!-- SEO header -->
             <h1 style="display: none">Orbstack 使用 docker 搭建各类开发环境</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年7月21日 下午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="nginx-proxy-manager"><a href="#nginx-proxy-manager" class="headerlink" title="nginx-proxy-manager"></a>nginx-proxy-manager</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3.8&#x27;</span><br><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">app:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">&#x27;jc21/nginx-proxy-manager:latest&#x27;</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;80:80&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;81:81&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;443:443&#x27;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">nginx-proxy-manager_data:/data</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">nginx-proxy-manager_letsencrypt:/etc/letsencrypt</span><br><span class="hljs-attr">volumes:</span><br>  <span class="hljs-attr">nginx-proxy-manager_data:</span><br>  <span class="hljs-attr">nginx-proxy-manager_letsencrypt:</span> <br></code></pre></td></tr></table></figure>

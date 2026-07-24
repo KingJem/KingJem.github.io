@@ -269,6 +269,14 @@
             <!-- SEO header -->
             <h1 style="display: none">RabbitMQ设置过期时间</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2025年7月23日 晚上
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="针对消息的过期时间设置"><a href="#针对消息的过期时间设置" class="headerlink" title="针对消息的过期时间设置"></a>针对消息的过期时间设置</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pika<br><br>credentials = pika.PlainCredentials(<span class="hljs-string">&quot;guest&quot;</span>, <span class="hljs-string">&quot;guest&quot;</span>)<br>connection = pika.BlockingConnection(pika.ConnectionParameters(host=<span class="hljs-string">&#x27;localhost&#x27;</span>, credentials=credentials))<br>channel = connection.channel()<br>channel.queue_declare(queue=<span class="hljs-string">&#x27;task_queue&#x27;</span>, durable=<span class="hljs-literal">True</span>)<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>):<br>    properties = pika.BasicProperties(delivery_mode=<span class="hljs-number">2</span>, )<br>    properties.expiration = <span class="hljs-string">&#x27;6000&#x27;</span><br>    body = <span class="hljs-string">&#x27;test&#x27;</span>.<span class="hljs-built_in">format</span>(i).encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>    channel.basic_publish(<br>        exchange=<span class="hljs-string">&#x27;&#x27;</span>,<br>        routing_key=<span class="hljs-string">&#x27;task_queue&#x27;</span>,<br>        body=body,<br>        properties=properties <br>    )<br><br><br>connection.close()<br><br></code></pre></td></tr></table></figure>

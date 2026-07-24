@@ -276,6 +276,14 @@
             <!-- SEO header -->
             <h1 style="display: none">反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</h1>
             
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年7月10日 下午
+                  
+                
+              </p>
+            
             <div class="markdown-body">
               
               <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 cookie 池架构里，思路是「<strong>真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放</strong>」。<br>浏览器内核负责<strong>过质询、拿真实会话</strong>，回放侧用 <code>curl_cffi</code> 的 <code>impersonate</code> 复刻内核的 TLS/JA3 指纹。<br>不同防护（Cloudflare / Akamai / PerimeterX / Imperva 等）对内核的要求差异很大，选错内核直接卡死。</p>
@@ -582,9 +590,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" title="Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning">
+                      <a href="/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/" title="eCapture 使用方法">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning</span>
+                        <span class="hidden-mobile">eCapture 使用方法</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
