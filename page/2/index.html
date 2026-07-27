@@ -215,6 +215,308 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" target="_self">
+          Android 抓包实战：mitmweb + pproxy（海外出口）+ Frida 解 SSL Pinning
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/07/13/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98-mitmweb-pproxy%E7%BE%8E%E5%9B%BD%E5%87%BA%E5%8F%A3-frida%E8%A7%A3SSLPinning/" target="_self">
+        <div>
+          
+          前言在受限网络里抓一个只对海外开放、且做了证书固定（SSL Pinning）的 Android App，常规「装个 CA + 开个代理」是不够的。这篇把一套跑通的组合记录下来：  VpnService&#x2F;TUN 转发：把手机（或指定 App）的流量喂给 mitmproxy； mitmweb upstream 模式 + pproxy：mitmproxy 负责解密，pproxy 负责把出口换到干净的海外
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-07-13 16:40" pubdate>
+              2026-07-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
+            
+              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+            
+              <a href="/tags/mitmproxy/">#mitmproxy</a>
+            
+              <a href="/tags/mitmweb/">#mitmweb</a>
+            
+              <a href="/tags/pproxy/">#pproxy</a>
+            
+              <a href="/tags/SSL-Pinning/">#SSL Pinning</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/" target="_self">
+          eCapture 使用方法
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/07/11/%E9%80%86%E5%90%91/eCapture%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/" target="_self">
+        <div>
+          
+          eCapture 使用方法eCapture 是一款基于 eBPF 的流量观测工具，核心用途是直接抓取 TLS&#x2F;SSL 明文内容，而不需要像传统 MITM 那样安装 CA 证书。它适合做 Android App 抓包、Go 程序网络分析、以及一些主机侧审计场景。 我自己用下来，最重要的结论只有一个：先判断目标用的是什么 TLS 实现，再决定用哪个模块。选错模块，后面怎么折腾都抓不到。 1. eCap
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-07-11 12:00" pubdate>
+              2026-07-11
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/eCapture/">#eCapture</a>
+            
+              <a href="/tags/eBPF/">#eBPF</a>
+            
+              <a href="/tags/GoTLS/">#GoTLS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/07/10/browser-kernels-guide/" target="_self">
+          反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/07/10/browser-kernels-guide/" target="_self">
+        <div>
+          
+          前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的要求差异很大，选错内核直接卡死。 本文把
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-07-10 12:00" pubdate>
+              2026-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/Camoufox/">#Camoufox</a>
+            
+              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+            
+              <a href="/tags/ruyipage/">#ruyipage</a>
+            
+              <a href="/tags/DrissionPage/">#DrissionPage</a>
+            
+              <a href="/tags/CloakBrowser/">#CloakBrowser</a>
+            
+              <a href="/tags/curl-cffi/">#curl_cffi</a>
+            
+              <a href="/tags/%E6%8C%87%E7%BA%B9/">#指纹</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/06/23/MobaXterm-RDP%E7%BB%8FSOCKS5%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91-gost/" target="_self">
+          MobaXterm RDP 经 SOCKS5 代理转发（gost + WSL）
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/06/23/MobaXterm-RDP%E7%BB%8FSOCKS5%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91-gost/" target="_self">
+        <div>
+          
+          背景一批 RDP 服务器（107.150.x.x、152.32.x.x 等，端口 3389）只能通过本地的SOCKS5&#x2F;HTTP 代理 127.0.0.1:7890（Clash&#x2F;mihomo 混合端口）访问。目标是让MobaXterm 里的这些 RDP 会话走这个代理，并且能把其中一台分享给局域网内的同事使用。 关键结论：MobaXterm 的 RDP 不支持 SOCKS 代理查证 .mxtses
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-23 18:40" pubdate>
+              2026-06-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/MobaXterm/">#MobaXterm</a>
+            
+              <a href="/tags/RDP/">#RDP</a>
+            
+              <a href="/tags/gost/">#gost</a>
+            
+              <a href="/tags/WSL/">#WSL</a>
+            
+              <a href="/tags/%E4%BB%A3%E7%90%86/">#代理</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2026/06/20/AI/js-reverse-vs-chrome-devtools/" target="_self">
           js-reverse vs chrome-devtools MCP 功能对比
         </a>
@@ -1250,271 +1552,6 @@
               <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
             
           </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
-          BrowserForge：智能浏览器指纹与请求头生成器
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
-        <div>
-          
-          简介BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 Apify fingerprint-suite 的 Python 重新实现。 核心特性 🎯 真实流量模拟 - 使用贝叶斯生成网络模拟实际网络流量 ⚡ 极速运行 - 运行时仅需 0.1-0.2 毫秒 👤 简单易用 - 对人类友好的 API 设计 🔧
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-17 11:25" pubdate>
-              2026-03-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="category-chain-item">网络请求</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/BrowserForge/">#BrowserForge</a>
-            
-              <a href="/tags/%E6%8C%87%E7%BA%B9%E7%94%9F%E6%88%90/">#指纹生成</a>
-            
-              <a href="/tags/%E8%AF%B7%E6%B1%82%E5%A4%B4/">#请求头</a>
-            
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
-              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
-            
-              <a href="/tags/Python/">#Python</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/03/17/Camoufox%EF%BC%9A%E5%BC%80%E6%BA%90%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7/" target="_self">
-          Camoufox：开源反检测浏览器与指纹注入工具
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/03/17/Camoufox%EF%BC%9A%E5%BC%80%E6%BA%90%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7/" target="_self">
-        <div>
-          
-          简介Camoufox 是一个开源的反检测浏览器，基于 Firefox 构建，提供强大的指纹注入功能。它能够在不注入 JavaScript 的情况下修改设备指纹，使其对反爬虫系统不可见。 核心特性🎭 反检测能力 对反爬虫系统不可见 - 绕过主流反爬虫检测 指纹注入与轮换 - 无需 JavaScript 注入即可修改指纹 底层 C++ 实现 - 直接修改设备信息，不留痕迹  🔧 指纹修改能力
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-17 11:25" pubdate>
-              2026-03-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
-              <a href="/tags/Camoufox/">#Camoufox</a>
-            
-              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
-            
-              <a href="/tags/%E6%8C%87%E7%BA%B9%E6%B3%A8%E5%85%A5/">#指纹注入</a>
-            
-              <a href="/tags/Playwright/">#Playwright</a>
-            
-              <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">#自动化</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/03/17/%E8%B7%B3%E8%BF%87%E5%AE%89%E8%A3%85-Visual-C-%E8%BF%90%E8%A1%8C%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" target="_self">
-          跳过安装 Visual C++ 运行库的问题与解决方案
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/03/17/%E8%B7%B3%E8%BF%87%E5%AE%89%E8%A3%85-Visual-C-%E8%BF%90%E8%A1%8C%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" target="_self">
-        <div>
-          
-          问题背景在 Windows 上使用 Conda 安装 Python 包时，经常会遇到需要安装 Visual C++ 运行库的提示。如果不想安装完整的 Visual Studio C++ 组件，可以使用 vc14_runtime 作为替代方案。 解决方案使用 vc14_runtime 替代 VS C++ 组件在 Windows 环境下，vc14_runtime 可以替代完整的 Visual Stud
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-17 10:58" pubdate>
-              2026-03-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" class="category-chain-item">环境配置</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Visual-C/">#Visual C++</a>
-            
-              <a href="/tags/vc14-runtime/">#vc14_runtime</a>
-            
-              <a href="/tags/vs2015-runtime/">#vs2015_runtime</a>
-            
-              <a href="/tags/Conda/">#Conda</a>
-            
-              <a href="/tags/%E4%BE%9D%E8%B5%96%E9%97%AE%E9%A2%98/">#依赖问题</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/01/27/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%A3%80%E6%B5%8B%E7%82%B9console-table/" target="_self">
-          自动化检测点console.table
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/01/27/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%A3%80%E6%B5%8B%E7%82%B9console-table/" target="_self">
-        <div>
-          
-          监测点看到阿龙的博客 中有selenium 中打开带有 dev-tools 的页面会跳转到新的页面 原文在这里 项目代码这段代码是 dev-tools 中 检测性能的代码. 两次检查 tablePrintTime &gt; logPrintTime * 20 的时候触发条件.  123456789101112131415161718192021222324252627282930313233343
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-27 14:07" pubdate>
-              2026-01-27
-            </time>
-          </div>
-        
-        
         
       </div>
     </article>
