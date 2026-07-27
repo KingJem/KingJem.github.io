@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>IP 类型检测工具指南：判断住宅 IP 还是数据中心</title>
+    <link href="/2026/07/27/IP%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7%E6%8C%87%E5%8D%97%E5%88%A4%E6%96%AD%E4%BD%8F%E5%AE%85IP%E8%BF%98%E6%98%AF%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83/"/>
+    <url>/2026/07/27/IP%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7%E6%8C%87%E5%8D%97%E5%88%A4%E6%96%AD%E4%BD%8F%E5%AE%85IP%E8%BF%98%E6%98%AF%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83/</url>
+    
+    <content type="html"><![CDATA[<h1 id="IP-类型检测工具指南：判断住宅-IP-还是数据中心"><a href="#IP-类型检测工具指南：判断住宅-IP-还是数据中心" class="headerlink" title="IP 类型检测工具指南：判断住宅 IP 还是数据中心"></a>IP 类型检测工具指南：判断住宅 IP 还是数据中心</h1><p>快速判断一个 IP 是<strong>住宅 ISP</strong> 还是<strong>数据中心/机房</strong>，核心看 ASN 类型、ISP/Org、Usage Type 三个维度。以下从在线工具、命令行/API、商业库三个层面整理。</p><hr><h2 id="一、在线工具（最常用，免费）"><a href="#一、在线工具（最常用，免费）" class="headerlink" title="一、在线工具（最常用，免费）"></a>一、在线工具（最常用，免费）</h2><h3 id="1-ipinfo-io（首选，ASN-类型最准）"><a href="#1-ipinfo-io（首选，ASN-类型最准）" class="headerlink" title="1. ipinfo.io（首选，ASN 类型最准）"></a>1. ipinfo.io（首选，ASN 类型最准）</h3><p>地址：<code>https://ipinfo.io/[IP]</code></p><p>看 <strong>3 个关键字段</strong>：</p><table><thead><tr><th>字段</th><th>住宅 ISP</th><th>数据中心</th></tr></thead><tbody><tr><td><strong>asn.type</strong></td><td><code>isp</code></td><td><code>hosting</code></td></tr><tr><td><strong>org</strong></td><td>电信/联通/移动/广电等</td><td>阿里云/AWS/DO/OVH 等</td></tr><tr><td><strong>hostname</strong></td><td>运营商域名</td><td>含 <code>dc</code>/<code>cloud</code>/<code>server</code></td></tr></tbody></table><p>示例：</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">113.XX.XX.XX → asn.<span class="hljs-attribute">type</span>=isp, <span class="hljs-attribute">org</span>=中国电信 → 住宅<br>104.XX.XX.XX → asn.<span class="hljs-attribute">type</span>=hosting, <span class="hljs-attribute">org</span>=DigitalOcean → 机房<br></code></pre></td></tr></table></figure><h3 id="2-IP2Location（看-Usage-Type，权威）"><a href="#2-IP2Location（看-Usage-Type，权威）" class="headerlink" title="2. IP2Location（看 Usage Type，权威）"></a>2. IP2Location（看 Usage Type，权威）</h3><p>地址：<code>https://www.ip2location.com/</code></p><p>重点看 <strong>Usage Type</strong>：</p><ul><li><code>ISP</code>/<code>MOB</code> = 住宅/手机</li><li><code>DCH</code> = 数据中心</li></ul><h3 id="3-IPIPseek（国内友好，中文）"><a href="#3-IPIPseek（国内友好，中文）" class="headerlink" title="3. IPIPseek（国内友好，中文）"></a>3. IPIPseek（国内友好，中文）</h3><p>地址：<code>https://www.ipipseek.com/</code></p><p>直接显示 IP 类型（住宅/数据中心/代理）、ISP、风险评分，国内节点查询速度快。</p><h3 id="4-ip-api-com（简洁，JSON-接口）"><a href="#4-ip-api-com（简洁，JSON-接口）" class="headerlink" title="4. ip-api.com（简洁，JSON 接口）"></a>4. ip-api.com（简洁，JSON 接口）</h3><p>地址：<code>https://ip-api.com/json/[IP]</code></p><p>关键字段：<code>isp</code>、<code>org</code>、<code>as</code><br>机房特征：<code>org</code> 含 <code>Hosting</code>/<code>Cloud</code>/<code>Data Center</code></p><h3 id="5-TrustMyIP-Cloud-IP-Check（专检云-机房）"><a href="#5-TrustMyIP-Cloud-IP-Check（专检云-机房）" class="headerlink" title="5. TrustMyIP Cloud IP Check（专检云/机房）"></a>5. TrustMyIP Cloud IP Check（专检云/机房）</h3><p>地址：<code>https://trustmyip.com/cloud-ip-check</code></p><p>直接返回：Datacenter/Hosting（是/否）、云厂商（AWS/Azure/GCP 等）</p><h3 id="6-Whoer（综合检测，含-DNS-泄露）"><a href="#6-Whoer（综合检测，含-DNS-泄露）" class="headerlink" title="6. Whoer（综合检测，含 DNS 泄露）"></a>6. Whoer（综合检测，含 DNS 泄露）</h3><p>地址：<code>https://whoer.com/zh/</code></p><p>看 ASN 与 DNS 服务器：DNS 为运营商 = 住宅；DNS 为云厂商 = 机房</p><hr><h2 id="二、命令行-API（适合批量、自动化）"><a href="#二、命令行-API（适合批量、自动化）" class="headerlink" title="二、命令行/API（适合批量、自动化）"></a>二、命令行/API（适合批量、自动化）</h2><h3 id="1-curl-ipinfo（Linux-macOS，最常用）"><a href="#1-curl-ipinfo（Linux-macOS，最常用）" class="headerlink" title="1. curl + ipinfo（Linux/macOS，最常用）"></a>1. curl + ipinfo（Linux/macOS，最常用）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://ipinfo.io/1.1.1.1/json<br><span class="hljs-comment"># 关键字段：asn.type, org, isp</span><br></code></pre></td></tr></table></figure><h3 id="2-bgp-he-net（查-ASN-网段）"><a href="#2-bgp-he-net（查-ASN-网段）" class="headerlink" title="2. bgp.he.net（查 ASN 网段）"></a>2. bgp.he.net（查 ASN 网段）</h3><p>地址：<code>https://bgp.he.net/</code></p><p>输入 IP → 看路由：<code>/20</code>~`/24` 大段连续 = 机房；碎片化 = 住宅</p><h3 id="3-apnic-net（亚太-IP-注册库）"><a href="#3-apnic-net（亚太-IP-注册库）" class="headerlink" title="3. apnic.net（亚太 IP 注册库）"></a>3. apnic.net（亚太 IP 注册库）</h3><p>地址：<code>https://search.apnic.net/</code></p><p>看注册人：运营商分公司 = 住宅；IDC/云公司 = 机房</p><hr><h2 id="三、商业-付费工具（高精度、批量）"><a href="#三、商业-付费工具（高精度、批量）" class="headerlink" title="三、商业/付费工具（高精度、批量）"></a>三、商业/付费工具（高精度、批量）</h2><h3 id="1-IPQualityScore（IPQS，反爬-风控常用）"><a href="#1-IPQualityScore（IPQS，反爬-风控常用）" class="headerlink" title="1. IPQualityScore（IPQS，反爬/风控常用）"></a>1. IPQualityScore（IPQS，反爬/风控常用）</h3><p>地址：<code>https://www.ipqualityscore.com/</code></p><p>输出：住宅/数据中心/代理/VPN、欺诈分、爬虫历史</p><h3 id="2-MaxMind-GeoIP2（企业级数据库）"><a href="#2-MaxMind-GeoIP2（企业级数据库）" class="headerlink" title="2. MaxMind GeoIP2（企业级数据库）"></a>2. MaxMind GeoIP2（企业级数据库）</h3><p>字段：<code>isp</code>、<code>organization</code>、<code>user_type</code></p><ul><li><code>residential</code> = 住宅</li><li><code>corporate</code>/<code>datacenter</code> = 机房</li></ul><hr><h2 id="四、快速判断规则（不用工具也能初步判断）"><a href="#四、快速判断规则（不用工具也能初步判断）" class="headerlink" title="四、快速判断规则（不用工具也能初步判断）"></a>四、快速判断规则（不用工具也能初步判断）</h2><table><thead><tr><th>维度</th><th>住宅 ISP</th><th>数据中心</th></tr></thead><tbody><tr><td><strong>ASN 类型</strong></td><td><code>isp</code></td><td><code>hosting</code>（最准）</td></tr><tr><td><strong>ISP 名称</strong></td><td>国内电信/联通/移动；海外 Comcast/AT&amp;T</td><td>阿里云/AWS/DO/DigitalOcean</td></tr><tr><td><strong>Usage Type</strong></td><td><code>ISP</code>/<code>MOB</code></td><td><code>DCH</code></td></tr><tr><td><strong>反向 DNS</strong></td><td>运营商域名</td><td>含 <code>dc</code>/<code>cloud</code>/<code>server</code></td></tr><tr><td><strong>网段大小</strong></td><td>碎片化</td><td><code>/20</code>~`/24` 大段连续</td></tr><tr><td><strong>IP 段归属</strong></td><td>运营商分公司</td><td>IDC/云公司</td></tr></tbody></table><hr><h2 id="五、推荐组合"><a href="#五、推荐组合" class="headerlink" title="五、推荐组合"></a>五、推荐组合</h2><table><thead><tr><th>场景</th><th>推荐方案</th></tr></thead><tbody><tr><td><strong>日常快速查询</strong></td><td>ipinfo.io + IP2Location</td></tr><tr><td><strong>批量自动化</strong></td><td><code>curl ipinfo.io</code> + bgp.he.net</td></tr><tr><td><strong>风控/反爬</strong></td><td>IPQualityScore + MaxMind</td></tr><tr><td><strong>国内节点</strong></td><td>IPIPseek</td></tr><tr><td><strong>纯云检测</strong></td><td>TrustMyIP Cloud IP Check</td></tr></tbody></table>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术笔记</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>代理</tag>
+      
+      <tag>反爬虫</tag>
+      
+      <tag>IP</tag>
+      
+      <tag>网络工具</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>小重山词牌与岳飞的知音难觅</title>
     <link href="/2026/07/27/%E5%B0%8F%E9%87%8D%E5%B1%B1%E8%AF%8D%E7%89%8C%E4%B8%8E%E5%B2%B3%E9%A3%9E%E7%9A%84%E7%9F%A5%E9%9F%B3%E9%9A%BE%E8%A7%85/"/>
     <url>/2026/07/27/%E5%B0%8F%E9%87%8D%E5%B1%B1%E8%AF%8D%E7%89%8C%E4%B8%8E%E5%B2%B3%E9%A3%9E%E7%9A%84%E7%9F%A5%E9%9F%B3%E9%9A%BE%E8%A7%85/</url>
