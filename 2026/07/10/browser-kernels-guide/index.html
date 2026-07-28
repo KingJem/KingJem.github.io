@@ -18,18 +18,19 @@
   
     <meta name="description" content="前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的要求差异很大，选错内核直接卡死。 本文把">
 <meta property="og:type" content="article">
-<meta property="og:title" content="反检测浏览器内核实战：ruyipage &#x2F; DrissionPage &#x2F; camoufox &#x2F; CloakBrowser">
+<meta property="og:title" content="反检测浏览器内核实战：ruyipage &#x2F; DrissionPage &#x2F; invisible &#x2F; camoufox &#x2F; CloakBrowser">
 <meta property="og:url" content="https://kingjem.github.io/2026/07/10/browser-kernels-guide/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
 <meta property="og:description" content="前言在 cookie 池架构里，思路是「真浏览器采放行 cookie → curl_cffi 同出口 IP + 同指纹回放」。浏览器内核负责过质询、拿真实会话，回放侧用 curl_cffi 的 impersonate 复刻内核的 TLS&#x2F;JA3 指纹。不同防护（Cloudflare &#x2F; Akamai &#x2F; PerimeterX &#x2F; Imperva 等）对内核的要求差异很大，选错内核直接卡死。 本文把">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-07-10T04:00:00.000Z">
-<meta property="article:modified_time" content="2026-07-10T05:30:28.091Z">
+<meta property="article:modified_time" content="2026-07-26T16:00:00.000Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Camoufox">
 <meta property="article:tag" content="CloakBrowser">
 <meta property="article:tag" content="DrissionPage">
 <meta property="article:tag" content="curl_cffi">
+<meta property="article:tag" content="invisible_playwright">
 <meta property="article:tag" content="ruyipage">
 <meta property="article:tag" content="反检测浏览器">
 <meta property="article:tag" content="指纹">
@@ -37,7 +38,7 @@
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser - Ruhai&#39;s blogs</title>
+  <title>反检测浏览器内核实战：ruyipage / DrissionPage / invisible / camoufox / CloakBrowser - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -194,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser"></span>
+            <span id="subtitle" data-typed-text="反检测浏览器内核实战：ruyipage / DrissionPage / invisible / camoufox / CloakBrowser"></span>
           
         </div>
 
@@ -217,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          9.7k 字
+          11k 字
         
       </span>
     
@@ -228,7 +229,7 @@
         
         
         
-          82 分钟
+          93 分钟
         
       </span>
     
@@ -274,12 +275,12 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</h1>
+            <h1 style="display: none">反检测浏览器内核实战：ruyipage / DrissionPage / invisible / camoufox / CloakBrowser</h1>
             
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2026年7月10日 下午
+                    本文最后更新于：2026年7月27日 凌晨
                   
                 
               </p>
@@ -316,6 +317,13 @@
 <td><code>firefox151</code></td>
 </tr>
 <tr>
+<td><strong>invisible_playwright</strong></td>
+<td>Firefox 151</td>
+<td>★★★★☆</td>
+<td>过 bot 检测测试（FingerprintJS/CreepJS）</td>
+<td><code>firefox*</code> + 采集时实际 UA</td>
+</tr>
+<tr>
 <td><strong>camoufox</strong></td>
 <td>反检测 Firefox</td>
 <td>★★★★☆</td>
@@ -330,7 +338,7 @@
 <td><code>chrome146</code>（免费版）</td>
 </tr>
 </tbody></table>
-<p><strong>升级顺序</strong>：Chrome 类站点被拦 → <code>dp → cloak</code>；Firefox 类质询更硬 → <code>ruyipage → camoufox</code>。</p>
+<p><strong>升级顺序</strong>：Chrome 类站点被拦 → <code>dp → cloak</code>；Firefox 类质询更硬 → <code>ruyipage → invisible → camoufox</code>。</p>
 <p>工程上四者统一为同一个后端接口（<code>spiders/cookie_pool/backends/</code>）：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># backends/__init__.py</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_backend</span>(<span class="hljs-params">name</span>):<br>    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">in</span> (<span class="hljs-string">&quot;cloak&quot;</span>, <span class="hljs-string">&quot;cloakbrowser&quot;</span>): ...<br>    <span class="hljs-keyword">if</span> name == <span class="hljs-string">&quot;ruyipage&quot;</span>: ...<br>    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">in</span> (<span class="hljs-string">&quot;drissionpage&quot;</span>, <span class="hljs-string">&quot;dp&quot;</span>): ...<br>    <span class="hljs-keyword">if</span> name == <span class="hljs-string">&quot;camoufox&quot;</span>: ...<br><br><span class="hljs-comment"># 每个后端模块只暴露两个函数：</span><br><span class="hljs-comment">#   available() -&gt; bool            当前环境能否用</span><br><span class="hljs-comment">#   async fetch(**kw) -&gt; dict      返回 &#123;cookies, ua, blocked, block_marker, ready, page_len&#125;</span><br></code></pre></td></tr></table></figure>
 
@@ -394,7 +402,94 @@
 </ul>
 <p>工程后端：<code>backend=&quot;ruyipage&quot;</code>（或 <code>turnstile</code> = ruyipage + CF Managed 处理）。</p>
 <hr>
-<h2 id="3-camoufox-——-反检测-Firefox（官方-三方-fork）"><a href="#3-camoufox-——-反检测-Firefox（官方-三方-fork）" class="headerlink" title="3. camoufox —— 反检测 Firefox（官方 + 三方 fork）"></a>3. camoufox —— 反检测 Firefox（官方 + 三方 fork）</h2><p>对 Firefox 深度打补丁、<strong>不注入 JS 即可改指纹</strong>，比 ruyipage/invisible 更「像真人」。<br>onbuy 的 Cloudflare 自适应 JA3 严格质询就是靠它解的（ruyipage 被升级成交互式解不出、dp 的 JA3 curl 又回放不了）。</p>
+<h2 id="3-invisible-playwright-——-隐身-Playwright（FF151-反检测）"><a href="#3-invisible-playwright-——-隐身-Playwright（FF151-反检测）" class="headerlink" title="3. invisible_playwright —— 隐身 Playwright（FF151 反检测）"></a>3. invisible_playwright —— 隐身 Playwright（FF151 反检测）</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><a target="_blank" rel="noopener" href="https://github.com/feder-cr/invisible_playwright"><code>invisible_playwright</code></a>（<code>invisible-playwright</code> on PyPI）是一款基于 <strong>Firefox 151</strong> 的隐身 Playwright 封装，在浏览器引擎层（而非 JS 注入层）打补丁，号称”passes every bot detection test”。</p>
+<ul>
+<li><strong>开发者：</strong> <a target="_blank" rel="noopener" href="https://github.com/feder-cr">feder-cr</a></li>
+<li><strong>基座：</strong> 自编译 Firefox 151（与 ruyipage 同基底，但补丁方案不同）</li>
+<li><strong>定位：</strong> 介于 ruyipage 和 camoufox 之间——比 ruyipage 更隐身，比 camoufox 更轻量</li>
+<li><strong>Stars：</strong> ~1800</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install invisible-playwright<br><span class="hljs-comment"># 自动下载补丁后的 Firefox 151 二进制</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="原生用法-1"><a href="#原生用法-1" class="headerlink" title="原生用法"></a>原生用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> invisible_playwright <span class="hljs-keyword">import</span> Playwright<br><br><span class="hljs-keyword">with</span> Playwright() <span class="hljs-keyword">as</span> pw:<br>    browser = pw.firefox.launch(headless=<span class="hljs-literal">False</span>)<br>    ctx = browser.new_context()<br>    page = ctx.new_page()<br>    page.goto(<span class="hljs-string">&quot;https://bot-detection-reborn.pages.dev&quot;</span>)<br>    page.screenshot(path=<span class="hljs-string">&quot;result.png&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>与标准 Playwright API 兼容，只需将 <code>sync_playwright</code> 替换为 <code>Playwright</code>，即可获得隐身能力。</p>
+<h3 id="核心原理"><a href="#核心原理" class="headerlink" title="核心原理"></a>核心原理</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>指纹修改</strong></td>
+<td>在引擎层（C++）修改 Firefox 源码，非 JS 注入</td>
+</tr>
+<tr>
+<td><strong>补丁方式</strong></td>
+<td>针对主流反检测工具（FingerprintJS、sannysoft、CreepJS 等）逐个修复泄漏点</td>
+</tr>
+<tr>
+<td><strong>WebRTC</strong></td>
+<td>引擎层禁用，无泄漏风险</td>
+</tr>
+<tr>
+<td><strong>CDP 检测</strong></td>
+<td>Firefox 无 CDP（走 CDP/DevTools Protocol 的检测无效）</td>
+</tr>
+<tr>
+<td><strong>头戴模式</strong></td>
+<td>支持 headless，real headless（无 fake headless 特征）</td>
+</tr>
+</tbody></table>
+<h3 id="与-ruyipage-camoufox-对比"><a href="#与-ruyipage-camoufox-对比" class="headerlink" title="与 ruyipage / camoufox 对比"></a>与 ruyipage / camoufox 对比</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>ruyipage (FF151)</th>
+<th>invisible_playwright (FF151)</th>
+<th>camoufox (FF135 / 自定义)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>补丁深度</strong></td>
+<td>BiDi + JS 层面</td>
+<td>引擎层 C++ 补丁</td>
+<td>引擎层 C++ 补丁</td>
+</tr>
+<tr>
+<td><strong>强度评级</strong></td>
+<td>★★★☆☆</td>
+<td>★★★★☆</td>
+<td>★★★★☆</td>
+</tr>
+<tr>
+<td><strong>API</strong></td>
+<td>自研 ruyipage API</td>
+<td>标准 Playwright API</td>
+<td>标准 Playwright API</td>
+</tr>
+<tr>
+<td><strong>geoip 对齐</strong></td>
+<td>通过 <code>apply_smart_fingerprint</code></td>
+<td>需自行处理</td>
+<td>内置 <code>geoip=True</code></td>
+</tr>
+<tr>
+<td><strong>选型场景</strong></td>
+<td>静默 JS 挑战、Turnstile</td>
+<td><strong>过 bot 检测测试</strong></td>
+<td>CF 严格质询、Akamai 行为检测</td>
+</tr>
+</tbody></table>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ul>
+<li>和 camoufox 一样，<strong>注意钉牢 playwright 版本</strong>（项目依赖 <code>playwright&lt;=1.61.0,&gt;=1.55</code>）</li>
+<li>引擎下载约 200MB，首次启动自动拉取</li>
+<li>内核版本目前固定在 FF151，没有像 camoufox fork 那样的高版本自定义构建</li>
+</ul>
+<p>工程后端可映射为 <code>backend=&quot;invisible&quot;</code>。</p>
+<hr>
+<h2 id="4-camoufox-——-反检测-Firefox（官方-三方-fork）"><a href="#4-camoufox-——-反检测-Firefox（官方-三方-fork）" class="headerlink" title="4. camoufox —— 反检测 Firefox（官方 + 三方 fork）"></a>4. camoufox —— 反检测 Firefox（官方 + 三方 fork）</h2><p>对 Firefox 深度打补丁、<strong>不注入 JS 即可改指纹</strong>，比 ruyipage/invisible 更「像真人」。<br>onbuy 的 Cloudflare 自适应 JA3 严格质询就是靠它解的（ruyipage 被升级成交互式解不出、dp 的 JA3 curl 又回放不了）。</p>
 <h3 id="3-1-官方版（pip）"><a href="#3-1-官方版（pip）" class="headerlink" title="3.1 官方版（pip）"></a>3.1 官方版（pip）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install <span class="hljs-string">&quot;camoufox[geoip]&quot;</span>       <span class="hljs-comment"># geoip extra 会带本地 mmdb</span><br>python -m camoufox fetch            <span class="hljs-comment"># 下载浏览器二进制（官方 FF135，约 700MB）</span><br></code></pre></td></tr></table></figure>
 
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camoufox.async_api <span class="hljs-keyword">import</span> AsyncCamoufox   <span class="hljs-comment"># 同步版：from camoufox.sync_api import Camoufox</span><br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> AsyncCamoufox(headless=<span class="hljs-literal">True</span>, humanize=<span class="hljs-literal">True</span>,<br>                         geoip=<span class="hljs-literal">True</span>, locale=<span class="hljs-string">&quot;en-US&quot;</span>) <span class="hljs-keyword">as</span> browser:<br>    page = <span class="hljs-keyword">await</span> browser.new_page()<br>    <span class="hljs-keyword">await</span> page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>, wait_until=<span class="hljs-string">&quot;domcontentloaded&quot;</span>)<br>    html = <span class="hljs-keyword">await</span> page.content()<br>    jar  = &#123;c[<span class="hljs-string">&quot;name&quot;</span>]: c[<span class="hljs-string">&quot;value&quot;</span>] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-keyword">await</span> page.context.cookies()&#125;<br>    ua   = <span class="hljs-keyword">await</span> page.evaluate(<span class="hljs-string">&quot;navigator.userAgent&quot;</span>)<br></code></pre></td></tr></table></figure>
@@ -431,10 +526,10 @@
 <h3 id="3-4-回放侧的坑：每会话随机-UA"><a href="#3-4-回放侧的坑：每会话随机-UA" class="headerlink" title="3.4 回放侧的坑：每会话随机 UA"></a>3.4 回放侧的坑：每会话随机 UA</h3><p>camoufox <strong>每个会话随机 UA</strong>，所以回放<strong>必须用采集时的实际 UA</strong>（不能硬编码）：采集后回传<br><code>navigator.userAgent</code>，消费端 <code>consumer.session</code> 用 <code>entry[&quot;ua&quot;]</code> 设 <code>curl_cffi</code> 的请求头，<br><code>impersonate</code> 用 <code>firefox*</code> 对齐 JA3。</p>
 <p>工程后端：<code>backend=&quot;camoufox&quot;</code>。</p>
 <hr>
-<h2 id="4-CloakBrowser-——-反检测最强的隐身-Chromium"><a href="#4-CloakBrowser-——-反检测最强的隐身-Chromium" class="headerlink" title="4. CloakBrowser —— 反检测最强的隐身 Chromium"></a>4. CloakBrowser —— 反检测最强的隐身 Chromium</h2><p>源码级指纹补丁的隐身 Chromium：<strong>击败 CDP 检测、无 headless 泄漏、Windows 原生 GPU 直通、过 incognito 检测</strong><br>（”passes every bot detection test”）。实测反检测强度最高 —— bloomingdales 的 Akamai 上，它是<strong>唯一</strong>能拿到<br>真实首页（1.58MB）的内核（dp/普通 Chrome 被 Access Denied、ruyipage/invisible/camoufox 卡 sec-cpt 行为质询）。</p>
+<h2 id="5-CloakBrowser-——-反检测最强的隐身-Chromium"><a href="#5-CloakBrowser-——-反检测最强的隐身-Chromium" class="headerlink" title="5. CloakBrowser —— 反检测最强的隐身 Chromium"></a>5. CloakBrowser —— 反检测最强的隐身 Chromium</h2><p>源码级指纹补丁的隐身 Chromium：<strong>击败 CDP 检测、无 headless 泄漏、Windows 原生 GPU 直通、过 incognito 检测</strong><br>（”passes every bot detection test”）。实测反检测强度最高 —— bloomingdales 的 Akamai 上，它是<strong>唯一</strong>能拿到<br>真实首页（1.58MB）的内核（dp/普通 Chrome 被 Access Denied、ruyipage/invisible/camoufox 卡 sec-cpt 行为质询）。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install -U cloakbrowser        <span class="hljs-comment"># 实测 0.4.9</span><br><span class="hljs-comment"># 免费版内核 Chrome146；Pro 版 Chrome148 + 最新反爬补丁（cloakbrowser.dev 7 天试用）</span><br><span class="hljs-comment"># 首次 launch 自动拉内核二进制；启动会打印 free-tier banner（stdout 噪音，无害）</span><br></code></pre></td></tr></table></figure>
 
-<h3 id="原生用法-1"><a href="#原生用法-1" class="headerlink" title="原生用法"></a>原生用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> cloakbrowser <span class="hljs-keyword">import</span> launch_async<br><span class="hljs-keyword">from</span> tools.trans_proxy <span class="hljs-keyword">import</span> proxy_to_playwright<br><br>browser = <span class="hljs-keyword">await</span> launch_async(<br>    proxy=proxy_to_playwright(<span class="hljs-string">&quot;http://user:pwd@host:port&quot;</span>),  <span class="hljs-comment"># None=直连</span><br>    headless=<span class="hljs-literal">False</span>,<br>    humanize=<span class="hljs-literal">True</span>,<br>    geoip=<span class="hljs-literal">True</span>,        <span class="hljs-comment"># 有代理时按出口 IP 地理对齐指纹（CloakBrowser 自带）</span><br>    args=[<span class="hljs-string">&#x27;--blink-settings=imagesEnabled=false&#x27;</span>],           <span class="hljs-comment"># 禁图</span><br>)<br>ctx  = <span class="hljs-keyword">await</span> browser.new_context()<br>page = <span class="hljs-keyword">await</span> ctx.new_page()<br><span class="hljs-keyword">await</span> page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>, wait_until=<span class="hljs-string">&quot;domcontentloaded&quot;</span>, timeout=<span class="hljs-number">120000</span>)<br>html = <span class="hljs-keyword">await</span> page.content()<br>jar  = &#123;c[<span class="hljs-string">&quot;name&quot;</span>]: c[<span class="hljs-string">&quot;value&quot;</span>] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-keyword">await</span> page.context.cookies()&#125;<br><span class="hljs-keyword">await</span> browser.close()<br></code></pre></td></tr></table></figure>
+<h3 id="原生用法-2"><a href="#原生用法-2" class="headerlink" title="原生用法"></a>原生用法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> cloakbrowser <span class="hljs-keyword">import</span> launch_async<br><span class="hljs-keyword">from</span> tools.trans_proxy <span class="hljs-keyword">import</span> proxy_to_playwright<br><br>browser = <span class="hljs-keyword">await</span> launch_async(<br>    proxy=proxy_to_playwright(<span class="hljs-string">&quot;http://user:pwd@host:port&quot;</span>),  <span class="hljs-comment"># None=直连</span><br>    headless=<span class="hljs-literal">False</span>,<br>    humanize=<span class="hljs-literal">True</span>,<br>    geoip=<span class="hljs-literal">True</span>,        <span class="hljs-comment"># 有代理时按出口 IP 地理对齐指纹（CloakBrowser 自带）</span><br>    args=[<span class="hljs-string">&#x27;--blink-settings=imagesEnabled=false&#x27;</span>],           <span class="hljs-comment"># 禁图</span><br>)<br>ctx  = <span class="hljs-keyword">await</span> browser.new_context()<br>page = <span class="hljs-keyword">await</span> ctx.new_page()<br><span class="hljs-keyword">await</span> page.goto(<span class="hljs-string">&quot;https://target.com&quot;</span>, wait_until=<span class="hljs-string">&quot;domcontentloaded&quot;</span>, timeout=<span class="hljs-number">120000</span>)<br>html = <span class="hljs-keyword">await</span> page.content()<br>jar  = &#123;c[<span class="hljs-string">&quot;name&quot;</span>]: c[<span class="hljs-string">&quot;value&quot;</span>] <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> <span class="hljs-keyword">await</span> page.context.cookies()&#125;<br><span class="hljs-keyword">await</span> browser.close()<br></code></pre></td></tr></table></figure>
 
 <ul>
 <li>回放 <code>curl_cffi</code> 用 **<code>chrome146</code>**（对齐免费版内核大版本；Pro 版对齐 <code>chrome148</code>）。</li>
@@ -442,7 +537,7 @@
 </ul>
 <p>工程后端：<code>backend=&quot;cloak&quot;</code>（别名 <code>cloakbrowser</code>）。</p>
 <hr>
-<h2 id="5-回放侧指纹对齐（curl-cffi）"><a href="#5-回放侧指纹对齐（curl-cffi）" class="headerlink" title="5. 回放侧指纹对齐（curl_cffi）"></a>5. 回放侧指纹对齐（curl_cffi）</h2><p>内核采完 cookie，回放要用 <code>curl_cffi</code> 复刻<strong>同一内核的 TLS/JA3 指纹</strong>，否则同 IP 同 cookie 也会被拦：</p>
+<h2 id="6-回放侧指纹对齐（curl-cffi）"><a href="#6-回放侧指纹对齐（curl-cffi）" class="headerlink" title="6. 回放侧指纹对齐（curl_cffi）"></a>6. 回放侧指纹对齐（curl_cffi）</h2><p>内核采完 cookie，回放要用 <code>curl_cffi</code> 复刻<strong>同一内核的 TLS/JA3 指纹</strong>，否则同 IP 同 cookie 也会被拦：</p>
 <table>
 <thead>
 <tr>
@@ -470,11 +565,11 @@
 <blockquote>
 <p>本地装的是 <strong>KingJem 自编译的 curl_cffi fork</strong>（curl-impersonate + curl_cffi 0.15.5），<br>含 <code>chrome141-150</code>（无 147）/ <code>firefox144-153</code> / brave 等新指纹；标准版 <code>curl_cffi</code> 没有这些。<br><strong>部署前先探测目标机器有没有这个 fork</strong>，否则回放报 <code>ImpersonateError</code>。</p>
 </blockquote>
-<h2 id="6-选型决策"><a href="#6-选型决策" class="headerlink" title="6. 选型决策"></a>6. 选型决策</h2><ol>
-<li><strong>先按防护类型定基座</strong>：Chrome 类站点走 dp/cloak；Firefox 更能过的质询走 ruyipage/camoufox。</li>
+<h2 id="7-选型决策"><a href="#7-选型决策" class="headerlink" title="7. 选型决策"></a>7. 选型决策</h2><ol>
+<li><strong>先按防护类型定基座</strong>：Chrome 类站点走 dp/cloak；Firefox 更能过的质询走 ruyipage/invisible/camoufox。</li>
 <li><strong>按被拦程度升级</strong>：<ul>
 <li>Chrome 侧：<code>dp（本机 Chrome）→ cloak（隐身 Chromium）</code></li>
-<li>Firefox 侧：<code>ruyipage（FF151）→ camoufox（反检测 FF，含 fork）</code></li>
+<li>Firefox 侧：<code>ruyipage（FF151）→ invisible（FF151 隐身）→ camoufox（反检测 FF，含 fork）</code></li>
 </ul>
 </li>
 <li><strong>geo 敏感站</strong>：数据中心代理务必开 geoip 对齐（camoufox <code>geoip=</code>；ruyipage <code>apply_smart_fingerprint</code>）。</li>
@@ -537,6 +632,8 @@
       
         <a href="/tags/%E6%8C%87%E7%BA%B9/">#指纹</a>
       
+        <a href="/tags/invisible-playwright/">#invisible_playwright</a>
+      
     </div>
   
 </div>
@@ -547,7 +644,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>反检测浏览器内核实战：ruyipage / DrissionPage / camoufox / CloakBrowser</div>
+      <div>反检测浏览器内核实战：ruyipage / DrissionPage / invisible / camoufox / CloakBrowser</div>
       <div>https://kingjem.github.io/2026/07/10/browser-kernels-guide/</div>
     </div>
     <div class="license-meta">
