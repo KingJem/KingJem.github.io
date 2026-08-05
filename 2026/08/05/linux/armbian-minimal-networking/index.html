@@ -16,15 +16,15 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="Armbian minimal 镜像没有 NetworkManager，nmcli&#x2F;nmtui 不可用；本文用 systemd-networkd + Netplan 配置有线、静态 IP 与 WiFi，附 nmcli 命令对照表和远程 SSH 操作的保命技巧。">
+    <meta name="description" content="Armbian minimal 镜像没有 NetworkManager，nmcli&#x2F;nmtui 不可用；本文用 systemd-networkd + Netplan 配置有线、WiFi（DHCP&#x2F;静态 IP），附 WiFi 问题排查、nmcli 命令对照表和远程 SSH 操作的保命技巧。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Armbian Minimal 镜像网络设置指南：systemd-networkd + Netplan">
 <meta property="og:url" content="https://kingjem.github.io/2026/08/05/linux/armbian-minimal-networking/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="Armbian minimal 镜像没有 NetworkManager，nmcli&#x2F;nmtui 不可用；本文用 systemd-networkd + Netplan 配置有线、静态 IP 与 WiFi，附 nmcli 命令对照表和远程 SSH 操作的保命技巧。">
+<meta property="og:description" content="Armbian minimal 镜像没有 NetworkManager，nmcli&#x2F;nmtui 不可用；本文用 systemd-networkd + Netplan 配置有线、WiFi（DHCP&#x2F;静态 IP），附 WiFi 问题排查、nmcli 命令对照表和远程 SSH 操作的保命技巧。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-05T03:10:38.000Z">
-<meta property="article:modified_time" content="2026-08-05T03:10:43.294Z">
+<meta property="article:modified_time" content="2026-08-05T03:18:47.737Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Armbian">
 <meta property="article:tag" content="Linux">
@@ -217,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          2.6k 字
         
       </span>
     
@@ -228,7 +228,7 @@
         
         
         
-          16 分钟
+          22 分钟
         
       </span>
     
@@ -287,10 +287,10 @@
             <div class="markdown-body">
               
               <blockquote>
-<p>适用范围：Armbian <strong>minimal</strong> 镜像（Debian / Ubuntu 均适用）<br>Backend：<code>systemd-networkd</code>（<strong>没有</strong> NetworkManager，<code>nmcli</code> / <code>nmtui</code> 命令在此镜像上不可用）<br>配置方式：<code>Netplan</code>（Armbian 24.05 及以后版本统一使用）</p>
+<p>适用范围：Armbian <strong>minimal</strong> 镜像（Debian / Ubuntu 均适用），有线 / WiFi 无线连接均可<br>Backend：<code>systemd-networkd</code>（<strong>没有</strong> NetworkManager，<code>nmcli</code> / <code>nmtui</code> 命令在此镜像上不可用）<br>配置方式：<code>Netplan</code>（Armbian 24.05 及以后版本统一使用）</p>
 </blockquote>
 <hr>
-<h2 id="1-确认当前网络状态"><a href="#1-确认当前网络状态" class="headerlink" title="1. 确认当前网络状态"></a>1. 确认当前网络状态</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">ip addr                          <span class="hljs-comment"># 查看接口名和当前 IP</span><br><span class="hljs-built_in">ls</span> /etc/netplan/                 <span class="hljs-comment"># 查看现有配置文件</span><br><span class="hljs-built_in">cat</span> /etc/netplan/*.yaml          <span class="hljs-comment"># 查看配置内容</span><br>networkctl status                <span class="hljs-comment"># networkd 专用状态查看</span><br>resolvectl status                <span class="hljs-comment"># 查看 DNS 配置</span><br></code></pre></td></tr></table></figure>
+<h2 id="1-确认当前网络状态"><a href="#1-确认当前网络状态" class="headerlink" title="1. 确认当前网络状态"></a>1. 确认当前网络状态</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">ip addr                          <span class="hljs-comment"># 查看接口名和当前 IP（无线一般是 wlan0 / wlx开头）</span><br><span class="hljs-built_in">ls</span> /etc/netplan/                 <span class="hljs-comment"># 查看现有配置文件</span><br><span class="hljs-built_in">cat</span> /etc/netplan/*.yaml          <span class="hljs-comment"># 查看配置内容</span><br>networkctl status                <span class="hljs-comment"># networkd 专用状态查看</span><br>resolvectl status                <span class="hljs-comment"># 查看 DNS 配置</span><br>iw dev                           <span class="hljs-comment"># 确认无线接口是否被内核识别</span><br></code></pre></td></tr></table></figure>
 
 <hr>
 <h2 id="2-有线网络"><a href="#2-有线网络" class="headerlink" title="2. 有线网络"></a>2. 有线网络</h2><h3 id="2-1-DHCP（默认）"><a href="#2-1-DHCP（默认）" class="headerlink" title="2.1 DHCP（默认）"></a>2.1 DHCP（默认）</h3><p>默认文件 <code>/etc/netplan/10-dhcp-all-interfaces.yaml</code>：</p>
@@ -301,20 +301,25 @@
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">network:</span><br>  <span class="hljs-attr">version:</span> <span class="hljs-number">2</span><br>  <span class="hljs-attr">renderer:</span> <span class="hljs-string">networkd</span><br>  <span class="hljs-attr">ethernets:</span><br>    <span class="hljs-attr">eth0:</span>                    <span class="hljs-comment"># 换成实际接口名（用 ip addr 查）</span><br>      <span class="hljs-attr">dhcp4:</span> <span class="hljs-literal">no</span><br>      <span class="hljs-attr">addresses:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.199</span><span class="hljs-string">/24</span><br>      <span class="hljs-attr">routes:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">to:</span> <span class="hljs-string">default</span><br>          <span class="hljs-attr">via:</span> <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span><br>      <span class="hljs-attr">nameservers:</span><br>        <span class="hljs-attr">addresses:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-number">9.9</span><span class="hljs-number">.9</span><span class="hljs-number">.9</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-number">1.1</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span><br></code></pre></td></tr></table></figure>
 
 <hr>
-<h2 id="3-WiFi-网络"><a href="#3-WiFi-网络" class="headerlink" title="3. WiFi 网络"></a>3. WiFi 网络</h2><h3 id="3-1-前置依赖"><a href="#3-1-前置依赖" class="headerlink" title="3.1 前置依赖"></a>3.1 前置依赖</h3><p>networkd 处理 WiFi 需要 <code>wpa_supplicant</code>：</p>
+<h2 id="3-WiFi-前置依赖"><a href="#3-WiFi-前置依赖" class="headerlink" title="3. WiFi 前置依赖"></a>3. WiFi 前置依赖</h2><p>networkd 处理 WiFi 需要 <code>wpa_supplicant</code>，先确认已安装：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">which</span> wpa_supplicant || <span class="hljs-built_in">sudo</span> apt install wpasupplicant -y<br></code></pre></td></tr></table></figure>
 
-<h3 id="3-2-配置文件"><a href="#3-2-配置文件" class="headerlink" title="3.2 配置文件"></a>3.2 配置文件</h3><p>新建 <code>/etc/netplan/30-wifi.yaml</code>：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">network:</span><br>  <span class="hljs-attr">version:</span> <span class="hljs-number">2</span><br>  <span class="hljs-attr">renderer:</span> <span class="hljs-string">networkd</span><br>  <span class="hljs-attr">wifis:</span><br>    <span class="hljs-attr">wlan0:</span>                   <span class="hljs-comment"># 换成实际无线接口名</span><br>      <span class="hljs-attr">dhcp4:</span> <span class="hljs-literal">yes</span><br>      <span class="hljs-attr">access-points:</span><br>        <span class="hljs-string">&quot;你的SSID&quot;</span><span class="hljs-string">:</span><br>          <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;你的密码&quot;</span><br></code></pre></td></tr></table></figure>
+<hr>
+<h2 id="4-WiFi-配置（DHCP，自动获取-IP，推荐）"><a href="#4-WiFi-配置（DHCP，自动获取-IP，推荐）" class="headerlink" title="4. WiFi 配置（DHCP，自动获取 IP，推荐）"></a>4. WiFi 配置（DHCP，自动获取 IP，推荐）</h2><p>新建 <code>/etc/netplan/30-wifi.yaml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">network:</span><br>  <span class="hljs-attr">version:</span> <span class="hljs-number">2</span><br>  <span class="hljs-attr">renderer:</span> <span class="hljs-string">networkd</span><br>  <span class="hljs-attr">wifis:</span><br>    <span class="hljs-attr">wlan0:</span>                   <span class="hljs-comment"># 换成实际无线接口名，用 ip addr 或 iw dev 确认</span><br>      <span class="hljs-attr">dhcp4:</span> <span class="hljs-literal">yes</span><br>      <span class="hljs-attr">access-points:</span><br>        <span class="hljs-string">&quot;你的SSID&quot;</span><span class="hljs-string">:</span><br>          <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;你的密码&quot;</span><br></code></pre></td></tr></table></figure>
 
 <hr>
-<h2 id="4-应用配置"><a href="#4-应用配置" class="headerlink" title="4. 应用配置"></a>4. 应用配置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chmod</span> 600 /etc/netplan/*.yaml   <span class="hljs-comment"># 权限不对不会生效</span><br><span class="hljs-built_in">sudo</span> netplan generate                 <span class="hljs-comment"># 检查语法</span><br><span class="hljs-built_in">sudo</span> netplan try                      <span class="hljs-comment"># 试运行，120秒内不确认会自动回滚（远程操作强烈建议先用这个）</span><br><span class="hljs-built_in">sudo</span> netplan apply                    <span class="hljs-comment"># 正式应用</span><br></code></pre></td></tr></table></figure>
+<h2 id="5-WiFi-配置（静态-IP）"><a href="#5-WiFi-配置（静态-IP）" class="headerlink" title="5. WiFi 配置（静态 IP）"></a>5. WiFi 配置（静态 IP）</h2><p>如果不想用 DHCP，改成静态 IP：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">network:</span><br>  <span class="hljs-attr">version:</span> <span class="hljs-number">2</span><br>  <span class="hljs-attr">renderer:</span> <span class="hljs-string">networkd</span><br>  <span class="hljs-attr">wifis:</span><br>    <span class="hljs-attr">wlan0:</span><br>      <span class="hljs-attr">dhcp4:</span> <span class="hljs-literal">no</span><br>      <span class="hljs-attr">addresses:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.199</span><span class="hljs-string">/24</span><br>      <span class="hljs-attr">routes:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">to:</span> <span class="hljs-string">default</span><br>          <span class="hljs-attr">via:</span> <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span><br>      <span class="hljs-attr">nameservers:</span><br>        <span class="hljs-attr">addresses:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-number">9.9</span><span class="hljs-number">.9</span><span class="hljs-number">.9</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-number">1.1</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span><br>      <span class="hljs-attr">access-points:</span><br>        <span class="hljs-string">&quot;你的SSID&quot;</span><span class="hljs-string">:</span><br>          <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;你的密码&quot;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-应用配置"><a href="#6-应用配置" class="headerlink" title="6. 应用配置"></a>6. 应用配置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chmod</span> 600 /etc/netplan/*.yaml   <span class="hljs-comment"># 权限不对不会生效</span><br><span class="hljs-built_in">sudo</span> netplan generate                 <span class="hljs-comment"># 检查语法</span><br><span class="hljs-built_in">sudo</span> netplan try                      <span class="hljs-comment"># 试运行，120秒内不确认会自动回滚（远程操作强烈建议先用这个）</span><br><span class="hljs-built_in">sudo</span> netplan apply                    <span class="hljs-comment"># 正式应用</span><br></code></pre></td></tr></table></figure>
 
 <blockquote>
 <p>⚠️ **远程 SSH 操作时优先用 <code>netplan try</code>**，避免配置出错导致远程连接直接断开、只能物理接屏幕救。</p>
 </blockquote>
 <hr>
-<h2 id="5-断开重连-WiFi-接口"><a href="#5-断开重连-WiFi-接口" class="headerlink" title="5. 断开重连 WiFi / 接口"></a>5. 断开重连 WiFi / 接口</h2><p>networkd 没有 <code>nmcli connection down/up</code> 这种命令，对应操作是：</p>
+<h2 id="7-断开重连-WiFi-接口"><a href="#7-断开重连-WiFi-接口" class="headerlink" title="7. 断开重连 WiFi / 接口"></a>7. 断开重连 WiFi / 接口</h2><p>networkd 没有 <code>nmcli connection down/up</code> 这种命令，对应操作是：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> networkctl reconfigure wlan0<br></code></pre></td></tr></table></figure>
 
 <p>或重启整个 networkd 服务：</p>
@@ -322,7 +327,15 @@
 
 <p>如果只是改了 SSID/密码，直接编辑 yaml 后 <code>netplan apply</code> 即可，不需要单独”断开”这一步。</p>
 <hr>
-<h2 id="6-常用命令对照表（nmcli-→-networkd）"><a href="#6-常用命令对照表（nmcli-→-networkd）" class="headerlink" title="6. 常用命令对照表（nmcli → networkd）"></a>6. 常用命令对照表（nmcli → networkd）</h2><table>
+<h2 id="8-WiFi-常见问题排查"><a href="#8-WiFi-常见问题排查" class="headerlink" title="8. WiFi 常见问题排查"></a>8. WiFi 常见问题排查</h2><ul>
+<li><strong><code>iw dev</code> 看不到无线接口</strong> → 内核驱动没识别到硬件，检查 <code>dmesg | grep -i wlan</code> 或 <code>dmesg | grep -i firmware</code>，多半是固件文件缺失或驱动不支持该芯片。</li>
+<li><strong>接口存在但连不上</strong> → 确认 SSID/密码拼写、<code>wpasupplicant</code> 是否装了，然后看日志：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">journalctl -u systemd-networkd -f<br>journalctl -u wpa_supplicant@wlan0 -f<br></code></pre></td></tr></table></figure></li>
+<li><strong>能连上但没有 IP</strong> → 大概率是 DHCP 没拿到地址，检查路由器 DHCP 池是否够用，或换成静态 IP 配置排除干扰。</li>
+<li><strong>信号弱 / 频繁掉线</strong> → networkd 本身不做信号强度展示，用 <code>iw dev wlan0 link</code> 看当前连接的信号质量（signal 值越接近 0 越好，一般 -70dBm 以内可用）。</li>
+<li><strong>改了配置没生效</strong> → 检查文件权限（<code>chmod 600</code>）和文件名排序是否被别的 yaml 覆盖（<code>ls /etc/netplan/</code> 按字典序确认加载顺序）。</li>
+</ul>
+<hr>
+<h2 id="9-常用命令对照表（nmcli-→-networkd）"><a href="#9-常用命令对照表（nmcli-→-networkd）" class="headerlink" title="9. 常用命令对照表（nmcli → networkd）"></a>9. 常用命令对照表（nmcli → networkd）</h2><table>
 <thead>
 <tr>
 <th>想干什么</th>
@@ -355,7 +368,7 @@
 </tr>
 </tbody></table>
 <hr>
-<h2 id="7-常见坑"><a href="#7-常见坑" class="headerlink" title="7. 常见坑"></a>7. 常见坑</h2><ul>
+<h2 id="10-常见坑"><a href="#10-常见坑" class="headerlink" title="10. 常见坑"></a>10. 常见坑</h2><ul>
 <li>多个 <code>.yaml</code> 文件按<strong>文件名字典序</strong>加载，同名字段后加载的会覆盖前面的，新建静态 IP 配置时记得处理掉默认的 DHCP 文件。</li>
 <li>yaml 文件权限要求严格，权限不对（比如全局可读）会静默不生效或报警告，务必 <code>chmod 600</code>。</li>
 <li>WiFi 配置缺 <code>wpasupplicant</code> 包时，<code>netplan apply</code> 不会报错但连接建立不起来，排查时先确认这个依赖装了。</li>
