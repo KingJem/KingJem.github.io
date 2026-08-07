@@ -1,0 +1,986 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="项目简介TencentDB Agent Memory 是腾讯云开源的 Agent 记忆框架（MIT 协议），解决的核心问题是：怎样减少使用 Agent 时的重复工作——项目背景不用换个 Session 再讲一遍、文档不用每个 Agent 从第一页重读、跑通的做法不用下次再摸索。 1已有信息 → 可复用记忆资产 → 更少 Turns → 更少返工 → 更稳定的结果   记忆分层：L0 原始对话 →">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TencentDB Agent Memory 安装使用教程 — Windows &#x2F; Linux &#x2F; macOS 三平台">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/07/TencentDB-Agent-Memory-%E4%B8%89%E5%B9%B3%E5%8F%B0%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="项目简介TencentDB Agent Memory 是腾讯云开源的 Agent 记忆框架（MIT 协议），解决的核心问题是：怎样减少使用 Agent 时的重复工作——项目背景不用换个 Session 再讲一遍、文档不用每个 Agent 从第一页重读、跑通的做法不用下次再摸索。 1已有信息 → 可复用记忆资产 → 更少 Turns → 更少返工 → 更稳定的结果   记忆分层：L0 原始对话 →">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-07T06:25:55.000Z">
+<meta property="article:modified_time" content="2026-08-07T06:26:03.375Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="AI 编程">
+<meta property="article:tag" content="Agent Memory">
+<meta property="article:tag" content="Claude Code">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="TencentDB">
+<meta property="article:tag" content="团队记忆">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-07 14:25" pubdate>
+          2026年8月7日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          83 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月7日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p><a target="_blank" rel="noopener" href="https://github.com/TencentCloud/TencentDB-Agent-Memory">TencentDB Agent Memory</a> 是腾讯云开源的 Agent 记忆框架（MIT 协议），解决的核心问题是：<strong>怎样减少使用 Agent 时的重复工作</strong>——项目背景不用换个 Session 再讲一遍、文档不用每个 Agent 从第一页重读、跑通的做法不用下次再摸索。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">已有信息 → 可复用记忆资产 → 更少 Turns → 更少返工 → 更稳定的结果<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>记忆分层：L0 原始对话 → L1 Atom → L2 Scene → L3 Persona，逐层沉淀</li>
+<li>Chat Memory 保留偏好/事实/决策；Skill 自动从对话提炼可复用操作方法；Wiki + CodeGraph 建立文档和代码的知识地图</li>
+<li>与 Agent 框架解耦，支持 Claude Code / CodeBuddy / Hermes / OpenClaw 及任意 OpenAI 兼容客户端</li>
+</ul>
+<h3 id="三件套架构"><a href="#三件套架构" class="headerlink" title="三件套架构"></a>三件套架构</h3><table>
+<thead>
+<tr>
+<th>服务</th>
+<th>容器名</th>
+<th>宿主机端口</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Memory Core</td>
+<td>tdai-memory-core</td>
+<td><code>8420</code></td>
+<td>记忆读写、鉴权、skill/RAG 数据面</td>
+</tr>
+<tr>
+<td>Memory Hub（Panel + Knowledge）</td>
+<td>tdai-memory-hub</td>
+<td><code>8125</code> / <code>8424</code></td>
+<td>团队记忆管理面板 / Wiki、CodeGraph 服务</td>
+</tr>
+<tr>
+<td>Proxy</td>
+<td>tdai-proxy</td>
+<td><code>8096</code></td>
+<td>LLM 请求代理（Anthropic / OpenAI 双协议），coding agent 的 API 入口</td>
+</tr>
+</tbody></table>
+<p>镜像发布在 Docker Hub 的 <code>agentmemory</code> 命名空间（<code>memory-core</code> / <code>memory-hub</code> / <code>memory-proxy</code>），多架构 amd64 + arm64，公开可拉无需登录。</p>
+<h2 id="前置要求"><a href="#前置要求" class="headerlink" title="前置要求"></a>前置要求</h2><table>
+<thead>
+<tr>
+<th>平台</th>
+<th>Docker</th>
+<th>shell</th>
+<th>推荐方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linux</td>
+<td>docker-ce / docker.io</td>
+<td>bash</td>
+<td>原生跑脚本</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Docker Desktop / OrbStack / colima 任一</td>
+<td>bash（macOS 自带 3.2 可跑）</td>
+<td>原生跑脚本</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Docker Desktop（WSL2 backend）</td>
+<td>WSL2 内 bash（推荐）/ Git Bash</td>
+<td>WSL2 里跑脚本；纯 PowerShell 只能 docker run 单组件</td>
+</tr>
+</tbody></table>
+<ul>
+<li>git、curl</li>
+<li>一组可用的 LLM API Key（OpenAI 兼容或 Anthropic 协议，如 DeepSeek）</li>
+<li>端口 <code>8420</code> / <code>8125</code> / <code>8424</code> / <code>8096</code> 空闲</li>
+</ul>
+<h2 id="安装：完整三件套（推荐）"><a href="#安装：完整三件套（推荐）" class="headerlink" title="安装：完整三件套（推荐）"></a>安装：完整三件套（推荐）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/TencentCloud/TencentDB-Agent-Memory.git<br><span class="hljs-built_in">cd</span> TencentDB-Agent-Memory/deploy/global-images<br><span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span><br><span class="hljs-variable">$EDITOR</span> .<span class="hljs-built_in">env</span>    <span class="hljs-comment"># 填两组 LLM 参数</span><br>./verify.sh     <span class="hljs-comment"># 干跑校验（可选，会做 LLM 通路预检，--skip-llm 跳过）</span><br>./start-all.sh  <span class="hljs-comment"># 一键拉起三件套</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Ubuntu/Debian（任选一种 Docker）</span><br><span class="hljs-built_in">sudo</span> apt update &amp;&amp; <span class="hljs-built_in">sudo</span> apt install -y docker.io docker-compose-plugin git<br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> --now docker<br><span class="hljs-comment"># 或官方 docker-ce 源：https://docs.docker.com/engine/install/ubuntu/</span><br><br>git <span class="hljs-built_in">clone</span> https://github.com/TencentCloud/TencentDB-Agent-Memory.git<br><span class="hljs-built_in">cd</span> TencentDB-Agent-Memory/deploy/global-images<br><span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span><br><span class="hljs-variable">$EDITOR</span> .<span class="hljs-built_in">env</span><br>./verify.sh<br>./start-all.sh<br></code></pre></td></tr></table></figure>
+
+<h3 id="macOS"><a href="#macOS" class="headerlink" title="macOS"></a>macOS</h3><p>安装 Docker Desktop（或更轻量的 OrbStack / colima），然后把 Docker Desktop 启动起来，其余步骤与 Linux 完全一致：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/TencentCloud/TencentDB-Agent-Memory.git<br><span class="hljs-built_in">cd</span> TencentDB-Agent-Memory/deploy/global-images<br><span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span><br><span class="hljs-variable">$EDITOR</span> .<span class="hljs-built_in">env</span><br>./verify.sh<br>./start-all.sh<br></code></pre></td></tr></table></figure>
+
+<p>macOS 自带 bash 3.2 即可运行脚本；Docker Desktop 原生支持 <code>host.docker.internal</code>。</p>
+<h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><p>官方脚本是 bash 写的，Windows 上<strong>推荐用 WSL2 + Docker Desktop</strong> 跑全套：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1) WSL2 里装 Ubuntu，Windows 上装 Docker Desktop 并启用 WSL2 backend</span><br><span class="hljs-comment"># 2) 进入 WSL2 终端：</span><br><span class="hljs-built_in">sudo</span> apt update &amp;&amp; <span class="hljs-built_in">sudo</span> apt install -y git<br><span class="hljs-comment"># （Docker Desktop 的 WSL2 backend 会让 WSL 里直接有 docker 命令）</span><br><br>git <span class="hljs-built_in">clone</span> https://github.com/TencentCloud/TencentDB-Agent-Memory.git<br><span class="hljs-built_in">cd</span> TencentDB-Agent-Memory/deploy/global-images<br><span class="hljs-built_in">cp</span> .env.example .<span class="hljs-built_in">env</span><br><span class="hljs-variable">$EDITOR</span> .<span class="hljs-built_in">env</span><br>./verify.sh<br>./start-all.sh<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>WSL2 会自动把容器端口转发到 Windows 宿主，浏览器直接访问 <code>http://localhost:8125</code> 即可</li>
+<li>备选：Git Bash + Docker Desktop 也能跑脚本（脚本探测宿主机 IP 的 <code>hostname -I</code> 在 Git Bash 下可能失效，会自动回落 localhost，单机使用无影响）</li>
+<li>纯 PowerShell/CMD：只能执行”只装 Memory Hub”的 <code>docker run</code> 单组件命令，无法跑 <code>start-all.sh</code></li>
+</ul>
+<h3 id="env-配置"><a href="#env-配置" class="headerlink" title=".env 配置"></a>.env 配置</h3><p>两组独立 LLM 参数，可以相同，也可以完全不同（比如 memory 组用便宜模型做 embedding，proxy 组用强模型做主对话）：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>MEMORY_LLM_BASE_URL</code></td>
+<td>memory + hub 内部用（embed/summarize、wiki ingest）</td>
+<td><code>https://api.deepseek.com/v1</code></td>
+</tr>
+<tr>
+<td><code>MEMORY_LLM_API_KEY</code></td>
+<td>上述端点 Key</td>
+<td><code>sk-xxxxxxxx</code></td>
+</tr>
+<tr>
+<td><code>MEMORY_LLM_MODEL</code></td>
+<td>模型 ID</td>
+<td><code>deepseek-chat</code></td>
+</tr>
+<tr>
+<td><code>MEMORY_LLM_PROTOCOL</code></td>
+<td><code>openai</code> 或 <code>anthropic</code>，默认 <code>openai</code></td>
+<td><code>openai</code></td>
+</tr>
+<tr>
+<td><code>PROXY_UPSTREAM_URL</code></td>
+<td>proxy 转发到的上游 base URL</td>
+<td><code>https://api.deepseek.com/v1</code></td>
+</tr>
+<tr>
+<td><code>PROXY_UPSTREAM_API_KEY</code></td>
+<td>转发用 Key（可与 memory 组不同）</td>
+<td><code>sk-xxxxxxxx</code></td>
+</tr>
+<tr>
+<td><code>PROXY_UPSTREAM_MODEL</code></td>
+<td>面向用户的模型 ID</td>
+<td><code>deepseek-chat</code></td>
+</tr>
+<tr>
+<td><code>MEMORY_CORE_PORT</code> / <code>PANEL_PORT</code> / <code>KNOWLEDGE_PORT</code> / <code>PROXY_PORT</code></td>
+<td>端口，冲突时改这里</td>
+<td><code>8420</code> / <code>8125</code> / <code>8424</code> / <code>8096</code></td>
+</tr>
+<tr>
+<td><code>KNOWLEDGE_PUBLIC_BASE_URL</code></td>
+<td>knowledge 外部可达地址，必须含 <code>/v3</code> 前缀</td>
+<td><code>http://host.docker.internal:8424/v3</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li>参数缺失时脚本会在启动前一次性列出所有缺失项并 exit 1，不会跑到一半才失败</li>
+<li><code>verify.sh</code> 默认预检两组 LLM 通路：OpenAI 兼容协议只请求 <code>GET {base}/models</code>（不消耗 token）；Anthropic 协议发 <code>max_tokens=1</code> 最小消息（≤10 token）；容器已运行时还会从容器内 exec curl 验证”容器 → LLM”可达性（企业代理/DNS 隔离环境下宿主机可达但容器不可达的情况能提前暴露）</li>
+<li>⚠️ 安全：脚本默认 <code>MEMORY_CORE_GATEWAY_API_KEY=local</code>、admin 用户 key 为 <code>admin</code>，只适合个人本地跑通。<strong>生产/联调/公网暴露前必须换成随机长串</strong>，否则任何拿到端口的人都能拿到 system_admin 权限</li>
+</ul>
+<p>启动完成后脚本自动生成 admin 用户，<code>user_key</code> 随机 32 位持久化到 <code>./.admin-key</code>，并打印一段可直接 <code>export</code> + <code>claude</code> 的运行命令。</p>
+<h2 id="使用：让-Claude-Code-用上团队记忆"><a href="#使用：让-Claude-Code-用上团队记忆" class="headerlink" title="使用：让 Claude Code 用上团队记忆"></a>使用：让 Claude Code 用上团队记忆</h2><h3 id="第-1-步：登录管理面板"><a href="#第-1-步：登录管理面板" class="headerlink" title="第 1 步：登录管理面板"></a>第 1 步：登录管理面板</h3><p>浏览器打开 <code>http://localhost:8125</code>，用 <code>deploy/global-images/.admin-key</code> 里那串 <code>sk-mem-...</code> 登录。</p>
+<ul>
+<li>admin 是”运维口”：管用户、建团队，也能用 Wiki / CodeGraph / Skill 等资产管理功能</li>
+<li>推荐隔离：用 API 建一个业务用户（面板「用户」→「新建」等价）：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">ADMIN_KEY=$(<span class="hljs-built_in">cat</span> ./.admin-key)<br>curl -sS -X POST http://localhost:8420/v3/meta/user/create \<br>  -H <span class="hljs-string">&quot;x-tdai-user-key: <span class="hljs-variable">$ADMIN_KEY</span>&quot;</span> \<br>  -H <span class="hljs-string">&quot;x-tdai-service-id: default&quot;</span> \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;&quot;username&quot;:&quot;you&quot;&#125;&#x27;</span> | jq<br></code></pre></td></tr></table></figure>
+
+<p>返回体里 <code>data.default_user_key</code>（<code>sk-mem-...</code>）就是新用户登录 key，<strong>只显示这一次，保存好</strong>。之后面板退出登录，用新 key 重新登录，业务用户是”应用口”用来建资产。</p>
+<blockquote>
+<p>注：2.0.0-beta.1 中 admin 不能拥有业务资产；2.0.0 正式版起 admin 也可以直接操作资产。</p>
+</blockquote>
+<h3 id="第-2-步：建-Team-Agent-Task"><a href="#第-2-步：建-Team-Agent-Task" class="headerlink" title="第 2 步：建 Team / Agent / Task"></a>第 2 步：建 Team / Agent / Task</h3><p>Coding agent 用记忆必须落到具体 <code>team / agent / task</code> 三元组上：</p>
+<ol>
+<li><strong>Team</strong>：面板左侧「团队」→ 新建。一组资产的归属容器（memory、skill、knowledge 都归 Team）</li>
+<li><strong>Agent</strong>：进入 Team → 「Agent」→ 新建。填 <code>description</code> + <code>system prompt</code> 作为角色说明（如 <code>bug-fix 工程师</code>、<code>SQL 优化师</code>）</li>
+<li><strong>Task</strong>（可选）：Team → 「任务」→ 新建。本次工作的抓手（如「修复登录页 XSS」）；不建也能用，但 L2/L3 会缺 Task 维度</li>
+</ol>
+<p>先建至少 1 个 Team + 1 个 Agent。</p>
+<h3 id="第-3-步：CC-走-Proxy"><a href="#第-3-步：CC-走-Proxy" class="headerlink" title="第 3 步：CC 走 Proxy"></a>第 3 步：CC 走 Proxy</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> ANTHROPIC_BASE_URL=http://127.0.0.1:8096/claude-code/default<br><span class="hljs-built_in">export</span> ANTHROPIC_AUTH_TOKEN=<span class="hljs-string">&quot;&lt;业务用户的 sk-mem-...&gt;&quot;</span><br>claude --model &lt;PROXY_UPSTREAM_MODEL 里配的上游模型&gt;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>ANTHROPIC_BASE_URL</code> 把 CC 的 API 改指到本机 proxy；路径里 <code>default</code> 是 memory 实例 ID（本地部署固定叫 <code>default</code>）</li>
+<li><code>ANTHROPIC_AUTH_TOKEN</code> 用业务用户的 user_key，proxy 会拿它去 core 反查 user_id，只有该用户 own 的 team/agent/task 会出现在表单里</li>
+<li><code>--model</code> 用 <code>.env</code> 里 <code>PROXY_UPSTREAM_MODEL</code> 配的上游模型名</li>
+</ul>
+<h3 id="第-4-步：新会话选-Team-→-Agent-→-Task"><a href="#第-4-步：新会话选-Team-→-Agent-→-Task" class="headerlink" title="第 4 步：新会话选 Team → Agent → Task"></a>第 4 步：新会话选 Team → Agent → Task</h3><p>每开一个新的 CC 会话，proxy 用 CC 自带的 <code>AskUserQuestion</code> 工具弹出 3 个连续选择（Team → Agent → Task，Task 可选，箭头选择回车确认）。选完后：</p>
+<ul>
+<li>proxy 记住本次会话的 team/agent/task 绑定，同一次 <code>claude</code> 进程内多轮不再询问</li>
+<li>后续每一轮请求自动把该 agent 的 L2/L3 记忆、skill、knowledge 注入 system prompt</li>
+<li>L0 原始对话自动落到 memory-core 的 SQLite；满足触发条件时后台跑 L1 → L2 → L3</li>
+<li>想切换 team/agent：起一个新的 <code>claude</code> 会话即可重新弹表单</li>
+</ul>
+<h3 id="第-5-步：观察记忆生成"><a href="#第-5-步：观察记忆生成" class="headerlink" title="第 5 步：观察记忆生成"></a>第 5 步：观察记忆生成</h3><ul>
+<li>面板左侧「记忆」→ Chat Memory：看 L0 原始对话切分成的 scene</li>
+<li>「Agent」详情页 → Profile：L2 scene 与 L3 persona 逐步累积</li>
+<li>「Skill」列表：对话里 LLM 判定”可复用的操作方法”会自动抽出 skill</li>
+<li>后台 pipeline 干活情况：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s http://localhost:8420/health | jq .services.pipelineWorker<br><span class="hljs-comment"># 期望 tasksConsumed / tasksCompleted 随对话增长</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="其他-Agent-接入"><a href="#其他-Agent-接入" class="headerlink" title="其他 Agent 接入"></a>其他 Agent 接入</h2><h3 id="CodeBuddy"><a href="#CodeBuddy" class="headerlink" title="CodeBuddy"></a>CodeBuddy</h3><p>⚠️ 版本限制：<strong>4.10.2 / 4.10.3 / 4.10.4 有 Bug</strong>（请求不携带 <code>sessionId</code>，Proxy 无法完成 Session 初始化），请用 <strong>≥ 4.10.5 或 ≤ 4.10.1</strong>。</p>
+<p>编辑 <code>~/.codebuddy/models.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;models&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>    <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;claude-sonnet-4-20250514&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;proxy-memory-agent&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;vendor&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;claude&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;apiKey&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;业务用户的 sk-mem-... user_key&gt;&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;maxInputTokens&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">200000</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://127.0.0.1:8096/codebuddy/default&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;supportsToolCall&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;supportsImages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>id</code> 必须与 proxy 上游支持的模型 ID 匹配；<code>apiKey</code> 用业务用户 user_key（不建议直接使用 admin key）；<code>url</code> 是 proxy 地址 + <code>/codebuddy/default</code>。配置后在对话框选择该模型即可，Session init 流程与 Claude Code 一致。</p>
+<h3 id="Hermes"><a href="#Hermes" class="headerlink" title="Hermes"></a>Hermes</h3><p>编辑 <code>~/.hermes/config.yaml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">model:</span><br>  <span class="hljs-attr">default:</span> <span class="hljs-string">gpt-5.5</span><br>  <span class="hljs-attr">provider:</span> <span class="hljs-string">custom</span><br>  <span class="hljs-attr">base_url:</span> <span class="hljs-string">http://&lt;proxy-host&gt;:&lt;port&gt;/hermes/&lt;spaceId&gt;</span><br>  <span class="hljs-attr">api_key:</span> <span class="hljs-string">&lt;从面板获取的</span> <span class="hljs-string">API</span> <span class="hljs-string">Key&gt;</span><br>  <span class="hljs-attr">extra_headers:</span><br>    <span class="hljs-attr">x-team-id:</span> <span class="hljs-string">&lt;从面板获取的</span> <span class="hljs-string">team_id&gt;</span><br>    <span class="hljs-attr">x-agent-id:</span> <span class="hljs-string">&lt;从面板获取的</span> <span class="hljs-string">agent_id&gt;</span><br>    <span class="hljs-attr">x-task-id:</span> <span class="hljs-string">&lt;从面板获取的</span> <span class="hljs-string">task_id&gt;</span><br>    <span class="hljs-attr">x-conversation-id:</span> <span class="hljs-string">&lt;自定义的会话标识&gt;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>base_url</code>：proxy 地址 + <code>/hermes/&lt;spaceId&gt;</code>，<code>spaceId</code> 是 memory 实例 ID（本地通常为 <code>default</code>）</li>
+<li><code>api_key</code>：业务用户的 user_key（面板「API Key」页获取）</li>
+<li><code>x-task-id</code>：<strong>当前版本必填</strong>，缺少会导致 session 注册失败、记忆不生效（见下方已知限制）</li>
+</ul>
+<h3 id="OpenClaw"><a href="#OpenClaw" class="headerlink" title="OpenClaw"></a>OpenClaw</h3><p>编辑 <code>~/.openclaw/openclaw.json</code>，在 <code>models.providers</code> 中添加：</p>
+<figure class="highlight jsonc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs jsonc"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;models&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;mode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;merge&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;providers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;memory-proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;baseUrl&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://&lt;proxy-host&gt;:&lt;port&gt;/openclaw/&lt;spaceId&gt;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;apiKey&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;从面板获取的 API Key&gt;&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;api&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;openai-completions&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;headers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>          <span class="hljs-attr">&quot;x-team-id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;从面板获取的 team_id&gt;&quot;</span><span class="hljs-punctuation">,</span><br>          <span class="hljs-attr">&quot;x-agent-id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;从面板获取的 agent_id&gt;&quot;</span><span class="hljs-punctuation">,</span><br>          <span class="hljs-attr">&quot;x-task-id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;从面板获取的 task_id&gt;&quot;</span><span class="hljs-punctuation">,</span><br>          <span class="hljs-attr">&quot;x-conversation-id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;自定义的会话标识&gt;&quot;</span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;request&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;allowPrivateNetwork&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;models&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>          <span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;gpt-5.5&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;GPT-5.5&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;reasoning&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;input&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;text&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;contextWindow&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">128000</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;maxTokens&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">32000</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;cost&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;input&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;output&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;cacheRead&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;cacheWrite&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span> <span class="hljs-punctuation">&#125;</span><br>          <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">]</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>models[].id</code> 必须与 proxy 上游配置的模型 ID 匹配。</p>
+<h3 id="通用接入（任意-OpenAI-兼容平台）"><a href="#通用接入（任意-OpenAI-兼容平台）" class="headerlink" title="通用接入（任意 OpenAI 兼容平台）"></a>通用接入（任意 OpenAI 兼容平台）</h3><p>把平台的 API base URL 指向 Proxy，请求 path 自动拼接 <code>/v1/chat/completions</code>（OpenAI）或 <code>/v1/messages</code>（Anthropic）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">http://&lt;proxy-host&gt;:&lt;port&gt;/&lt;agent-source&gt;/&lt;spaceId&gt;<br></code></pre></td></tr></table></figure>
+
+<p><code>&lt;agent-source&gt;</code> 必须为 <code>claude-code</code> / <code>codebuddy</code> / <code>hermes</code> / <code>openclaw</code> 之一（其他平台可伪装成其中一个接入），<code>&lt;spaceId&gt;</code> 本地固定 <code>default</code>。</p>
+<p>必须携带的 Header（缺一不可，Proxy 通过 header 直接完成 session 注册，跳过交互式表单）：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Authorization: Bearer &lt;key&gt;</code></td>
+<td>业务用户 API Key</td>
+</tr>
+<tr>
+<td><code>x-team-id</code></td>
+<td>团队 ID</td>
+</tr>
+<tr>
+<td><code>x-agent-id</code></td>
+<td>Agent ID</td>
+</tr>
+<tr>
+<td><code>x-task-id</code></td>
+<td>任务 ID（当前版本必填）</td>
+</tr>
+<tr>
+<td><code>x-conversation-id</code></td>
+<td>会话标识，客户端自行生成管理</td>
+</tr>
+</tbody></table>
+<h2 id="只装-Memory-Hub（已有-Core）"><a href="#只装-Memory-Hub（已有-Core）" class="headerlink" title="只装 Memory Hub（已有 Core）"></a>只装 Memory Hub（已有 Core）</h2><p>已有 Memory Core 跑在本机 <code>8420</code> 时，单命令拉起面板（此命令在 Windows PowerShell / CMD 也能直接跑）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker pull docker.io/agentmemory/memory-hub:latest<br>docker run -d --name tdai-memory-hub \<br>  --add-host=host.docker.internal:host-gateway \<br>  -p 8125:8125 -p 8424:8424 \<br>  -v tdai-panel-data:/data/knowledge \<br>  -e REMOTE_INSTANCE_URL=http://host.docker.internal:8420 \<br>  -e REMOTE_INSTANCE_KEY=<span class="hljs-built_in">local</span> \<br>  -e KNOWLEDGE_PUBLIC_BASE_URL=http://host.docker.internal:8424/v3 \<br>  -e LLM_MODE=custom \<br>  -e LLM_BASE_URL=&lt;OPENAI_COMPATIBLE_BASE_URL&gt; \<br>  -e LLM_API_KEY=&lt;YOUR_API_KEY&gt; \<br>  -e LLM_MODEL=&lt;MODEL_ID&gt; \<br>  docker.io/agentmemory/memory-hub:latest<br></code></pre></td></tr></table></figure>
+
+<p>打开 <code>http://localhost:8125</code>。</p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>排查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CC 会话没有弹选择表单</td>
+<td><code>start-all.sh</code> 默认已开 <code>PROXY_FULL_STACK=1</code>；若手动改过或 <code>PROXY_FULL_STACK=0</code> 起的，重启：<code>PROXY_FULL_STACK=1 ./start-proxy.sh</code></td>
+</tr>
+<tr>
+<td>表单选项为空/只有别人的 team</td>
+<td>确认当前账号已创建过 Team 和 Agent（业务用户需在对应 team 下建过 Agent）</td>
+</tr>
+<tr>
+<td>面板显示”Panel API 8125 未启动”</td>
+<td><code>docker ps</code> 看 <code>tdai-memory-hub</code> 是否 healthy；不 healthy 看 <code>docker logs tdai-memory-hub</code>（大概率 <code>REMOTE_INSTANCE_URL</code> / <code>LLM_BASE_URL</code> 配错）</td>
+</tr>
+<tr>
+<td>L1/L2 一直没跑，records/ 没东西</td>
+<td>默认 <code>promptMode=chat</code>；若配了 <code>code</code> 而对话是闲聊，LLM 会认为没有可沉淀内容返回 0。改回 <code>chat</code> 或做真实工作对话（改文件、跑测试、给结论）</td>
+</tr>
+<tr>
+<td><code>./start-all.sh</code> 卡在 wait_healthy</td>
+<td>镜像还在拉取，先 <code>docker pull agentmemory/memory-core:latest</code> 等手动预拉</td>
+</tr>
+<tr>
+<td>proxy 转发 401</td>
+<td><code>PROXY_UPSTREAM_API_KEY</code> 无效或 <code>PROXY_UPSTREAM_URL</code> 不匹配，<code>docker logs tdai-proxy</code> 看错误</td>
+</tr>
+<tr>
+<td>端口冲突</td>
+<td>在 <code>.env</code> 改 <code>MEMORY_CORE_PORT</code> 等四个端口，<code>KNOWLEDGE_PUBLIC_BASE_URL</code> 跟着 <code>KNOWLEDGE_PORT</code> 改</td>
+</tr>
+<tr>
+<td>想接宿主机上的 Ollama/Langfuse</td>
+<td>脚本已默认 <code>--add-host=host.docker.internal:host-gateway</code>，容器内用 <code>http://host.docker.internal:&lt;port&gt;</code></td>
+</tr>
+</tbody></table>
+<h2 id="停止-清理"><a href="#停止-清理" class="headerlink" title="停止 / 清理"></a>停止 / 清理</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">./stop-all.sh          <span class="hljs-comment"># 停容器，保留 volume 数据 &amp; admin key</span><br>./stop-all.sh --purge  <span class="hljs-comment"># 连 volume、admin key、proxy config 一起清</span><br></code></pre></td></tr></table></figure>
+
+<p>数据持久化在 named volume：<code>tdai-memory-core-data</code>（记忆 SQLite）、<code>tdai-panel-data</code>（knowledge SQLite / wiki 文件），<code>docker volume rm</code> 前一直保留。</p>
+<h2 id="已知限制（当前版本）"><a href="#已知限制（当前版本）" class="headerlink" title="已知限制（当前版本）"></a>已知限制（当前版本）</h2><ul>
+<li><strong><code>x-task-id</code> 在 Hermes / OpenClaw 场景下必填</strong>：header 预选机制要求 team + agent + task 三者齐全才能完成 session 直接注册，否则 session bypass，记忆注入和对话回流都不生效。需要预先在面板创建 Task 并获取 <code>task_id</code>，切换任务时要手动改配置。下个版本将支持可选（自动选默认 task 或跳过绑定）</li>
+<li><strong><code>x-conversation-id</code> 需静态配置</strong>：Hermes / OpenClaw 在配置文件中指定，同一 conversation ID 的所有请求共享同一 session；每次开新对话需手动更换 ID，否则沿用上次 session 状态；部分客户端 tool call 后续请求可能不携带 extra headers，导致那些轮次跳过记忆注入</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Claude-Code/">#Claude Code</a>
+      
+        <a href="/tags/TencentDB/">#TencentDB</a>
+      
+        <a href="/tags/Agent-Memory/">#Agent Memory</a>
+      
+        <a href="/tags/Docker/">#Docker</a>
+      
+        <a href="/tags/%E5%9B%A2%E9%98%9F%E8%AE%B0%E5%BF%86/">#团队记忆</a>
+      
+        <a href="/tags/AI-%E7%BC%96%E7%A8%8B/">#AI 编程</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台</div>
+      <div>https://kingjem.github.io/2026/08/07/TencentDB-Agent-Memory-三平台安装使用教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月7日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/07/mise-%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E5%A4%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86Node-Python/" title="mise 使用教程 — 在 Linux/macOS 上管理 Node/Python 多版本">
+                        <span class="hidden-mobile">mise 使用教程 — 在 Linux/macOS 上管理 Node/Python 多版本</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
