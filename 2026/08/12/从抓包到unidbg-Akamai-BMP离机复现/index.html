@@ -1,0 +1,814 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="一次为竞品声量（SOV）分析做的移动端接口逆向：从 FlowTrans 抓包定位接口，到脱离 App 重放，再到 Frida 现场 harvest，最后用 unidbg 把 Akamai BMP 的 x-acf-sensor-data 完全离机现算、闭环验证被服务端接受。 ⚠️ 全文中所有 client_id&#x2F;client_secret、设备标识、代理账密、目标域名细节均为占位&#x2F;脱敏，仅用于授权">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/12/%E4%BB%8E%E6%8A%93%E5%8C%85%E5%88%B0unidbg-Akamai-BMP%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="一次为竞品声量（SOV）分析做的移动端接口逆向：从 FlowTrans 抓包定位接口，到脱离 App 重放，再到 Frida 现场 harvest，最后用 unidbg 把 Akamai BMP 的 x-acf-sensor-data 完全离机现算、闭环验证被服务端接受。 ⚠️ 全文中所有 client_id&#x2F;client_secret、设备标识、代理账密、目标域名细节均为占位&#x2F;脱敏，仅用于授权">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-12T06:20:15.000Z">
+<meta property="article:modified_time" content="2026-08-12T06:20:19.476Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Akamai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="mitmproxy">
+<meta property="article:tag" content="unidbg">
+<meta property="article:tag" content="抓包">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-12 14:20" pubdate>
+          2026年8月12日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月12日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>一次为竞品声量（SOV）分析做的移动端接口逆向：从 FlowTrans 抓包定位接口，到脱离 App 重放，再到 Frida 现场 harvest，最后用 <strong>unidbg 把 Akamai BMP 的 <code>x-acf-sensor-data</code> 完全离机现算</strong>、闭环验证被服务端接受。</p>
+<p>⚠️ 全文中所有 <code>client_id/client_secret</code>、设备标识、代理账密、目标域名细节均为<strong>占位/脱敏</strong>，仅用于授权范围内的调试与学习。请遵守你所检测应用的服务条款与法律。</p>
+</blockquote>
+<p>一个电商 App 的搜索接口，返回的是”某关键词下的排名商品 + 广告位”——正是做 <strong>Share of Voice</strong> 的数据源。难点只有一个:它挂在 <strong>Akamai Bot Manager</strong> 后面,每个请求都要带一个几 KB 的 <code>x-acf-sensor-data</code> 头,缺了就 <code>403 Access Denied</code>。</p>
+<p>这篇把从抓包到”纯 PC 离机现算 sensor”的完整链路记下来。</p>
+<blockquote>
+<p>姊妹篇：需要设备的路线（Frida 主动调用 + 云手机 / RK3588 redroid 设备池）见《从 x-acf-sensor-data 到规模化》；本文是它的进阶——完全离机。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、抓包-先看清接口"><a href="#一、抓包-先看清接口" class="headerlink" title="一、抓包:先看清接口"></a>一、抓包:先看清接口</h2><p>目标 App 是 OkHttp/Cronet 栈,<strong>忽略系统 HTTP 代理</strong>,所以不能靠 <code>settings put global http_proxy</code>。用 <a target="_blank" rel="noopener" href="https://github.com/KingJem/FlowTrans">FlowTrans</a>(mihomo TUN)在三层透明劫持,把指定 App 的流量转到 PC 的 mitmweb:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">App</span> ─▶ FlowTrans TUN ─▶ 设备<span class="hljs-number">127.0.0.1:8080</span> ─▶ adb reverse ─▶ PC mitmweb ─▶ 出口<br></code></pre></td></tr></table></figure>
+
+<p>抓到的关键接口(HTTP/2,base <code>apis.example.com</code>):</p>
+<ul>
+<li><code>POST /v1/oauthprovider/oauth2/token</code> — 取 Bearer(guest token)</li>
+<li><code>GET /fulcra/search/items?searchTerms=…</code> — <strong>SOV 搜索</strong>,返回 <code>itemList[]</code>(顺序=排名)、<code>itemCount</code>、<code>sponsoredItemCount</code>,每项含 <code>brand / sponsored / price / rating</code></li>
+</ul>
+<p><code>sponsored=true</code> 的就是广告位——按 <code>brand</code> 聚合、按 <code>sponsored</code> 拆自然/广告,就是关键词维度的品牌声量。</p>
+<h2 id="二、脱离-App-重放-静态凭据-唯一活门槛"><a href="#二、脱离-App-重放-静态凭据-唯一活门槛" class="headerlink" title="二、脱离 App 重放:静态凭据 + 唯一活门槛"></a>二、脱离 App 重放:静态凭据 + 唯一活门槛</h2><p>看 token 接口的请求体:</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nix">g<span class="hljs-attr">rant_type</span><span class="hljs-operator">=</span>client_credentials&amp;client_id<span class="hljs-operator">=</span><span class="hljs-symbol">&lt;CLIENT_ID&gt;</span>&amp;client_secret<span class="hljs-operator">=</span><span class="hljs-symbol">&lt;CLIENT_SECRET&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>是 <code>client_credentials</code>,client_id/secret 是 App 内置常量</strong>——不需要用户登录,谁都能换 guest token。于是整条链只剩一个真正的门槛:<strong>Akamai 的 <code>x-acf-sensor-data</code></strong>(token 和 search 两个接口都要它)。</p>
+<p>实测:</p>
+<ul>
+<li>不带 sensor → <code>403 Access Denied</code>(<code>errors.edgesuite.net</code>,Akamai 边缘拒绝)</li>
+<li>带一条抓到的 sensor → 过 Akamai,进到应用层</li>
+</ul>
+<p>而且这条路 <strong>Akamai 没死磕 TLS/JA3</strong>(Python 默认指纹都过),sensor 在时间窗内可复用。唯一的坑:<strong>同一条 sensor / 同一出口 IP 反复猛打会被限流</strong>——实测十几次后连 App 自己都 403,得换干净出口 IP。</p>
+<p>结论很清楚:要脱机自动化,核心就是<strong>能自己造 sensor</strong>。</p>
+<h2 id="三、定位-sensor-生成逻辑"><a href="#三、定位-sensor-生成逻辑" class="headerlink" title="三、定位 sensor 生成逻辑"></a>三、定位 sensor 生成逻辑</h2><p><code>x-acf-sensor-data</code> 的值以 <code>6,a,</code> 开头 = Akamai BMP sensor v6。静态扫 dex:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">com<span class="hljs-selector-class">.akamai</span><span class="hljs-selector-class">.botman</span><span class="hljs-selector-class">.CYFMonitor</span><span class="hljs-selector-class">.getSensorData</span>() : String   ← 对外壳(被 R8 混淆成 <span class="hljs-selector-tag">a</span>())<br>com<span class="hljs-selector-class">.cyberfend</span><span class="hljs-selector-class">.cyfsecurity</span><span class="hljs-selector-class">.CYFMonitor</span> / SensorDataBuilder ← 真实实现(Cyberfend=Akamai 收购)<br>Akamai BMPSDK/<span class="hljs-number">4.0</span>.<span class="hljs-number">5</span><br></code></pre></td></tr></table></figure>
+
+<p>一开始以为是纯混淆 Java,后来在 <code>split_config.arm64_v8a.apk</code> 里发现 <strong><code>libakamaibmp.so</code>(2.8MB)</strong>,导出静态 JNI:</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gams">Java_com_cyberfend_cyfsecurity_SensorDataBuilder_buildN          ← 核心生成<br><span class="hljs-function"><span class="hljs-title">Java_</span></span>..._encryptKeyN / initializeKeyN / decryptN                 ← 密钥态<br></code></pre></td></tr></table></figure>
+
+<p><strong>Java 侧采集设备/行为信号 → JNI 调 <code>buildN</code> 加密 → 出 sensor</strong>。这决定了两条路:Frida 现场 hook,或 unidbg 离机模拟。</p>
+<h2 id="四、Frida-现场-harvest（要设备-但先跑通）"><a href="#四、Frida-现场-harvest（要设备-但先跑通）" class="headerlink" title="四、Frida:现场 harvest（要设备,但先跑通）"></a>四、Frida:现场 harvest（要设备,但先跑通）</h2><p>hook <code>getSensorData()</code>(混淆后是 <code>a()</code>)就能按需拿新鲜 sensor。踩了几个坑:</p>
+<ul>
+<li><strong>Frida 17 移除了全局 Java</strong>:裸脚本 <code>Java.perform</code> 直接 <code>ReferenceError: &#39;Java&#39; is not defined</code>,要 <code>import Java from &quot;frida-java-bridge&quot;</code> + <code>frida-compile</code>。</li>
+<li><strong>App 有自-ptrace 反调试</strong>:<code>attach</code> 一律 <code>ServerNotRunningError: closed</code>(枚举正常、attach 就断),得用 <strong>spawn 模式</strong>早注入,并 hook <code>ptrace</code>→no-op。</li>
+<li><strong>frida-server 端口被抢</strong>:设备上有个 uid=2000 的 frida-server 自动重生抢占 27042,客户端连它就 <code>need Gadget / jailed</code>。解法:root 起在非默认端口,客户端 <code>add_remote_device</code> 定连。</li>
+</ul>
+<p>跑通后 <code>rpc.mint()</code> 直接调 <code>a()</code> 返回全新 sensor——但这仍要一台跑着 App 的设备。真正想要的是<strong>完全离机</strong>。</p>
+<h2 id="五、unidbg-把-sensor-搬到纯-JVM-现算"><a href="#五、unidbg-把-sensor-搬到纯-JVM-现算" class="headerlink" title="五、unidbg:把 sensor 搬到纯 JVM 现算"></a>五、unidbg:把 sensor 搬到纯 JVM 现算</h2><p>unidbg 能在 JVM 里加载 ARM64 <code>.so</code> 并调 JNI 函数。<code>buildN</code> 是静态 <code>Java_</code> 导出——正是 unidbg 的强项。</p>
+<h3 id="5-1-先-trace-出-buildN-的输入规格"><a href="#5-1-先-trace-出-buildN-的输入规格" class="headerlink" title="5.1 先 trace 出 buildN 的输入规格"></a>5.1 先 trace 出 buildN 的输入规格</h3><p>Frida 在真机上 hook <code>SensorDataBuilder.buildN</code>,dump 它的入参。关键发现:<strong><code>buildN(java.util.ArrayList) : String</code>,入参是一个自包含的 <code>ArrayList&lt;Pair&gt;</code>(27 项)</strong>,native 不靠回调自取、而是把采集好的数据整个传进来:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs csharp">[<span class="hljs-meta">0</span>] Pair&#123;<span class="hljs-string">&quot;&quot;</span> <span class="hljs-string">&quot;4.0.5&quot;</span>&#125;              <span class="hljs-meta"># SDK 版本</span><br>[<span class="hljs-meta">4</span>] Pair&#123;<span class="hljs-string">&quot;-100&quot;</span> <span class="hljs-string">&quot;…1080,2209,zh,&lt;DEVICE_MODEL&gt;,&lt;BUILD_FINGERPRINT&gt;,&lt;ANDROID_ID&gt;,…&quot;</span>&#125;   <span class="hljs-meta"># 设备指纹大串</span><br>[<span class="hljs-meta">14..19</span>] Pair&#123;<span class="hljs-string">&quot;-142&quot;</span>/<span class="hljs-string">&quot;-143&quot;</span>/… <span class="hljs-string">&quot;2;100.00;5422.00;…&quot;</span>&#125;   <span class="hljs-meta"># 加速度/陀螺/触摸 行为序列</span><br>[<span class="hljs-meta">21</span>] Pair&#123;<span class="hljs-string">&quot;-163&quot;</span> <span class="hljs-string">&quot;…&lt;app_version&gt;,&lt;timestamps&gt;&quot;</span>&#125;<br>…RET = <span class="hljs-string">&quot;6,a,&lt;b64&gt;,&lt;b64&gt;$&lt;b64&gt;$&lt;counts&gt;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>输入自包含 → unidbg 只需<strong>拼同样的 ArrayList + 调 buildN</strong>,不用 mock 一堆回调。这把难度从”地狱级”降到”可做”。</p>
+<h3 id="5-2-卡点一-反调试不是-brk-是-undefined-指令"><a href="#5-2-卡点一-反调试不是-brk-是-undefined-指令" class="headerlink" title="5.2 卡点一:反调试不是 brk,是 undefined 指令"></a>5.2 卡点一:反调试不是 brk,是 undefined 指令</h3><p>harness 载入 <code>.so</code> 时,<code>.init_array</code> 直接把 unidbg 顶进交互式调试器、疯狂刷寄存器 dump(表现为”卡死”)。第一反应是 brk 反调试,但检查 <code>EXCP_BKPT</code> 拦不住。加日志打印实际 <code>intno</code>:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">DIAG interrupt <span class="hljs-attribute">intno</span>=1 <span class="hljs-attribute">swi</span>=63518     ← <span class="hljs-attribute">intno</span>=1 = EXCP_UDEF(未定义指令!)<br></code></pre></td></tr></table></figure>
+
+<p>原来反调试用的是 <strong>undefined 指令陷阱</strong>,不是 brk。解法——子类化 <code>AndroidARM64Emulator</code>,重写 <code>createSyscallHandler</code> 注入一个自定义 handler:<strong>凡非-SWI 中断一律推进 PC 跳过、不进调试器</strong>(真 syscall 交给 unidbg,<code>sigprocmask</code> 之类它本就支持):</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SkipBrkHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ARM64SyscallHandler</span> &#123;<br>    SkipBrkHandler(SvcMemory svc) &#123; <span class="hljs-built_in">super</span>(svc); &#125;<br>    <span class="hljs-meta">@Override</span> <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">hook</span><span class="hljs-params">(Backend backend, <span class="hljs-type">int</span> intno, <span class="hljs-type">int</span> swi, Object user)</span> &#123;<br>        <span class="hljs-keyword">if</span> (intno != ARMEmulator.EXCP_SWI) &#123;                 <span class="hljs-comment">// brk/udef 反调试</span><br>            <span class="hljs-type">long</span> <span class="hljs-variable">pc</span> <span class="hljs-operator">=</span> backend.reg_read(Arm64Const.UC_ARM64_REG_PC).longValue();<br>            backend.reg_write(Arm64Const.UC_ARM64_REG_PC, pc + <span class="hljs-number">4</span>);   <span class="hljs-comment">// 跳过</span><br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <span class="hljs-built_in">super</span>.hook(backend, intno, swi, user);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>一改,<code>loaded libakamaibmp.so</code>——init 过了。</p>
+<h3 id="5-3-卡点二-补-JNI-回调"><a href="#5-3-卡点二-补-JNI-回调" class="headerlink" title="5.3 卡点二:补 JNI 回调"></a>5.3 卡点二:补 JNI 回调</h3><p>init 之后,native 通过 JNI 读设备字段:</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">UnsupportedOperationException:</span> android/os/Build<span class="hljs-number">$VERSION</span>-&gt;SDK_INT:I<br></code></pre></td></tr></table></figure>
+
+<p>在 <code>AbstractJni</code> 里补上:<code>getStaticIntField</code>(<code>SDK_INT</code>=34)+ <code>getStaticObjectField</code>(一批 <code>Build.*</code> 模板值),再把 27 项入参经 <code>ArrayList.size/get</code> + <code>Pair.first/second</code> 喂进去。再跑:</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-section">=== SENSOR ===</span><br>6,a,g/PmFy9q6Nl0dESAw9g6BXg/YRoVU2tfOPto/…$334000,92000,10000<br>looksValid=true<br>BUILD SUCCESS<br></code></pre></td></tr></table></figure>
+
+<p><strong>纯 JVM、无设备,吐出了合法 <code>6,a,…</code> sensor。</strong></p>
+<h3 id="5-4-闭环验证-服务端认不认"><a href="#5-4-闭环验证-服务端认不认" class="headerlink" title="5.4 闭环验证:服务端认不认"></a>5.4 闭环验证:服务端认不认</h3><p>格式合法不等于能用。把 unidbg 现算的 sensor 直接拿去打接口(走干净美区出口、<strong>不经 mitmproxy</strong>):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># POST oauth2/token（静态 client_credentials + unidbg sensor）</span><br>token: <span class="hljs-number">200</span>  ✅  <span class="hljs-comment"># 拿到 Bearer</span><br><br><span class="hljs-comment"># GET fulcra/search/items（Bearer + 同一 sensor + 应用头 x-api-version 等）</span><br>search: <span class="hljs-number">200</span> ✅  itemCount=<span class="hljs-number">468</span>  sponsoredItemCount=<span class="hljs-number">3</span><br>  <span class="hljs-number">1</span>    BISSELL       $<span class="hljs-number">199.99</span><br>  <span class="hljs-number">4</span> AD Bosch         $<span class="hljs-number">569.0</span>     <span class="hljs-comment"># 广告位</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>Akamai 接受了。</strong> 整条生产链在纯 PC 上跑通:</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stata">unidbg(libakamaibmp.<span class="hljs-keyword">so</span> → sensor)<br>  → oauth2/<span class="hljs-keyword">token</span>（静态凭据）→ Bearer<br>  → fulcra/<span class="hljs-keyword">search</span>/items → SOV 数据<br>无设备 · 无 <span class="hljs-keyword">App</span> · 无 mitmproxy<br></code></pre></td></tr></table></figure>
+
+<h2 id="六、几个可复用的经验"><a href="#六、几个可复用的经验" class="headerlink" title="六、几个可复用的经验"></a>六、几个可复用的经验</h2><ul>
+<li><strong>Akamai BMP 4.x 的核心在 native</strong>(<code>libakamaibmp.so</code>),<code>buildN</code> 静态 JNI 导出、入参自包含 → 对 unidbg 友好。</li>
+<li><strong>反调试可能是 undefined 指令陷阱(intno=1)而非 brk</strong>——<code>intno != EXCP_SWI</code> 一律跳过更省事。</li>
+<li><strong>Frida 17 无全局 Java</strong>(frida-java-bridge)、<strong>自-ptrace 要 spawn</strong>、<strong>frida-server 抢端口用非默认端口定连</strong>。</li>
+<li><strong>sensor 可复用但有配额</strong>:一 sensor 低频用 + 轮换干净出口 IP,别用一条猛打招限流。</li>
+<li>生产化还要:时间戳/行为序列动态化(免 stale)、把 unidbg 包成常驻 sensor 服务。</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>unidbg：<a target="_blank" rel="noopener" href="https://github.com/zhkl0228/unidbg">https://github.com/zhkl0228/unidbg</a></li>
+<li>Frida / frida-java-bridge / objection</li>
+<li>FlowTrans（本文抓包转发器）：<a target="_blank" rel="noopener" href="https://github.com/KingJem/FlowTrans">https://github.com/KingJem/FlowTrans</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Akamai/">#Akamai</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+      
+        <a href="/tags/mitmproxy/">#mitmproxy</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/unidbg/">#unidbg</a>
+      
+        <a href="/tags/JNI/">#JNI</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录</div>
+      <div>https://kingjem.github.io/2026/08/12/从抓包到unidbg-Akamai-BMP离机复现/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月12日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/07/nodriver-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%A8%E5%B1%80%E6%B3%A8%E5%86%8C%E8%A1%A8/" title="nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set">
+                        <span class="hidden-mobile">nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

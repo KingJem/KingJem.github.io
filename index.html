@@ -215,6 +215,170 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2026/08/12/%E4%BB%8E%E6%8A%93%E5%8C%85%E5%88%B0unidbg-Akamai-BMP%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0/" target="_self">
+          从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/08/12/%E4%BB%8E%E6%8A%93%E5%8C%85%E5%88%B0unidbg-Akamai-BMP%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0/" target="_self">
+        <div>
+          
+          一次为竞品声量（SOV）分析做的移动端接口逆向：从 FlowTrans 抓包定位接口，到脱离 App 重放，再到 Frida 现场 harvest，最后用 unidbg 把 Akamai BMP 的 x-acf-sensor-data 完全离机现算、闭环验证被服务端接受。 ⚠️ 全文中所有 client_id&#x2F;client_secret、设备标识、代理账密、目标域名细节均为占位&#x2F;脱敏，仅用于授权
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-12 14:20" pubdate>
+              2026-08-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Akamai/">#Akamai</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
+            
+              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+            
+              <a href="/tags/mitmproxy/">#mitmproxy</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/unidbg/">#unidbg</a>
+            
+              <a href="/tags/JNI/">#JNI</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/08/07/nodriver-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%A8%E5%B1%80%E6%B3%A8%E5%86%8C%E8%A1%A8/" target="_self">
+          nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/08/07/nodriver-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%A8%E5%B1%80%E6%B3%A8%E5%86%8C%E8%A1%A8/" target="_self">
+        <div>
+          
+          前言一台 8GB 的 Windows 采集机反复 OOM：SSH 连上去停在 SSH2_MSG_KEXINIT 之后就断，事件日志里 Resource-Exhaustion-Detector（EventID 2004）一天报 150 多次，Kernel-Power 41（非正常重启）隔几天来一次。 排查最后落到 nodriver 上：它每跑一轮采集就永久泄漏一整个 Browser 对象，实测约 1
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-07 15:40" pubdate>
+              2026-08-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/Python/">#Python</a>
+            
+              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+            
+              <a href="/tags/nodriver/">#nodriver</a>
+            
+              <a href="/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/">#内存泄漏</a>
+            
+              <a href="/tags/undetected-chromedriver/">#undetected-chromedriver</a>
+            
+              <a href="/tags/CDP/">#CDP</a>
+            
+              <a href="/tags/asyncio/">#asyncio</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2026/08/07/TencentDB-Agent-Memory-%E4%B8%89%E5%B9%B3%E5%8F%B0%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" target="_self">
           TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台
         </a>
@@ -293,15 +457,15 @@
             
               <a href="/tags/Python/">#Python</a>
             
-              <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">#开发工具</a>
-            
-              <a href="/tags/%E7%8E%AF%E5%A2%83%E7%AE%A1%E7%90%86/">#环境管理</a>
-            
               <a href="/tags/mise/">#mise</a>
             
               <a href="/tags/Node-js/">#Node.js</a>
             
               <a href="/tags/%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86/">#版本管理</a>
+            
+              <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">#开发工具</a>
+            
+              <a href="/tags/%E7%8E%AF%E5%A2%83%E7%AE%A1%E7%90%86/">#环境管理</a>
             
           </div>
         
@@ -888,9 +1052,9 @@
             
               <a href="/tags/%E6%B1%89%E6%96%B9%E8%8D%AF/">#汉方药</a>
             
-              <a href="/tags/%E6%97%A5%E6%9C%AC/">#日本</a>
-            
               <a href="/tags/%E7%BE%8E%E5%AE%B9/">#美容</a>
+            
+              <a href="/tags/%E6%97%A5%E6%9C%AC/">#日本</a>
             
               <a href="/tags/%E6%8A%A4%E8%82%A4/">#护肤</a>
             
@@ -1397,138 +1561,6 @@
               <a href="/tags/%E5%8F%A4%E7%B1%8D/">#古籍</a>
             
               <a href="/tags/%E8%8D%AF%E8%86%B3/">#药膳</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/07/23/%E5%85%A8%E5%9B%BD%E7%BB%9F%E4%B8%80%E7%94%B5%E5%8A%9B%E5%B8%82%E5%9C%BA%E5%BB%BA%E8%AE%BE%E5%AF%B9%E5%82%A8%E8%83%BD%E4%B8%8E%E7%94%B5%E5%8A%9B%E8%AE%BE%E5%A4%87%E8%A1%8C%E4%B8%9A%E7%9A%84%E5%BD%B1%E5%93%8D/" target="_self">
-          全国统一电力市场建设对储能与电力设备行业的影响
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/07/23/%E5%85%A8%E5%9B%BD%E7%BB%9F%E4%B8%80%E7%94%B5%E5%8A%9B%E5%B8%82%E5%9C%BA%E5%BB%BA%E8%AE%BE%E5%AF%B9%E5%82%A8%E8%83%BD%E4%B8%8E%E7%94%B5%E5%8A%9B%E8%AE%BE%E5%A4%87%E8%A1%8C%E4%B8%9A%E7%9A%84%E5%BD%B1%E5%93%8D/" target="_self">
-        <div>
-          
-          2030 年基本建成、2035 年全面建成全国统一电力市场，这将对储能行业和电力设备行业产生深远影响。本文从市场机制、商业模式、受益标的三个层面展开分析。
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-07-23 17:55" pubdate>
-              2026-07-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%95%E8%B5%84%E5%88%86%E6%9E%90/" class="category-chain-item">投资分析</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%94%B5%E5%8A%9B%E5%B8%82%E5%9C%BA/">#电力市场</a>
-            
-              <a href="/tags/%E5%82%A8%E8%83%BD/">#储能</a>
-            
-              <a href="/tags/%E7%94%B5%E5%8A%9B%E8%AE%BE%E5%A4%87/">#电力设备</a>
-            
-              <a href="/tags/%E6%8A%95%E8%B5%84/">#投资</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/07/23/%E8%83%8E%E8%83%AA%E8%8D%AF%E5%BD%95%E4%B8%8E%E4%BA%94%E5%8D%81%E4%BA%8C%E7%97%85%E6%96%B9%EF%BC%9A%E4%B8%80%E9%83%A8%E5%A4%B1%E4%BC%A0%E6%9C%AC%E8%8D%89%E4%B9%A6%E4%B8%8E%E4%B8%80%E9%83%A8%E5%87%BA%E5%9C%9F%E5%8C%BB%E6%96%B9%E9%9B%86/" target="_self">
-          胎胪药录与五十二病方：一部失传本草书与一部出土医方集
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/07/23/%E8%83%8E%E8%83%AA%E8%8D%AF%E5%BD%95%E4%B8%8E%E4%BA%94%E5%8D%81%E4%BA%8C%E7%97%85%E6%96%B9%EF%BC%9A%E4%B8%80%E9%83%A8%E5%A4%B1%E4%BC%A0%E6%9C%AC%E8%8D%89%E4%B9%A6%E4%B8%8E%E4%B8%80%E9%83%A8%E5%87%BA%E5%9C%9F%E5%8C%BB%E6%96%B9%E9%9B%86/" target="_self">
-        <div>
-          
-          张仲景《伤寒论》序中提到的《胎胪药录》究竟是一部怎样的书？它与马王堆出土的《五十二病方》有什么关联和区别？本文带你一探究竟。
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-07-23 17:50" pubdate>
-              2026-07-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%9D%82%E8%B0%88/" class="category-chain-item">杂谈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E4%B8%AD%E5%8C%BB/">#中医</a>
-            
-              <a href="/tags/%E5%8F%A4%E7%B1%8D/">#古籍</a>
-            
-              <a href="/tags/%E9%A9%AC%E7%8E%8B%E5%A0%86/">#马王堆</a>
             
           </div>
         
