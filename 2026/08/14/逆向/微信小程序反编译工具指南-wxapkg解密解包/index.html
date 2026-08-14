@@ -1,0 +1,821 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文介绍微信小程序 .wxapkg 文件的格式、反编译流程，并对比几款主流开源工具，重点讲 wux1an&#x2F;wxapkg 的图形界面用法。数据截至 2026-08。 ⚠️ 免责声明：本文仅作技术学习与安全研究记录。请在授权测试、安全研究或自有小程序范围内使用，勿用于侵权或攻击。  一、.wxapkg 是什么.wxapkg 是微信小程序的打包文件格式。当你在手机或 PC 微信里打开一个小程序时，微信">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微信小程序反编译工具指南：.wxapkg 解密与解包">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E6%8C%87%E5%8D%97-wxapkg%E8%A7%A3%E5%AF%86%E8%A7%A3%E5%8C%85/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文介绍微信小程序 .wxapkg 文件的格式、反编译流程，并对比几款主流开源工具，重点讲 wux1an&#x2F;wxapkg 的图形界面用法。数据截至 2026-08。 ⚠️ 免责声明：本文仅作技术学习与安全研究记录。请在授权测试、安全研究或自有小程序范围内使用，勿用于侵权或攻击。  一、.wxapkg 是什么.wxapkg 是微信小程序的打包文件格式。当你在手机或 PC 微信里打开一个小程序时，微信">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:04:55.884Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="wxapkg">
+<meta property="article:tag" content="反编译">
+<meta property="article:tag" content="安全评估">
+<meta property="article:tag" content="微信小程序">
+<meta property="article:tag" content="解包">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>微信小程序反编译工具指南：.wxapkg 解密与解包 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="微信小程序反编译工具指南：.wxapkg 解密与解包"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 21:00" pubdate>
+          2026年8月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">微信小程序反编译工具指南：.wxapkg 解密与解包</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>本文介绍微信小程序 <code>.wxapkg</code> 文件的格式、反编译流程，并对比几款主流开源工具，重点讲 <a target="_blank" rel="noopener" href="https://github.com/wux1an/wxapkg">wux1an/wxapkg</a> 的图形界面用法。数据截至 2026-08。</p>
+<p>⚠️ <strong>免责声明</strong>：本文仅作技术学习与安全研究记录。请在授权测试、安全研究或自有小程序范围内使用，勿用于侵权或攻击。</p>
+</blockquote>
+<h2 id="一、-wxapkg-是什么"><a href="#一、-wxapkg-是什么" class="headerlink" title="一、.wxapkg 是什么"></a>一、<code>.wxapkg</code> 是什么</h2><p><code>.wxapkg</code> 是<strong>微信小程序的打包文件格式</strong>。当你在手机或 PC 微信里打开一个小程序时，微信会把它的代码、页面、资源打包成一个（或多个，分包）<code>.wxapkg</code> 文件下载到本地缓存。</p>
+<p>包里是小程序<strong>编译后的产物</strong>：</p>
+<ul>
+<li><code>.wxml</code>：页面结构（类 HTML）</li>
+<li><code>.wxss</code>：样式（类 CSS）</li>
+<li><code>.js</code>：逻辑代码（通常已合并、压缩）</li>
+<li>图片等静态资源</li>
+</ul>
+<p><strong>逆向价值</strong>：拿到 <code>.wxapkg</code> 就能<strong>还原出小程序源码</strong>，用于安全评估、接口分析、排查硬编码的密钥 / 接口地址等——这也是它在安全和爬虫圈很受关注的原因。</p>
+<p>一个关键点：<strong>PC 微信下载的 wxapkg 是加密的</strong>，密钥与用户 <code>wxid</code> 相关，必须先解密才能解包。</p>
+<h2 id="二、反编译的三个步骤"><a href="#二、反编译的三个步骤" class="headerlink" title="二、反编译的三个步骤"></a>二、反编译的三个步骤</h2><p>不管用哪个工具，处理 <code>.wxapkg</code> 本质都是这三步：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs armasm">解密（Decrypt）  →  解包（Unpack）  →  还原工程目录（Decompile）<br>  <span class="hljs-built_in">PC</span> 包加密         拆出各个文件         还原成 wxml/wxss/js 结构<br></code></pre></td></tr></table></figure>
+
+<p>前提：<strong>目标小程序要先在 PC 微信里打开过一次</strong>，让它把包下载到本地缓存。缓存目录一般在微信的 <code>WeChat Files/.../Applet/{appid}/</code> 下。</p>
+<h2 id="三、主流工具对比"><a href="#三、主流工具对比" class="headerlink" title="三、主流工具对比"></a>三、主流工具对比</h2><table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">★</th>
+<th align="left">语言</th>
+<th align="left">形态</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/Ackites/KillWxapkg">Ackites/KillWxapkg</a></td>
+<td align="left">5942</td>
+<td align="left">Go</td>
+<td align="left">CLI</td>
+<td align="left"><strong>功能最全</strong>：自动化反编译 + 安全评估 + Hook + 改包，一条龙</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/wux1an/wxapkg">wux1an/wxapkg</a></td>
+<td align="left">3974</td>
+<td align="left">Go + Vue</td>
+<td align="left"><strong>GUI</strong></td>
+<td align="left"><strong>上手最快</strong>：扫描 + 解密 + 解包 + 美化，图形界面</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/biggerstar/wedecode">biggerstar/wedecode</a></td>
+<td align="left">3040</td>
+<td align="left">TypeScript</td>
+<td align="left">CLI</td>
+<td align="left">全自动源码还原，跨平台，主打线上代码审计</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/ezshine/wxapkg-convertor">ezshine/wxapkg-convertor</a></td>
+<td align="left">1492</td>
+<td align="left">JS</td>
+<td align="left">GUI</td>
+<td align="left">老牌反编译工具，附带收集各种小程序 / 小游戏包</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/BlackTrace/pc_wxapkg_decrypt">BlackTrace/pc_wxapkg_decrypt</a></td>
+<td align="left">740</td>
+<td align="left">Go</td>
+<td align="left">脚本</td>
+<td align="left"><strong>只做解密</strong>（不解包），经典解密实现</td>
+</tr>
+</tbody></table>
+<h3 id="怎么选"><a href="#怎么选" class="headerlink" title="怎么选"></a>怎么选</h3><ul>
+<li><strong>想要图形界面、不想敲命令</strong> → <strong>wux1an/wxapkg</strong>（本文重点）</li>
+<li><strong>想要一条龙、功能最全、做深度安全评估</strong> → <strong>KillWxapkg</strong></li>
+<li><strong>做线上代码审计 / CI 自动化</strong> → <strong>wedecode</strong></li>
+<li><strong>只需要解密那一步</strong>（已有解包工具） → <strong>pc_wxapkg_decrypt</strong></li>
+</ul>
+<h2 id="四、各工具的用法要点"><a href="#四、各工具的用法要点" class="headerlink" title="四、各工具的用法要点"></a>四、各工具的用法要点</h2><p>不同工具形态不同（GUI / CLI / 脚本），下面按类型给出各自的上手方式。</p>
+<h3 id="GUI-派：wux1an-wxapkg"><a href="#GUI-派：wux1an-wxapkg" class="headerlink" title="GUI 派：wux1an/wxapkg"></a>GUI 派：wux1an/wxapkg</h3><p>跨平台反编译 GUI 工具，基于 <a target="_blank" rel="noopener" href="https://wails.io/">Wails</a> 构建，支持 Windows 与 macOS。适合不想敲命令的人。</p>
+<blockquote>
+<p>⚠️ <strong>版本形态变化</strong>：当前 <strong>v2.0.0（2026-04）已是纯 GUI 桌面应用</strong>，不再是命令行工具。网上很多旧教程里的 <code>wxapkg scan</code> / <code>wxapkg unpack</code> 命令是 <strong>v1.x</strong> 的写法，新版<strong>双击运行图形界面</strong>即可。</p>
+</blockquote>
+<ul>
+<li><strong>安装</strong>：从 <a target="_blank" rel="noopener" href="https://github.com/wux1an/wxapkg/releases/latest">Releases</a> 下载 <code>wxapkg-gui-windows-x64.exe</code> 或 <code>wxapkg-gui-darwin.app.zip</code>，双击运行。</li>
+<li><strong>使用</strong>：自动扫描微信安装目录列出缓存的小程序 → 选中一键解密 + 解包，还原成源码文件结构 → 输出带代码美化（JSON / HTML / JS），可直接阅读。</li>
+<li><strong>自行编译</strong>（需 Go + Node）：<code>go install github.com/wailsapp/wails/v2/cmd/wails@latest</code>，前端 <code>cd frontend &amp;&amp; npm install</code>，再 <code>wails build</code>。</li>
+</ul>
+<h3 id="一条龙派：Ackites-KillWxapkg"><a href="#一条龙派：Ackites-KillWxapkg" class="headerlink" title="一条龙派：Ackites/KillWxapkg"></a>一条龙派：Ackites/KillWxapkg</h3><p>功能最全的命令行工具，把解密、解包、还原工程目录、安全评估串成自动化流程，还支持 Hook 和改包，适合做<strong>深度安全评估</strong>。命令行运行，可脚本化集成。</p>
+<h3 id="审计派：biggerstar-wedecode"><a href="#审计派：biggerstar-wedecode" class="headerlink" title="审计派：biggerstar/wedecode"></a>审计派：biggerstar/wedecode</h3><p>TypeScript 实现的全自动源码还原工具，跨 Windows / macOS / Linux，主打<strong>线上代码安全审计</strong>，适合接入 CI 自动化流程。</p>
+<h3 id="单步派：BlackTrace-pc-wxapkg-decrypt"><a href="#单步派：BlackTrace-pc-wxapkg-decrypt" class="headerlink" title="单步派：BlackTrace/pc_wxapkg_decrypt"></a>单步派：BlackTrace/pc_wxapkg_decrypt</h3><p>只做<strong>解密</strong>这一步（不解包）的经典实现。如果你已经有解包工具、只缺解密环节，或想理解 PC 微信 wxapkg 的解密原理，用它最合适。</p>
+<blockquote>
+<p>补充：PC 微信的 wxapkg 用与 <code>wxid</code> 相关的密钥加密，<code>pc_wxapkg_decrypt</code> 是很多上层工具（含 wux1an/wxapkg）解密环节的参考来源。</p>
+</blockquote>
+<h2 id="五、注意事项"><a href="#五、注意事项" class="headerlink" title="五、注意事项"></a>五、注意事项</h2><ol>
+<li><strong>需先在 PC 微信打开目标小程序</strong>，否则本地没有缓存包可扫 / 可解。</li>
+<li><strong>部分工具无开源 License</strong>（如 wux1an/wxapkg 未声明协议），二次开发 / 分发前请留意各自的授权情况。</li>
+<li><strong>仅供学习研究</strong>——各工具 README 均带免责声明。请在合法授权范围内使用。</li>
+<li><strong>反编译 ≠ 完整源码</strong>：还原的是编译后产物，变量名可能已压缩混淆；如需进一步可读化，可再用 JS 反混淆工具处理（如 <a href="/2026/08/14/%E9%80%86%E5%90%91/jsimplifier%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7-%E7%94%A8DeepSeek%E6%94%B9%E9%80%A0%E5%9B%BD%E5%86%85%E5%A4%A7%E6%A8%A1%E5%9E%8B/">JSimplifier 配合大模型</a>）。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>wux1an/wxapkg：<a target="_blank" rel="noopener" href="https://github.com/wux1an/wxapkg">https://github.com/wux1an/wxapkg</a></li>
+<li>Ackites/KillWxapkg：<a target="_blank" rel="noopener" href="https://github.com/Ackites/KillWxapkg">https://github.com/Ackites/KillWxapkg</a></li>
+<li>biggerstar/wedecode：<a target="_blank" rel="noopener" href="https://github.com/biggerstar/wedecode">https://github.com/biggerstar/wedecode</a></li>
+<li>BlackTrace/pc_wxapkg_decrypt：<a target="_blank" rel="noopener" href="https://github.com/BlackTrace/pc_wxapkg_decrypt">https://github.com/BlackTrace/pc_wxapkg_decrypt</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习与安全研究记录。请在合法合规、获得授权的前提下使用相关技术。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/">#微信小程序</a>
+      
+        <a href="/tags/wxapkg/">#wxapkg</a>
+      
+        <a href="/tags/%E5%8F%8D%E7%BC%96%E8%AF%91/">#反编译</a>
+      
+        <a href="/tags/%E8%A7%A3%E5%8C%85/">#解包</a>
+      
+        <a href="/tags/%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/">#安全评估</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>微信小程序反编译工具指南：.wxapkg 解密与解包</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/微信小程序反编译工具指南-wxapkg解密解包/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/jsimplifier%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7-%E7%94%A8DeepSeek%E6%94%B9%E9%80%A0%E5%9B%BD%E5%86%85%E5%A4%A7%E6%A8%A1%E5%9E%8B/" title="JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆">
+                        <span class="hidden-mobile">JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

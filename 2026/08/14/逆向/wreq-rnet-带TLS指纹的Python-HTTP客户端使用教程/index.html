@@ -1,0 +1,840 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为工具使用整理，基于官方仓库与示例编写  Python 绑定仓库：https:&#x2F;&#x2F;github.com&#x2F;0x676e67&#x2F;wreq-python（★1.4k+，0x676e67&#x2F;rnet 现已重定向到此） 底层 Rust 库：https:&#x2F;&#x2F;github.com&#x2F;0x676e67&#x2F;wreq 官方文档：https:&#x2F;&#x2F;python.wreq.org PyPI：新包 wreq、旧包 rnet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wreq（原 rnet）：带 TLS&#x2F;JA3&#x2F;JA4 指纹的 Python HTTP 客户端使用教程">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/wreq-rnet-%E5%B8%A6TLS%E6%8C%87%E7%BA%B9%E7%9A%84Python-HTTP%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为工具使用整理，基于官方仓库与示例编写  Python 绑定仓库：https:&#x2F;&#x2F;github.com&#x2F;0x676e67&#x2F;wreq-python（★1.4k+，0x676e67&#x2F;rnet 现已重定向到此） 底层 Rust 库：https:&#x2F;&#x2F;github.com&#x2F;0x676e67&#x2F;wreq 官方文档：https:&#x2F;&#x2F;python.wreq.org PyPI：新包 wreq、旧包 rnet">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T07:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T05:47:57.453Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="JA3">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="TLS指纹">
+<meta property="article:tag" content="rnet">
+<meta property="article:tag" content="wreq">
+<meta property="article:tag" content="反爬">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 15:00" pubdate>
+          2026年8月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          69 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为工具使用整理，基于官方仓库与示例编写</strong></p>
+<ul>
+<li><strong>Python 绑定仓库</strong>：<a target="_blank" rel="noopener" href="https://github.com/0x676e67/wreq-python">https://github.com/0x676e67/wreq-python</a>（★1.4k+，<code>0x676e67/rnet</code> 现已重定向到此）</li>
+<li><strong>底层 Rust 库</strong>：<a target="_blank" rel="noopener" href="https://github.com/0x676e67/wreq">https://github.com/0x676e67/wreq</a></li>
+<li><strong>官方文档</strong>：<a target="_blank" rel="noopener" href="https://python.wreq.org/">https://python.wreq.org</a></li>
+<li><strong>PyPI</strong>：新包 <a target="_blank" rel="noopener" href="https://pypi.org/project/wreq/"><code>wreq</code></a>、旧包 <a target="_blank" rel="noopener" href="https://pypi.org/project/rnet/"><code>rnet</code></a></li>
+</ul>
+<p>文中代码均来自官方 <code>examples/</code> 目录，可直接验证。License：Apache-2.0。</p>
+</blockquote>
+<h2 id="一、rnet-和-wreq-是什么关系？"><a href="#一、rnet-和-wreq-是什么关系？" class="headerlink" title="一、rnet 和 wreq 是什么关系？"></a>一、rnet 和 wreq 是什么关系？</h2><p>先把最容易混淆的一点说清楚：</p>
+<ul>
+<li><strong>rnet 是旧名，现在已改名为 wreq。</strong> 原仓库 <code>0x676e67/rnet</code> 已重定向到 <code>0x676e67/wreq-python</code>，新版所有示例都改成了 <code>import wreq</code>。</li>
+<li>PyPI 上<strong>两个包目前都在</strong>：旧包 <code>rnet</code>（v2.4.x）仍可安装使用，新包 <code>wreq</code>（v0.12.x）是现在主推的。</li>
+<li>架构上：**<code>wreq</code>（Rust）是底层高性能 HTTP 客户端** → <strong><code>wreq-python</code>（即原 rnet）是它的 Python 绑定</strong>（用 PyO3 + maturin 打包成 wheel）。</li>
+</ul>
+<p><strong>本文以新名 <code>wreq</code> 为主</strong>。如果你还在用旧包 <code>rnet</code>，把代码里的 <code>import wreq</code> 换成 <code>import rnet</code>、<code>from wreq import X</code> 换成 <code>from rnet import X</code> 即可，API 基本一致。</p>
+<blockquote>
+<p>⚠️ <strong>版本注意</strong>：新包 <code>wreq</code> 要求 <strong>Python ≥ 3.11</strong>；旧包 <code>rnet</code> 支持 <strong>Python ≥ 3.7</strong>。低版本环境暂时只能用 rnet。</p>
+</blockquote>
+<h2 id="二、它解决什么问题？"><a href="#二、它解决什么问题？" class="headerlink" title="二、它解决什么问题？"></a>二、它解决什么问题？</h2><p>一句话：<strong>它是一个自带浏览器 TLS / HTTP2 指纹伪装的 HTTP 客户端</strong>，用来对抗基于指纹的反爬。</p>
+<p>普通的 <code>requests</code>、<code>httpx</code>、<code>aiohttp</code> 用的是 Python 自己的 TLS 栈，其 <strong>JA3 / JA4 指纹</strong>和真实浏览器完全不同，稍强一点的风控（Cloudflare、Akamai 等）一看指纹就知道你不是浏览器。<code>curl_cffi</code> 是这个领域的常见方案，而 wreq 是更新的一个 Rust 实现，<strong>基准测试中号称优于 requests / httpx / aiohttp / curl_cffi</strong>（性能数据仅供参考，随环境变化）。</p>
+<p>它的核心特性：</p>
+<ul>
+<li><strong>异步 + 同步</strong> 两种 <code>Client</code></li>
+<li><strong>TLS 通过 BoringSSL</strong>，可精细控制 TLS 扩展、密码套件、曲线，以及 <strong>HTTP/2 的 SETTINGS / 伪头顺序</strong></li>
+<li><strong>100+ 浏览器设备模拟 profile</strong>（Chrome、Firefox、Safari、Okhttp 等，含 Android/iOS 平台）</li>
+<li>Body 支持 plain / JSON / urlencoded / multipart</li>
+<li>Cookie Store、重定向策略、旋转代理、连接池、流式传输、WebSocket 升级、自动解压</li>
+</ul>
+<p>关于指纹的官方设计理念值得一提：<strong>它不主张用「一串 JA3 字符串」去模拟指纹</strong>，因为 TLS + HTTP/2 的真实指纹很复杂，字符串无法可靠还原；而是提供对 TLS / HTTP2 各项扩展和设置的<strong>细粒度控制</strong>，用内置的浏览器 profile 来精确还原真实浏览器行为。</p>
+<h2 id="三、安装"><a href="#三、安装" class="headerlink" title="三、安装"></a>三、安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install wreq<br></code></pre></td></tr></table></figure>
+
+<p>旧包（Python 3.7~3.10 环境）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install rnet<br></code></pre></td></tr></table></figure>
+
+<p>预编译 wheel 覆盖 Linux（glibc/musl：x86_64、aarch64、armv7、i686）、macOS（x86_64、aarch64）、Windows（x86_64、i686、aarch64）、Android，一般无需本地编译。</p>
+<h2 id="四、快速开始"><a href="#四、快速开始" class="headerlink" title="四、快速开始"></a>四、快速开始</h2><p>最小示例（异步 + Chrome 指纹模拟）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Client, Emulation<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-comment"># 构建一个客户端，模拟 Chrome 149 的指纹</span><br>    client = Client(emulation=Emulation.Chrome149)<br><br>    <span class="hljs-comment"># 用你已经熟悉的 API 发请求</span><br>    resp = <span class="hljs-keyword">await</span> client.get(<span class="hljs-string">&quot;https://pingly.us.kg/api/all&quot;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-keyword">await</span> resp.text())<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+
+<p>如果懒得建 client，也有模块级快捷函数 <code>wreq.get/post/request</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> wreq<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Method<br><br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    resp: wreq.Response = <span class="hljs-keyword">await</span> wreq.request(Method.GET, url=<span class="hljs-string">&quot;https://www.google.com/&quot;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Status Code:&quot;</span>, resp.status)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Version:&quot;</span>, resp.version)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Response URL:&quot;</span>, resp.url)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Headers:&quot;</span>, resp.headers)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Cookies:&quot;</span>, resp.cookies)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Content-Length:&quot;</span>, resp.content_length)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Remote Address:&quot;</span>, resp.remote_addr)          <span class="hljs-comment"># 能拿到远端 IP</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;set-cookie:&quot;</span>, resp.headers[<span class="hljs-string">&quot;set-cookie&quot;</span>])<br><br>    <span class="hljs-comment"># headers 可迭代</span><br>    <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> resp.headers:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;key&#125;</span>: <span class="hljs-subst">&#123;value&#125;</span>&quot;</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    asyncio.run(main())<br></code></pre></td></tr></table></figure>
+
+<h2 id="五、常用用法"><a href="#五、常用用法" class="headerlink" title="五、常用用法"></a>五、常用用法</h2><h3 id="1-浏览器指纹模拟（Emulation）"><a href="#1-浏览器指纹模拟（Emulation）" class="headerlink" title="1. 浏览器指纹模拟（Emulation）"></a>1. 浏览器指纹模拟（Emulation）</h3><p>这是 wreq 最核心的能力。最简单的用法是直接选一个 profile：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Client<br><span class="hljs-keyword">from</span> wreq.emulation <span class="hljs-keyword">import</span> Emulation, Profile, Platform<br><br><span class="hljs-comment"># 直接用预设：Firefox 135</span><br>client = Client(emulation=Emulation.Firefox135)<br><br><span class="hljs-comment"># 指定 profile + 平台：Chrome 134 on Android</span><br>resp = <span class="hljs-keyword">await</span> client.get(<br>    <span class="hljs-string">&quot;https://tls.peet.ws/api/all&quot;</span>,<br>    emulation=Emulation(<br>        profile=Profile.Chrome134,<br>        platform=Platform.Android,<br>    ),<br>    default_headers=<span class="hljs-literal">False</span>,   <span class="hljs-comment"># 关闭客户端默认头，只用你指定的</span><br>)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>验证指纹是否生效，可以请求 <code>https://tls.peet.ws/api/all</code> 或 <code>https://pingly.us.kg/api/all</code> 这类回显 TLS/JA3 信息的服务，对比真实浏览器。</p>
+</blockquote>
+<h3 id="2-JSON-表单-查询参数"><a href="#2-JSON-表单-查询参数" class="headerlink" title="2. JSON / 表单 / 查询参数"></a>2. JSON / 表单 / 查询参数</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> wreq<br><br><span class="hljs-comment"># JSON body</span><br>resp = <span class="hljs-keyword">await</span> wreq.post(<span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>, json=&#123;<span class="hljs-string">&quot;key&quot;</span>: <span class="hljs-string">&quot;value&quot;</span>&#125;)<br><span class="hljs-built_in">print</span>(<span class="hljs-keyword">await</span> resp.json())<br><br><span class="hljs-comment"># 表单（dict 或 list of tuples 都行）</span><br>resp = <span class="hljs-keyword">await</span> wreq.post(<br>    <span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>,<br>    form=&#123;<span class="hljs-string">&quot;keyA&quot;</span>: <span class="hljs-string">&quot;valueA&quot;</span>, <span class="hljs-string">&quot;number&quot;</span>: <span class="hljs-number">789</span>, <span class="hljs-string">&quot;flag&quot;</span>: <span class="hljs-literal">False</span>&#125;,<br>)<br><br><span class="hljs-comment"># query 查询参数</span><br>resp = <span class="hljs-keyword">await</span> wreq.get(<br>    <span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>,<br>    query=[(<span class="hljs-string">&quot;key1&quot;</span>, <span class="hljs-string">&quot;value1&quot;</span>), (<span class="hljs-string">&quot;number&quot;</span>, <span class="hljs-number">123</span>)],<br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-multipart-文件上传"><a href="#3-multipart-文件上传" class="headerlink" title="3. multipart 文件上传"></a>3. multipart 文件上传</h3><p>支持文本、字节、文件路径、异步字节流四种 Part：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pathlib <span class="hljs-keyword">import</span> Path<br><span class="hljs-keyword">import</span> wreq<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Multipart, Part<br><br>resp = <span class="hljs-keyword">await</span> wreq.post(<br>    <span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>,<br>    multipart=Multipart(<br>        Part(name=<span class="hljs-string">&quot;def&quot;</span>, value=<span class="hljs-string">&quot;111&quot;</span>, filename=<span class="hljs-string">&quot;def.txt&quot;</span>, mime=<span class="hljs-string">&quot;text/plain&quot;</span>),<br>        Part(name=<span class="hljs-string">&quot;abc&quot;</span>, value=<span class="hljs-string">b&quot;000&quot;</span>, filename=<span class="hljs-string">&quot;abc.txt&quot;</span>, mime=<span class="hljs-string">&quot;text/plain&quot;</span>),<br>        Part(name=<span class="hljs-string">&quot;LICENSE&quot;</span>, value=Path(<span class="hljs-string">&quot;LICENSE&quot;</span>), filename=<span class="hljs-string">&quot;LICENSE&quot;</span>, mime=<span class="hljs-string">&quot;text/plain&quot;</span>),<br>    ),<br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-代理（含旋转-SOCKS5-Unix-socket）"><a href="#4-代理（含旋转-SOCKS5-Unix-socket）" class="headerlink" title="4. 代理（含旋转 / SOCKS5 / Unix socket）"></a>4. 代理（含旋转 / SOCKS5 / Unix socket）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> wreq<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Client, Proxy<br><br><span class="hljs-comment"># 客户端级代理（可传多个实现旋转）</span><br>client = Client(proxies=[Proxy.http(<span class="hljs-string">&quot;socks5h://user:pass@127.0.0.1:6152&quot;</span>)])<br>resp = <span class="hljs-keyword">await</span> client.get(<span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>)<br><br><span class="hljs-comment"># 单次请求级代理，还能给代理带自定义头</span><br>resp = <span class="hljs-keyword">await</span> wreq.get(<br>    <span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>,<br>    proxy=Proxy.<span class="hljs-built_in">all</span>(<br>        url=<span class="hljs-string">&quot;http://127.0.0.1:6152&quot;</span>,<br>        custom_http_headers=&#123;<span class="hljs-string">&quot;user-agent&quot;</span>: <span class="hljs-string">&quot;wreq&quot;</span>, <span class="hljs-string">&quot;x-proxy&quot;</span>: <span class="hljs-string">&quot;wreq&quot;</span>&#125;,<br>    ),<br>)<br><br><span class="hljs-comment"># Unix socket 代理（例如直接怼 docker.sock）</span><br>resp = <span class="hljs-keyword">await</span> wreq.get(<br>    <span class="hljs-string">&quot;http://localhost/v1.41/containers/json&quot;</span>,<br>    proxy=Proxy.unix(<span class="hljs-string">&quot;/var/run/docker.sock&quot;</span>),<br>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-认证"><a href="#5-认证" class="headerlink" title="5. 认证"></a>5. 认证</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Bearer / token</span><br>resp = <span class="hljs-keyword">await</span> wreq.get(<span class="hljs-string">&quot;https://httpbin.io/anything&quot;</span>, auth=<span class="hljs-string">&quot;token&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>（另有 <code>examples/basic_auth.py</code>、<code>bearer_auth.py</code> 对应 Basic / Bearer 认证。）</p>
+<h3 id="6-流式响应"><a href="#6-流式响应" class="headerlink" title="6. 流式响应"></a>6. 流式响应</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio<br><span class="hljs-keyword">import</span> wreq<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Response<br><br>resp: Response = <span class="hljs-keyword">await</span> wreq.get(<span class="hljs-string">&quot;https://httpbin.io/stream/20&quot;</span>)<br><span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> resp:<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> resp.stream() <span class="hljs-keyword">as</span> streamer:<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> streamer:<br>            <span class="hljs-built_in">print</span>(chunk)<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-自定义重定向策略"><a href="#7-自定义重定向策略" class="headerlink" title="7. 自定义重定向策略"></a>7. 自定义重定向策略</h3><p>可以用 Python 回调精细控制每一次重定向：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Client, redirect<br><span class="hljs-keyword">from</span> wreq.redirect <span class="hljs-keyword">import</span> Attempt, Action<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">custom_policy</span>(<span class="hljs-params">attempt: Attempt</span>) -&gt; Action:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Redirect to: <span class="hljs-subst">&#123;attempt.<span class="hljs-built_in">next</span>&#125;</span> (status: <span class="hljs-subst">&#123;attempt.status&#125;</span>)&quot;</span>)<br>    <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;example.com&quot;</span> <span class="hljs-keyword">in</span> attempt.<span class="hljs-built_in">next</span>:<br>        <span class="hljs-keyword">return</span> attempt.stop()              <span class="hljs-comment"># 阻止跳到 example.com</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(attempt.previous) &gt; <span class="hljs-number">5</span>:<br>        <span class="hljs-keyword">return</span> attempt.error(<span class="hljs-string">&quot;Too many redirects&quot;</span>)  <span class="hljs-comment"># 链太长就报错</span><br>    <span class="hljs-keyword">return</span> attempt.follow()                <span class="hljs-comment"># 其余放行</span><br><br><br>client = Client(redirect=redirect.Policy.custom(custom_policy))<br>resp = <span class="hljs-keyword">await</span> client.get(<span class="hljs-string">&quot;http://httpbin.io/redirect/3&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-HeaderMap（同名多值头）"><a href="#8-HeaderMap（同名多值头）" class="headerlink" title="8. HeaderMap（同名多值头）"></a>8. HeaderMap（同名多值头）</h3><p><code>HeaderMap</code> 支持同一个 key 多值，适合处理 <code>Accept</code>、<code>Set-Cookie</code> 这类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> wreq.header <span class="hljs-keyword">import</span> HeaderMap<br><br>headers = HeaderMap()<br>headers.insert(<span class="hljs-string">&quot;Content-Type&quot;</span>, <span class="hljs-string">&quot;application/json&quot;</span>)<br>headers.insert(<span class="hljs-string">&quot;Accept&quot;</span>, <span class="hljs-string">&quot;application/json&quot;</span>)<br>headers.insert(<span class="hljs-string">&quot;Accept&quot;</span>, <span class="hljs-string">&quot;text/html&quot;</span>)           <span class="hljs-comment"># 同名多值</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">list</span>(headers.get_all(<span class="hljs-string">&quot;Accept&quot;</span>)))          <span class="hljs-comment"># [&#x27;application/json&#x27;, &#x27;text/html&#x27;]</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="9-WebSocket"><a href="#9-WebSocket" class="headerlink" title="9. WebSocket"></a>9. WebSocket</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> wreq<br><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Message, WebSocket<br><br>client = wreq.Client()<br>ws: WebSocket = <span class="hljs-keyword">await</span> client.websocket(<span class="hljs-string">&quot;wss://echo.websocket.org&quot;</span>)<br><span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> ws:<br>    <span class="hljs-keyword">if</span> ws.status == <span class="hljs-number">101</span>:<br>        <span class="hljs-keyword">await</span> ws.send(Message.from_text(<span class="hljs-string">&quot;hello&quot;</span>))<br>        msg = <span class="hljs-keyword">await</span> ws.recv()<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Received:&quot;</span>, msg)<br></code></pre></td></tr></table></figure>
+
+<h2 id="六、进阶：手工定制-TLS-HTTP2-指纹"><a href="#六、进阶：手工定制-TLS-HTTP2-指纹" class="headerlink" title="六、进阶：手工定制 TLS / HTTP2 指纹"></a>六、进阶：手工定制 TLS / HTTP2 指纹</h2><p>如果内置 profile 不够用，可以直接手搓 TLS 与 HTTP/2 参数（下面是官方 <code>emulation.py</code> 里的高级配置节选，模拟 Twitter Android 客户端）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> wreq <span class="hljs-keyword">import</span> Client<br><span class="hljs-keyword">from</span> wreq.tls <span class="hljs-keyword">import</span> TlsOptions, TlsVersion, AlpnProtocol<br><span class="hljs-keyword">from</span> wreq.http2 <span class="hljs-keyword">import</span> Http2Options, PseudoId, PseudoOrder<br><span class="hljs-keyword">from</span> wreq.header <span class="hljs-keyword">import</span> HeaderMap, OrigHeaderMap<br><br>tls_options = TlsOptions(<br>    grease_enabled=<span class="hljs-literal">True</span>,<br>    enable_ocsp_stapling=<span class="hljs-literal">True</span>,<br>    curves_list=<span class="hljs-string">&quot;:&quot;</span>.join([<span class="hljs-string">&quot;X25519&quot;</span>, <span class="hljs-string">&quot;P-256&quot;</span>, <span class="hljs-string">&quot;P-384&quot;</span>]),<br>    cipher_list=<span class="hljs-string">&quot;:&quot;</span>.join([<br>        <span class="hljs-string">&quot;TLS_AES_128_GCM_SHA256&quot;</span>, <span class="hljs-string">&quot;TLS_AES_256_GCM_SHA384&quot;</span>,<br>        <span class="hljs-string">&quot;TLS_CHACHA20_POLY1305_SHA256&quot;</span>,<br>        <span class="hljs-string">&quot;TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256&quot;</span>,<br>        <span class="hljs-comment"># ... 省略</span><br>    ]),<br>    alpn_protocols=[AlpnProtocol.HTTP2, AlpnProtocol.HTTP1],<br>    min_tls_version=TlsVersion.TLS_1_2,<br>    max_tls_version=TlsVersion.TLS_1_3,<br>)<br><br>http2_options = Http2Options(<br>    initial_stream_id=<span class="hljs-number">3</span>,<br>    initial_window_size=<span class="hljs-number">16777216</span>,<br>    headers_pseudo_order=PseudoOrder(<br>        PseudoId.METHOD, PseudoId.PATH, PseudoId.AUTHORITY,<br>        PseudoId.SCHEME, PseudoId.PROTOCOL,<br>    ),<br>)<br><br><span class="hljs-comment"># OrigHeaderMap 用来保留请求头的原始大小写与顺序（指纹的一部分）</span><br>orig_headers = OrigHeaderMap()<br>orig_headers.insert(<span class="hljs-string">&quot;Cookie&quot;</span>)<br>orig_headers.insert(<span class="hljs-string">&quot;User-Agent&quot;</span>)<br><br>client = Client(<br>    tls_options=tls_options,<br>    http2_options=http2_options,<br>    orig_headers=orig_headers,<br>)<br></code></pre></td></tr></table></figure>
+
+<p>这里能看出 wreq 的设计哲学：<strong>JA3/JA4/Akamai 指纹不是靠一串字符串模拟，而是靠对 cipher 列表、曲线、ALPN、HTTP2 SETTINGS、伪头顺序、头部原始顺序等逐项还原</strong>——这也是它比”设个 ja3 字符串”的方案更贴近真实浏览器的原因。</p>
+<h2 id="七、和其他方案的对比"><a href="#七、和其他方案的对比" class="headerlink" title="七、和其他方案的对比"></a>七、和其他方案的对比</h2><table>
+<thead>
+<tr>
+<th align="left">方案</th>
+<th align="left">语言/底层</th>
+<th align="left">TLS 指纹</th>
+<th align="left">备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">requests / httpx / aiohttp</td>
+<td align="left">Python ssl</td>
+<td align="left">❌ 无伪装</td>
+<td align="left">指纹一眼假</td>
+</tr>
+<tr>
+<td align="left">curl_cffi</td>
+<td align="left">libcurl-impersonate</td>
+<td align="left">✅</td>
+<td align="left">老牌方案，见本站 <a href="curl-impersonate-JA3-TLS-Fingerprint.md">curl-impersonate 笔记</a></td>
+</tr>
+<tr>
+<td align="left"><strong>wreq（原 rnet）</strong></td>
+<td align="left">Rust + BoringSSL</td>
+<td align="left">✅ 细粒度</td>
+<td align="left">异步优先、性能强、profile 多</td>
+</tr>
+</tbody></table>
+<p>选型建议：需要<strong>异步 + 高并发 + 多浏览器 profile</strong>，wreq 是很好的选择；已有 curl_cffi 工作流、或需要 Python 3.7~3.10，可继续用 curl_cffi 或旧包 rnet。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>wreq-python（原 rnet）：<a target="_blank" rel="noopener" href="https://github.com/0x676e67/wreq-python">https://github.com/0x676e67/wreq-python</a></li>
+<li>wreq（Rust 底层）：<a target="_blank" rel="noopener" href="https://github.com/0x676e67/wreq">https://github.com/0x676e67/wreq</a></li>
+<li>官方文档：<a target="_blank" rel="noopener" href="https://python.wreq.org/">https://python.wreq.org</a></li>
+<li>全部示例：<a target="_blank" rel="noopener" href="https://github.com/0x676e67/wreq-python/tree/main/examples">https://github.com/0x676e67/wreq-python/tree/main/examples</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习记录。请在合法合规、遵守目标站点条款的前提下使用相关技术。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8F%8D%E7%88%AC/">#反爬</a>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+        <a href="/tags/JA3/">#JA3</a>
+      
+        <a href="/tags/wreq/">#wreq</a>
+      
+        <a href="/tags/rnet/">#rnet</a>
+      
+        <a href="/tags/TLS%E6%8C%87%E7%BA%B9/">#TLS指纹</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/wreq-rnet-带TLS指纹的Python-HTTP客户端使用教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/never-jscore-Python%E9%AB%98%E6%80%A7%E8%83%BDJS%E5%BC%95%E6%93%8E%E9%80%86%E5%90%91%E5%88%A9%E5%99%A8/" title="never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/SKRoot%E5%86%85%E6%A0%B8%E7%BA%A7Root%E6%96%B9%E6%A1%88%E4%BB%8B%E7%BB%8D%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程">
+                        <span class="hidden-mobile">SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

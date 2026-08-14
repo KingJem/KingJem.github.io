@@ -1,0 +1,867 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为工具使用与改造记录，基于官方仓库源码编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;xingtulab&#x2F;jsimplifier（GPL-3.0） 论文：《From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis》，NDSS 2026  本文介绍 JS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/jsimplifier%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7-%E7%94%A8DeepSeek%E6%94%B9%E9%80%A0%E5%9B%BD%E5%86%85%E5%A4%A7%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为工具使用与改造记录，基于官方仓库源码编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;xingtulab&#x2F;jsimplifier（GPL-3.0） 论文：《From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis》，NDSS 2026  本文介绍 JS">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T08:15:44.572Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="JS反混淆">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="jsimplifier">
+<meta property="article:tag" content="大模型">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 20:00" pubdate>
+          2026年8月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为工具使用与改造记录，基于官方仓库源码编写</strong></p>
+<ul>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/xingtulab/jsimplifier">https://github.com/xingtulab/jsimplifier</a>（GPL-3.0）</li>
+<li><strong>论文</strong>：《From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis》，NDSS 2026</li>
+</ul>
+<p>本文介绍 JSimplifier 的基本用法，并重点讲<strong>如何把它改造成用国内 DeepSeek 大模型</strong>驱动。文中代码与配置均基于官方源码核对，可直接落地。</p>
+</blockquote>
+<h2 id="一、JSimplifier-是什么"><a href="#一、JSimplifier-是什么" class="headerlink" title="一、JSimplifier 是什么"></a>一、JSimplifier 是什么</h2><p>一个 <strong>JS 反混淆 / 反压缩 / 简化工具</strong>，来头不小——它是 <strong>NDSS 2026 论文</strong>《From Obfuscated to Obvious》的官方开源实现。</p>
+<p>它的核心思路是<strong>多阶段流水线</strong>：</p>
+<blockquote>
+<p>预处理 → AST 静态分析变换 → 动态执行追踪 → <strong>LLM 增强的标识符重命名</strong></p>
+</blockquote>
+<p>论文数据：覆盖 20 类混淆技术、代码复杂度降低 88.2%、可读性提升 4 倍以上，在 44,421 个真实样本上评测过。</p>
+<p><strong>LLM 在这里干什么？</strong> 纯 AST 变换能还原结构、解常量、去死代码，但<strong>没法给变量起有意义的名字</strong>——混淆后满屏的 <code>a</code>、<code>_0x1f2e</code> 它只能照搬。JSimplifier 把每个变量连同上下文发给大模型，让它<strong>推断用途、起一个描述性的新名字</strong>（比如 <code>a</code> → <code>userToken</code>）。这是它比传统 AST 反混淆工具更进一步的地方。</p>
+<h2 id="二、基本使用"><a href="#二、基本使用" class="headerlink" title="二、基本使用"></a>二、基本使用</h2><h3 id="环境与安装"><a href="#环境与安装" class="headerlink" title="环境与安装"></a>环境与安装</h3><ul>
+<li><strong>Node.js ≥ 20</strong></li>
+<li>Python 3.11（仅评测实验用，日常反混淆不需要）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/xingtulab/jsimplifier<br><span class="hljs-built_in">cd</span> jsimplifier<br>npm install<br></code></pre></td></tr></table></figure>
+
+<h3 id="三种运行模式"><a href="#三种运行模式" class="headerlink" title="三种运行模式"></a>三种运行模式</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 纯 AST 变换，不用 AI（免费、离线）</span><br>npm start deobfuscate -- --model=none input.js<br><br><span class="hljs-comment"># 2. 用 OpenAI 系模型</span><br>npm start deobfuscate -- --model=gpt-4o-mini --apiKey=<span class="hljs-string">&quot;sk-...&quot;</span> input.js<br><br><span class="hljs-comment"># 3. 用 Google Gemini</span><br>npm start deobfuscate -- --model=gemini-1.5-flash --apiKey=<span class="hljs-string">&quot;...&quot;</span> input.js<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：命令要用 <code>npm start deobfuscate --</code>，参数前的双横线 <code>--</code> 不能少。</p>
+</blockquote>
+<p>输出保存在 <code>output/deobfuscated_{文件名}/deobfuscated.js</code>。</p>
+<p>常用参数：</p>
+<ul>
+<li><code>--model</code>：模型（<code>none</code> 表示纯 AST，默认）</li>
+<li><code>--apiKey</code>：API 密钥</li>
+<li><code>--baseURL</code>：API 服务器地址（<strong>改造国内模型的关键</strong>）</li>
+<li><code>--batch</code>：批量处理目录下所有 JS</li>
+<li><code>--outputDir</code>：输出目录</li>
+<li><code>--verbose</code>：详细输出</li>
+</ul>
+<p>它还提供 <strong>Web UI</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm run build<br>node web-server.js      <span class="hljs-comment"># 默认 http://localhost:3000</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="三、为什么它对国内大模型很友好"><a href="#三、为什么它对国内大模型很友好" class="headerlink" title="三、为什么它对国内大模型很友好"></a>三、为什么它对国内大模型很友好</h2><p>看源码会发现，改造成国内模型几乎不用动代码，原因有三：</p>
+<ol>
+<li><strong>用的是官方 <code>openai</code> npm SDK</strong>，<code>new OpenAI({ apiKey, baseURL })</code>，<strong>baseURL 可自定义</strong>。</li>
+<li><strong>默认 baseURL 本来就是国内中转</strong>——<code>src/commands/openai.ts</code> 里默认值是 <code>https://api.zhizengzeng.com/v1</code>（智增增），说明作者本就考虑了国内访问。</li>
+<li><strong>支持 <code>--baseURL</code> 参数和 <code>BASE_URL</code> 环境变量</strong>覆盖。</li>
+</ol>
+<p>而 DeepSeek 提供<strong>兼容 OpenAI 格式</strong>的接口。所以理论上，<strong>只改 <code>baseURL</code> + <code>model</code> + <code>apiKey</code> 三个值就能用 DeepSeek</strong>。</p>
+<h2 id="四、用-DeepSeek-改造（分两步）"><a href="#四、用-DeepSeek-改造（分两步）" class="headerlink" title="四、用 DeepSeek 改造（分两步）"></a>四、用 DeepSeek 改造（分两步）</h2><h3 id="第-1-步：配置-DeepSeek"><a href="#第-1-步：配置-DeepSeek" class="headerlink" title="第 1 步：配置 DeepSeek"></a>第 1 步：配置 DeepSeek</h3><p>DeepSeek 的 OpenAI 兼容参数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">项</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">baseURL</td>
+<td align="left"><code>https://api.deepseek.com/v1</code></td>
+</tr>
+<tr>
+<td align="left">model</td>
+<td align="left"><code>deepseek-chat</code></td>
+</tr>
+<tr>
+<td align="left">apiKey</td>
+<td align="left">你在 DeepSeek 平台申请的 <code>sk-...</code></td>
+</tr>
+</tbody></table>
+<p><strong>方式 A：命令行直接传</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm start deobfuscate -- \<br>  --model=deepseek-chat \<br>  --apiKey=<span class="hljs-string">&quot;sk-你的DeepSeek密钥&quot;</span> \<br>  --baseURL=<span class="hljs-string">&quot;https://api.deepseek.com/v1&quot;</span> \<br>  input.js<br></code></pre></td></tr></table></figure>
+
+<p><strong>方式 B：写进 <code>.env</code>（推荐）</strong></p>
+<p>项目用了 <code>dotenv</code>（见 <code>src/env.ts</code>），在项目根目录建 <code>.env</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">OPENAI_API_KEY=sk-你的DeepSeek密钥<br>BASE_URL=https://api.deepseek.com/v1<br></code></pre></td></tr></table></figure>
+
+<p>然后就不用每次敲密钥了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm start deobfuscate -- --model=deepseek-chat input.js<br></code></pre></td></tr></table></figure>
+
+<h3 id="第-2-步：⚠️-关键坑-——-修改-response-format"><a href="#第-2-步：⚠️-关键坑-——-修改-response-format" class="headerlink" title="第 2 步：⚠️ 关键坑 —— 修改 response_format"></a>第 2 步：⚠️ 关键坑 —— 修改 <code>response_format</code></h3><p><strong>这一步决定改造能不能成功，务必注意。</strong></p>
+<p>JSimplifier 给模型发请求时，用了 OpenAI 的<strong>严格结构化输出</strong>（<code>src/plugins/openai/openai-rename.ts</code> 的 <code>toRenamePrompt</code> 函数）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-attr">response_format</span>: &#123;<br>  <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;json_schema&quot;</span>,        <span class="hljs-comment">// ← OpenAI 专有特性</span><br>  <span class="hljs-attr">json_schema</span>: &#123;<br>    <span class="hljs-attr">strict</span>: <span class="hljs-literal">true</span>,<br>    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;rename&quot;</span>,<br>    <span class="hljs-attr">schema</span>: &#123; <span class="hljs-comment">/* newName ... */</span> &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>问题</strong>：<code>json_schema</code> + <code>strict</code> 是 OpenAI 较新的专有能力，<strong>DeepSeek 不支持</strong>，直接用会报 400 错误。DeepSeek 只支持 <code>{ type: &quot;json_object&quot; }</code>。</p>
+<p><strong>解决</strong>：打开 <code>src/plugins/openai/openai-rename.ts</code>，找到 <code>toRenamePrompt</code> 函数，做两处修改。</p>
+<p><strong>① 把 <code>response_format</code> 换成 <code>json_object</code>：</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 改前（OpenAI 专有，DeepSeek 报错）</span><br><span class="hljs-attr">response_format</span>: &#123;<br>  <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;json_schema&quot;</span>,<br>  <span class="hljs-attr">json_schema</span>: &#123; <span class="hljs-attr">strict</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;rename&quot;</span>, <span class="hljs-attr">schema</span>: &#123;...&#125; &#125;<br>&#125;<br><br><span class="hljs-comment">// 改后（DeepSeek / 通义 / Kimi / GLM 都认）</span><br><span class="hljs-attr">response_format</span>: &#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;json_object&quot;</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>② 在 system prompt 里明确要求返回 JSON</strong>（<code>json_object</code> 模式通常要求 prompt 中出现 “JSON” 字样，否则可能报错或不返回 JSON）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 改后的 system content</span><br><span class="hljs-attr">content</span>: <span class="hljs-string">`Rename the JavaScript variable/function \`<span class="hljs-subst">$&#123;name&#125;</span>\` to a descriptive name based on its usage. Respond ONLY with JSON in the form &#123;&quot;newName&quot;: &quot;...&quot;&#125;. Do not reuse names mentioned earlier.`</span><br></code></pre></td></tr></table></figure>
+
+<p>改完这两处，DeepSeek 就能正常跑了。</p>
+<blockquote>
+<p><strong>附带说明</strong>：文件里的 <code>PRICING</code> 价格表只用于日志中估算 <code>cost_usd</code>，不影响功能。换成 DeepSeek 后成本数字会不准，但<strong>不影响反混淆正常运行</strong>。想让日志成本准确，可以给 <code>PRICING</code> 加一行 <code>deepseek-chat</code> 的价格。</p>
+</blockquote>
+<h2 id="五、落地建议（少踩坑）"><a href="#五、落地建议（少踩坑）" class="headerlink" title="五、落地建议（少踩坑）"></a>五、落地建议（少踩坑）</h2><ol>
+<li><p><strong>先跑 <code>--model=none</code> 验证基础链路</strong>。它不需要任何 API，先确认 AST 反混淆这条路通了，再接 DeepSeek，排错更容易。</p>
+</li>
+<li><p><strong>先拿小文件试</strong>。JSimplifier 是<strong>逐个变量调用 API</strong>的（<code>visitAllIdentifiers</code> 遍历每个标识符各发一次请求），混淆文件变量多时 API 调用次数会非常大。先用小样本验证改造成功，再批量。</p>
+</li>
+<li><p><strong>DeepSeek 性价比高</strong>。变量重命名任务对模型能力要求不高，<code>deepseek-chat</code> 足够，而且逐变量调用累积的 token 量不小，DeepSeek 便宜量大正好合适。</p>
+</li>
+<li><p><strong>改代码前先只改配置试一次</strong>。万一你用的中转层恰好支持 <code>json_schema</code>，就省了改代码；报 <code>response_format</code> 相关错误了，再动第 2 步。</p>
+</li>
+</ol>
+<h2 id="六、其他国内模型对照"><a href="#六、其他国内模型对照" class="headerlink" title="六、其他国内模型对照"></a>六、其他国内模型对照</h2><p>如果不用 DeepSeek，其他几家的兼容参数（<code>response_format</code> 同样建议改成 <code>json_object</code>）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">厂商</th>
+<th align="left">baseURL</th>
+<th align="left">model 示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">DeepSeek</td>
+<td align="left"><code>https://api.deepseek.com/v1</code></td>
+<td align="left"><code>deepseek-chat</code></td>
+</tr>
+<tr>
+<td align="left">通义千问（百炼）</td>
+<td align="left"><code>https://dashscope.aliyuncs.com/compatible-mode/v1</code></td>
+<td align="left"><code>qwen-plus</code></td>
+</tr>
+<tr>
+<td align="left">Kimi（月之暗面）</td>
+<td align="left"><code>https://api.moonshot.cn/v1</code></td>
+<td align="left"><code>moonshot-v1-8k</code></td>
+</tr>
+<tr>
+<td align="left">智谱 GLM</td>
+<td align="left"><code>https://open.bigmodel.cn/api/paas/v4</code></td>
+<td align="left"><code>glm-4-flash</code></td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>JSimplifier：<a target="_blank" rel="noopener" href="https://github.com/xingtulab/jsimplifier">https://github.com/xingtulab/jsimplifier</a></li>
+<li>论文 DOI：<a target="_blank" rel="noopener" href="https://dx.doi.org/10.14722/ndss.2026.242198">10.14722/ndss.2026.242198</a></li>
+<li>DeepSeek API 文档：<a target="_blank" rel="noopener" href="https://api-docs.deepseek.com/">https://api-docs.deepseek.com/</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习与安全研究记录。请在合法合规、获得授权的前提下使用相关技术。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/jsimplifier/">#jsimplifier</a>
+      
+        <a href="/tags/JS%E5%8F%8D%E6%B7%B7%E6%B7%86/">#JS反混淆</a>
+      
+        <a href="/tags/DeepSeek/">#DeepSeek</a>
+      
+        <a href="/tags/LLM/">#LLM</a>
+      
+        <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">#大模型</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/jsimplifier反混淆工具-用DeepSeek改造国内大模型/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E6%8C%87%E5%8D%97-wxapkg%E8%A7%A3%E5%AF%86%E8%A7%A3%E5%8C%85/" title="微信小程序反编译工具指南：.wxapkg 解密与解包">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">微信小程序反编译工具指南：.wxapkg 解密与解包</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%80%89%E5%9E%8B%E5%AF%B9%E6%AF%94-Zoraxy-Traefik-NPM-Caddy-nginx-OpenResty/" title="反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty">
+                        <span class="hidden-mobile">反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

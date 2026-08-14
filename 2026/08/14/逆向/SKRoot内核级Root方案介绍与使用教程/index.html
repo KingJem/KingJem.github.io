@@ -1,0 +1,879 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为工具介绍与使用整理，基于项目官方仓库的公开资料编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;abcz316&#x2F;SKRoot-linuxKernelRoot（作者 abcz316，★3.8k+） 资料来源：项目官方 README、Releases（Lite_v2026.6.1）  本文内容整理自 SKRoot 官方仓库的公开说明，用于技术学习记录。该项目涉及修改手机底层内核，有变砖风">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/SKRoot%E5%86%85%E6%A0%B8%E7%BA%A7Root%E6%96%B9%E6%A1%88%E4%BB%8B%E7%BB%8D%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为工具介绍与使用整理，基于项目官方仓库的公开资料编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;abcz316&#x2F;SKRoot-linuxKernelRoot（作者 abcz316，★3.8k+） 资料来源：项目官方 README、Releases（Lite_v2026.6.1）  本文内容整理自 SKRoot 官方仓库的公开说明，用于技术学习记录。该项目涉及修改手机底层内核，有变砖风">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T05:17:56.668Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Root">
+<meta property="article:tag" content="SKRoot">
+<meta property="article:tag" content="免Root检测">
+<meta property="article:tag" content="内核">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 14:00" pubdate>
+          2026年8月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为工具介绍与使用整理，基于项目官方仓库的公开资料编写</strong></p>
+<ul>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/abcz316/SKRoot-linuxKernelRoot">https://github.com/abcz316/SKRoot-linuxKernelRoot</a>（作者 abcz316，★3.8k+）</li>
+<li><strong>资料来源</strong>：项目官方 README、Releases（<code>Lite_v2026.6.1</code>）</li>
+</ul>
+<p>本文内容整理自 SKRoot 官方仓库的公开说明，用于技术学习记录。<strong>该项目涉及修改手机底层内核，有变砖风险，且主打对抗 Root 检测，用途敏感</strong>。请务必阅读文末的「风险与合规提示」，并仅在<strong>自有设备、授权测试、安全研究</strong>范围内使用。</p>
+</blockquote>
+<h2 id="一、SKRoot-是什么"><a href="#一、SKRoot-是什么" class="headerlink" title="一、SKRoot 是什么"></a>一、SKRoot 是什么</h2><p>SKRoot 是一个 <strong>Android / Linux 内核级的 Root 方案</strong>，主打「完美隐藏 Root、无视检测」。它和主流的 Magisk 思路不同：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比维度</th>
+<th align="left">Magisk（传统方案）</th>
+<th align="left">SKRoot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">实现方式</td>
+<td align="left">用户态 + 挂载（overlay/magic mount）</td>
+<td align="left"><strong>直接 Patch 原厂内核二进制</strong></td>
+</tr>
+<tr>
+<td align="left">SELinux</td>
+<td align="left">通常需要改动</td>
+<td align="left"><strong>SELinux 零触碰</strong></td>
+</tr>
+<tr>
+<td align="left">挂载痕迹</td>
+<td align="left">有挂载点</td>
+<td align="left"><strong>无挂载</strong></td>
+</tr>
+<tr>
+<td align="left">是否需内核源码</td>
+<td align="left">否（但走 boot 修改）</td>
+<td align="left"><strong>免源码，直接 patch 原厂内核</strong></td>
+</tr>
+<tr>
+<td align="left">授权方式</td>
+<td align="left">su 授权弹窗</td>
+<td align="left"><strong>48 位随机字符串密钥</strong></td>
+</tr>
+</tbody></table>
+<p>它的核心卖点：</p>
+<ul>
+<li><strong>免内核源码、不编译内核</strong>——直接对原厂 <code>boot.img</code> 里的内核二进制打补丁，<strong>完美保留原厂内核的所有优化和功耗调教</strong>（所以官方强调无额外耗电问题）。</li>
+<li><strong>SELinux 零触碰、无挂载</strong>——不改 SELinux 状态、不做挂载，尽量减少可被检测的痕迹。</li>
+<li><strong>通杀内核版本 3.10 ~ 6.12</strong>，覆盖机型很广（小米、红米、三星、一加、ROG、红魔、联想等）。</li>
+<li><strong>寄生模式</strong>——Root 环境可寄生进其他 App，<strong>无外显管理器实体</strong>，进一步躲避检测。</li>
+</ul>
+<h3 id="版本区分：Lite-与-Pro"><a href="#版本区分：Lite-与-Pro" class="headerlink" title="版本区分：Lite 与 Pro"></a>版本区分：Lite 与 Pro</h3><ul>
+<li><strong>Lite</strong>：核心 Root 环境，稳定性和兼容性优先。<strong>目前唯一公开发布 Release 的版本。</strong></li>
+<li><strong>Pro</strong>：在 Lite 基础上增加授权管理、内核模块、免解越狱、隐藏目录、隐蔽执行 sh、解除温控、系统文件无痕伪造等；自带「用户态 / 内核态自由切换」的内核 Hook 框架，内核偏移动态寻找、跨内核通用。<strong>Pro 目前处于众测阶段，只公开了模块开发 SDK 和开发指南 PDF，完整功能尚未放出。</strong></li>
+</ul>
+<p>本文教程部分以<strong>公开可用的 Lite 版</strong>为准。</p>
+<h3 id="功能列表（Lite）"><a href="#功能列表（Lite）" class="headerlink" title="功能列表（Lite）"></a>功能列表（Lite）</h3><ol>
+<li>测试 ROOT 权限</li>
+<li>执行 ROOT 命令</li>
+<li>以 ROOT 身份执行程序</li>
+<li>安装部署 su</li>
+<li>注入 su 到指定进程（<strong>仅支持 64 位 App</strong>，老式 32 位 App 不支持）</li>
+<li>完全卸载清理 su</li>
+<li>寄生目标 APP</li>
+</ol>
+<blockquote>
+<p>备注：App 获取 Root 权限的唯一途径是拿到 <strong>Root 密钥</strong>（48 位随机字符串），这是安全凭证，务必妥善保管。</p>
+</blockquote>
+<h2 id="二、使用前提"><a href="#二、使用前提" class="headerlink" title="二、使用前提"></a>二、使用前提</h2><p>官方 README 的「使用流程」只写了 3 步，但实际要跑通，以下前提缺一不可：</p>
+<ul>
+<li><strong>手机已解锁 Bootloader（解 BL 锁）</strong>——否则无法刷入修改后的 boot。</li>
+<li>准备好你手机对应的 <strong>原厂 <code>boot.img</code><strong>（从官方线刷 / 卡刷包里提取，</strong>必须是官方原版内核</strong>，不能是第三方编译内核）。</li>
+<li>一台 <strong>Windows 电脑</strong>（patch 工具是 <code>.exe</code>）。</li>
+<li>一个 <strong>Linux 环境</strong>（打包 6.0+ 内核的 boot 时需要用 magiskboot，官方未提供其 Windows 版）。</li>
+<li>**务必提前备份原始 <code>boot.img</code>**，以便刷失败时回刷救砖。</li>
+</ul>
+<h2 id="三、下载"><a href="#三、下载" class="headerlink" title="三、下载"></a>三、下载</h2><p>官方 Release（<code>Lite_v2026.6.1</code>）提供两个文件：</p>
+<ul>
+<li><code>patch_kernel_root.2026-6-1.exe</code>（约 2 MB）—— 内核补丁工具</li>
+<li><code>SKRoot_Lite.2026-6-1.apk</code>（约 7 MB）—— 安卓端管理 / 测试 App</li>
+</ul>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/abcz316/SKRoot-linuxKernelRoot/releases">https://github.com/abcz316/SKRoot-linuxKernelRoot/releases</a></p>
+<blockquote>
+<p>也可以下载源码自行编译。仓库内 <code>Lite_version/src/</code> 下有 patch 工具（C++，使用 asmjit 生成 aarch64 汇编）和 App（<code>PermissionManager</code>）的完整源码。</p>
+</blockquote>
+<h2 id="四、使用流程"><a href="#四、使用流程" class="headerlink" title="四、使用流程"></a>四、使用流程</h2><p>整体链路：<strong>电脑上给内核打补丁 → 重新打包 boot → 刷入手机 → App 输入密钥调用 Root</strong>。</p>
+<h3 id="第-1-步：提取内核并打补丁"><a href="#第-1-步：提取内核并打补丁" class="headerlink" title="第 1 步：提取内核并打补丁"></a>第 1 步：提取内核并打补丁</h3><ol>
+<li>从 <code>boot.img</code> 中解出内核文件（<code>kernel</code>）。</li>
+<li>把 <code>kernel</code> 文件<strong>直接拖拽到 <code>patch_kernel_root.exe</code> 上</strong>，工具会一键自动完成内核补丁，<strong>同时生成一个 48 位的 Root 密钥</strong>。</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>记下这个 Root 密钥</strong>，它是后续 App 获取 Root 的唯一凭证，丢了就得重新 patch。</p>
+</blockquote>
+<h3 id="第-2-步：重新打包-boot-镜像（最容易翻车的一步）"><a href="#第-2-步：重新打包-boot-镜像（最容易翻车的一步）" class="headerlink" title="第 2 步：重新打包 boot 镜像（最容易翻车的一步）"></a>第 2 步：重新打包 boot 镜像（最容易翻车的一步）</h3><p>把 patch 后的内核塞回 <code>boot.img</code>。这一步官方给了明确警告：</p>
+<ul>
+<li><strong>不要使用 Android Image Kitchen 打包</strong>——它不支持 Linux 6.0 以上内核，会导致无法开机。</li>
+<li><strong>请使用 magiskboot 打包。</strong></li>
+</ul>
+<p><strong>magiskboot 的快速获取方式</strong>（官方给的技巧）：</p>
+<ol>
+<li>从 <a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases">Magisk Releases</a> 下载 <code>Magisk.apk</code>；</li>
+<li>用 7z 解压，进入 <code>lib/x86_64/</code> 目录；</li>
+<li>把 <code>libmagiskboot.so</code> <strong>改名为 <code>magiskboot</code></strong> 即可使用。</li>
+</ol>
+<blockquote>
+<p>注意：它虽然叫 <code>.so</code>，但<strong>其实是一个 Linux 可执行文件，不是动态库</strong>，别被名字迷惑。官方没有提供 Windows 版本，请在 Linux 系统中使用它，也不建议用非官方的 Windows 移植版（代码可能太旧）。</p>
+</blockquote>
+<p>打包命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 解包原始 boot.img</span><br>./magiskboot unpack boot.img<br><br><span class="hljs-comment"># （将 patch 后的内核替换进去后）重新打包</span><br>./magiskboot repack boot.img<br></code></pre></td></tr></table></figure>
+
+<h3 id="第-3-步：刷入并使用"><a href="#第-3-步：刷入并使用" class="headerlink" title="第 3 步：刷入并使用"></a>第 3 步：刷入并使用</h3><ol>
+<li><p>进入 fastboot 模式，刷入打包好的 boot 镜像：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">fastboot flash boot new-boot.img<br>fastboot reboot<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面是通用刷入方式；请按你机型的实际分区/A/B 情况调整（部分机型 boot 需刷到对应槽位）。</p>
+</blockquote>
+</li>
+<li><p>安装并启动 <code>SKRoot_Lite.apk</code>（或使用源码里的 <code>testRoot</code>）；</p>
+</li>
+<li><p><strong>输入第 1 步生成的 Root 密钥</strong>，即可正常使用 SKRoot 的各项功能。</p>
+</li>
+</ol>
+<h2 id="五、常见问题排查（官方）"><a href="#五、常见问题排查（官方）" class="headerlink" title="五、常见问题排查（官方）"></a>五、常见问题排查（官方）</h2><p>以下整理自官方 README 的「问题排查」章节：</p>
+<h3 id="1-Linux-6-0-以上内核无法开机"><a href="#1-Linux-6-0-以上内核无法开机" class="headerlink" title="1. Linux 6.0 以上内核无法开机"></a>1. Linux 6.0 以上内核无法开机</h3><ul>
+<li>不要用 Android Image Kitchen 打包，改用 magiskboot（见第 2 步）。</li>
+</ul>
+<h3 id="2-第三方-App-仍检测到-Root"><a href="#2-第三方-App-仍检测到-Root" class="headerlink" title="2. 第三方 App 仍检测到 Root"></a>2. 第三方 App 仍检测到 Root</h3><ul>
+<li><strong>内核必须基于官方原版修改</strong>，而非自编译或第三方源码编译。</li>
+<li>若曾用过 Magisk，应<strong>先完全刷机</strong>，因为 Magisk 可能残留日志等信息。</li>
+<li><strong>不要安装需要 Root 的工具或环境检测类应用</strong>（如冰箱、黑洞、momo、密钥认证等）——它们的存在本身可能被用来推断设备已 Root，用完请立即卸载。</li>
+<li>App 本身可能被特征检测，仓库里的 App 只是<strong>演示功能写法</strong>；实际使用建议用<strong>寄生功能</strong>把 Root 藏进无害 App。</li>
+<li>如果对方检测的是 <strong>BL 锁</strong>而非 Root，需使用 SKRoot 的隐藏 BL 锁模块或开启「免解越狱」模式。</li>
+<li>检查 SELinux 状态是否被恶意软件禁用。</li>
+</ul>
+<h3 id="3-耗电问题"><a href="#3-耗电问题" class="headerlink" title="3. 耗电问题"></a>3. 耗电问题</h3><ul>
+<li>官方不提倡自行编译内核（会丢失原厂功耗管理，导致续航缩短、发烫）。SKRoot 是在<strong>原厂内核上修补</strong>，保留原厂调教，理论上无额外耗电。</li>
+</ul>
+<h2 id="六、风险与合规提示"><a href="#六、风险与合规提示" class="headerlink" title="六、风险与合规提示"></a>六、风险与合规提示</h2><blockquote>
+<p>以下为使用者需自行评估的风险，请认真对待：</p>
+</blockquote>
+<ol>
+<li><strong>变砖风险真实存在</strong>。你在修改手机最底层的 boot / 内核，刷错内核或打包方式不当会导致无法开机。官方更新日志里大量条目正是在修各种「无法开机 / 死机」问题。<strong>务必先在备用机上操作，并备份原始 <code>boot.img</code> 以便回刷救砖。</strong></li>
+<li><strong>用途敏感</strong>。该项目明确主打绕过 Root 检测（README 提到某些金融 / 政务类 App）。<strong>绕过真实业务风控可能违反目标 App 的服务条款，并可能涉及法律风险。</strong> 合理边界是自有设备、授权测试、安全研究。</li>
+<li><strong>仓库无开源 License</strong>，默认保留所有权利，二次开发 / 分发前需先与作者确认授权。</li>
+<li><strong>核心为预编译二进制</strong>（<code>.exe</code> / <code>.apk</code>），无法完全验证其对内核的改动，信任门槛高于纯源码项目，请谨慎评估来源。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>SKRoot 项目：<a target="_blank" rel="noopener" href="https://github.com/abcz316/SKRoot-linuxKernelRoot">https://github.com/abcz316/SKRoot-linuxKernelRoot</a></li>
+<li>Magisk（获取 magiskboot）：<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases">https://github.com/topjohnwu/Magisk/releases</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习与研究记录，不构成任何使用建议。请在合法合规、获得授权的前提下使用相关技术，因使用产生的一切后果由使用者自行承担。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/SKRoot/">#SKRoot</a>
+      
+        <a href="/tags/Root/">#Root</a>
+      
+        <a href="/tags/%E5%86%85%E6%A0%B8/">#内核</a>
+      
+        <a href="/tags/%E5%85%8DRoot%E6%A3%80%E6%B5%8B/">#免Root检测</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/SKRoot内核级Root方案介绍与使用教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/wreq-rnet-%E5%B8%A6TLS%E6%8C%87%E7%BA%B9%E7%9A%84Python-HTTP%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/bestV8%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E7%BA%AF%E5%87%80V8%E8%A1%A5%E7%8E%AF%E5%A2%83%E8%B7%91JS/" title="bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试">
+                        <span class="hidden-mobile">bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
