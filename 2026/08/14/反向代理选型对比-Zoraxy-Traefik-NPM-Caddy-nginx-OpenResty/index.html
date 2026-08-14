@@ -1,0 +1,911 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文对比六款常见的反向代理 &#x2F; Web 服务器：Zoraxy、Traefik、Nginx Proxy Manager(NPM)、Caddy、nginx、OpenResty，帮你按场景选型。数据截至 2026-08。 想看 Traefik 的具体配置，见本站 Traefik 配置教程。  一、先分清它们是什么层次这六个不完全是同类竞品，硬拉到一张表比高下会误导。它们其实处在三个层次：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="反向代理选型对比：Zoraxy vs Traefik &#x2F; NPM &#x2F; Caddy &#x2F; nginx &#x2F; OpenResty">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%80%89%E5%9E%8B%E5%AF%B9%E6%AF%94-Zoraxy-Traefik-NPM-Caddy-nginx-OpenResty/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文对比六款常见的反向代理 &#x2F; Web 服务器：Zoraxy、Traefik、Nginx Proxy Manager(NPM)、Caddy、nginx、OpenResty，帮你按场景选型。数据截至 2026-08。 想看 Traefik 的具体配置，见本站 Traefik 配置教程。  一、先分清它们是什么层次这六个不完全是同类竞品，硬拉到一张表比高下会误导。它们其实处在三个层次：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T10:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.556Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Caddy">
+<meta property="article:tag" content="OpenResty">
+<meta property="article:tag" content="Traefik">
+<meta property="article:tag" content="Zoraxy">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="反向代理">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 18:30" pubdate>
+          2026年8月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>本文对比六款常见的反向代理 &#x2F; Web 服务器：<strong>Zoraxy、Traefik、Nginx Proxy Manager(NPM)、Caddy、nginx、OpenResty</strong>，帮你按场景选型。数据截至 2026-08。</p>
+<p>想看 Traefik 的具体配置，见本站 <a href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">Traefik 配置教程</a>。</p>
+</blockquote>
+<h2 id="一、先分清它们是什么层次"><a href="#一、先分清它们是什么层次" class="headerlink" title="一、先分清它们是什么层次"></a>一、先分清它们是什么层次</h2><p>这六个<strong>不完全是同类竞品</strong>，硬拉到一张表比高下会误导。它们其实处在三个层次：</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">本质</th>
+<th align="left">谁在用它</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>nginx</strong></td>
+<td align="left">底层 Web 服务器 &#x2F; 反代<strong>引擎</strong></td>
+<td align="left">几乎所有人的地基</td>
+</tr>
+<tr>
+<td align="left"><strong>OpenResty</strong></td>
+<td align="left">nginx + LuaJIT，可编程的 nginx</td>
+<td align="left">要在网关层写逻辑的人</td>
+</tr>
+<tr>
+<td align="left"><strong>Caddy</strong></td>
+<td align="left">现代 Web 服务器，自动 HTTPS</td>
+<td align="left">开发者、追求简洁</td>
+</tr>
+<tr>
+<td align="left"><strong>Traefik</strong></td>
+<td align="left">云原生<strong>动态</strong>反代</td>
+<td align="left">K8s &#x2F; Docker、微服务</td>
+</tr>
+<tr>
+<td align="left"><strong>NPM</strong>（Nginx Proxy Manager）</td>
+<td align="left">nginx 的 <strong>Web UI 套壳</strong></td>
+<td align="left">homelab 新手</td>
+</tr>
+<tr>
+<td align="left"><strong>Zoraxy</strong></td>
+<td align="left">all-in-one <strong>Web UI</strong> 网关</td>
+<td align="left">homelab 玩家</td>
+</tr>
+</tbody></table>
+<p><strong>关键洞察</strong>：NPM 和 Zoraxy 的核心是「给你一个图形界面」；Traefik 的核心是「自动服务发现」；nginx &#x2F; OpenResty 是「手写配置的引擎」；Caddy 是「极简配置 + 自动证书」。它们解决的痛点不同。</p>
+<h2 id="二、基础数据（2026-08-核实）"><a href="#二、基础数据（2026-08-核实）" class="headerlink" title="二、基础数据（2026-08 核实）"></a>二、基础数据（2026-08 核实）</h2><table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">Star</th>
+<th align="left">语言</th>
+<th align="left">License</th>
+<th align="left">定位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Caddy</td>
+<td align="left">★74.9k</td>
+<td align="left">Go</td>
+<td align="left">Apache-2.0</td>
+<td align="left">现代 Web 服务器</td>
+</tr>
+<tr>
+<td align="left">Traefik</td>
+<td align="left">★64.5k</td>
+<td align="left">Go</td>
+<td align="left">MIT</td>
+<td align="left">云原生反代</td>
+</tr>
+<tr>
+<td align="left">NPM</td>
+<td align="left">★33.9k</td>
+<td align="left">TypeScript</td>
+<td align="left">MIT</td>
+<td align="left">nginx 的 Web UI</td>
+</tr>
+<tr>
+<td align="left">nginx</td>
+<td align="left">★31.4k</td>
+<td align="left">C</td>
+<td align="left">BSD-2</td>
+<td align="left">反代引擎</td>
+</tr>
+<tr>
+<td align="left">OpenResty</td>
+<td align="left">★14.0k</td>
+<td align="left">C</td>
+<td align="left">BSD 类</td>
+<td align="left">可编程 nginx</td>
+</tr>
+<tr>
+<td align="left"><strong>Zoraxy</strong></td>
+<td align="left">★5.4k</td>
+<td align="left">Go</td>
+<td align="left"><strong>AGPL-3.0</strong></td>
+<td align="left">homelab 网关</td>
+</tr>
+</tbody></table>
+<h2 id="三、逐维度对比"><a href="#三、逐维度对比" class="headerlink" title="三、逐维度对比"></a>三、逐维度对比</h2><h3 id="配置方式（最本质的区别）"><a href="#配置方式（最本质的区别）" class="headerlink" title="配置方式（最本质的区别）"></a>配置方式（最本质的区别）</h3><ul>
+<li><strong>nginx</strong>：手写 <code>nginx.conf</code>，最灵活但最陡峭。</li>
+<li><strong>OpenResty</strong>：nginx 配置 + <strong>Lua 脚本</strong>，能在请求生命周期里写任意逻辑（动态鉴权、灰度、WAF、限流）。</li>
+<li><strong>Caddy</strong>：<code>Caddyfile</code> 极简，几行搞定，或用 JSON API 动态配置。</li>
+<li><strong>Traefik</strong>：<strong>不手写路由</strong>，通过 Docker label &#x2F; K8s Ingress <strong>自动发现</strong>服务，容器一起，路由自动生效。</li>
+<li><strong>NPM &#x2F; Zoraxy</strong>：<strong>浏览器点点点</strong>，零配置文件。</li>
+</ul>
+<h3 id="自动-HTTPS（Let’s-Encrypt）"><a href="#自动-HTTPS（Let’s-Encrypt）" class="headerlink" title="自动 HTTPS（Let’s Encrypt）"></a>自动 HTTPS（Let’s Encrypt）</h3><ul>
+<li><strong>Caddy</strong>：✅ <strong>默认全自动</strong>，零配置，这是它的招牌。</li>
+<li><strong>Traefik &#x2F; NPM &#x2F; Zoraxy</strong>：✅ 内置，几下点选 &#x2F; 几行配置。</li>
+<li><strong>nginx &#x2F; OpenResty</strong>：❌ 要配 certbot 手动搞。</li>
+</ul>
+<h3 id="动态性（适不适合容器编排）"><a href="#动态性（适不适合容器编排）" class="headerlink" title="动态性（适不适合容器编排）"></a>动态性（适不适合容器编排）</h3><ul>
+<li><strong>Traefik</strong>：★ 天生为此设计，容器增减自动同步路由，K8s Ingress 一等公民。</li>
+<li><strong>Caddy</strong>：有 API 可动态改。</li>
+<li><strong>nginx &#x2F; OpenResty &#x2F; NPM &#x2F; Zoraxy</strong>：改配置多需 reload（NPM &#x2F; Zoraxy 由 UI 触发 reload）。</li>
+</ul>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><ul>
+<li><strong>nginx &#x2F; OpenResty</strong>：★ 顶级，C 写的；OpenResty 靠 LuaJIT 在可编程的同时保持高性能，扛超高并发。</li>
+<li><strong>Caddy &#x2F; Traefik &#x2F; Zoraxy</strong>：Go 写的，性能够用，极端高并发略逊于 nginx，但对绝大多数场景无感。</li>
+</ul>
+<h3 id="可编程-扩展"><a href="#可编程-扩展" class="headerlink" title="可编程 &#x2F; 扩展"></a>可编程 &#x2F; 扩展</h3><ul>
+<li><strong>OpenResty</strong>：★★ 最强，Lua 能在网关层做任何事（很多 API 网关如 Kong、APISIX 就是以 OpenResty 为底座）。</li>
+<li><strong>Caddy &#x2F; Traefik</strong>：Go 插件 &#x2F; 中间件。</li>
+<li><strong>Zoraxy</strong>：有插件系统 + 一堆内置小工具（见下）。</li>
+<li><strong>nginx &#x2F; NPM</strong>：模块需重新编译，扩展性最弱。</li>
+</ul>
+<h3 id="附加功能（Zoraxy-的差异化）"><a href="#附加功能（Zoraxy-的差异化）" class="headerlink" title="附加功能（Zoraxy 的差异化）"></a>附加功能（Zoraxy 的差异化）</h3><p><strong>Zoraxy 的卖点是 all-in-one</strong>——除了反代，还自带：Web SSH、内网穿透、Uptime 监控、GeoIP 访问控制、TCP&#x2F;UDP 转发、集群网关、访问统计。这是 NPM（相对聚焦）和其他几个都没有的「瑞士军刀」式打包。</p>
+<h2 id="四、选型建议（按场景）"><a href="#四、选型建议（按场景）" class="headerlink" title="四、选型建议（按场景）"></a>四、选型建议（按场景）</h2><table>
+<thead>
+<tr>
+<th align="left">你的场景</th>
+<th align="left">推荐</th>
+<th align="left">理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Kubernetes &#x2F; Docker 微服务</strong></td>
+<td align="left"><strong>Traefik</strong></td>
+<td align="left">自动服务发现，容器一起路由自动生效</td>
+</tr>
+<tr>
+<td align="left"><strong>homelab，想要 UI + 一堆工具</strong></td>
+<td align="left"><strong>Zoraxy</strong></td>
+<td align="left">all-in-one，自带监控 &#x2F; 穿透 &#x2F; SSH</td>
+</tr>
+<tr>
+<td align="left"><strong>homelab，只想要个反代 UI</strong></td>
+<td align="left"><strong>NPM</strong></td>
+<td align="left">更老牌、更聚焦、社区大</td>
+</tr>
+<tr>
+<td align="left"><strong>个人站 &#x2F; 开发，要极简 + 自动 HTTPS</strong></td>
+<td align="left"><strong>Caddy</strong></td>
+<td align="left">几行配置，证书全自动</td>
+</tr>
+<tr>
+<td align="left"><strong>要在网关写复杂逻辑（鉴权 &#x2F; 灰度 &#x2F; WAF）</strong></td>
+<td align="left"><strong>OpenResty</strong></td>
+<td align="left">Lua 无所不能，高性能</td>
+</tr>
+<tr>
+<td align="left"><strong>超高并发生产、团队熟 nginx</strong></td>
+<td align="left"><strong>nginx</strong></td>
+<td align="left">性能天花板，生态最成熟</td>
+</tr>
+</tbody></table>
+<h2 id="五、几个要留意的点"><a href="#五、几个要留意的点" class="headerlink" title="五、几个要留意的点"></a>五、几个要留意的点</h2><ol>
+<li><p><strong>Zoraxy 是 AGPL-3.0</strong>，是这六个里协议最严的。如果你基于它二次开发并对外提供网络服务，有开源义务——个人 homelab 无所谓，商用要留意。其余几个（MIT &#x2F; Apache &#x2F; BSD）宽松得多。</p>
+</li>
+<li><p><strong>Zoraxy vs NPM 是最直接的竞争</strong>（都是 homelab 的反代 UI）。Zoraxy 更「全」（内置工具多），NPM 更「稳」（★33.9k、出现更早、社区教程海量）。求功能全选 Zoraxy，求省心稳妥选 NPM。</p>
+</li>
+<li><p><strong>别把 nginx &#x2F; OpenResty 和后面四个对立</strong>。事实上 NPM 底层就是 nginx；很多人的架构是「Traefik &#x2F; Caddy &#x2F; Zoraxy 做入口 + 后端某处仍有 nginx &#x2F; OpenResty」。它们可以叠着用。</p>
+</li>
+<li><p><strong>两种哲学的分野</strong>：Zoraxy &#x2F; NPM 代表「UI 傻瓜式」，Traefik 代表「声明式 + 自动发现」，这是反代选型最核心的分水岭。想看声明式这一派怎么落地，见 <a href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">Traefik 配置教程</a>。</p>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>Zoraxy：<a target="_blank" rel="noopener" href="https://github.com/tobychui/zoraxy">https://github.com/tobychui/zoraxy</a>（官网 <a target="_blank" rel="noopener" href="https://zoraxy.aroz.org/">https://zoraxy.aroz.org</a>）</li>
+<li>Traefik：<a target="_blank" rel="noopener" href="https://github.com/traefik/traefik">https://github.com/traefik/traefik</a></li>
+<li>Nginx Proxy Manager：<a target="_blank" rel="noopener" href="https://github.com/NginxProxyManager/nginx-proxy-manager">https://github.com/NginxProxyManager/nginx-proxy-manager</a></li>
+<li>Caddy：<a target="_blank" rel="noopener" href="https://github.com/caddyserver/caddy">https://github.com/caddyserver/caddy</a></li>
+<li>nginx：<a target="_blank" rel="noopener" href="https://nginx.org/">https://nginx.org</a></li>
+<li>OpenResty：<a target="_blank" rel="noopener" href="https://openresty.org/">https://openresty.org</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">#反向代理</a>
+      
+        <a href="/tags/Zoraxy/">#Zoraxy</a>
+      
+        <a href="/tags/Traefik/">#Traefik</a>
+      
+        <a href="/tags/Caddy/">#Caddy</a>
+      
+        <a href="/tags/nginx/">#nginx</a>
+      
+        <a href="/tags/OpenResty/">#OpenResty</a>
+      
+        <a href="/tags/homelab/">#homelab</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty</div>
+      <div>https://kingjem.github.io/2026/08/14/反向代理选型对比-Zoraxy-Traefik-NPM-Caddy-nginx-OpenResty/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/jsimplifier%E5%8F%8D%E6%B7%B7%E6%B7%86%E5%B7%A5%E5%85%B7-%E7%94%A8DeepSeek%E6%94%B9%E9%80%A0%E5%9B%BD%E5%86%85%E5%A4%A7%E6%A8%A1%E5%9E%8B/" title="JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JSimplifier 使用与改造：用 DeepSeek 跑 LLM 增强的 JS 反混淆</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/Frida%E5%8F%8D%E6%A3%80%E6%B5%8B%E4%B8%89%E4%BB%B6%E5%A5%97%E5%AF%B9%E6%AF%94-Florida-rusda-fridare/" title="Frida 反检测三件套对比：Florida vs rusda vs fridare">
+                        <span class="hidden-mobile">Frida 反检测三件套对比：Florida vs rusda vs fridare</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,907 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为工具使用整理，基于官方仓库、README 与类型存根编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;neverl805&#x2F;never-jscore（★360+） PyPI：pip install never-jscore（v3.2.x） 底层：Rust + deno_core（V8）  文中代码与 API 签名均来自官方 README 和 never_jscore.pyi 类型存根，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/never-jscore-Python%E9%AB%98%E6%80%A7%E8%83%BDJS%E5%BC%95%E6%93%8E%E9%80%86%E5%90%91%E5%88%A9%E5%99%A8/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为工具使用整理，基于官方仓库、README 与类型存根编写  项目地址：https:&#x2F;&#x2F;github.com&#x2F;neverl805&#x2F;never-jscore（★360+） PyPI：pip install never-jscore（v3.2.x） 底层：Rust + deno_core（V8）  文中代码与 API 签名均来自官方 README 和 never_jscore.pyi 类型存根，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T08:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.559Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Hook">
+<meta property="article:tag" content="JS逆向">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="V8">
+<meta property="article:tag" content="deno_core">
+<meta property="article:tag" content="never-jscore">
+<meta property="article:tag" content="补环境">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境） - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 16:30" pubdate>
+          2026年8月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          60 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为工具使用整理，基于官方仓库、README 与类型存根编写</strong></p>
+<ul>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/neverl805/never-jscore">https://github.com/neverl805/never-jscore</a>（★360+）</li>
+<li><strong>PyPI</strong>：<code>pip install never-jscore</code>（v3.2.x）</li>
+<li><strong>底层</strong>：Rust + <a target="_blank" rel="noopener" href="https://github.com/denoland/deno_core">deno_core</a>（V8）</li>
+</ul>
+<p>文中代码与 API 签名均来自官方 README 和 <code>never_jscore.pyi</code> 类型存根，可直接验证。</p>
+<p>⚠️ <strong>License 提示</strong>：仓库 GitHub API 未标注 License，而 README 徽章写的是 MIT——两者不一致，商用前请向作者确认授权。</p>
+</blockquote>
+<h2 id="一、它是什么，解决什么问题"><a href="#一、它是什么，解决什么问题" class="headerlink" title="一、它是什么，解决什么问题"></a>一、它是什么，解决什么问题</h2><p>never-jscore 是一个<strong>用 Python 高性能执行 JavaScript 的引擎，专为 JS 逆向工程设计</strong>，定位是 <strong>execjs（PyExecJS）的上位替代</strong>。</p>
+<p>在 Python 里跑 JS，常见几条路线：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方案</th>
+<th align="left">底层</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><del>PyExecJS（execjs）</del></td>
+<td align="left">外部 Node 等 runtime</td>
+<td align="left">每次起子进程，慢、已过时</td>
+</tr>
+<tr>
+<td align="left">mini-racer</td>
+<td align="left">嵌入式 V8</td>
+<td align="left">通用、轻量，跑纯算法最省心</td>
+</tr>
+<tr>
+<td align="left">bestV8</td>
+<td align="left">纯净 V8 动态库</td>
+<td align="left">补环境（白纸全手补）</td>
+</tr>
+<tr>
+<td align="left"><strong>never-jscore</strong></td>
+<td align="left"><strong>Rust + deno_core（V8）</strong></td>
+<td align="left"><strong>自带 Deno 全套 API + 逆向专用 Hook</strong></td>
+</tr>
+</tbody></table>
+<p>never-jscore 的独特之处在于：它底层用的是 <strong>deno_core</strong>，因此<strong>自带 Deno 那一整套 Web &#x2F; Node.js API</strong>（fetch、localStorage、crypto、require 等），实现”零配置补环境”；同时提供 <strong>Hook 拦截</strong>和<strong>确定性随机数</strong>这两个逆向专用能力。</p>
+<p>一句话对比：<strong>bestV8 给你一张纯净白纸让你手工补环境；never-jscore 直接给你一个装好浏览器&#x2F;Node API 的环境，还额外送你逆向 Hook。</strong></p>
+<h2 id="二、核心特点"><a href="#二、核心特点" class="headerlink" title="二、核心特点"></a>二、核心特点</h2><ul>
+<li>🚀 <strong>极致性能</strong>：简单任务 25 万+ ops&#x2F;s，复杂任务 2 万+ ops&#x2F;s（Context 复用模式）</li>
+<li>🎣 <strong>双模式 Hook 拦截</strong>（<code>$return</code> + <code>$terminate</code>），专为逆向设计</li>
+<li>🎲 <strong>确定性随机数</strong>：固定种子，加密算法调试结果可复现</li>
+<li>🌐 <strong>完整 Web &#x2F; Node.js API</strong>，零配置补环境</li>
+<li>⚡ <strong>v3.0.0 GIL 释放优化</strong>，多线程性能提升</li>
+<li>🎨 附带 Canvas 2D API（纯 Rust 实现）、V8 堆内存分析等</li>
+</ul>
+<h2 id="三、安装与快速上手"><a href="#三、安装与快速上手" class="headerlink" title="三、安装与快速上手"></a>三、安装与快速上手</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install never-jscore<br></code></pre></td></tr></table></figure>
+
+<p>支持 Windows &#x2F; Linux &#x2F; macOS，Python 3.8+（官方推荐 3.14 获得最佳性能）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> never_jscore<br><br><span class="hljs-comment"># 方式 1：Context（适合探索、调试）</span><br>ctx = never_jscore.Context()<br>ctx.<span class="hljs-built_in">compile</span>(<span class="hljs-string">&quot;function add(a, b) &#123; return a + b; &#125;&quot;</span>)<br><span class="hljs-built_in">print</span>(ctx.call(<span class="hljs-string">&quot;add&quot;</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>]))          <span class="hljs-comment"># 3</span><br><br><span class="hljs-comment"># 方式 2：JSEngine（Worker Pool，适合批量、并发）</span><br>engine = never_jscore.JSEngine(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    function encrypt(data) &#123; return btoa(data); &#125;</span><br><span class="hljs-string">&quot;&quot;&quot;</span>, workers=<span class="hljs-number">4</span>)<br>results = [engine.call(<span class="hljs-string">&quot;encrypt&quot;</span>, [<span class="hljs-string">f&quot;data_<span class="hljs-subst">&#123;i&#125;</span>&quot;</span>]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1000</span>)]<br></code></pre></td></tr></table></figure>
+
+<h2 id="四、两种执行模式：Context-vs-JSEngine"><a href="#四、两种执行模式：Context-vs-JSEngine" class="headerlink" title="四、两种执行模式：Context vs JSEngine"></a>四、两种执行模式：Context vs JSEngine</h2><p>v3.0.0 起提供双架构，<strong>选错模式性能差几十上百倍</strong>，这是最需要注意的点。</p>
+<h3 id="关键性能真相-⚠️"><a href="#关键性能真相-⚠️" class="headerlink" title="关键性能真相 ⚠️"></a>关键性能真相 ⚠️</h3><table>
+<thead>
+<tr>
+<th align="left">场景</th>
+<th align="left">Context（复用）</th>
+<th align="left">JSEngine（Pool）</th>
+<th align="left">差距</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">简单 JS（btoa）</td>
+<td align="left"><strong>255,969 ops&#x2F;s</strong></td>
+<td align="left">743 ops&#x2F;s</td>
+<td align="left">Context 快 <strong>344×</strong></td>
+</tr>
+<tr>
+<td align="left">复杂计算（循环）</td>
+<td align="left"><strong>23,675 ops&#x2F;s</strong></td>
+<td align="left">550 ops&#x2F;s</td>
+<td align="left">Context 快 <strong>43×</strong></td>
+</tr>
+<tr>
+<td align="left">冷启动（每次重建）</td>
+<td align="left">50 ops&#x2F;s</td>
+<td align="left"><strong>607 ops&#x2F;s</strong></td>
+<td align="left">JSEngine 快 <strong>12×</strong></td>
+</tr>
+</tbody></table>
+<p><strong>结论：99% 场景用 Context 复用模式</strong>。只有”每次都要跑不同 JS、无法复用 Context”或”避免大型 JS 库重复冷启动”时，JSEngine 才有优势。</p>
+<h3 id="最容易踩的坑：不要在循环里反复建-Context"><a href="#最容易踩的坑：不要在循环里反复建-Context" class="headerlink" title="最容易踩的坑：不要在循环里反复建 Context"></a>最容易踩的坑：不要在循环里反复建 Context</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># ❌ 错误：每次都重建 + 重新加载（~50 ops/s）</span><br><span class="hljs-keyword">for</span> data <span class="hljs-keyword">in</span> data_list:<br>    ctx = never_jscore.Context()<br>    ctx.<span class="hljs-built_in">compile</span>(js_code)<br>    result = ctx.call(<span class="hljs-string">&quot;encrypt&quot;</span>, [data])<br><br><span class="hljs-comment"># ✅ 正确：Context 复用（~255,000 ops/s，快 5000 倍）</span><br>ctx = never_jscore.Context()<br>ctx.<span class="hljs-built_in">compile</span>(js_code)<br><span class="hljs-keyword">for</span> data <span class="hljs-keyword">in</span> data_list:<br>    result = ctx.call(<span class="hljs-string">&quot;encrypt&quot;</span>, [data])<br><span class="hljs-keyword">del</span> ctx<br></code></pre></td></tr></table></figure>
+
+<h3 id="JSEngine-模式（批量-并发）"><a href="#JSEngine-模式（批量-并发）" class="headerlink" title="JSEngine 模式（批量 &#x2F; 并发）"></a>JSEngine 模式（批量 &#x2F; 并发）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> never_jscore<br><span class="hljs-keyword">from</span> concurrent.futures <span class="hljs-keyword">import</span> ThreadPoolExecutor<br><br>engine = never_jscore.JSEngine(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    const CryptoJS = require(&#x27;crypto-js&#x27;);</span><br><span class="hljs-string">    function encrypt(data, key) &#123;</span><br><span class="hljs-string">        return CryptoJS.AES.encrypt(data, key).toString();</span><br><span class="hljs-string">    &#125;</span><br><span class="hljs-string">&quot;&quot;&quot;</span>, workers=<span class="hljs-number">4</span>, enable_node_compat=<span class="hljs-literal">True</span>)<br><br><span class="hljs-comment"># 多线程并发（v3.0.0 自动释放 GIL）</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">process</span>(<span class="hljs-params">data</span>):<br>    <span class="hljs-keyword">return</span> engine.call(<span class="hljs-string">&quot;encrypt&quot;</span>, [data, <span class="hljs-string">&quot;secret_key&quot;</span>])<br><br><span class="hljs-keyword">with</span> ThreadPoolExecutor(max_workers=<span class="hljs-number">10</span>) <span class="hljs-keyword">as</span> executor:<br>    results = <span class="hljs-built_in">list</span>(executor.<span class="hljs-built_in">map</span>(process, data_list))<br><span class="hljs-keyword">del</span> engine<br></code></pre></td></tr></table></figure>
+
+<h2 id="五、逆向专属能力"><a href="#五、逆向专属能力" class="headerlink" title="五、逆向专属能力"></a>五、逆向专属能力</h2><p>这三个特性是 never-jscore 比通用 JS 引擎（mini-racer 等）更”懂逆向”的地方。</p>
+<h3 id="1-双模式-Hook-拦截"><a href="#1-双模式-Hook-拦截" class="headerlink" title="1. 双模式 Hook 拦截"></a>1. 双模式 Hook 拦截</h3><h4 id="return-——-快速拦截，抠出加密中间值"><a href="#return-——-快速拦截，抠出加密中间值" class="headerlink" title="$return() —— 快速拦截，抠出加密中间值"></a><code>$return()</code> —— 快速拦截，抠出加密中间值</h4><p>在 JS 逻辑中间插一句 <code>$return(...)</code>，提前返回中间结果，后续代码不再执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python">ctx = never_jscore.Context()<br>result = ctx.evaluate(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    function encrypt(data) &#123;</span><br><span class="hljs-string">        const step1 = processData(data);</span><br><span class="hljs-string">        // Hook：提前返回中间结果</span><br><span class="hljs-string">        $return(&#123; intercepted: true, step1: step1, timestamp: Date.now() &#125;);</span><br><span class="hljs-string">        // 下面的代码不会执行</span><br><span class="hljs-string">        return furtherProcess(step1);</span><br><span class="hljs-string">    &#125;</span><br><span class="hljs-string">    encrypt(&quot;sensitive_data&quot;)</span><br><span class="hljs-string">&quot;&quot;&quot;</span>)<br><span class="hljs-built_in">print</span>(result)   <span class="hljs-comment"># &#123;&#x27;intercepted&#x27;: True, &#x27;step1&#x27;: ..., &#x27;timestamp&#x27;: ...&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="terminate-——-强制终止，连-try-catch-都拦不住"><a href="#terminate-——-强制终止，连-try-catch-都拦不住" class="headerlink" title="$terminate() —— 强制终止，连 try-catch 都拦不住"></a><code>$terminate()</code> —— 强制终止，连 try-catch 都拦不住</h4><p>适合 Hook 那些被 <code>try-catch</code> 包裹的关键函数（比如 <code>XMLHttpRequest.send</code>），拿到加密后的 payload：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> json<br>ctx = never_jscore.Context()<br><br><span class="hljs-keyword">try</span>:<br>    ctx.evaluate(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        try &#123;</span><br><span class="hljs-string">            XMLHttpRequest.prototype.send = function(data) &#123;</span><br><span class="hljs-string">                $terminate(&#123; url: this._url, method: this._method, encrypted: data &#125;);</span><br><span class="hljs-string">            &#125;;</span><br><span class="hljs-string">            const xhr = new XMLHttpRequest();</span><br><span class="hljs-string">            xhr.open(&#x27;POST&#x27;, &#x27;https://api.example.com/login&#x27;);</span><br><span class="hljs-string">            xhr.send(encryptedPayload);</span><br><span class="hljs-string">        &#125; catch (e) &#123;</span><br><span class="hljs-string">            console.log(&quot;不会执行&quot;);   // ❌ try-catch 无法捕获 $terminate</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">    &quot;&quot;&quot;</span>)<br><span class="hljs-keyword">except</span> Exception:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;✓ JS 被强制终止&quot;</span>)<br><br><span class="hljs-comment"># 从 Python 侧取出拦截到的数据</span><br>hook_data = json.loads(ctx.get_hook_data())<br><span class="hljs-built_in">print</span>(hook_data)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>$return</code> 与 <code>$terminate</code> 的区别：前者是”正常提前返回”，后者是”强制终止事件循环、无法被 JS 捕获”。逆向时想拿被保护函数的入参&#x2F;中间值，<code>$terminate</code> 更可靠。</p>
+</blockquote>
+<h3 id="2-确定性随机数（调试可复现）"><a href="#2-确定性随机数（调试可复现）" class="headerlink" title="2. 确定性随机数（调试可复现）"></a>2. 确定性随机数（调试可复现）</h3><p>固定种子后，所有随机 API 每次结果都一样——对依赖随机数的签名&#x2F;加密算法调试极其有用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">ctx = never_jscore.Context(random_seed=<span class="hljs-number">12345</span>)<br>r1 = ctx.evaluate(<span class="hljs-string">&quot;Math.random()&quot;</span>)   <span class="hljs-comment"># 0.8831156266...</span><br>r2 = ctx.evaluate(<span class="hljs-string">&quot;Math.random()&quot;</span>)   <span class="hljs-comment"># 0.5465919174...</span><br><br><span class="hljs-comment"># 换个新 Context，同种子 → 同结果</span><br>ctx2 = never_jscore.Context(random_seed=<span class="hljs-number">12345</span>)<br>r3 = ctx2.evaluate(<span class="hljs-string">&quot;Math.random()&quot;</span>)  <span class="hljs-comment"># 0.8831156266...（与 r1 相同）</span><br></code></pre></td></tr></table></figure>
+
+<p>影响的 API：<code>Math.random()</code>、<code>crypto.randomUUID()</code>、<code>crypto.getRandomValues()</code>。</p>
+<h3 id="3-零配置补环境（Web-Node-js-API）"><a href="#3-零配置补环境（Web-Node-js-API）" class="headerlink" title="3. 零配置补环境（Web &#x2F; Node.js API）"></a>3. 零配置补环境（Web &#x2F; Node.js API）</h3><h4 id="Web-API（默认启用）"><a href="#Web-API（默认启用）" class="headerlink" title="Web API（默认启用）"></a>Web API（默认启用）</h4><p><code>fetch</code>、<code>localStorage</code>、<code>URL</code>、<code>TextEncoder/Decoder</code>、<code>atob/btoa</code>、<code>crypto</code>、<code>setTimeout</code>、<code>ReadableStream</code>、<code>structuredClone</code>、<code>Event/EventTarget</code>、<code>AbortController</code> 等<strong>开箱即用</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">ctx = never_jscore.Context()<br><br>ctx.<span class="hljs-built_in">eval</span>(<span class="hljs-string">&quot;localStorage.setItem(&#x27;token&#x27;, &#x27;abc123&#x27;)&quot;</span>)<br><span class="hljs-built_in">print</span>(ctx.evaluate(<span class="hljs-string">&quot;localStorage.getItem(&#x27;token&#x27;)&quot;</span>))   <span class="hljs-comment"># &#x27;abc123&#x27;</span><br><br><span class="hljs-built_in">print</span>(ctx.evaluate(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    const url = new URL(&#x27;https://example.com/path?foo=bar&#x27;);</span><br><span class="hljs-string">    (&#123; origin: url.origin, pathname: url.pathname, search: url.search &#125;)</span><br><span class="hljs-string">&quot;&quot;&quot;</span>))<br></code></pre></td></tr></table></figure>
+
+<h4 id="Node-js-兼容模式"><a href="#Node-js-兼容模式" class="headerlink" title="Node.js 兼容模式"></a>Node.js 兼容模式</h4><p>传 <code>enable_node_compat=True</code> 即可用 <code>require()</code> 和 Node 内置模块，甚至加载 npm 包（需先 <code>npm install</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">ctx = never_jscore.Context(enable_node_compat=<span class="hljs-literal">True</span>)<br><span class="hljs-built_in">print</span>(ctx.evaluate(<span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    const path = require(&#x27;path&#x27;);</span><br><span class="hljs-string">    const crypto = require(&#x27;crypto&#x27;);</span><br><span class="hljs-string">    (&#123;</span><br><span class="hljs-string">        joined: path.join(&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;),</span><br><span class="hljs-string">        hash: crypto.createHash(&#x27;md5&#x27;).update(&#x27;hello&#x27;).digest(&#x27;hex&#x27;)</span><br><span class="hljs-string">    &#125;)</span><br><span class="hljs-string">&quot;&quot;&quot;</span>))<br><span class="hljs-comment"># &#123;&#x27;joined&#x27;: &#x27;a\\b\\c&#x27;, &#x27;hash&#x27;: &#x27;5d41402abc4b2a76b9719d911017c592&#x27;&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>支持 <code>path/fs/crypto/buffer/stream/url/util/events</code> 等内置模块，以及 <code>jsdom</code>、<code>lodash</code>、<code>crypto-js</code>、<code>ws</code> 等 npm 包。</p>
+<h2 id="六、Context-关键参数（来自类型存根）"><a href="#六、Context-关键参数（来自类型存根）" class="headerlink" title="六、Context 关键参数（来自类型存根）"></a>六、Context 关键参数（来自类型存根）</h2><p><code>Context.__init__</code> 的真实签名与含义：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">never_jscore.Context(<br>    enable_extensions=<span class="hljs-literal">True</span>,    <span class="hljs-comment"># True=加载 Deno Web API；False=纯净 V8（只有 ECMAScript）</span><br>    enable_logging=<span class="hljs-literal">False</span>,      <span class="hljs-comment"># True=输出所有扩展操作日志，调试用</span><br>    random_seed=<span class="hljs-literal">None</span>,          <span class="hljs-comment"># int=固定随机数种子（确定性）；None=系统随机</span><br>    enable_node_compat=<span class="hljs-literal">False</span>,  <span class="hljs-comment"># True=启用 require() 与 Node 内置模块</span><br>    fast_return=<span class="hljs-literal">False</span>,         <span class="hljs-comment"># True=函数 return 后立即返回，不等 setTimeout/setInterval</span><br>)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>小提示：如果你想要一个<strong>纯净 V8 环境</strong>（不自带 Deno API，类似 bestV8 的白纸），可以传 <code>enable_extensions=False</code>。</p>
+</blockquote>
+<p>常用方法：</p>
+<ul>
+<li><code>compile(code)</code>：编译并加载 JS（供后续 <code>call</code> 复用）</li>
+<li><code>evaluate(code, auto_await=None)</code>：执行并返回最后一个表达式的值，自动 await Promise</li>
+<li><code>eval(code, return_value=True, auto_await=None)</code>：底层求值</li>
+<li><code>call(name, args=[], auto_await=None)</code>：按函数名调用</li>
+<li><code>get_hook_data()</code>：取出 Hook（<code>$return</code>&#x2F;<code>$terminate</code>）保存的数据（JSON 字符串）</li>
+<li><code>get_heap_statistics()</code> &#x2F; <code>take_heap_snapshot(path)</code> &#x2F; <code>gc()</code>：V8 堆分析与内存管理</li>
+<li><code>get_stats()</code> &#x2F; <code>reset_stats()</code>：调用计数统计</li>
+</ul>
+<h2 id="七、性能对比（官方数据，仅供参考）"><a href="#七、性能对比（官方数据，仅供参考）" class="headerlink" title="七、性能对比（官方数据，仅供参考）"></a>七、性能对比（官方数据，仅供参考）</h2><table>
+<thead>
+<tr>
+<th align="left">测试项</th>
+<th align="left">never-jscore</th>
+<th align="left">PyMiniRacer</th>
+<th align="left">PyExecJS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">简单计算</td>
+<td align="left">0.007ms</td>
+<td align="left">0.005ms</td>
+<td align="left">2.3ms</td>
+</tr>
+<tr>
+<td align="left">字符串操作</td>
+<td align="left"><strong>0.004ms</strong></td>
+<td align="left">0.008ms</td>
+<td align="left">2.3ms</td>
+</tr>
+<tr>
+<td align="left">复杂算法（1000 次）</td>
+<td align="left"><strong>11ms</strong></td>
+<td align="left">38ms</td>
+<td align="left">69473ms</td>
+</tr>
+<tr>
+<td align="left">Promise &#x2F; async</td>
+<td align="left"><strong>✅ 3ms</strong></td>
+<td align="left">❌ 不支持</td>
+<td align="left">❌ 不支持</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>数据来自官方 README，随环境变化，仅供参考。可以看出它和 PyMiniRacer 在纯计算上同量级，但<strong>多了 Promise&#x2F;async 支持</strong>，且远快于起子进程的 PyExecJS。</p>
+</blockquote>
+<h2 id="八、选型建议"><a href="#八、选型建议" class="headerlink" title="八、选型建议"></a>八、选型建议</h2><ul>
+<li><strong>跑不依赖浏览器环境的纯算法 JS</strong> → mini-racer 最省心（轻量、稳定）。</li>
+<li><strong>需要补浏览器环境 + 逆向 Hook</strong> → never-jscore（自带 Deno API，还有 <code>$return</code>&#x2F;<code>$terminate</code>）。</li>
+<li><strong>需要极致纯净 V8、自己精确控制环境特征</strong> → bestV8，或 never-jscore 传 <code>enable_extensions=False</code>。</li>
+</ul>
+<p>一个需要留意的<strong>权衡</strong>：never-jscore 底层是 deno_core，自带 Deno&#x2F;Node 环境是把双刃剑——补环境省事，但如果目标站点会<strong>检测 Deno&#x2F;Node 特征</strong>，反而可能露馅。对抗强检测时要评估这一点，必要时切到纯净模式或 bestV8。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>项目地址：<a target="_blank" rel="noopener" href="https://github.com/neverl805/never-jscore">https://github.com/neverl805/never-jscore</a></li>
+<li>PyPI：<a target="_blank" rel="noopener" href="https://pypi.org/project/never-jscore/">https://pypi.org/project/never-jscore/</a></li>
+<li>deno_core：<a target="_blank" rel="noopener" href="https://github.com/denoland/deno_core">https://github.com/denoland/deno_core</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习记录。请在合法合规、获得授权的前提下使用相关技术。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+        <a href="/tags/%E8%A1%A5%E7%8E%AF%E5%A2%83/">#补环境</a>
+      
+        <a href="/tags/V8/">#V8</a>
+      
+        <a href="/tags/JS%E9%80%86%E5%90%91/">#JS逆向</a>
+      
+        <a href="/tags/never-jscore/">#never-jscore</a>
+      
+        <a href="/tags/deno-core/">#deno_core</a>
+      
+        <a href="/tags/Hook/">#Hook</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/never-jscore-Python高性能JS引擎逆向利器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/Frida%E5%8F%8D%E6%A3%80%E6%B5%8B%E4%B8%89%E4%BB%B6%E5%A5%97%E5%AF%B9%E6%AF%94-Florida-rusda-fridare/" title="Frida 反检测三件套对比：Florida vs rusda vs fridare">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Frida 反检测三件套对比：Florida vs rusda vs fridare</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/wreq-rnet-%E5%B8%A6TLS%E6%8C%87%E7%BA%B9%E7%9A%84Python-HTTP%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程">
+                        <span class="hidden-mobile">wreq（原 rnet）：带 TLS/JA3/JA4 指纹的 Python HTTP 客户端使用教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

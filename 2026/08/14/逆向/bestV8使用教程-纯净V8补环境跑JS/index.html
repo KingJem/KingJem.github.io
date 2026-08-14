@@ -1,0 +1,804 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为整理性内容，基于官方开源仓库的公开资料编写  官方 Release 仓库：https:&#x2F;&#x2F;github.com&#x2F;BestToYou&#x2F;bestV8_release（作者公众号：二进制科学） Python 封装库 PyBestV8：https:&#x2F;&#x2F;github.com&#x2F;wangluozhe&#x2F;pybestV8（作者 wangluozhe）  bestV8 是一个开源免费、可以直接跑 JS 的逆向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/bestV8%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E7%BA%AF%E5%87%80V8%E8%A1%A5%E7%8E%AF%E5%A2%83%E8%B7%91JS/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为整理性内容，基于官方开源仓库的公开资料编写  官方 Release 仓库：https:&#x2F;&#x2F;github.com&#x2F;BestToYou&#x2F;bestV8_release（作者公众号：二进制科学） Python 封装库 PyBestV8：https:&#x2F;&#x2F;github.com&#x2F;wangluozhe&#x2F;pybestV8（作者 wangluozhe）  bestV8 是一个开源免费、可以直接跑 JS 的逆向">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T03:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.558Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="JS逆向">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="V8">
+<meta property="article:tag" content="bestV8">
+<meta property="article:tag" content="补环境">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 11:30" pubdate>
+          2026年8月14日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为整理性内容，基于官方开源仓库的公开资料编写</strong></p>
+<ul>
+<li><strong>官方 Release 仓库</strong>：<a target="_blank" rel="noopener" href="https://github.com/BestToYou/bestV8_release">https://github.com/BestToYou/bestV8_release</a>（作者公众号：二进制科学）</li>
+<li><strong>Python 封装库 PyBestV8</strong>：<a target="_blank" rel="noopener" href="https://github.com/wangluozhe/pybestV8">https://github.com/wangluozhe/pybestV8</a>（作者 wangluozhe）</li>
+</ul>
+<p>bestV8 是一个<strong>开源免费</strong>、可以直接跑 JS 的逆向工具，本质是把纯净的 V8 引擎编译成跨平台动态库，供外部（如 Python 通过 ctypes）调用来执行 JavaScript。本文中的代码示例均来自上述两个官方仓库，可直接验证。文末附<strong>免责声明</strong>，请务必阅读。</p>
+</blockquote>
+<h2 id="为什么要用-bestV8，而不是直接用-Node"><a href="#为什么要用-bestV8，而不是直接用-Node" class="headerlink" title="为什么要用 bestV8，而不是直接用 Node"></a>为什么要用 bestV8，而不是直接用 Node</h2><p>做 JS 逆向（尤其是补环境）时，很多人第一反应是拿 Node 跑目标脚本。但 Node <strong>不是</strong>一个”干净”的执行环境：</p>
+<ul>
+<li>Node 里有 <code>process</code>、<code>global</code>、<code>__dirname</code>、<code>__filename</code>、<code>require</code> 等一堆 <strong>Node 特有对象</strong>，而真实浏览器里没有这些。</li>
+<li>有些反爬 JS 会专门检测这些 Node 特征，一旦发现 <code>process</code> 之类的东西就判定为”非浏览器环境”，直接返回假值或报错。</li>
+<li>Node 内置的某些属性（比如新版本内置的 <code>navigator</code>）你想删都删不干净，反而干扰补环境。</li>
+</ul>
+<p>而 <strong>bestV8 提供的是一个纯净的 V8 环境</strong>：里面只有 ECMAScript 标准对象（<code>Date</code>、<code>Array</code>、<code>JSON</code>……），<strong>没有任何 Node 特征，也没有任何浏览器 BOM&#x2F;DOM 对象</strong>。这正是补环境想要的起点——一张白纸，浏览器里有什么、检测点用到什么，你就往里补什么，补得干净、可控。</p>
+<p>一句话：<strong>bestV8 &#x3D; 纯净 V8 执行器；补环境 &#x3D; 你在这张白纸上手工画出一个”浏览器”。</strong></p>
+<h2 id="bestV8-的组成"><a href="#bestV8-的组成" class="headerlink" title="bestV8 的组成"></a>bestV8 的组成</h2><p>从官方 Release 仓库 <a target="_blank" rel="noopener" href="https://github.com/BestToYou/bestV8_release">BestToYou&#x2F;bestV8_release</a> 看，核心就几个文件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">bestV8_win64.dll        # Windows x64 动态库<br>bestV8_x64.so           # Linux x64 动态库<br>bestV8_mac_intel.dylib  # macOS Intel 动态库<br>bestV8_mac_m.dylib      # macOS Apple Silicon (M 系列) 动态库<br>main.py                 # Python 调用示例（ctypes 原生调用）<br>demo.js                 # 被执行的示例 JS<br></code></pre></td></tr></table></figure>
+
+<p>也就是说，bestV8 本体是<strong>编译好的 V8 动态库</strong>，对外暴露一个 <code>runJs</code> 导出函数。你用任何能调 C 动态库的语言都能驱动它，官方给的是 Python + ctypes 的方式。</p>
+<h2 id="用法一：官方原生调用（Python-ctypes）"><a href="#用法一：官方原生调用（Python-ctypes）" class="headerlink" title="用法一：官方原生调用（Python + ctypes）"></a>用法一：官方原生调用（Python + ctypes）</h2><p>这是官方 <code>main.py</code> 的原始代码，直接加载对应平台的动态库、调用 <code>runJs</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">from</span> ctypes <span class="hljs-keyword">import</span> *<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_encrypt_value</span>(<span class="hljs-params">data</span>):<br>    <span class="hljs-keyword">if</span> sys.platform == <span class="hljs-string">&quot;darwin&quot;</span>:<br>        <span class="hljs-comment"># 这个里面根据 mac 电脑来换，通常一个可以另一个不可以。</span><br>        cur = cdll.LoadLibrary(<span class="hljs-string">&quot;./bestV8_mac_m.dylib&quot;</span>)<br>    <span class="hljs-keyword">elif</span> sys.platform == <span class="hljs-string">&quot;linux&quot;</span>:<br>        cur = cdll.LoadLibrary(<span class="hljs-string">&quot;./bestV8_x64.so&quot;</span>)<br>    <span class="hljs-keyword">elif</span> sys.platform == <span class="hljs-string">&quot;win32&quot;</span>:<br>        cur = cdll.LoadLibrary(<span class="hljs-string">&quot;./bestV8_win64.dll&quot;</span>)<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">raise</span> Exception(<span class="hljs-string">&quot;unknown systerm!&quot;</span>)<br><br>    result = <span class="hljs-built_in">bytes</span>(<span class="hljs-number">20000</span>)<br>    cur.runJs.argtypes = (c_char_p, c_char_p)<br>    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>):<br>        cur.runJs(create_string_buffer(data.encode(<span class="hljs-string">&#x27;utf8&#x27;</span>)), result)<br>        <span class="hljs-built_in">print</span>(result.rstrip(<span class="hljs-string">b&quot;\x00&quot;</span>))<br><br>data = <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;demo.js&quot;</span>, <span class="hljs-string">&quot;r&quot;</span>).read()<br>get_encrypt_value(data)<br></code></pre></td></tr></table></figure>
+
+<p>配套的 <code>demo.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title function_">print</span>(<span class="hljs-string">&quot;hellword bestV8&quot;</span>);<br><br><span class="hljs-keyword">var</span> result = <span class="hljs-string">&quot;this is return&quot;</span>;<br><br>result;<br></code></pre></td></tr></table></figure>
+
+<p>运行逻辑很直白：</p>
+<ol>
+<li>按操作系统选择对应的动态库加载（macOS 上 Intel &#x2F; M 芯片要换对应的 <code>.dylib</code>，官方注释说”通常一个可以另一个不可以”，两个都试一下）。</li>
+<li>声明 <code>runJs</code> 的参数类型：第一个参数是要执行的 JS 源码（<code>c_char_p</code>），第二个参数是一个预分配的接收缓冲区（这里是 20000 字节的 <code>bytes</code>）。</li>
+<li>调用 <code>runJs</code>，<strong>JS 脚本里最后一个表达式的值</strong>会被写回到 <code>result</code> 缓冲区里。</li>
+<li><code>result.rstrip(b&quot;\x00&quot;)</code> 去掉尾部填充的空字节，得到真正的返回值。</li>
+</ol>
+<p>⚠️ <strong>注意</strong>：接收缓冲区大小（示例是 20000 字节）需要 ≥ 你的返回值长度，返回结果很大时要调大，否则会被截断。用封装库 PyBestV8 时对应的是 <code>recv_size</code> 参数。</p>
+<h2 id="用法二：PyBestV8（pip-封装，推荐）"><a href="#用法二：PyBestV8（pip-封装，推荐）" class="headerlink" title="用法二：PyBestV8（pip 封装，推荐）"></a>用法二：PyBestV8（pip 封装，推荐）</h2><p>每次手写 ctypes 太麻烦。<a target="_blank" rel="noopener" href="https://github.com/wangluozhe/pybestV8">wangluozhe&#x2F;pybestV8</a> 把上面这套动态库封装成了 pip 包 <strong>PyBestV8</strong>，动态库已经内置在包里，装完直接 import 即可。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install PyBestV8<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-eval：直接执行一段-JS"><a href="#1-eval：直接执行一段-JS" class="headerlink" title="1. eval：直接执行一段 JS"></a>1. eval：直接执行一段 JS</h3><p>最简单的用法——把 JS 字符串丢进去，拿最后一个表达式的值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> bestv8<br><br>js_string = <span class="hljs-string">&quot;&quot;&quot;a = 1;a&quot;&quot;&quot;</span><br>result = bestv8.<span class="hljs-built_in">eval</span>(js_string, recv_size=<span class="hljs-number">200</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;result:&quot;</span>, result, <span class="hljs-built_in">type</span>(result))<br></code></pre></td></tr></table></figure>
+
+<p><code>recv_size</code> 就是接收缓冲区大小（对应原生调用里的那个 20000 字节缓冲区），返回值大就调大。</p>
+<h3 id="2-compile-call：编译后按函数名调用（支持上下文）"><a href="#2-compile-call：编译后按函数名调用（支持上下文）" class="headerlink" title="2. compile + call：编译后按函数名调用（支持上下文）"></a>2. compile + call：编译后按函数名调用（支持上下文）</h3><p>这是逆向里最常用的模式：<strong>先把整段 JS 编译成一个上下文 <code>ctx</code>，之后可以多次调用里面的函数，而且上下文里的全局变量状态会保留。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> bestv8<br><br>js_string = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">a = 1;</span><br><span class="hljs-string">b = 2;</span><br><span class="hljs-string">function abc()&#123;</span><br><span class="hljs-string">    a += 1;</span><br><span class="hljs-string">    b += 2;</span><br><span class="hljs-string">    return &#123;</span><br><span class="hljs-string">        name: &quot;lisa&quot;,</span><br><span class="hljs-string">        age: 18</span><br><span class="hljs-string">    &#125;</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">function bcd()&#123;</span><br><span class="hljs-string">    return [a, b];</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br>ctx = bestv8.<span class="hljs-built_in">compile</span>(js_string)<br><br>result = ctx.call(<span class="hljs-string">&quot;bcd&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;bcd-&gt;result:&quot;</span>, result, <span class="hljs-built_in">type</span>(result))   <span class="hljs-comment"># [1, 2]</span><br><br>result = ctx.call(<span class="hljs-string">&quot;abc&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;abc-&gt;result:&quot;</span>, result, <span class="hljs-built_in">type</span>(result))   <span class="hljs-comment"># &#123;&#x27;name&#x27;: &#x27;lisa&#x27;, &#x27;age&#x27;: 18&#125;</span><br><br>result = ctx.call(<span class="hljs-string">&quot;bcd&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;bcd-&gt;result:&quot;</span>, result, <span class="hljs-built_in">type</span>(result))   <span class="hljs-comment"># [2, 4]  &lt;- 注意状态被保留了</span><br></code></pre></td></tr></table></figure>
+
+<p>留意最后一次 <code>bcd</code> 的结果：因为前面调过一次 <code>abc()</code>，全局的 <code>a</code>、<code>b</code> 已经被改过，所以第二次 <code>bcd()</code> 返回的是 <code>[2, 4]</code> 而不是 <code>[1, 2]</code>。<strong>这个”上下文状态保持”的特性，正是补环境跑加密函数时需要的</strong>——很多加密逻辑依赖初始化时设置的全局状态。</p>
+<h3 id="3-bestv8-import：把补好的环境拆成独立文件导入"><a href="#3-bestv8-import：把补好的环境拆成独立文件导入" class="headerlink" title="3. bestv8_import：把补好的环境拆成独立文件导入"></a>3. bestv8_import：把补好的环境拆成独立文件导入</h3><p>补环境代码往往很长（<code>window</code>、<code>document</code>、<code>navigator</code>、<code>location</code>……一大堆）。PyBestV8 支持用 <code>ctx.bestv8_import()</code> 把这些环境代码放到单独的 <code>.js</code> 文件里导入，让主逻辑更清爽：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> bestv8<br><br>js_string = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">function get_location()&#123;</span><br><span class="hljs-string">    return location;</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br><br>ctx = bestv8.<span class="hljs-built_in">compile</span>(js_string)<br>ctx.bestv8_import(<span class="hljs-string">&quot;import_test.js&quot;</span>)   <span class="hljs-comment"># 导入补好的环境文件</span><br>result = ctx.call(<span class="hljs-string">&quot;get_location&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;import-&gt;result:&quot;</span>, result, <span class="hljs-built_in">type</span>(result))<br></code></pre></td></tr></table></figure>
+
+<p>配套的 <code>import_test.js</code>（一个手工补的 <code>location</code> 对象示例）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> location = &#123;<br>    <span class="hljs-attr">ancestorOrigins</span>: &#123;<span class="hljs-attr">length</span>: <span class="hljs-number">0</span>&#125;,<br>    <span class="hljs-attr">assign</span>: <span class="hljs-keyword">function</span> <span class="hljs-title function_">assign</span>(<span class="hljs-params"></span>)&#123;<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;调用了assign&quot;</span>)&#125;,<br>    <span class="hljs-attr">hash</span>: <span class="hljs-string">&quot;&quot;</span>,<br>    <span class="hljs-attr">host</span>: <span class="hljs-string">&quot;www.xxx.com&quot;</span>,<br>    <span class="hljs-attr">hostname</span>: <span class="hljs-string">&quot;www.xxx.com&quot;</span>,<br>    <span class="hljs-attr">href</span>: <span class="hljs-string">&quot;https://www.xxx.com/&quot;</span>,<br>    <span class="hljs-attr">origin</span>: <span class="hljs-string">&quot;https://www.xxx.com&quot;</span>,<br>    <span class="hljs-attr">pathname</span>: <span class="hljs-string">&quot;/&quot;</span>,<br>    <span class="hljs-attr">port</span>: <span class="hljs-string">&quot;&quot;</span>,<br>    <span class="hljs-attr">protocol</span>: <span class="hljs-string">&quot;https:&quot;</span>,<br>    <span class="hljs-attr">reload</span>: <span class="hljs-keyword">function</span> <span class="hljs-title function_">reload</span>(<span class="hljs-params"></span>)&#123;<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;调用了reload&quot;</span>)&#125;,<br>    <span class="hljs-attr">replace</span>: <span class="hljs-keyword">function</span> <span class="hljs-title function_">replace</span>(<span class="hljs-params"></span>)&#123;<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;调用了replace&quot;</span>)&#125;,<br>    <span class="hljs-attr">search</span>: <span class="hljs-string">&quot;&quot;</span>,<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这样你就能把”环境”和”业务逻辑”分离：<code>import_test.js</code> 专门放补好的 BOM&#x2F;DOM 对象，主脚本只管调用加密函数。</p>
+<h2 id="结合补环境的典型工作流"><a href="#结合补环境的典型工作流" class="headerlink" title="结合补环境的典型工作流"></a>结合补环境的典型工作流</h2><p>bestV8 只是”纯净执行器”，真正过检测靠的是你补的环境。完整流程一般是：</p>
+<ol>
+<li><p><strong>抠出加密 JS</strong>：从目标站点定位到加密函数（比如 <code>window.get_signature()</code> 之类），把相关代码抠下来。</p>
+</li>
+<li><p><strong>丢进 bestV8 直接跑</strong>：<code>bestv8.eval</code> &#x2F; <code>compile</code> 跑一遍，看报什么错——通常是 <code>xxx is not defined</code>（缺 <code>window</code>、<code>document</code>、<code>navigator</code> 等）。</p>
+</li>
+<li><p><strong>用 Proxy 自吐环境</strong>：给 <code>window</code> 等对象套一层 Proxy，打印所有被 <code>get</code>&#x2F;<code>set</code> 的属性，摸清脚本到底用了哪些浏览器 API。参考补环境通用写法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable language_">window</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Proxy</span>(<span class="hljs-variable language_">window</span>, &#123;<br>    <span class="hljs-title function_">get</span>(<span class="hljs-params">target, property, receiver</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;get window&quot;</span>, property, <span class="hljs-keyword">typeof</span> target[property]);<br>        <span class="hljs-keyword">return</span> target[property];<br>    &#125;,<br>    <span class="hljs-title function_">set</span>(<span class="hljs-params">target, property, value, receiver</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;set window&quot;</span>, property, <span class="hljs-keyword">typeof</span> value);<br>        <span class="hljs-keyword">return</span> <span class="hljs-title class_">Reflect</span>.<span class="hljs-title function_">set</span>(...<span class="hljs-variable language_">arguments</span>);<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>针对性补</strong>：根据自吐日志，把缺的对象&#x2F;属性一个个补上（放到 <code>import_test.js</code> 里用 <code>bestv8_import</code> 导入）。</p>
+</li>
+<li><p><strong>补到不报错、结果和浏览器一致</strong>：反复迭代，直到 bestV8 里跑出的加密结果和真实浏览器里一致，补环境就成功了。</p>
+</li>
+</ol>
+<h2 id="小结与选型"><a href="#小结与选型" class="headerlink" title="小结与选型"></a>小结与选型</h2><ul>
+<li><strong>bestV8</strong>：纯净 V8 执行器，无 Node 特征、无浏览器对象，是补环境的干净起点；跨平台动态库，Python 通过 ctypes 或 PyBestV8 驱动。</li>
+<li><strong>PyBestV8</strong>：把 bestV8 封装成 pip 包，提供 <code>eval</code> &#x2F; <code>compile</code> &#x2F; <code>ctx.call</code> &#x2F; <code>bestv8_import</code>，动态库已内置，开箱即用。</li>
+<li>和 <strong>jsdom &#x2F; <a href="happy-dom.md">happy-dom</a></strong> 的区别：后两者自带一套现成的 DOM 模拟（省事但特征明显、偏测试向），bestV8 则是<strong>完全干净、全靠自己补</strong>（更可控、更贴近真实浏览器、也更费手工）。实战里两条路线常按站点检测强度取舍。</li>
+</ul>
+<h2 id="免责声明"><a href="#免责声明" class="headerlink" title="免责声明"></a>免责声明</h2><blockquote>
+<p>引用自官方仓库声明：该调试工具仅供技术人员进行内部测试和分析使用。请勿将其用于非法用途或以任何方式窃取第三方数据。使用该工具产生的所有风险均由用户自行承担，作者不对用户因使用该工具而造成的任何损失或损害承担任何责任。</p>
+<p>本文仅作技术学习记录，请在合法合规、获得授权的前提下使用相关技术。</p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>bestV8 官方 Release：<a target="_blank" rel="noopener" href="https://github.com/BestToYou/bestV8_release">https://github.com/BestToYou/bestV8_release</a></li>
+<li>PyBestV8：<a target="_blank" rel="noopener" href="https://github.com/wangluozhe/pybestV8">https://github.com/wangluozhe/pybestV8</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+        <a href="/tags/bestV8/">#bestV8</a>
+      
+        <a href="/tags/%E8%A1%A5%E7%8E%AF%E5%A2%83/">#补环境</a>
+      
+        <a href="/tags/V8/">#V8</a>
+      
+        <a href="/tags/JS%E9%80%86%E5%90%91/">#JS逆向</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/bestV8使用教程-纯净V8补环境跑JS/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/SKRoot%E5%86%85%E6%A0%B8%E7%BA%A7Root%E6%96%B9%E6%A1%88%E4%BB%8B%E7%BB%8D%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SKRoot：Linux 内核级隐藏 Root 方案介绍与使用教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%AB%99%E5%9C%A8%E5%B7%A8%E4%BA%BA%E7%9A%84%E8%82%A9%E8%86%80%E4%B8%8A-%E7%94%A8LLVM%E5%8F%8D%E6%B7%B7%E6%B7%86WebAssembly/" title="【翻译】站在巨人的肩膀上：用 LLVM 反混淆 WebAssembly">
+                        <span class="hidden-mobile">【翻译】站在巨人的肩膀上：用 LLVM 反混淆 WebAssembly</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

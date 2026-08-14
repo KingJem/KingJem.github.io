@@ -1,0 +1,1182 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="前言AI 代码助手（Claude Code、Codex 等）搭配 Skill&#x2F;MCP 扩展，正在把 JS 逆向从”苦力活”变成”指挥活”。本文调研 10 个 GitHub 上公开的相关项目，涵盖 AI 技能库（Skill）和专业逆向工具，方便按需选用。  调研时间：2026-03-23数据来源：各项目 GitHub README   一览表🤖 AI 技能库（Skill）   项目 方向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI + JS 逆向工具 &amp; 技能库全景调研">
+<meta property="og:url" content="https://kingjem.github.io/2026/03/23/AI-JS%E9%80%86%E5%90%91%E6%8A%80%E8%83%BD%E5%BA%93%E5%85%A8%E6%99%AF%E8%B0%83%E7%A0%94/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="前言AI 代码助手（Claude Code、Codex 等）搭配 Skill&#x2F;MCP 扩展，正在把 JS 逆向从”苦力活”变成”指挥活”。本文调研 10 个 GitHub 上公开的相关项目，涵盖 AI 技能库（Skill）和专业逆向工具，方便按需选用。  调研时间：2026-03-23数据来源：各项目 GitHub README   一览表🤖 AI 技能库（Skill）   项目 方向">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-23T05:15:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.550Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="AI工具">
+<meta property="article:tag" content="Claude Code">
+<meta property="article:tag" content="JavaScript逆向">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="逆向工程">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>AI + JS 逆向工具 &amp; 技能库全景调研 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="AI + JS 逆向工具 &amp; 技能库全景调研"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-23 13:15" pubdate>
+          2026年3月23日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          69 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">AI + JS 逆向工具 &amp; 技能库全景调研</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>AI 代码助手（Claude Code、Codex 等）搭配 Skill&#x2F;MCP 扩展，正在把 JS 逆向从”苦力活”变成”指挥活”。本文调研 <strong>10 个</strong> GitHub 上公开的相关项目，涵盖 AI 技能库（Skill）和专业逆向工具，方便按需选用。</p>
+<blockquote>
+<p><strong>调研时间</strong>：2026-03-23<br><strong>数据来源</strong>：各项目 GitHub README</p>
+</blockquote>
+<hr>
+<h2 id="一览表"><a href="#一览表" class="headerlink" title="一览表"></a>一览表</h2><h3 id="🤖-AI-技能库（Skill）"><a href="#🤖-AI-技能库（Skill）" class="headerlink" title="🤖 AI 技能库（Skill）"></a>🤖 AI 技能库（Skill）</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>方向</th>
+<th>核心能力</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="#715494637reverse-skill">715494637&#x2F;reverse-skill</a></td>
+<td>Web JS 逆向</td>
+<td>请求链证据化、AST 恢复、JSVMP、WASM、worker</td>
+<td>复杂站点签名、登录链、风控链路</td>
+</tr>
+<tr>
+<td><a href="#zhizhuodemaoai-reverse-toolkit">zhizhuodemao&#x2F;ai-reverse-toolkit</a></td>
+<td>Web&#x2F;JS 全栈</td>
+<td>find-crypto-entry、env-patch、AST 解混淆</td>
+<td>加密入口定位、补环境</td>
+</tr>
+<tr>
+<td><a href="#fausto-404js-reverse-automation--skill">Fausto-404&#x2F;js-reverse-automation–skill</a></td>
+<td>JS 逆向自动化</td>
+<td>JSRPC + Flask + autoDecoder 全自动链路</td>
+<td>需要对接 Burp 的完整逆向</td>
+</tr>
+<tr>
+<td><a href="#wuji66ddejshook-skill">wuji66dde&#x2F;jshook-skill</a></td>
+<td>JS 逆向</td>
+<td>20+ 混淆类型、CDP 调试、Hook 注入、反检测</td>
+<td>混淆代码还原、浏览器调试</td>
+</tr>
+<tr>
+<td><a href="#p4nda0sreverse-skills">P4nda0s&#x2F;reverse-skills</a></td>
+<td>二进制&#x2F;IDA 联动</td>
+<td>IDA 导出 + 符号&#x2F;结构体重建</td>
+<td>Native 层 + 混合样本</td>
+</tr>
+<tr>
+<td><a href="#simoneavogadroandroid-reverse-engineering-skill">SimoneAvogadro&#x2F;android-reverse-engineering-skill</a></td>
+<td>Android APK</td>
+<td>jadx 反编译、Retrofit API 提取</td>
+<td>APP 逆向（非 JS）</td>
+</tr>
+<tr>
+<td><a href="#vgrichinare-skill">vgrichina&#x2F;re-skill</a></td>
+<td>复古游戏 ROM</td>
+<td>ROM 架构分析、资源提取、Web 移植</td>
+<td>游戏逆向（ NES&#x2F;GB&#x2F;DOS）</td>
+</tr>
+<tr>
+<td><a href="#betab0tskills">betab0t&#x2F;skills</a></td>
+<td>通用 RE</td>
+<td>GDB 非阻塞调试等</td>
+<td>C&#x2F;C++&#x2F;Rust 调试（非 JS）</td>
+</tr>
+</tbody></table>
+<h3 id="🔧-专业逆向工具"><a href="#🔧-专业逆向工具" class="headerlink" title="🔧 专业逆向工具"></a>🔧 专业逆向工具</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>方向</th>
+<th>核心能力</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="#trace-ui">trace-ui</a></td>
+<td>ARM64 Trace 可视化</td>
+<td>千万行级流畅浏览、反向污点追踪、调用树折叠</td>
+<td>固件&#x2F;native 逆向</td>
+</tr>
+<tr>
+<td><a href="#jshookmcp">jshookmcp</a></td>
+<td>JS Hook + MCP 服务器</td>
+<td>290+ 内置工具、17+ 领域、浏览器自动化</td>
+<td>Web&#x2F;JS 逆向、浏览器自动化</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="第一部分：AI-技能库（Skill）详解"><a href="#第一部分：AI-技能库（Skill）详解" class="headerlink" title="第一部分：AI 技能库（Skill）详解"></a>第一部分：AI 技能库（Skill）详解</h2><hr>
+<h3 id="715494637-reverse-skill"><a href="#715494637-reverse-skill" class="headerlink" title="715494637&#x2F;reverse-skill"></a>715494637&#x2F;reverse-skill</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/715494637/reverse-skill">https://github.com/715494637/reverse-skill</a><br>📌 方向：Web JS 逆向（最全面）</p>
+</blockquote>
+<p><strong>定位</strong>：面向真实浏览器样本的 JS 逆向统一入口，覆盖从请求链追踪到算法还原的全链路。</p>
+<p><strong>核心能力</strong>：</p>
+<ul>
+<li><strong>请求链证据化</strong>：围绕目标请求，建立触发动作→上游依赖→字段写入→状态消费的完整证据链</li>
+<li><strong>写边界证明</strong>：定位动态字段、请求头、Cookie、消息对象的真实 writer&#x2F;builder&#x2F;sink</li>
+<li><strong>壳层恢复</strong>：JSVMP、AST 混淆、worker、WASM、webpack&#x2F;runtime、协议封装</li>
+<li><strong>运行时对齐</strong>：识别风控分支、指纹、执行时序造成的偏差</li>
+<li><strong>检查点验证</strong>：固定样本，对齐输入输出形成可交付结论</li>
+</ul>
+<p><strong>接入</strong>：<a target="_blank" rel="noopener" href="https://github.com/zhizhuodemao/js-reverse-mcp">js-reverse-mcp</a>，通过 MCP 连接真实浏览器采集运行时数据。</p>
+<p><strong>交付形式</strong>：Node.js 生成加密参数 + Python 调度和发请求。</p>
+<p><strong>推荐最小输入</strong>：URL + 接口&#x2F;字段 + 触发方式 + 当前现象 + 约束（是否允许补环境、是否纯算法）</p>
+<p><strong>亮点</strong>：有交接文档机制（reverse-records&#x2F;请求链路.md），会话压缩后可持续接续。</p>
+<hr>
+<h3 id="zhizhuodemao-ai-reverse-toolkit"><a href="#zhizhuodemao-ai-reverse-toolkit" class="headerlink" title="zhizhuodemao&#x2F;ai-reverse-toolkit"></a>zhizhuodemao&#x2F;ai-reverse-toolkit</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/zhizhuodemao/ai-reverse-toolkit">https://github.com/zhizhuodemao/ai-reverse-toolkit</a><br>📌 方向：Web&#x2F;JS 逆向框架</p>
+</blockquote>
+<p><strong>定位</strong>：”让 AI 成为独立的逆向分析员”——不只是写代码，而是让 AI 自己判断该搜什么、断在哪、怎么追踪、怎么补环境。</p>
+<p><strong>核心理念</strong>：MCP 工具给 AI 一双手，Skill 给 AI 一个脑子。</p>
+<p><strong>Skill 矩阵</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>功能</th>
+<th>输入</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>find-crypto-entry</code></td>
+<td>定位加密入口（静态搜索 + XHR 断点）</td>
+<td>参数名（如 x-sign）</td>
+<td>脚本 URL + 函数位置 + 调用链 + 加密类型</td>
+</tr>
+<tr>
+<td><code>env-patch</code></td>
+<td>补环境（Proxy 监控 + webpack 提取）</td>
+<td>已知加密入口</td>
+<td>可独立运行的 sign.js</td>
+</tr>
+<tr>
+<td><code>ast-deobfuscate</code></td>
+<td>AST 解混淆（Babel 还原）</td>
+<td>混淆 JS 文件</td>
+<td>可读 JS 文件</td>
+</tr>
+<tr>
+<td><code>skill-creator</code></td>
+<td>创建&#x2F;优化 Skill</td>
+<td>需求描述</td>
+<td>完整 Skill 文件</td>
+</tr>
+</tbody></table>
+<p><strong>配套 Rules</strong>：<code>js-reverse.md</code> — JS 逆向技术手册，6 阶段流程 + 算法识别表 + MCP 工具速查。</p>
+<p><strong>案例</strong>：知乎 x-zse-96 签名逆向，3 条指令，15 分钟，Python 验证 200+ 文章。</p>
+<hr>
+<h3 id="Fausto-404-js-reverse-automation–skill"><a href="#Fausto-404-js-reverse-automation–skill" class="headerlink" title="Fausto-404&#x2F;js-reverse-automation–skill"></a>Fausto-404&#x2F;js-reverse-automation–skill</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/Fausto-404/js-reverse-automation--skill">https://github.com/Fausto-404/js-reverse-automation--skill</a><br>📌 方向：JS 逆向自动化（工程化）</p>
+</blockquote>
+<p><strong>定位</strong>：JSRPC + Flask + autoDecoder 方案的前端 JS 逆向自动化，目标是”高自动化”，人员只需下指令 + 配置 Burp。</p>
+<p><strong>核心能力</strong>：</p>
+<ul>
+<li>基于 MCP 连接真实浏览器，触发并跟踪 JS 加密&#x2F;签名链路</li>
+<li>自动定位 sign&#x2F;enc&#x2F;token 等关键参数生成入口</li>
+<li>自动生成 JSRPC 注入与注册代码</li>
+<li>自动生成 Python Flask 代理代码</li>
+<li>输出 Burp autoDecoder 对接说明</li>
+<li>支持 AntiDebug_Breaker 的 11 项反调试能力</li>
+</ul>
+<p><strong>工作流</strong>（4 阶段）：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">phase0: 规范化输入（URL、目标接口、触发方式）</span><br><span class="hljs-section">phase1: 浏览器链路复现（采集运行时数据）</span><br><span class="hljs-section">phase2: 参数入口识别</span><br><span class="hljs-section">phase3: 依赖提取 + 代码生成</span><br><span class="hljs-section">最终: validation_report.json 校验报告</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>适用场景</strong>：需要快速落地签名参数逆向 + 封装为可复用代码 + 与 Burp 联动。</p>
+<hr>
+<h3 id="wuji66dde-jshook-skill"><a href="#wuji66dde-jshook-skill" class="headerlink" title="wuji66dde&#x2F;jshook-skill"></a>wuji66dde&#x2F;jshook-skill</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/wuji66dde/jshook-skill">https://github.com/wuji66dde/jshook-skill</a><br>📌 方向：JS 逆向（偏调试&#x2F;HOOK）</p>
+</blockquote>
+<p><strong>定位</strong>：AI 驱动的 JavaScript 逆向工程 CLI 工具，深度集成 CDP（Chrome DevTools Protocol）。</p>
+<p><strong>核心能力</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>智能代码收集</td>
+<td>摘要&#x2F;优先级&#x2F;增量模式，防止 token 溢出</td>
+</tr>
+<tr>
+<td>AI 反混淆</td>
+<td>20+ 混淆类型，自动还原代码</td>
+</tr>
+<tr>
+<td>代码理解</td>
+<td>AI 语义分析和业务逻辑提取</td>
+</tr>
+<tr>
+<td>加密检测</td>
+<td>AES&#x2F;RSA&#x2F;MD5&#x2F;SHA 及自定义算法识别</td>
+</tr>
+<tr>
+<td>CDP 调试器</td>
+<td>断点、单步、变量查看、监视表达式</td>
+</tr>
+<tr>
+<td>Hook 注入</td>
+<td>函数拦截、网络监控、属性劫持</td>
+</tr>
+<tr>
+<td>反检测伪装</td>
+<td>16 项反检测功能、5 种平台预设、指纹伪造</td>
+</tr>
+<tr>
+<td>DOM 检查</td>
+<td>元素查询、结构分析、可点击元素定位</td>
+</tr>
+</tbody></table>
+<p><strong>技术栈</strong>：TypeScript + Node.js，需要 OpenAI 或 Anthropic API Key。</p>
+<p><strong>注意</strong>：是独立 CLI 工具（非纯 Skill 文件），需要 <code>npm install &amp;&amp; npm run build</code>。</p>
+<hr>
+<h3 id="P4nda0s-reverse-skills"><a href="#P4nda0s-reverse-skills" class="headerlink" title="P4nda0s&#x2F;reverse-skills"></a>P4nda0s&#x2F;reverse-skills</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/P4nda0s/reverse-skills">https://github.com/P4nda0s/reverse-skills</a><br>📌 方向：二进制逆向 + IDA 联动</p>
+</blockquote>
+<p><strong>定位</strong>：为 <a target="_blank" rel="noopener" href="https://github.com/P4nda0s/IDA-NO-MCP">IDA-NO-MCP</a> 设计的 Claude Code 技能盘，从 IDA 导出反编译结果供 AI 分析。</p>
+<p><strong>Skill</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/reverse-engineering:rev-symbol</code></td>
+<td>从导出表&#x2F;导入表或反编译代码分析函数符号</td>
+</tr>
+<tr>
+<td><code>/reverse-engineering:rev-struct</code></td>
+<td>从反编译函数重建数据结构</td>
+</tr>
+</tbody></table>
+<p><strong>导出结构</strong>：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">export_dir/<br>├── decompile/      <span class="hljs-comment"># 反编译 C 代码（每函数一个 .c 文件）</span><br>├── strings.txt     <span class="hljs-comment"># 字符串表</span><br>├── imports.txt     <span class="hljs-comment"># 导入表</span><br>├── <span class="hljs-built_in">exports</span>.txt     <span class="hljs-comment"># 导出表</span><br>└── memory/         <span class="hljs-comment"># 内存十六进制转储（1MB 分块）</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>适用场景</strong>：Native 层混合样本（JS + SO），需要 IDA 深度分析后联动 AI。</p>
+<hr>
+<h3 id="SimoneAvogadro-android-reverse-engineering-skill"><a href="#SimoneAvogadro-android-reverse-engineering-skill" class="headerlink" title="SimoneAvogadro&#x2F;android-reverse-engineering-skill"></a>SimoneAvogadro&#x2F;android-reverse-engineering-skill</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/SimoneAvogadro/android-reverse-engineering-skill">https://github.com/SimoneAvogadro/android-reverse-engineering-skill</a><br>📌 方向：Android APK 逆向（非 JS）</p>
+</blockquote>
+<p><strong>定位</strong>：Claude Code Skill，自动反编译 APK&#x2F;XAPK&#x2F;JAR&#x2F;AAR 并提取 HTTP API 痕迹。</p>
+<p><strong>核心能力</strong>：</p>
+<ul>
+<li>jadx &#x2F; Vineflower 反编译</li>
+<li>提取 Retrofit 端点、OkHttp 调用、硬编码 URL</li>
+<li>追踪 Activities→ViewModels→Repository→HTTP 的调用链</li>
+<li>分析混淆代码（ProGuard&#x2F;R8）</li>
+</ul>
+<p><strong>工具链</strong>：Java JDK 17+、jadx（必选）、Vineflower（推荐）、dex2jar（可选）</p>
+<p><strong>注意</strong>：这是 <strong>Android</strong> 方向，非 JS 逆向，但展示了 AI + 逆向 Skill 的跨平台扩展思路。</p>
+<hr>
+<h3 id="vgrichina-re-skill"><a href="#vgrichina-re-skill" class="headerlink" title="vgrichina&#x2F;re-skill"></a>vgrichina&#x2F;re-skill</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/vgrichina/re-skill">https://github.com/vgrichina/re-skill</a><br>📌 方向：复古游戏 ROM 逆向</p>
+</blockquote>
+<p><strong>定位</strong>：Claude Code Skill，引导”逆向→标注→资源提取→Web 移植”全流程。</p>
+<p><strong>核心能力</strong>：</p>
+<ul>
+<li>启动新逆向项目：<code>/re path/to/rom.nes</code></li>
+<li>继续任务：<code>/re</code>（自动挑下一个未完成任务）</li>
+<li><code>re_loop.sh</code>：自主循环直到所有任务完成</li>
+</ul>
+<p><strong>已支持平台</strong>：NES (6502)、Game Boy (SM83)、DOS MZ (8086)</p>
+<p><strong>添加新平台</strong>：只需写 <code>tools/instruction_set.py</code>（CPU 指令集），其余自动适配。</p>
+<hr>
+<h3 id="betab0t-skills"><a href="#betab0t-skills" class="headerlink" title="betab0t&#x2F;skills"></a>betab0t&#x2F;skills</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/betab0t/skills">https://github.com/betab0t/skills</a><br>📌 方向：通用 RE 工具集</p>
+</blockquote>
+<p><strong>定位</strong>：AI 编码助手的逆向工程技能集合（不只是 JS）。</p>
+<p><strong>主要 Skill</strong>：</p>
+<ul>
+<li><code>gdb</code>：GNU Debugger 非阻塞调试，AI 调试 C&#x2F;C++&#x2F;Rust 进程时不会卡在断点上</li>
+</ul>
+<p><strong>特点</strong>：与具体 AI 工具无关（Cursor、Claude Code、Gemini CLI 通用），通过 <code>npx add-skill</code> 安装。</p>
+<hr>
+<h2 id="第二部分：专业逆向工具"><a href="#第二部分：专业逆向工具" class="headerlink" title="第二部分：专业逆向工具"></a>第二部分：专业逆向工具</h2><hr>
+<h3 id="trace-ui-—-高性能-ARM64-Trace-可视化分析工具"><a href="#trace-ui-—-高性能-ARM64-Trace-可视化分析工具" class="headerlink" title="trace-ui — 高性能 ARM64 Trace 可视化分析工具"></a>trace-ui — 高性能 ARM64 Trace 可视化分析工具</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/imj01y/trace-ui">https://github.com/imj01y/trace-ui</a><br>📌 方向：ARM64 Trace 可视化<br><strong>技术栈</strong>: Tauri 2 + React + TypeScript + Rust<br><strong>平台</strong>: macOS &#x2F; Windows &#x2F; Linux</p>
+</blockquote>
+<h4 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a>核心功能</h4><p>专为安全研究员设计，支持千万行到亿行级 ARM64 trace 的流畅浏览。</p>
+<ul>
+<li><strong>大规模 Trace 浏览</strong> — 虚拟滚动 + mmap 零拷贝，内存占用恒定</li>
+<li><strong>函数调用树折叠</strong> — 自动识别 BL&#x2F;BLR&#x2F;RET 构建调用树，按层级折叠&#x2F;展开</li>
+<li><strong>反向污点追踪</strong> — 从寄存器或内存地址反向切片追踪数据依赖，支持数据依赖&#x2F;控制依赖独立开关</li>
+<li><strong>字符串提取</strong> — 自动从内存写操作中提取运行时字符串，支持 XRefs 交叉引用</li>
+<li><strong>寄存器 &amp; 内存面板</strong> — 实时查看任意指令处的寄存器值和内存 Hex Dump</li>
+<li><strong>DEF&#x2F;USE 箭头连线</strong> — 可视化寄存器值在指令间的传播路径</li>
+<li><strong>函数重命名</strong> — 右键自定义别名，持久化到本地</li>
+<li><strong>高亮与注释</strong> — 5 色高亮、删除线、隐藏行、行内注释</li>
+</ul>
+<h4 id="支持的-Trace-格式"><a href="#支持的-Trace-格式" class="headerlink" title="支持的 Trace 格式"></a>支持的 Trace 格式</h4><ul>
+<li><strong>unidbg</strong> 格式 — 包含时间戳、PC 地址、反汇编指令及寄存器值</li>
+<li><strong>GumTrace</strong> 格式 — 基于 Frida Stalker 的真机 trace 工具输出</li>
+</ul>
+<h4 id="性能表现"><a href="#性能表现" class="headerlink" title="性能表现"></a>性能表现</h4><p>首次打开 2400 万行 trace 索引构建约 15 秒，构建完成后自动缓存，再次打开秒级加载。</p>
+<h4 id="安装构建"><a href="#安装构建" class="headerlink" title="安装构建"></a>安装构建</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 环境依赖：Rust 1.75+、Node.js 18+、Tauri CLI</span><br><br><span class="hljs-comment"># 开发模式（热重载）</span><br>./build.sh dev<br><br><span class="hljs-comment"># 构建发布包</span><br>./build.sh release<br></code></pre></td></tr></table></figure>
+
+<h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><p>逆向工程师在做 trace 日志分析时，不再只能依赖文本一行一行硬看，适合想要更轻松理解程序执行逻辑的安全研究员。</p>
+<hr>
+<h3 id="jshookmcp-—-全能-JavaScript-Hook-与分析-MCP-服务器"><a href="#jshookmcp-—-全能-JavaScript-Hook-与分析-MCP-服务器" class="headerlink" title="jshookmcp — 全能 JavaScript Hook 与分析 MCP 服务器"></a>jshookmcp — 全能 JavaScript Hook 与分析 MCP 服务器</h3><blockquote>
+<p>🔗 <a target="_blank" rel="noopener" href="https://github.com/vmoranv/jshookmcp">https://github.com/vmoranv/jshookmcp</a><br>📌 方向：JavaScript Hook + MCP 服务器<br><strong>技术栈</strong>: TypeScript &#x2F; Node.js 20+ &#x2F; MCP<br><strong>文档</strong>: <a target="_blank" rel="noopener" href="https://vmoranv.github.io/jshookmcp/">https://vmoranv.github.io/jshookmcp/</a></p>
+</blockquote>
+<h4 id="核心亮点"><a href="#核心亮点" class="headerlink" title="核心亮点"></a>核心亮点</h4><p>一个 MCP 服务器，提供 <strong>290+ 内置工具</strong>，覆盖 <strong>17+ 领域</strong>，开箱即用。</p>
+<h4 id="主要功能领域"><a href="#主要功能领域" class="headerlink" title="主要功能领域"></a>主要功能领域</h4><ul>
+<li><strong>🤖 AI 驱动分析</strong> — LLM 辅助 JavaScript 逆向、加密算法检测、AST 级代码理解</li>
+<li><strong>🌐 浏览器自动化</strong> — Chromium &#x2F; Camoufox 浏览器控制、CDP 调试、网络拦截</li>
+<li><strong>🛡️ 反调试对抗</strong> — 内置 debugger 语句规避、时间检测绕过、headless bot 指纹识别对抗</li>
+<li><strong>🧩 动态扩展</strong> — 从 <code>plugins/</code> 和 <code>workflows/</code> 目录热加载扩展</li>
+<li><strong>🔧 逆向工具链</strong> — WASM 反汇编、二进制熵分析、内存扫描、Burp Suite &#x2F; Ghidra &#x2F; IDA Pro 桥接</li>
+<li><strong>⚡ 高效工具发现</strong> — BM25 搜索驱动，tool-schema 初始化从 40K+ tokens 降至 ~3K tokens</li>
+</ul>
+<h4 id="工具分层机制"><a href="#工具分层机制" class="headerlink" title="工具分层机制"></a>工具分层机制</h4><p>内置三种配置档（search &#x2F; workflow &#x2F; full），支持按需渐进式扩展能力：</p>
+<ul>
+<li><code>search_tools</code> — BM25 搜索工具列表，按相关性排序</li>
+<li><code>activate_tools</code> &#x2F; <code>activate_domain</code> — 按需激活具体工具或整个领域</li>
+<li><code>boost_profile</code> — 批量升级工具配置档</li>
+</ul>
+<h4 id="安装使用"><a href="#安装使用" class="headerlink" title="安装使用"></a>安装使用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 前提条件：Node.js &gt;= 20</span><br>git <span class="hljs-built_in">clone</span> https://github.com/vmoranv/jshookmcp.git<br><span class="hljs-built_in">cd</span> jshookmcp<br>pnpm install<br><br><span class="hljs-comment"># MCP 集成（Claude Code/Desktop）</span><br><span class="hljs-comment"># 在 MCP 客户端配置中添加：</span><br>&#123;<br>  <span class="hljs-string">&quot;mcpServers&quot;</span>: &#123;<br>    <span class="hljs-string">&quot;jshookmcp&quot;</span>: &#123;<br>      <span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;node&quot;</span>,<br>      <span class="hljs-string">&quot;args&quot;</span>: [<span class="hljs-string">&quot;path/to/jshookmcp/dist/index.js&quot;</span>]<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h4><p>需要快速 Hook JavaScript、浏览器逆向、加密算法分析、WASM 调试、以及将逆向能力接入 AI 辅助分析流程的工程师。</p>
+<hr>
+<h2 id="横向对比"><a href="#横向对比" class="headerlink" title="横向对比"></a>横向对比</h2><h3 id="JS-逆向-AI-技能库专项对比"><a href="#JS-逆向-AI-技能库专项对比" class="headerlink" title="JS 逆向 AI 技能库专项对比"></a>JS 逆向 AI 技能库专项对比</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>reverse-skill</th>
+<th>ai-reverse-toolkit</th>
+<th>js-reverse-automation–skill</th>
+<th>jshook-skill</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>混淆恢复</td>
+<td>✅ JSVMP&#x2F;AST</td>
+<td>✅ AST</td>
+<td>侧重 JSRPC</td>
+<td>✅ 20+ 类型</td>
+</tr>
+<tr>
+<td>补环境</td>
+<td>✅</td>
+<td>✅ Proxy+webpack</td>
+<td>✅ JSRPC+Flask</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>请求链追踪</td>
+<td>✅ 证据化</td>
+<td>✅ find-crypto-entry</td>
+<td>✅ phase1</td>
+<td>✅ CDP</td>
+</tr>
+<tr>
+<td>Burp 集成</td>
+<td>Python 手动</td>
+<td>手动</td>
+<td>✅ autoDecoder</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>MCP 依赖</td>
+<td>js-reverse-mcp</td>
+<td>js-reverse-mcp</td>
+<td>chrome-devtools-mcp</td>
+<td>独立 CLI</td>
+</tr>
+<tr>
+<td>自动化程度</td>
+<td>高</td>
+<td>高</td>
+<td>最高（全自动）</td>
+<td>中</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>复杂站点</td>
+<td>加密定位为主</td>
+<td>工程化交付</td>
+<td>混淆还原为主</td>
+</tr>
+</tbody></table>
+<h3 id="工具类专项对比"><a href="#工具类专项对比" class="headerlink" title="工具类专项对比"></a>工具类专项对比</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>trace-ui</th>
+<th>jshookmcp</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>ARM64 Trace 可视化</td>
+<td>JavaScript Hook + MCP 服务器</td>
+</tr>
+<tr>
+<td>技术栈</td>
+<td>Tauri 2 (Rust + React)</td>
+<td>Node.js + TypeScript</td>
+</tr>
+<tr>
+<td>核心场景</td>
+<td>固件&#x2F;native 逆向</td>
+<td>Web&#x2F;JS 逆向、浏览器自动化</td>
+</tr>
+<tr>
+<td>扩展方式</td>
+<td>工具自身持续迭代</td>
+<td>插件 + 工作流热加载</td>
+</tr>
+<tr>
+<td>AI 集成</td>
+<td>规划中</td>
+<td>深度集成 MCP，LLM 辅助分析</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="实战中的反混淆工具"><a href="#实战中的反混淆工具" class="headerlink" title="实战中的反混淆工具"></a>实战中的反混淆工具</h2><p>除了 AI Skill&#x2F;MCP 的”高配”路线，真正在业内活跃使用的，是几个专门的反混淆工具（内部用 Babel 做 AST 操作，但不是以 <code>babel-plugin-*</code> 命名发布）。</p>
+<h3 id="社区活跃维护的工具"><a href="#社区活跃维护的工具" class="headerlink" title="社区活跃维护的工具"></a>社区活跃维护的工具</h3><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>专精方向</th>
+<th>技术栈</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>webcrack</strong>（j4k0xb）</td>
+<td>obfuscator.io 输出、反 minify、拆包 webpack&#x2F;browserify bundle</td>
+<td><code>@babel/parser</code> + <code>@babel/traverse</code> + <code>@babel/types</code> + <code>@babel/generator</code>，外加 <code>@codemod/matchers</code> 做模式匹配</td>
+</tr>
+<tr>
+<td><strong>synchrony</strong>（relative）</td>
+<td>专门针对 javascript-obfuscator &#x2F; obfuscator.io</td>
+<td>自己的 AST 处理，配套字符串解码器</td>
+</tr>
+<tr>
+<td><strong>restringer</strong>（HumanSecurity，原 PerimeterX）</td>
+<td>字符串还原 + 逻辑简化，模块化设计，能自定义 pipeline</td>
+<td>内部叫 flast，提供 safe&#x2F;unsafe 两档转换模块可以自己拼</td>
+</tr>
+</tbody></table>
+<h3 id="restringer-的设计思路值得参考"><a href="#restringer-的设计思路值得参考" class="headerlink" title="restringer 的设计思路值得参考"></a>restringer 的设计思路值得参考</h3><p>它把变换拆成一个个独立模块（比如 <code>resolveDefiniteBinaryExpressions</code>、<code>resolveLocalCalls</code>），你可以按需组装自己的 pipeline，而不是黑盒跑一遍：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; applyIteratively &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;flast&#x27;</span>;<br><span class="hljs-keyword">import</span> &#123; safe, unsafe &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;restringer&#x27;</span>;<br><br><span class="hljs-keyword">const</span> customModules = [<br>  unsafe.<span class="hljs-property">resolveDefiniteBinaryExpressions</span>.<span class="hljs-property">default</span>,<br>  unsafe.<span class="hljs-property">resolveLocalCalls</span>.<span class="hljs-property">default</span>,<br>];<br></code></pre></td></tr></table></figure>
+
+<h3 id="实践中更常见的做法：没有现成插件就自己写"><a href="#实践中更常见的做法：没有现成插件就自己写" class="headerlink" title="实践中更常见的做法：没有现成插件就自己写"></a>实践中更常见的做法：没有现成插件就自己写</h3><p>多数站点会在标准 obfuscator 之上做二次魔改，社区工具只能覆盖通用模式。最终往往还是用 Babel 手写 transformer 做定向处理，反而更可控。</p>
+<hr>
+<h2 id="选型建议"><a href="#选型建议" class="headerlink" title="选型建议"></a>选型建议</h2><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs sqf">简单参数提取（知道参数名）<br>  └─ zhizhuodemao/ai-<span class="hljs-built_in">reverse</span>-toolkit → /<span class="hljs-built_in">find</span>-crypto-entry<br><br>需要完整逆向+对接 Burp<br>  └─ Fausto-<span class="hljs-number">404</span>/js-<span class="hljs-built_in">reverse</span>-automation--<span class="hljs-built_in">skill</span> → 全自动链路<br><br>复杂站点（JSVMP/风控/多入口）<br>  └─ <span class="hljs-number">715494637</span>/<span class="hljs-built_in">reverse</span>-<span class="hljs-built_in">skill</span> → 请求链证据化<br><br>混淆代码还原为主<br>  └─ wuji66dde/jshook-<span class="hljs-built_in">skill</span> → <span class="hljs-number">20</span>+ 混淆类型 + CDP<br><br>Native+JS 混合样本<br>  └─ P4nda0s/<span class="hljs-built_in">reverse</span>-skills → IDA 联动<br><br>ARM64 trace 分析<br>  └─ trace-ui → 千万行级流畅浏览<br><br>浏览器自动化 + JS Hook + AI<br>  └─ jshookmcp → <span class="hljs-number">290</span>+ 工具，开箱即用<br><br>Android APP 逆向<br>  └─ SimoneAvogadro/android-<span class="hljs-built_in">reverse</span>-engineering-<span class="hljs-built_in">skill</span><br><br>复古游戏 ROM<br>  └─ vgrichina/re-<span class="hljs-built_in">skill</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>AI + 逆向 Skill 的生态已相当丰富，从”定位加密入口”到”全自动化 JSRPC”都有现成工具。核心趋势：</p>
+<ol>
+<li><strong>MCP 是入口</strong>：大量 Skill 依赖 <code>js-reverse-mcp</code> &#x2F; <code>chrome-devtools-mcp</code> 连接真实浏览器</li>
+<li><strong>Skill 即工作流</strong>：不是让 AI 写代码，而是把逆向经验编码成 AI 可执行的步骤</li>
+<li><strong>交付物工程化</strong>：从”跑通算法”到”输出 sign.js + Flask + Burp 对接说明”</li>
+<li><strong>工具互补</strong>：trace-ui 专攻 ARM64 trace，jshookmcp 专攻 JS Hook，形成完整逆向栈</li>
+</ol>
+<p>按需选用，组合使用效果更佳。</p>
+<hr>
+<p><em>待发布审稿</em></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E8%B0%83%E7%A0%94/" class="category-chain-item">技术调研</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JavaScript%E9%80%86%E5%90%91/">#JavaScript逆向</a>
+      
+        <a href="/tags/AI%E5%B7%A5%E5%85%B7/">#AI工具</a>
+      
+        <a href="/tags/Claude-Code/">#Claude Code</a>
+      
+        <a href="/tags/MCP/">#MCP</a>
+      
+        <a href="/tags/%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/">#逆向工程</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>AI + JS 逆向工具 &amp; 技能库全景调研</div>
+      <div>https://kingjem.github.io/2026/03/23/AI-JS逆向技能库全景调研/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月23日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" title="curl-impersonate JA3 指纹原理与复现">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">curl-impersonate JA3 指纹原理与复现</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/22/AI/%E7%8C%BF%E4%BA%BA%E5%AD%A6%E7%AC%AC21%E9%A2%98%20%E2%80%94%20%E9%AD%94%E6%94%B9SM3%E9%80%86%E5%90%91%E5%88%86%E6%9E%90-Claude%20%E5%88%86%E6%9E%90/" title="猿人学第21题 — 魔改SM3逆向分析-Claude 分析">
+                        <span class="hidden-mobile">猿人学第21题 — 魔改SM3逆向分析-Claude 分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

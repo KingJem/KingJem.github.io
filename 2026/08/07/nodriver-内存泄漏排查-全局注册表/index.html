@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="前言一台 8GB 的 Windows 采集机反复 OOM：SSH 连上去停在 SSH2_MSG_KEXINIT 之后就断，事件日志里 Resource-Exhaustion-Detector（EventID 2004）一天报 150 多次，Kernel-Power 41（非正常重启）隔几天来一次。 排查最后落到 nodriver 上：它每跑一轮采集就永久泄漏一整个 Browser 对象，实测约 1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/07/nodriver-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%A8%E5%B1%80%E6%B3%A8%E5%86%8C%E8%A1%A8/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="前言一台 8GB 的 Windows 采集机反复 OOM：SSH 连上去停在 SSH2_MSG_KEXINIT 之后就断，事件日志里 Resource-Exhaustion-Detector（EventID 2004）一天报 150 多次，Kernel-Power 41（非正常重启）隔几天来一次。 排查最后落到 nodriver 上：它每跑一轮采集就永久泄漏一整个 Browser 对象，实测约 1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-07T07:40:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.554Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="CDP">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="asyncio">
+<meta property="article:tag" content="nodriver">
+<meta property="article:tag" content="undetected-chromedriver">
+<meta property="article:tag" content="内存泄漏">
+<meta property="article:tag" content="反检测浏览器">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-07 15:40" pubdate>
+          2026年8月7日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一台 8GB 的 Windows 采集机反复 OOM：SSH 连上去停在 <code>SSH2_MSG_KEXINIT</code> 之后就断，<br>事件日志里 Resource-Exhaustion-Detector（EventID 2004）一天报 150 多次，<br>Kernel-Power 41（非正常重启）隔几天来一次。</p>
+<p>排查最后落到 <a target="_blank" rel="noopener" href="https://github.com/ultrafunkamsterdam/nodriver">nodriver</a> 上：<br><strong>它每跑一轮采集就永久泄漏一整个 <code>Browser</code> 对象，实测约 1GB&#x2F;h。</strong></p>
+<p>这篇记录泄漏是怎么定位的（方法比结论更值钱）、根因是什么、以及怎么修。</p>
+<blockquote>
+<p>版本：nodriver <code>0.50.3</code>，Python 3.10，Windows Server。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、症状：内存只涨不落"><a href="#一、症状：内存只涨不落" class="headerlink" title="一、症状：内存只涨不落"></a>一、症状：内存只涨不落</h2><p>先明确一个基本功：量内存要看 Private（私有字节），不要看 WorkingSet。<br>WS 降下去往往只是被换出到页面文件，不代表内存被回收。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-attribute">pid</span>=3108  cp_others   <span class="hljs-attribute">age</span>=3.1h  <span class="hljs-attribute">private</span>=1022MB   → 332 MB/h<br><span class="hljs-attribute">pid</span>=8028  albertsons  <span class="hljs-attribute">age</span>=3.1h  private= 149MB   →  48 MB/h<br><span class="hljs-attribute">firefox</span>=0  <span class="hljs-attribute">chrome</span>=0<br></code></pre></td></tr></table></figure>
+
+<p>两个刺眼的地方：</p>
+<ul>
+<li><strong>一个浏览器进程都没有存活</strong>，python 自己攥着 1GB，所以不是「孤儿浏览器没清理」那类问题。</li>
+<li>把进程杀掉后，可用内存<strong>立刻回吐 1.5GB</strong>，说明是进程生命周期内的泄漏，<br>不是内核对象&#x2F;句柄泄漏（那种杀进程也不一定还）。</li>
+</ul>
+<h2 id="二、定位方法：按后端分组比增速"><a href="#二、定位方法：按后端分组比增速" class="headerlink" title="二、定位方法：按后端分组比增速"></a>二、定位方法：按后端分组比增速</h2><p>这一步是整件事里最值得抄走的部分。</p>
+<p>采集守护进程是一个大杂烩：一个进程轮着采十几个站点，背后有 5 种不同的浏览器后端<br>（ruyipage &#x2F; nodriver &#x2F; turnstile &#x2F; cloak &#x2F; invisible）。直接去读代码猜「哪里可能没释放」，<br>效率极低而且容易先入为主。</p>
+<p>换个思路：让它们分开跑，用增速把嫌疑人指出来。</p>
+<p>站点选择本来就支持 <code>--exclude</code>，于是用互补的排除列表把一个进程拆成三个，<br>所有站点不重不漏、生产采集全程不中断：</p>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>后端</th>
+<th>增速</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g1</td>
+<td>ruyipage</td>
+<td>~30 MB&#x2F;h</td>
+</tr>
+<tr>
+<td><strong>g2</strong></td>
+<td><strong>nodriver + cloak</strong></td>
+<td><strong>819 MB&#x2F;h</strong></td>
+</tr>
+<tr>
+<td>g3</td>
+<td>turnstile + invisible</td>
+<td>~30 MB&#x2F;h</td>
+</tr>
+</tbody></table>
+<p>差 24 倍。这种量级的差异不需要长时间观察，16 分钟就能定案，也不用担心噪声。</p>
+<p>再切一刀，把 g2 里的两个后端分开：</p>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>后端</th>
+<th>增速</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>g2a</strong></td>
+<td><strong>nodriver</strong></td>
+<td><strong>1076 MB&#x2F;h</strong></td>
+</tr>
+<tr>
+<td>g2b</td>
+<td>cloak</td>
+<td><strong>0 MB&#x2F;h</strong></td>
+</tr>
+</tbody></table>
+<p><code>cloak</code> 那一组<strong>一个字节都没涨</strong>。到这里嫌疑人只剩一个。</p>
+<blockquote>
+<p>二分的好处是：它对「你猜得对不对」完全免疫。你不需要预先知道哪里可能漏，<br>只需要能把系统切开、并且能量化每一块。</p>
+</blockquote>
+<h2 id="三、根因：stop-从不把自己从全局注册表摘掉"><a href="#三、根因：stop-从不把自己从全局注册表摘掉" class="headerlink" title="三、根因：stop() 从不把自己从全局注册表摘掉"></a>三、根因：<code>stop()</code> 从不把自己从全局注册表摘掉</h2><p>翻 nodriver 源码，<code>Browser.start()</code> 里有这么一行（<code>nodriver/core/browser.py:368</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">util.get_registered_instances().add(<span class="hljs-variable language_">self</span>)<br></code></pre></td></tr></table></figure>
+
+<p>而 <code>get_registered_instances()</code> 返回的是一个模块级全局集合（<code>nodriver/core/util.py</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">__registered__instances__: <span class="hljs-type">Set</span>[Browser] = <span class="hljs-built_in">set</span>()<br></code></pre></td></tr></table></figure>
+
+<p>再看 <code>Browser.stop()</code>（<code>browser.py:589</code>）：它 terminate 子进程、关闭连接，<br><strong>但从头到尾没有把自己从这个集合里移除</strong>。</p>
+<p>这个集合唯一被清空的地方，在 <code>util.deconstruct_browser()</code> 的结尾：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">__registered__instances__.clear()<br></code></pre></td></tr></table></figure>
+
+<p>而 <code>deconstruct_browser()</code> 是进程退出路径（atexit 一类）才会走的。<br>对于跑几天几周的采集守护进程或价格追踪爬虫来说，这行代码永远不会执行。</p>
+<p>于是形成一条完整的泄漏链：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">uc.<span class="hljs-built_in">start</span>()  →  Browser 加入全局 <span class="hljs-built_in">set</span>（强引用）<br>browser.<span class="hljs-built_in">stop</span>()  →  Chrome 进程没了，但 Browser 对象还被 <span class="hljs-built_in">set</span> 拴着<br>                   ↓<br>        Browser 持有 Connection（websocket 收发缓冲）<br>                  + 全部 Tab / Target 对象<br>                  + CDP 事件历史<br>                   ↓<br>        gc 无能为力：<span class="hljs-built_in">set</span> 是强引用，且 Browser.__del__ 是 pass<br></code></pre></td></tr></table></figure>
+
+<p><strong>每采一轮，就永久多留一整个 Browser 及其挂着的所有东西。</strong><br><code>about:blank</code> 页面看不出多少，但真实电商页面的 CDP 事件缓冲很可观，线上实测约 1GB&#x2F;h。</p>
+<h3 id="最小复现"><a href="#最小复现" class="headerlink" title="最小复现"></a>最小复现</h3><p>同一个进程里连跑 6 轮，前 3 轮原样、后 3 轮加上修复：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> asyncio, gc, os, sys<br><span class="hljs-keyword">import</span> nodriver <span class="hljs-keyword">as</span> uc<br><span class="hljs-keyword">from</span> nodriver.core <span class="hljs-keyword">import</span> util <span class="hljs-keyword">as</span> uc_util<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">one_round</span>(<span class="hljs-params">apply_fix: <span class="hljs-built_in">bool</span></span>):<br>    browser = <span class="hljs-keyword">await</span> uc.start(headless=<span class="hljs-literal">True</span>)<br>    page = <span class="hljs-keyword">await</span> browser.get(<span class="hljs-string">&quot;about:blank&quot;</span>)<br>    <span class="hljs-keyword">await</span> page.sleep(<span class="hljs-number">1</span>)<br>    browser.stop()<br>    <span class="hljs-keyword">if</span> apply_fix:<br>        uc_util.get_registered_instances().discard(browser)   <span class="hljs-comment"># ← 关键一行</span><br>    <span class="hljs-keyword">del</span> page, browser<br>    <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.3</span>)<br>    gc.collect()<br></code></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs abnf">start                registry<span class="hljs-operator">=</span>  <span class="hljs-number">0</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">39.1</span>MB<br>round <span class="hljs-number">1</span> fix<span class="hljs-operator">=</span>False    registry<span class="hljs-operator">=</span>  <span class="hljs-number">1</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">40.9</span>MB<br>round <span class="hljs-number">2</span> fix<span class="hljs-operator">=</span>False    registry<span class="hljs-operator">=</span>  <span class="hljs-number">2</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">41.1</span>MB<br>round <span class="hljs-number">3</span> fix<span class="hljs-operator">=</span>False    registry<span class="hljs-operator">=</span>  <span class="hljs-number">3</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">41.4</span>MB<br>--- now apply the discard fix ---<br>round <span class="hljs-number">4</span> fix<span class="hljs-operator">=</span>True     registry<span class="hljs-operator">=</span>  <span class="hljs-number">3</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">41.4</span>MB<br>round <span class="hljs-number">5</span> fix<span class="hljs-operator">=</span>True     registry<span class="hljs-operator">=</span>  <span class="hljs-number">3</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">41.4</span>MB<br>round <span class="hljs-number">6</span> fix<span class="hljs-operator">=</span>True     registry<span class="hljs-operator">=</span>  <span class="hljs-number">3</span>  rss<span class="hljs-operator">=</span>   <span class="hljs-number">41.5</span>MB<br></code></pre></td></tr></table></figure>
+
+<p><code>registry</code> 单调递增，修复后不再增长。注册表这个「计数器」比 RSS 更早、更干净地暴露问题：<br>用 <code>about:blank</code> 时 RSS 每轮才涨 0.3MB，光看 RSS 很容易以为是抖动。</p>
+<h2 id="四、修复"><a href="#四、修复" class="headerlink" title="四、修复"></a>四、修复</h2><p>不改第三方库（下次 <code>pip install</code> 就没了），在自己的封装里收尾时摘掉即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">_unregister_browser</span>(<span class="hljs-params">browser</span>) -&gt; <span class="hljs-literal">None</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;把用完的 Browser 从 nodriver 的模块级全局注册表里摘掉 —— 不摘就是纯内存泄漏。&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-keyword">from</span> nodriver.core <span class="hljs-keyword">import</span> util <span class="hljs-keyword">as</span> _uc_util<br>        _uc_util.get_registered_instances().discard(browser)<br>    <span class="hljs-keyword">except</span> Exception:<br>        <span class="hljs-keyword">pass</span><br></code></pre></td></tr></table></figure>
+
+<p>调用点放在 <code>finally</code> 里，紧跟 <code>stop()</code> 之后：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">finally</span>:<br>    <span class="hljs-keyword">if</span> browser <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-keyword">try</span>:<br>            browser.stop()<br>        <span class="hljs-keyword">except</span> Exception:<br>            <span class="hljs-keyword">pass</span><br>        _unregister_browser(browser)     <span class="hljs-comment"># ★ 必须</span><br>        <span class="hljs-keyword">await</span> asyncio.sleep(<span class="hljs-number">0.3</span>)         <span class="hljs-comment"># 给后台 CDP 监听器/管道时间收尾</span><br></code></pre></td></tr></table></figure>
+
+<p>用 <code>discard()</code> 而不是 <code>remove()</code>：对象不在集合里时不抛异常，天然幂等。</p>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>走真实的后端入口验证（不是另写一个循环，那样测的是测试脚本，不是线上代码路径）：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs routeros">start            <span class="hljs-attribute">registry</span>=0  <span class="hljs-attribute">rss</span>=39.8MB<br>round 1          <span class="hljs-attribute">registry</span>=0  <span class="hljs-attribute">rss</span>=43.7MB<br>round 2          <span class="hljs-attribute">registry</span>=0  <span class="hljs-attribute">rss</span>=43.7MB<br>round 3          <span class="hljs-attribute">registry</span>=0  <span class="hljs-attribute">rss</span>=43.8MB<br>round 4          <span class="hljs-attribute">registry</span>=0  <span class="hljs-attribute">rss</span>=43.8MB<br></code></pre></td></tr></table></figure>
+
+<p><code>registry</code> 恒为 0，RSS 43.7 → 43.8MB 持平。</p>
+<p>另外值得一提：全仓库只有一处 <code>uc.start()</code>，都收敛在这个后端模块里。<br>所以这一处修复同时覆盖了 cookie 池采集端、一个长跑的价格追踪爬虫、以及另一个会话获取脚本。<br>其中价格追踪那个是跑了很久的长驻进程，一直在漏，只是没人往那儿看。</p>
+<blockquote>
+<p>把第三方库的调用收敛到一个封装层，平时看不出好处，出事的时候能省掉一场大规模改造。</p>
+</blockquote>
+<h2 id="五、几条可以带走的经验"><a href="#五、几条可以带走的经验" class="headerlink" title="五、几条可以带走的经验"></a>五、几条可以带走的经验</h2><p>1）长跑进程里用第三方库，先查它有没有全局注册表。</p>
+<p><code>__instances__</code>、<code>_registry</code>、<code>_all_*</code> 这类模块级容器是重灾区。<br>很多库的设计前提是「一个进程跑一次就退出」，收尾逻辑挂在进程退出路径上。<br>一旦你把它放进 while-True 里，它的假设就不成立了。搜一下 <code>.add(self)</code> &#x2F; <code>.append(self)</code> 通常很快。</p>
+<p>2）<code>__del__</code> 是 <code>pass</code> 不代表没问题，反而是信号。</p>
+<p>它说明作者知道析构时机不可控、干脆放弃在那里做事，那么资源释放一定在别的地方。去把那个地方找出来，<br>并确认你的调用方式会走到它。</p>
+<p>3）量内存看 Private，不看 WorkingSet。</p>
+<p>4）定位泄漏优先用「切开比增速」，而不是读代码找可疑点。</p>
+<p>只要系统能按维度切开、每块能量化，二分几轮就能收敛，而且结论不依赖你的先验判断。<br>配合两条旁证会更稳：</p>
+<ul>
+<li>采样时<strong>子进程数为 0</strong> 而主进程仍在涨 → 漏在自己这一侧；</li>
+<li>杀进程后内存<strong>立刻回吐</strong> → 进程生命周期内泄漏。</li>
+</ul>
+<p>5）定时重启是止血，不是治疗。</p>
+<p>出事之后加了个「每 2 小时重启一次」的任务，机器确实不崩了，但泄漏一直在那儿。<br>这类补丁的副作用是让问题不再痛，于是也不再有人查。这次泄漏能拖这么久，一半是这个原因。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%B5%8F%E8%A7%88%E5%99%A8%E8%87%AA%E5%8A%A8%E5%8C%96/" class="category-chain-item">浏览器自动化</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+      
+        <a href="/tags/Python/">#Python</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
+      
+        <a href="/tags/nodriver/">#nodriver</a>
+      
+        <a href="/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/">#内存泄漏</a>
+      
+        <a href="/tags/undetected-chromedriver/">#undetected-chromedriver</a>
+      
+        <a href="/tags/CDP/">#CDP</a>
+      
+        <a href="/tags/asyncio/">#asyncio</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nodriver 内存泄漏排查实录：每小时 1GB，罪魁是一个模块级全局 Set</div>
+      <div>https://kingjem.github.io/2026/08/07/nodriver-内存泄漏排查-全局注册表/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月7日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/12/%E4%BB%8E%E6%8A%93%E5%8C%85%E5%88%B0unidbg-Akamai-BMP%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0/" title="从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">从抓包到 unidbg：一个 Akamai BMP 移动端接口的离机复现全记录</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/07/TencentDB-Agent-Memory-%E4%B8%89%E5%B9%B3%E5%8F%B0%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台">
+                        <span class="hidden-mobile">TencentDB Agent Memory 安装使用教程 — Windows / Linux / macOS 三平台</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

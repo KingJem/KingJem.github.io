@@ -1,0 +1,954 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="香橙派 5 Plus 用的是瑞芯微 RK3588（4×A76 + 4×A55，8nm，自带 6 TOPS NPU），跑 Linux 做小服务器、跑 Docker、跑云手机、跑本地模型都很合适。但它和树莓派不一样：RK3588 的启动介质有优先级，板子上可能同时存在 SPI Flash、eMMC、NVMe 和 SD 卡四个可启动位置，新手最常见的坑不是「卡没刷好」，而是「卡刷好了但板子没从卡启动」。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程">
+<meta property="og:url" content="https://kingjem.github.io/2026/07/30/linux/%E9%A6%99%E6%A9%99%E6%B4%BE5Plus-SD%E5%8D%A1%E5%88%B7%E6%9C%BA%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="香橙派 5 Plus 用的是瑞芯微 RK3588（4×A76 + 4×A55，8nm，自带 6 TOPS NPU），跑 Linux 做小服务器、跑 Docker、跑云手机、跑本地模型都很合适。但它和树莓派不一样：RK3588 的启动介质有优先级，板子上可能同时存在 SPI Flash、eMMC、NVMe 和 SD 卡四个可启动位置，新手最常见的坑不是「卡没刷好」，而是「卡刷好了但板子没从卡启动」。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-30T02:20:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.554Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Orange Pi 5 Plus">
+<meta property="article:tag" content="RK3588">
+<meta property="article:tag" content="刷机">
+<meta property="article:tag" content="单板机">
+<meta property="article:tag" content="香橙派">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-30 10:20" pubdate>
+          2026年7月30日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <p>香橙派 5 Plus 用的是瑞芯微 RK3588（4×A76 + 4×A55，8nm，自带 6 TOPS NPU），跑 Linux 做小服务器、跑 Docker、跑云手机、跑本地模型都很合适。但它和树莓派不一样：<strong>RK3588 的启动介质有优先级，板子上可能同时存在 SPI Flash、eMMC、NVMe 和 SD 卡四个可启动位置</strong>，新手最常见的坑不是「卡没刷好」，而是「卡刷好了但板子没从卡启动」。</p>
+<p>这篇按 SD 卡（TF 卡）方式，从选卡、选镜像、写卡到首次启动、扩容、排错，走一遍完整流程。</p>
+<span id="more"></span>
+
+<h2 id="一、准备工作"><a href="#一、准备工作" class="headerlink" title="一、准备工作"></a>一、准备工作</h2><h3 id="硬件清单"><a href="#硬件清单" class="headerlink" title="硬件清单"></a>硬件清单</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>要求</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>microSD 卡</td>
+<td><strong>≥ 16GB，建议 32GB 起，A1&#x2F;A2 + Class10&#x2F;U3</strong></td>
+<td>桌面版镜像解包后就 10GB 左右，16GB 会很紧</td>
+</tr>
+<tr>
+<td>读卡器</td>
+<td>USB3.0 优先</td>
+<td>劣质读卡器是写卡失败的头号原因</td>
+</tr>
+<tr>
+<td>电源</td>
+<td><strong>5V&#x2F;4A（或 PD 协议）Type-C</strong></td>
+<td>关键项，见下方说明</td>
+</tr>
+<tr>
+<td>HDMI 线 + 显示器</td>
+<td>可选</td>
+<td>装 Server 版可以纯 SSH，不接显示器</td>
+</tr>
+<tr>
+<td>网线</td>
+<td>建议</td>
+<td>首次启动用有线最省事</td>
+</tr>
+</tbody></table>
+<p>关于电源，多说一句，因为这是 RK3588 板子最容易踩的坑：<strong>用手机充电器或电脑 USB 口供电，大概率出现「能进系统但随机重启 &#x2F; 跑满载就掉电 &#x2F; SD 卡读写报错」</strong>。RK3588 满载 + NVMe + 外设的峰值电流不低，官方建议 5V&#x2F;4A。很多被当成「SD 卡坏了」的问题，实际是供电不足。</p>
+<blockquote>
+<p>关于「卡本身要好」这点，Ubuntu Rockchip 项目的 README 也专门强调过：启动或稳定性问题，多数情况来自电源不足，或者跟 SD 卡有关（坏卡、坏读卡器、烧写出错、卡太慢）。</p>
+</blockquote>
+<h3 id="顺手把卡测一下（强烈建议）"><a href="#顺手把卡测一下（强烈建议）" class="headerlink" title="顺手把卡测一下（强烈建议）"></a>顺手把卡测一下（强烈建议）</h3><p>网购的「高速大容量卡」扩容卡比例不低，刷之前花几分钟测，比刷完排查两小时划算。</p>
+<p>Windows 用 <a target="_blank" rel="noopener" href="https://www.grc.com/validrive.htm">ValiDrive</a> 或 H2testw；Linux &#x2F; macOS 用 <code>f3</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt install f3<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">f3write /media/你的挂载点 &amp;&amp; f3read /media/你的挂载点<br></code></pre></td></tr></table></figure>
+
+<p>写入速度低于 10MB&#x2F;s、或者读回校验报错，直接换卡，别犹豫。</p>
+<h2 id="二、选镜像：三个流派"><a href="#二、选镜像：三个流派" class="headerlink" title="二、选镜像：三个流派"></a>二、选镜像：三个流派</h2><p>香橙派 5 Plus 能刷的系统有三大类，用途差别很大，先选对再下载。</p>
+<h3 id="1-官方镜像（orangepi-org）"><a href="#1-官方镜像（orangepi-org）" class="headerlink" title="1. 官方镜像（orangepi.org）"></a>1. 官方镜像（orangepi.org）</h3><p>官方提供 Orange Pi OS（Arch&#x2F;Droid 系）、Ubuntu、Debian、Android 等，从官网产品页的「Download」进，网盘（Google Drive &#x2F; 百度网盘）分发。</p>
+<ul>
+<li><strong>优点</strong>：硬件支持最全，GPU&#x2F;VPU&#x2F;NPU、HDMI-in、2.5G 网口这些外设开箱可用；要用 NPU 跑 RKNN 模型，官方镜像基本是首选。</li>
+<li><strong>缺点</strong>：基于 Rockchip 的 BSP 内核（5.10 系为主），内核较老，apt 源和内核更新节奏跟上游脱节。</li>
+<li><strong>默认账号</strong>：官方镜像通常是 <code>orangepi / orangepi</code>，<code>root / orangepi</code>。<strong>首次登录务必改密码。</strong></li>
+</ul>
+<h3 id="2-Ubuntu-Rockchip（社区，推荐给多数人）"><a href="#2-Ubuntu-Rockchip（社区，推荐给多数人）" class="headerlink" title="2. Ubuntu Rockchip（社区，推荐给多数人）"></a>2. Ubuntu Rockchip（社区，推荐给多数人）</h3><p><a target="_blank" rel="noopener" href="https://github.com/Joshua-Riek/ubuntu-rockchip">Joshua-Riek&#x2F;ubuntu-rockchip</a> 是社区把 Ubuntu 移植到 Rockchip 硬件的项目，对 Orange Pi 5 Plus 是一等支持，体验最接近「正常的 Ubuntu」。</p>
+<p>写这篇时最新的 release 是 <strong>v2.4.0</strong>，Orange Pi 5 Plus 的镜像资产有这些（<code>.img.xz</code>，无需先解压）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">ubuntu-22.04-preinstalled-desktop-arm64-orangepi-5-plus.img.xz<br>ubuntu-22.04-preinstalled-server-arm64-orangepi-5-plus.img.xz<br>ubuntu-24.04-preinstalled-desktop-arm64-orangepi-5-plus.img.xz<br>ubuntu-24.04-preinstalled-server-arm64-orangepi-5-plus.img.xz<br>ubuntu-24.10-preinstalled-desktop-arm64-orangepi-5-plus.img.xz<br>ubuntu-24.10-preinstalled-server-arm64-orangepi-5-plus.img.xz<br></code></pre></td></tr></table></figure>
+
+<p>选哪个：</p>
+<ul>
+<li><strong>做服务器 &#x2F; 跑 Docker &#x2F; 纯 SSH</strong> → <code>server</code> + <code>24.04</code>（LTS，内核 6.1）</li>
+<li><strong>要桌面、看视频、当轻办公机</strong> → <code>desktop</code> + <code>24.04</code></li>
+<li>有老教程依赖 5.10 内核的驱动 → <code>22.04</code>（Rockchip Linux 5.10）</li>
+</ul>
+<p>项目特性里值得注意的几条：包管理走官方 Ubuntu 源、更新走 apt、panfork 提供 3D 加速、GNOME 跑在 Wayland 上、Chromium 可流畅播 4K。</p>
+<p><strong>默认账号</strong>：Server 版是 <code>ubuntu / ubuntu</code>（首次登录会要求改密码）；Desktop 版需要接 HDMI 走首次开机向导建账号。</p>
+<p>下载页：<a target="_blank" rel="noopener" href="https://github.com/Joshua-Riek/ubuntu-rockchip/releases">Releases</a> 或 <a target="_blank" rel="noopener" href="https://joshua-riek.github.io/ubuntu-rockchip-download/">专用下载站</a>。</p>
+<h3 id="3-Armbian（社区，偏折腾-极简）"><a href="#3-Armbian（社区，偏折腾-极简）" class="headerlink" title="3. Armbian（社区，偏折腾&#x2F;极简）"></a>3. Armbian（社区，偏折腾&#x2F;极简）</h3><p><a target="_blank" rel="noopener" href="https://armbian.com/boards/orangepi5-plus">Armbian 的 Orange Pi 5 Plus 页面</a> 提供 Debian&#x2F;Ubuntu 多种组合，有 minimal&#x2F;CLI 和桌面变体，内核分支也有多个可选。适合想要极简系统、或者习惯 <code>armbian-config</code> 那套工具链的人。首次登录用 <code>root</code> + 默认密码 <code>1234</code>，随后强制改密并创建普通用户。</p>
+<blockquote>
+<p>我自己的取舍：<strong>要稳定跑服务，Ubuntu Rockchip Server 24.04；要用 NPU&#x2F;多媒体硬件特性，官方镜像；要极简折腾，Armbian。</strong></p>
+</blockquote>
+<h3 id="校验镜像"><a href="#校验镜像" class="headerlink" title="校验镜像"></a>校验镜像</h3><p>release 里每个镜像都带 <code>.sha256</code>。下完一定要校验，几十 MB 的传输错误就能让你排查半天：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sha256sum</span> -c ubuntu-24.04-preinstalled-server-arm64-orangepi-5-plus.img.xz.sha256<br></code></pre></td></tr></table></figure>
+
+<p>输出 <code>OK</code> 才继续。</p>
+<h2 id="三、写卡"><a href="#三、写卡" class="headerlink" title="三、写卡"></a>三、写卡</h2><h3 id="方式-A：balenaEtcher-USBImager（推荐，跨平台）"><a href="#方式-A：balenaEtcher-USBImager（推荐，跨平台）" class="headerlink" title="方式 A：balenaEtcher &#x2F; USBImager（推荐，跨平台）"></a>方式 A：balenaEtcher &#x2F; USBImager（推荐，跨平台）</h3><p>Ubuntu Rockchip 官方就推荐这两个，理由很实在：<strong>它们会在写完后做校验</strong>，不像某些工具写完就完事，让你拿着一张内容损坏的卡去排查启动问题。</p>
+<p><a target="_blank" rel="noopener" href="https://www.balena.io/etcher">balenaEtcher</a> 步骤：</p>
+<ol>
+<li><code>Flash from file</code> 选择 <code>.img.xz</code>（<strong>不用解压</strong>，Etcher 直接吃压缩包）</li>
+<li><code>Select target</code> 选你的 SD 卡 —— <strong>看清容量，别选错成移动硬盘</strong></li>
+<li><code>Flash!</code>，等写入 + 校验两个阶段都跑完</li>
+<li>结束后 Windows 可能弹「需要格式化磁盘」，<strong>点取消</strong>。这是正常现象：Windows 认不出 Linux 的 ext4 分区</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://bztsrc.gitlab.io/usbimager/">USBImager</a> 更轻量（不到 300KB，无需安装），逻辑一样。</p>
+<h3 id="方式-B：命令行-dd（Linux-macOS）"><a href="#方式-B：命令行-dd（Linux-macOS）" class="headerlink" title="方式 B：命令行 dd（Linux &#x2F; macOS）"></a>方式 B：命令行 dd（Linux &#x2F; macOS）</h3><p>老手更快，但<strong>认错设备就是抹盘</strong>，务必先确认设备名。</p>
+<p>先找卡：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,MODEL<br></code></pre></td></tr></table></figure>
+
+<p>假设卡是 <code>/dev/sdX</code>（macOS 上形如 <code>/dev/rdiskN</code>）。先卸载已自动挂载的分区：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> umount /dev/sdX*<br></code></pre></td></tr></table></figure>
+
+<p><code>xz</code> 解压后直接管给 <code>dd</code>，不落地中间文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">xzcat ubuntu-24.04-preinstalled-server-arm64-orangepi-5-plus.img.xz | <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">dd</span> of=/dev/sdX bs=4M status=progress conv=fsync<br></code></pre></td></tr></table></figure>
+
+<p>写完刷缓存再拔卡，这步别省，否则可能只写了一半到卡上：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sync</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <code>of=</code> 写整块设备（<code>/dev/sdX</code>），<strong>不是分区</strong>（<code>/dev/sdX1</code>）。写成分区必然启动不了。</p>
+</blockquote>
+<h3 id="方式-C：Raspberry-Pi-Imager"><a href="#方式-C：Raspberry-Pi-Imager" class="headerlink" title="方式 C：Raspberry Pi Imager"></a>方式 C：Raspberry Pi Imager</h3><p>能用，选 <code>Use custom</code> 加载本地镜像即可。但注意：<strong>不要用它的「预配置」功能</strong>（设置 WiFi&#x2F;SSH&#x2F;用户名那些），那套是给树莓派 OS 写 <code>firstrun</code> 逻辑的，对香橙派镜像无效，甚至可能干扰首次启动。</p>
+<h2 id="四、首次启动"><a href="#四、首次启动" class="headerlink" title="四、首次启动"></a>四、首次启动</h2><h3 id="插卡与启动优先级（最关键的一节）"><a href="#插卡与启动优先级（最关键的一节）" class="headerlink" title="插卡与启动优先级（最关键的一节）"></a>插卡与启动优先级（最关键的一节）</h3><p>microSD 卡槽在板子背面。插到底，一般会有轻微卡合感。</p>
+<p>RK3588 的启动顺序大致是：<strong>SPI Flash（若烧了 bootloader）→ eMMC → NVMe → SD 卡</strong>。这意味着：</p>
+<ul>
+<li><strong>板子是全新的、没有 eMMC 模块、SPI 空白</strong> → 插卡直接就从卡启动，没有额外操作</li>
+<li><strong>之前刷过 eMMC 或往 SPI 烧过 bootloader</strong> → 它会优先走那边，<strong>你的新卡看起来「刷了没反应」</strong></li>
+</ul>
+<p>如果遇到后者，按需处理：</p>
+<ol>
+<li><p><strong>物理拔掉 eMMC 模块</strong>，最直接</p>
+</li>
+<li><p><strong>在已有系统里清掉 eMMC 引导头</strong>（认准设备名再执行，<code>mmcblk*</code> 编号在不同镜像下可能不同）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=/dev/mmcblk0 bs=1M count=16<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>清 SPI Flash</strong>：用 Rockchip 的 RKDevTool（Windows）或 <code>rkdeveloptool</code>，把板子按 <strong>MASKROM 键</strong>（板子上的小按钮，需上电前按住）连 USB-C 到电脑，进 maskrom 模式后擦除 SPI</p>
+</li>
+</ol>
+<h3 id="接线开机"><a href="#接线开机" class="headerlink" title="接线开机"></a>接线开机</h3><ol>
+<li>HDMI 接显示器（Server 版可跳过）</li>
+<li>网线插上</li>
+<li><strong>最后插电源</strong></li>
+</ol>
+<p>Ubuntu Rockchip 的 README 明确提示：<strong>首次启动可能需要长达两分钟</strong>，因为要做分区扩容、生成 SSH host key、初始化 first-run 向导。别看着黑屏就急着断电重插 —— 反复断电反而容易把文件系统搞坏。</p>
+<p>板子上的指示灯是最好的判断依据：常亮&#x2F;规律闪 &#x3D; 在跑；完全不亮 &#x3D; 检查供电和卡。</p>
+<h3 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h3><p><strong>Server 版</strong>，可以直接 SSH。先在路由器后台或用 <code>nmap</code>&#x2F;<code>arp</code> 找 IP：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">nmap -sn 192.168.1.0/24<br></code></pre></td></tr></table></figure>
+
+<p>然后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh ubuntu@192.168.1.x<br></code></pre></td></tr></table></figure>
+
+<p>用户名 <code>ubuntu</code>，密码 <code>ubuntu</code>，首次登录会强制改密码。</p>
+<p><strong>Desktop 版</strong>必须接 HDMI 走首次开机向导创建用户，之后才能 SSH。</p>
+<h2 id="五、启动后的必做配置"><a href="#五、启动后的必做配置" class="headerlink" title="五、启动后的必做配置"></a>五、启动后的必做配置</h2><h3 id="确认扩容"><a href="#确认扩容" class="headerlink" title="确认扩容"></a>确认扩容</h3><p>绝大多数镜像会自动把根分区扩到整张卡。确认一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h /<br></code></pre></td></tr></table></figure>
+
+<p>如果 <code>/</code> 还是镜像原始大小（比如 32G 卡只显示 10G），手动扩：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> growpart /dev/mmcblk1 2 &amp;&amp; <span class="hljs-built_in">sudo</span> resize2fs /dev/mmcblk1p2<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>设备名先用 <code>lsblk</code> 确认。SD 卡在 RK3588 上常见是 <code>mmcblk1</code>，但不同镜像的编号会变，别照抄。</p>
+</blockquote>
+<h3 id="基础设置"><a href="#基础设置" class="headerlink" title="基础设置"></a>基础设置</h3><p>更新系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt update &amp;&amp; <span class="hljs-built_in">sudo</span> apt full-upgrade -y<br></code></pre></td></tr></table></figure>
+
+<p>改主机名：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> hostnamectl set-hostname opi5plus<br></code></pre></td></tr></table></figure>
+
+<p>设时区：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> timedatectl set-timezone Asia/Shanghai<br></code></pre></td></tr></table></figure>
+
+<p>看 CPU 是否认全（应该是 8 核，4×A76 + 4×A55）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lscpu | <span class="hljs-built_in">head</span> -20<br></code></pre></td></tr></table></figure>
+
+<h3 id="装个散热监控"><a href="#装个散热监控" class="headerlink" title="装个散热监控"></a>装个散热监控</h3><p>RK3588 满载发热明显，被动散热片在夏天跑编译很容易到 80℃ 以上触发降频。看实时温度：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">watch -n 1 <span class="hljs-string">&#x27;cat /sys/class/thermal/thermal_zone*/temp&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>输出除以 1000 就是摄氏度。长期跑负载建议上主动散热。</p>
+<h3 id="SSH-安全加固"><a href="#SSH-安全加固" class="headerlink" title="SSH 安全加固"></a>SSH 安全加固</h3><p>做公网服务前至少改掉密码登录，换密钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh-copy-id ubuntu@192.168.1.x<br></code></pre></td></tr></table></figure>
+
+<p>然后编辑 <code>/etc/ssh/sshd_config</code>，设 <code>PasswordAuthentication no</code>，重启 <code>sshd</code>。</p>
+<h2 id="六、常见问题排查"><a href="#六、常见问题排查" class="headerlink" title="六、常见问题排查"></a>六、常见问题排查</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>可能原因</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>完全不亮灯</td>
+<td>供电不足 &#x2F; 电源线是「只充电不传数据」的劣质线</td>
+<td>换 5V&#x2F;4A 电源和好线</td>
+</tr>
+<tr>
+<td>亮灯但 HDMI 无信号</td>
+<td>Server 版无桌面属正常；或显示器不支持默认分辨率</td>
+<td>改用 SSH，或换显示器&#x2F;换 HDMI 口</td>
+</tr>
+<tr>
+<td>「刷了卡没反应」，启动的还是旧系统</td>
+<td>从 SPI&#x2F;eMMC 启动了</td>
+<td>见上文启动优先级一节</td>
+</tr>
+<tr>
+<td>启动到一半卡住、报 ext4 错误</td>
+<td>卡损坏 &#x2F; 写卡未校验 &#x2F; 供电不稳</td>
+<td>用 Etcher 重写并让校验跑完；测卡；换电源</td>
+</tr>
+<tr>
+<td>跑重负载随机重启</td>
+<td>供电不足（最常见）或过热</td>
+<td>换电源；加散热</td>
+</tr>
+<tr>
+<td>Windows 提示「需要格式化」</td>
+<td>Windows 不认 ext4</td>
+<td>点取消，卡是好的</td>
+</tr>
+<tr>
+<td>SSH 连不上</td>
+<td>没扫到 IP &#x2F; 服务未起完</td>
+<td>等满 2 分钟；确认在同网段；接 HDMI 看 <code>ip a</code></td>
+</tr>
+</tbody></table>
+<h2 id="七、进阶：从-SD-卡迁到-NVMe"><a href="#七、进阶：从-SD-卡迁到-NVMe" class="headerlink" title="七、进阶：从 SD 卡迁到 NVMe"></a>七、进阶：从 SD 卡迁到 NVMe</h2><p>SD 卡当系统盘的随机读写和寿命都一般。跑真实服务建议<strong>先用 SD 卡把系统跑通，再迁到 NVMe</strong>（Orange Pi 5 Plus 有 M.2 M-Key 插槽，走 PCIe）。</p>
+<p>大致思路是：SD 卡启动 → 装好系统 → 把根文件系统整体复制到 NVMe → 更新 bootloader 指向。官方镜像一般自带脚本，比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> orangepi-config<br></code></pre></td></tr></table></figure>
+
+<p>在 <code>System</code> → <code>Install</code> 里选择安装到 NVMe。Ubuntu Rockchip 也有对应的 <code>u-boot</code> 安装流程。这块细节较多，留待单独一篇再写。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>SD 卡刷香橙派 5 Plus，本身只有三步：<strong>下对镜像 → 用带校验的工具写卡 → 插卡上电等两分钟</strong>。真正会卡住人的是三件事：</p>
+<ol>
+<li><strong>电源</strong>：5V&#x2F;4A，不是手机充电器。大量「疑似坏卡」其实是供电问题</li>
+<li><strong>启动优先级</strong>：SPI&#x2F;eMMC 会抢在 SD 卡之前，新板子无感，刷过的板子必踩</li>
+<li><strong>写卡校验</strong>：用 Etcher&#x2F;USBImager 这种写完会校验的工具，省下的是后面几小时的盲猜</li>
+</ol>
+<hr>
+<p><strong>参考资料</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.orangepi.org/orangepiwiki/index.php/Orange_Pi_5_Plus">Orange Pi 5 Plus 官方 Wiki</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.orangepi.org/Docs/FAQ.html">Orange Pi 官方 FAQ</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Joshua-Riek/ubuntu-rockchip">Joshua-Riek&#x2F;ubuntu-rockchip</a> &#x2F; <a target="_blank" rel="noopener" href="https://joshua-riek.github.io/ubuntu-rockchip-download/">下载站</a></li>
+<li><a target="_blank" rel="noopener" href="https://armbian.com/boards/orangepi5-plus">Armbian - Orange Pi 5 Plus</a></li>
+<li><a target="_blank" rel="noopener" href="https://wiki.nixos.org/wiki/NixOS_on_ARM/Orange_Pi_5_Plus">NixOS Wiki - Orange Pi 5 Plus</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.balena.io/etcher">balenaEtcher</a> &#x2F; <a target="_blank" rel="noopener" href="https://bztsrc.gitlab.io/usbimager/">USBImager</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.scribd.com/document/701861869/OrangePi-5-Plus-RK3588-User-Manual-v1-6">Orange Pi 5 Plus RK3588 User Manual v1.6</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%B3%BB%E7%BB%9F%E6%8A%98%E8%85%BE/" class="category-chain-item">系统折腾</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/RK3588/">#RK3588</a>
+      
+        <a href="/tags/%E9%A6%99%E6%A9%99%E6%B4%BE/">#香橙派</a>
+      
+        <a href="/tags/Orange-Pi-5-Plus/">#Orange Pi 5 Plus</a>
+      
+        <a href="/tags/%E5%88%B7%E6%9C%BA/">#刷机</a>
+      
+        <a href="/tags/Linux/">#Linux</a>
+      
+        <a href="/tags/%E5%8D%95%E6%9D%BF%E6%9C%BA/">#单板机</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程</div>
+      <div>https://kingjem.github.io/2026/07/30/linux/香橙派5Plus-SD卡刷机教程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月30日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/05/linux/armbian-minimal-networking/" title="Armbian Minimal 镜像网络设置指南：systemd-networkd + Netplan">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Armbian Minimal 镜像网络设置指南：systemd-networkd + Netplan</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/29/FlowTrans%E4%B8%8Eandroid-capture-skill%E4%B8%80%E9%94%AE%E5%AE%89%E5%8D%93%E6%8A%93%E5%8C%85/" title="两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令">
+                        <span class="hidden-mobile">两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

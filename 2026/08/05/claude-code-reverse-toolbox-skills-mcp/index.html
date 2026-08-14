@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="把我在 Claude Code 里挂着的「逆向 &#x2F; 抓包」相关的 MCP 与 Skill 整理成一份清单，每一项都给出公开仓库地址 + 安装方法，方便照着装。全篇不含任何本机绝对路径，安装位置用通用写法说明。  先按需求选型   场景 用哪个    Web &#x2F; JSVMP 签名算法逆向（过盾 + Hook + VMP 重放） camoufox-versatile（MCP）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Claude Code 逆向工具箱：我在用的 Skill 与 MCP 清单（附安装方法）">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/05/claude-code-reverse-toolbox-skills-mcp/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="把我在 Claude Code 里挂着的「逆向 &#x2F; 抓包」相关的 MCP 与 Skill 整理成一份清单，每一项都给出公开仓库地址 + 安装方法，方便照着装。全篇不含任何本机绝对路径，安装位置用通用写法说明。  先按需求选型   场景 用哪个    Web &#x2F; JSVMP 签名算法逆向（过盾 + Hook + VMP 重放） camoufox-versatile（MCP）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-05T07:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.553Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Camoufox">
+<meta property="article:tag" content="Claude Code">
+<meta property="article:tag" content="JSVMP">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="Reqable">
+<meta property="article:tag" content="Skill">
+<meta property="article:tag" content="抓包">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Claude Code 逆向工具箱：我在用的 Skill 与 MCP 清单（附安装方法） - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Claude Code 逆向工具箱：我在用的 Skill 与 MCP 清单（附安装方法）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-05 15:00" pubdate>
+          2026年8月5日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Claude Code 逆向工具箱：我在用的 Skill 与 MCP 清单（附安装方法）</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>把我在 Claude Code 里挂着的「逆向 &#x2F; 抓包」相关的 MCP 与 Skill 整理成一份清单，每一项都给出<strong>公开仓库地址 + 安装方法</strong>，方便照着装。全篇不含任何本机绝对路径，安装位置用通用写法说明。</p>
+</blockquote>
+<h2 id="先按需求选型"><a href="#先按需求选型" class="headerlink" title="先按需求选型"></a>先按需求选型</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>用哪个</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Web &#x2F; JSVMP 签名算法逆向（过盾 + Hook + VMP 重放）</td>
+<td><strong>camoufox-versatile</strong>（MCP）</td>
+</tr>
+<tr>
+<td>纯浏览器断点扒代码、查 Cookie 来源</td>
+<td><strong>js-reverse</strong>（MCP）</td>
+</tr>
+<tr>
+<td>抓包 &#x2F; 断点改包（MITM，类 Charles&#x2F;Fiddler）</td>
+<td><strong>reqable</strong>（MCP）</td>
+</tr>
+<tr>
+<td>安卓 App 抓包脱壳</td>
+<td><strong>flowtrans-capture</strong>（Skill）</td>
+</tr>
+</tbody></table>
+<p>下面逐个给来源和安装命令。</p>
+<h2 id="一、MCP-服务器"><a href="#一、MCP-服务器" class="headerlink" title="一、MCP 服务器"></a>一、MCP 服务器</h2><h3 id="1-camoufox-versatile-——-JS-逆向主力"><a href="#1-camoufox-versatile-——-JS-逆向主力" class="headerlink" title="1. camoufox-versatile —— JS 逆向主力"></a>1. camoufox-versatile —— JS 逆向主力</h3><ul>
+<li>仓库：<a target="_blank" rel="noopener" href="https://github.com/usernamexiaozhang/camoufox-versatile-mcp">https://github.com/usernamexiaozhang/camoufox-versatile-mcp</a></li>
+<li>底层浏览器引擎 Camoufox：<a target="_blank" rel="noopener" href="https://github.com/daijro/camoufox">https://github.com/daijro/camoufox</a> · 文档 <a target="_blank" rel="noopener" href="https://camoufox.com/python">https://camoufox.com/python</a></li>
+<li>能力：反检测浏览器（C++ 引擎级指纹伪造）+ Cloudflare 自动过盾；JS Hook &#x2F; 属性访问追踪 &#x2F; JS 引擎 trace；<strong>JSVMP 专项</strong>（<code>trace_vmp_for_sign</code> &#x2F; <code>replay_vmp_offline</code> &#x2F; <code>verify_signer_offline</code> &#x2F; <code>disassemble_wasm</code>）；网络抓包 &#x2F; WebSocket payload &#x2F; worker JS 捕获；环境对比与状态导入导出。</li>
+</ul>
+<p><strong>安装（Python，建议放在独立虚拟环境里避免依赖冲突）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1) 安装 MCP 本体（克隆后可编辑安装，最稳）</span><br>git <span class="hljs-built_in">clone</span> https://github.com/usernamexiaozhang/camoufox-versatile-mcp.git<br><span class="hljs-built_in">cd</span> camoufox-versatile-mcp &amp;&amp; pip install -e .<br><span class="hljs-comment"># 或一行从 git 直接装：</span><br><span class="hljs-comment"># pip install git+https://github.com/usernamexiaozhang/camoufox-versatile-mcp.git</span><br><br><span class="hljs-comment"># 2) 首次必须：拉取 Camoufox 浏览器内核</span><br>pip install camoufox<br>python -m camoufox fetch<br></code></pre></td></tr></table></figure>
+
+<p><strong>注册到 Claude Code：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude mcp add camoufox-versatile -- python -m camoufox_versatile_mcp<br></code></pre></td></tr></table></figure>
+
+<p>对应 <code>.claude.json</code>（<code>command</code> 指向你所用环境的 python 即可）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;camoufox-versatile&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;stdio&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;python&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;-m&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;camoufox_versatile_mcp&quot;</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>安装位置说明：MCP 本体作为 Python 包装进当前解释器的 <code>site-packages</code>；用 conda&#x2F;venv 时把 <code>command</code> 换成该环境的 python 可执行文件即可（无需写死绝对路径，激活环境后用 <code>python</code> 就行）。</p>
+</blockquote>
+<h3 id="2-js-reverse-——-浏览器-CDP-断点调试逆向"><a href="#2-js-reverse-——-浏览器-CDP-断点调试逆向" class="headerlink" title="2. js-reverse —— 浏览器 CDP 断点调试逆向"></a>2. js-reverse —— 浏览器 CDP 断点调试逆向</h3><ul>
+<li>仓库：<a target="_blank" rel="noopener" href="https://github.com/zhizhuodemao/js-reverse-mcp">https://github.com/zhizhuodemao/js-reverse-mcp</a>（npm 包名 <code>js-reverse-mcp</code>）</li>
+<li>能力：<code>break_on_xhr</code> &#x2F; <code>set_breakpoint_on_text</code> 断点；<code>list_scripts</code> &#x2F; <code>search_in_sources</code> &#x2F; <code>get_script_source</code> 源码检索；<code>list_network_requests</code>（可按 <code>cookieName</code> 溯源 Set-Cookie）&#x2F; <code>get_request_initiator</code> &#x2F; <code>get_websocket_messages</code>。</li>
+</ul>
+<p><strong>安装 + 注册（npm，免克隆，npx 拉起）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude mcp add js-reverse -- npx -y js-reverse-mcp --isolated<br></code></pre></td></tr></table></figure>
+
+<p>对应 <code>.claude.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;js-reverse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;stdio&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;-y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;js-reverse-mcp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;--isolated&quot;</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>安装位置说明：走 <code>npx</code> 时无需手动安装，包按需缓存到 npm 全局缓存目录；想固定版本可先 <code>npm i -g js-reverse-mcp</code>。Windows 上若 <code>npx</code> 直接调不通，把命令包一层 <code>cmd /c npx -y js-reverse-mcp --isolated</code>。</p>
+</blockquote>
+<h3 id="3-reqable-——-HTTP-抓包-改包（MITM）"><a href="#3-reqable-——-HTTP-抓包-改包（MITM）" class="headerlink" title="3. reqable —— HTTP 抓包 &#x2F; 改包（MITM）"></a>3. reqable —— HTTP 抓包 &#x2F; 改包（MITM）</h3><ul>
+<li>官网：<a target="_blank" rel="noopener" href="https://reqable.com/">https://reqable.com</a> · 仓库（issues）：<a target="_blank" rel="noopener" href="https://github.com/reqable/reqable-app">https://github.com/reqable/reqable-app</a></li>
+<li>能力：<code>capture_breakpoint_*</code>（断点）、<code>capture_rewrite_*</code>（重写）、<code>capture_script_*</code>（脚本注入）、<code>capture_live_*</code>（实时抓包 &#x2F; 生成 curl）、<code>proxy_set</code>（代理设置）。</li>
+</ul>
+<p><strong>安装：</strong> Reqable 的 MCP server 随桌面端一起分发，装好客户端后即可用。</p>
+<ol>
+<li>从 <a target="_blank" rel="noopener" href="https://reqable.com/">https://reqable.com</a> 下载并安装 Reqable 桌面端；</li>
+<li>在其安装目录下找到可执行文件 <code>mcp-server</code>（Windows 为 <code>mcp-server.exe</code>）。</li>
+</ol>
+<p><strong>注册（把 <code>&lt;Reqable安装目录&gt;</code> 换成你本机 Reqable 的实际目录）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">claude mcp add reqable -- <span class="hljs-string">&quot;&lt;Reqable安装目录&gt;/mcp-server&quot;</span>   <span class="hljs-comment"># Windows 为 mcp-server.exe</span><br></code></pre></td></tr></table></figure>
+
+<p>对应 <code>.claude.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;reqable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;stdio&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;Reqable安装目录&gt;/mcp-server.exe&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;args&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>安装位置说明：<code>mcp-server</code> 不单独发布，位置就在 Reqable 安装目录内，随客户端版本更新；核心为闭源商业软件，<code>reqable.com</code> 是权威下载入口。</p>
+</blockquote>
+<h2 id="二、Skill"><a href="#二、Skill" class="headerlink" title="二、Skill"></a>二、Skill</h2><p>Claude Code 的 skill 只要放在<strong>用户级目录 <code>~/.claude/skills/&lt;名字&gt;/</code></strong> 下（每个 skill 一个目录，内含 <code>SKILL.md</code>）即可被自动发现。</p>
+<h3 id="flowtrans-capture-——-安卓一键抓包"><a href="#flowtrans-capture-——-安卓一键抓包" class="headerlink" title="flowtrans-capture —— 安卓一键抓包"></a>flowtrans-capture —— 安卓一键抓包</h3><ul>
+<li>仓库：<a target="_blank" rel="noopener" href="https://github.com/KingJem/android-capture-skill">https://github.com/KingJem/android-capture-skill</a></li>
+<li>用途：rooted 安卓设备上，FlowTrans TUN + mitmweb + Frida 一条命令抓 HTTPS &#x2F; API，支持脱壳、绕过强制更新墙。原理与实战见本站《两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令》。</li>
+</ul>
+<p><strong>安装：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/KingJem/android-capture-skill.git ~/.claude/skills/flowtrans-capture<br></code></pre></td></tr></table></figure>
+
+<h3 id="reverse-skill-——-逆向任务路由"><a href="#reverse-skill-——-逆向任务路由" class="headerlink" title="reverse-skill —— 逆向任务路由"></a>reverse-skill —— 逆向任务路由</h3><ul>
+<li>仓库：<a target="_blank" rel="noopener" href="https://github.com/zhaoxuya520/reverse-skill">https://github.com/zhaoxuya520/reverse-skill</a></li>
+<li>用途：逆向 &#x2F; 漏洞利用 &#x2F; 渗透 &#x2F; 移动 &#x2F; 固件任务的路由包（<code>reverse-skill-router</code>）：读完主控文件（<code>MASTER-ROUTING.md</code>）后自动定 PRIMARY 模块、落地 scope，按证据链（Evidence → Finding → Path）出结论。内含 api-security、apk-reverse、ghidra-reverse、js-reverse、malware-analysis 等几十个子模块，每个子目录一个 <code>SKILL.md</code>。</li>
+<li>说明：真正作为 skill 用的是仓库里的 <strong><code>skills/</code> 子目录</strong>（仓库根目录还带 <code>burp-mcp-full</code>、<code>kali</code>、<code>CTF-Sandbox-Orchestrator</code> 等配套，装 skill 时用不到）。</li>
+</ul>
+<p><strong>安装（把仓库的 <code>skills/</code> 子目录装到用户级技能目录）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 方式一：克隆后拷贝 skills/ 子目录</span><br>git <span class="hljs-built_in">clone</span> https://github.com/zhaoxuya520/reverse-skill.git /tmp/reverse-skill-src<br><span class="hljs-built_in">cp</span> -r /tmp/reverse-skill-src/skills ~/.claude/skills/reverse-skill<br><br><span class="hljs-comment"># 方式二：只稀疏检出 skills/，方便日后 git pull 更新</span><br>git <span class="hljs-built_in">clone</span> --filter=blob:none --sparse https://github.com/zhaoxuya520/reverse-skill.git ~/.claude/skills/reverse-skill-repo<br><span class="hljs-built_in">cd</span> ~/.claude/skills/reverse-skill-repo &amp;&amp; git sparse-checkout <span class="hljs-built_in">set</span> skills<br><span class="hljs-built_in">ln</span> -s <span class="hljs-string">&quot;<span class="hljs-variable">$PWD</span>/skills&quot;</span> ~/.claude/skills/reverse-skill<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>提示：直接 <code>cp</code> 进来的副本没有 <code>.git</code>，不会自动跟上游更新；想能 <code>git pull</code> 就用方式二（稀疏检出 + 软链）。</p>
+</blockquote>
+<h2 id="附：内置浏览器不算独立项目"><a href="#附：内置浏览器不算独立项目" class="headerlink" title="附：内置浏览器不算独立项目"></a>附：内置浏览器不算独立项目</h2><p><code>claude-in-chrome</code>、应用内 Browser 是 Claude 官方内置能力，不是可单独安装的 GitHub 项目，故不列入清单。</p>
+<hr>
+<p>清单先到这。要装哪个，照上面对应的一条命令即可。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Claude-Code/">#Claude Code</a>
+      
+        <a href="/tags/MCP/">#MCP</a>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
+      
+        <a href="/tags/Camoufox/">#Camoufox</a>
+      
+        <a href="/tags/JSVMP/">#JSVMP</a>
+      
+        <a href="/tags/Skill/">#Skill</a>
+      
+        <a href="/tags/Reqable/">#Reqable</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Claude Code 逆向工具箱：我在用的 Skill 与 MCP 清单（附安装方法）</div>
+      <div>https://kingjem.github.io/2026/08/05/claude-code-reverse-toolbox-skills-mcp/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月5日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/07/mise-%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E5%A4%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86Node-Python/" title="mise 使用教程 — 在 Linux/macOS 上管理 Node/Python 多版本">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">mise 使用教程 — 在 Linux/macOS 上管理 Node/Python 多版本</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/05/linux/armbian-minimal-networking/" title="Armbian Minimal 镜像网络设置指南：systemd-networkd + Netplan">
+                        <span class="hidden-mobile">Armbian Minimal 镜像网络设置指南：systemd-networkd + Netplan</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

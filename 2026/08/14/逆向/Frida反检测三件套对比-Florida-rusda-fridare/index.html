@@ -1,0 +1,896 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="本文为对比整理，基于三个项目的官方仓库与 README 编写  Florida：https:&#x2F;&#x2F;github.com&#x2F;Ylarod&#x2F;Florida rusda：https:&#x2F;&#x2F;github.com&#x2F;taisuii&#x2F;rusda fridare：https:&#x2F;&#x2F;github.com&#x2F;suifei&#x2F;fridare  三者主题一致——都是让 Frida 绕过反检测，但实现路线和定位差别很大。本文对比它们">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Frida 反检测三件套对比：Florida vs rusda vs fridare">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/Frida%E5%8F%8D%E6%A3%80%E6%B5%8B%E4%B8%89%E4%BB%B6%E5%A5%97%E5%AF%B9%E6%AF%94-Florida-rusda-fridare/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="本文为对比整理，基于三个项目的官方仓库与 README 编写  Florida：https:&#x2F;&#x2F;github.com&#x2F;Ylarod&#x2F;Florida rusda：https:&#x2F;&#x2F;github.com&#x2F;taisuii&#x2F;rusda fridare：https:&#x2F;&#x2F;github.com&#x2F;suifei&#x2F;fridare  三者主题一致——都是让 Frida 绕过反检测，但实现路线和定位差别很大。本文对比它们">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-14T09:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-14T09:10:04.558Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="frida-server">
+<meta property="article:tag" content="免检测">
+<meta property="article:tag" content="反检测">
+<meta property="article:tag" content="安卓逆向">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Frida 反检测三件套对比：Florida vs rusda vs fridare - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Frida 反检测三件套对比：Florida vs rusda vs fridare"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-14 17:30" pubdate>
+          2026年8月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Frida 反检测三件套对比：Florida vs rusda vs fridare</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年8月14日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p><strong>本文为对比整理，基于三个项目的官方仓库与 README 编写</strong></p>
+<ul>
+<li><strong>Florida</strong>：<a target="_blank" rel="noopener" href="https://github.com/Ylarod/Florida">https://github.com/Ylarod/Florida</a></li>
+<li><strong>rusda</strong>：<a target="_blank" rel="noopener" href="https://github.com/taisuii/rusda">https://github.com/taisuii/rusda</a></li>
+<li><strong>fridare</strong>：<a target="_blank" rel="noopener" href="https://github.com/suifei/fridare">https://github.com/suifei/fridare</a></li>
+</ul>
+<p>三者主题一致——都是让 Frida 绕过反检测，但<strong>实现路线和定位差别很大</strong>。本文对比它们的技术路线、适用场景，并给出选型建议。数据截至 2026-08。</p>
+</blockquote>
+<h2 id="为什么需要「反检测-frida」"><a href="#为什么需要「反检测-frida」" class="headerlink" title="为什么需要「反检测 frida」"></a>为什么需要「反检测 frida」</h2><p>Frida 好用，但也<strong>极容易被抓</strong>：它在进程里留了一大堆固定指纹，目标 App 一查一个准。常见检测点：</p>
+<ul>
+<li><strong>进程名 &#x2F; 文件名</strong>：<code>frida-server</code>、<code>frida-agent</code>、<code>frida-gadget</code></li>
+<li><strong>线程名</strong>（<code>/proc/&lt;pid&gt;/task/*/comm</code>）：<code>gum-js-loop</code>、<code>gmain</code>、<code>gdbus</code></li>
+<li><strong>内存特征字符串</strong>（<code>.rodata</code>）：<code>FridaScriptEngine</code>、<code>GumScript</code>、<code>GDBusProxy</code>、<code>GLib-GIO</code></li>
+<li><strong>RPC 标识</strong>：<code>frida:rpc</code></li>
+<li><strong>memfd &#x2F; maps</strong>：<code>memfd:frida-agent</code></li>
+<li><strong>入口符号</strong>：<code>frida_agent_main</code></li>
+<li><strong>默认端口</strong>：<code>27042</code> &#x2F; <code>27052</code>（运行时行为，不是字符串）</li>
+</ul>
+<p>所谓「反检测 frida」，就是把这些指纹尽量抹掉或改掉，同时不破坏 Frida 的功能和协议兼容。下面这三个项目，是目前中文圈子里最常被提到的方案。</p>
+<h2 id="一分钟速览"><a href="#一分钟速览" class="headerlink" title="一分钟速览"></a>一分钟速览</h2><table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">一句话定位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Florida</strong></td>
+<td align="left">跟随 Frida 上游、<strong>自动打补丁编译</strong>出反检测 frida-server，只做 Android，极简省心</td>
+</tr>
+<tr>
+<td align="left"><strong>rusda</strong></td>
+<td align="left"><strong>源码 + 构建 + 二进制三层深度魔改</strong>的 Frida，原理讲得最透，直接给编好的 Release</td>
+</tr>
+<tr>
+<td align="left"><strong>fridare</strong></td>
+<td align="left"><strong>重打包 &#x2F; 魔改工具链</strong>（不是 Frida 本身），带 GUI，静态补丁 + Docker 重编双路线，跨平台</td>
+</tr>
+</tbody></table>
+<h2 id="基础数据对比"><a href="#基础数据对比" class="headerlink" title="基础数据对比"></a>基础数据对比</h2><table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">Florida</th>
+<th align="left">rusda</th>
+<th align="left">fridare</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Star</td>
+<td align="left"><strong>★2160</strong>（最高）</td>
+<td align="left">★604</td>
+<td align="left">★877</td>
+</tr>
+<tr>
+<td align="left">语言</td>
+<td align="left">自动化脚本 &#x2F; CI</td>
+<td align="left">Python（补丁、工具）</td>
+<td align="left"><strong>Go</strong>（工具本体）</td>
+</tr>
+<tr>
+<td align="left">License</td>
+<td align="left"><strong>GPL-3.0</strong></td>
+<td align="left"><strong>无 ⚠️</strong></td>
+<td align="left"><strong>MIT</strong></td>
+</tr>
+<tr>
+<td align="left">建库</td>
+<td align="left">2023-07（最早）</td>
+<td align="left">2024-12</td>
+<td align="left">2024-06</td>
+</tr>
+<tr>
+<td align="left">平台</td>
+<td align="left"><strong>仅 Android</strong></td>
+<td align="left">仅 Android</td>
+<td align="left"><strong>iOS &#x2F; Android &#x2F; Win &#x2F; Linux</strong></td>
+</tr>
+<tr>
+<td align="left">你拿到的是</td>
+<td align="left">编好的 server</td>
+<td align="left">编好的 server&#x2F;inject&#x2F;gadget</td>
+<td align="left"><strong>工具</strong>（拿去改自己的 Frida）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>⚠️ <strong>rusda 无 License</strong>：默认保留所有权利，商用 &#x2F; 分发前请与作者确认授权。</p>
+</blockquote>
+<h2 id="最关键的区别：它们「是什么」"><a href="#最关键的区别：它们「是什么」" class="headerlink" title="最关键的区别：它们「是什么」"></a>最关键的区别：它们「是什么」</h2><p>三者不在同一层，这点先分清：</p>
+<ul>
+<li><strong>Florida 和 rusda 给你「成品」</strong>——它们是<strong>魔改后的 frida-server</strong>，直接下 Release 用，把 <code>frida-server</code> 换成它们的即可。</li>
+<li><strong>fridare 给你「工具」</strong>——它本身不是 Frida，而是一个<strong>去改 Frida 的自动化工具</strong>（Go 写的 CLI + GUI）。你把官方 Frida 喂给它，它帮你改名、改端口、改协议标识，甚至起 Docker 重新编译。</li>
+</ul>
+<h2 id="技术路线深挖"><a href="#技术路线深挖" class="headerlink" title="技术路线深挖"></a>技术路线深挖</h2><h3 id="Florida-——-最简、最「上游同步」"><a href="#Florida-——-最简、最「上游同步」" class="headerlink" title="Florida —— 最简、最「上游同步」"></a>Florida —— 最简、最「上游同步」</h3><p>核心价值是<strong>紧跟 Frida 上游版本自动 patch + CI 编译</strong>：Frida 一出新版，它很快就有对应的反检测版本。</p>
+<ul>
+<li>补丁思路承袭 hluwa <code>strong-frida</code>、<code>AntiFrida</code> 那批前辈（README 里逐一致谢）。</li>
+<li><strong>优点</strong>：省心、更新快、Star 最高、社区最认。</li>
+<li><strong>取舍</strong>：原理它自己不展开讲，想深入得去翻它引用的参考项目；README 明确写了 “Don’t fork this repository”（靠 CI 出包，fork 没意义）。</li>
+</ul>
+<h3 id="rusda-——-原理最透、魔改分三层"><a href="#rusda-——-原理最透、魔改分三层" class="headerlink" title="rusda —— 原理最透、魔改分三层"></a>rusda —— 原理最透、魔改分三层</h3><p>三个里 README 写得最详细的，把反检测拆成<strong>三层</strong>，每层解决源码够不够得着的问题：</p>
+<p><strong>① 源码层（编译前打补丁）</strong></p>
+<p>直接改 frida-core &#x2F; frida-gum 的 Vala &#x2F; C 源码：</p>
+<ul>
+<li>产物名 <code>frida-*</code> → <code>rusda-*</code>、资源目录 <code>lib/frida/</code> → <code>lib/rusda/</code></li>
+<li><code>frida:rpc</code> 改成<strong>运行时拼接</strong>（不在二进制里留明文）</li>
+<li>各种 <code>frida-*</code> 线程名改成<strong>运行时 XOR 解码</strong></li>
+<li><code>frida_agent_main</code> → <code>main</code>、进程名 <code>g_set_prgname(&quot;frida&quot;)</code> → <code>&quot;russell&quot;</code></li>
+<li>memfd 名 → <code>jit-cache</code>（避免 maps 里露出 <code>memfd:frida-agent</code>）</li>
+</ul>
+<p><strong>② 构建层</strong></p>
+<p>改 meson 输出名、磁盘路径、符号前缀，保证改名后整条链一致、能正常链接；串行编四个架构（并行会把 SDK 搞坏）。</p>
+<p><strong>③ 二进制层（链接后 topatch）</strong></p>
+<p>有些字符串源码层够不着——要么在静态链进来的 GLib&#x2F;GObject 里（<code>GLib-GIO</code>、<code>GDBusProxy</code>、<code>gmain</code>），要么是 Vala 自动生成的 GObject 类型名（<code>FridaScriptEngine</code>、<code>GumScript</code>）。这些只能等链接完直接对二进制动手，用 <a target="_blank" rel="noopener" href="https://github.com/lief-project/LIEF">LIEF</a> 处理：</p>
+<ul>
+<li><code>.rodata</code> 里的类型名<strong>等长反转</strong>：<code>FridaScriptEngine</code> → <code>enignEtpircSadirF</code>、<code>GumScript</code> → <code>tpircSmuG</code></li>
+<li>线程名等长替换：<code>gum-js-loop</code> → <code>russellloop</code>、<code>gmain</code> → <code>rmain</code></li>
+</ul>
+<blockquote>
+<p><strong>为什么是「等长反转」而不是删掉</strong>：ELF 里这些字符串的偏移、重定位都是定死的，只要长度不变就不动布局，二进制照常能跑；反转既等长，又让 <code>strings</code> 和内存扫描匹配不到原串。这是 rusda README 里讲得很漂亮的一点。</p>
+</blockquote>
+<p>rusda 还带<strong>自检脚本</strong> <code>verify-patch.py</code>（检查 7 个关键特征串是否清零）和<strong>真机测试报告</strong>（Pixel 6 Pro 过 Sentry 检测器），并诚实标注了边界：默认端口需自己换、深层 <code>Frida*</code> 类型名仍有残留、重度加固不一定够。<strong>适合想学原理或想二次开发的人。</strong></p>
+<h3 id="fridare-——-工具化、跨平台、带-GUI"><a href="#fridare-——-工具化、跨平台、带-GUI" class="headerlink" title="fridare —— 工具化、跨平台、带 GUI"></a>fridare —— 工具化、跨平台、带 GUI</h3><p>它是三者里唯一的「工具」而非「成品」，特点是覆盖面广：</p>
+<ul>
+<li><strong>双技术路线</strong>：A 静态 hex 补丁（秒级，改名改端口）&#x2F; B Docker 源码重编译（小时级，深度隐藏）。</li>
+<li><strong>唯一支持 iOS</strong>（DEB 重打包）<strong>和 Windows</strong>（MinGW server）。</li>
+<li>有 Fyne 写的<strong>跨平台 GUI</strong>，还内置了 AI Agent 辅助。</li>
+<li>深度魔改要点：魔改名固定 5 位小写字母；server 与 host client wheel 必须<strong>成对</strong>（同一 magic）；对象路径含 <code>/re/{magic}/</code>，避免只改 <code>re.frida.</code> 导致协议不匹配。</li>
+<li>README 里<strong>反复强调「不是免杀」</strong>——作者很克制，明确它只降低命中率。</li>
+</ul>
+<p><strong>适合要覆盖多平台、喜欢 GUI、要改 iOS 的场景。</strong></p>
+<h2 id="选型建议"><a href="#选型建议" class="headerlink" title="选型建议"></a>选型建议</h2><table>
+<thead>
+<tr>
+<th align="left">你的需求</th>
+<th align="left">推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">只搞 Android、想省心跟新版</td>
+<td align="left"><strong>Florida</strong>（Star 最高、更新最快、社区最认）</td>
+</tr>
+<tr>
+<td align="left">想理解反检测原理 &#x2F; 想深度定制</td>
+<td align="left"><strong>rusda</strong>（三层原理最清楚，有自检和真机验证）</td>
+</tr>
+<tr>
+<td align="left">要 iOS 或 Windows、要 GUI、要工具化流程</td>
+<td align="left"><strong>fridare</strong>（跨平台最全，MIT 最宽松）</td>
+</tr>
+</tbody></table>
+<p><strong>三者还能配合</strong>：用 Florida &#x2F; rusda 拿现成反检测 server，用 fridare 做跨平台 &#x2F; iOS 的重打包和端口改造。</p>
+<h2 id="共同的坑（三者都逃不掉）"><a href="#共同的坑（三者都逃不掉）" class="headerlink" title="共同的坑（三者都逃不掉）"></a>共同的坑（三者都逃不掉）</h2><ol>
+<li><p><strong>默认端口 27042 &#x2F; 27052</strong> 是运行时行为、不是字符串，魔改改不掉，得启动时用 <code>-l</code> 指定非默认端口：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 起服务时指定一个非默认端口（只监听本地）</span><br>adb shell su -c <span class="hljs-string">&#x27;/data/local/tmp/rusda-server -l 127.0.0.1:8765&#x27;</span><br><span class="hljs-comment"># 客户端走 USB，不依赖监听端口</span><br>frida -U -f 包名<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>都不是「免杀」</strong>——对付一般检测够用，重度加固 App 的深度内存扫描 &#x2F; CRC 校验不一定过（fridare 直接把「不是免杀」写进每个版本说明）。</p>
+</li>
+<li><p><strong>SELinux Enforcing</strong> 下 agent 通信可能被挡，需 <code>setenforce 0</code>——这是官方 Frida 的通病，非魔改本身的问题。</p>
+</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>Florida：<a target="_blank" rel="noopener" href="https://github.com/Ylarod/Florida">https://github.com/Ylarod/Florida</a></li>
+<li>rusda：<a target="_blank" rel="noopener" href="https://github.com/taisuii/rusda">https://github.com/taisuii/rusda</a></li>
+<li>fridare：<a target="_blank" rel="noopener" href="https://github.com/suifei/fridare">https://github.com/suifei/fridare</a></li>
+<li>相关阅读：<a href="/2025/11/12/%E9%80%86%E5%90%91/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91Frida%E8%84%9A%E6%9C%AC%E4%B8%80%E9%94%AE%E6%8C%81%E4%B9%85%E5%8C%96-%E6%89%93%E5%8C%85Xposed%E6%A8%A1%E5%9D%97-%E6%B3%A8%E5%85%A5so-dll/">Frida 脚本一键持久化（转载）</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>本文仅作技术学习与安全研究记录。请在合法合规、获得授权的前提下使用相关技术。</p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
+      
+        <a href="/tags/frida-server/">#frida-server</a>
+      
+        <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">#安卓逆向</a>
+      
+        <a href="/tags/%E5%85%8D%E6%A3%80%E6%B5%8B/">#免检测</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Frida 反检测三件套对比：Florida vs rusda vs fridare</div>
+      <div>https://kingjem.github.io/2026/08/14/逆向/Frida反检测三件套对比-Florida-rusda-fridare/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%80%89%E5%9E%8B%E5%AF%B9%E6%AF%94-Zoraxy-Traefik-NPM-Caddy-nginx-OpenResty/" title="反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">反向代理选型对比：Zoraxy vs Traefik / NPM / Caddy / nginx / OpenResty</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/14/%E9%80%86%E5%90%91/never-jscore-Python%E9%AB%98%E6%80%A7%E8%83%BDJS%E5%BC%95%E6%93%8E%E9%80%86%E5%90%91%E5%88%A9%E5%99%A8/" title="never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）">
+                        <span class="hidden-mobile">never-jscore：为逆向而生的 Python 高性能 JS 引擎（Hook 拦截 + 零配置补环境）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
