@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第八题「寻龙分金看缠山【grpc】」。请求走 gRPC(protobuf over HTTP&#x2F;2)。这题不难但”形态新”：读懂 gRPC 的服务&#x2F;方法&#x2F;消息 schema 后，不需要 .proto、不需要 codegen——手写 protobuf 编解码 + grpc 通用 stub 收发裸字节即可离线取数。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%85%AB%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-grpc%E6%89%8B%E6%90%93protobuf/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第八题「寻龙分金看缠山【grpc】」。请求走 gRPC(protobuf over HTTP&#x2F;2)。这题不难但”形态新”：读懂 gRPC 的服务&#x2F;方法&#x2F;消息 schema 后，不需要 .proto、不需要 codegen——手写 protobuf 编解码 + grpc 通用 stub 收发裸字节即可离线取数。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-01T09:01:34.000Z">
+<meta property="article:modified_time" content="2026-09-01T09:02:54.039Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="HTTP2">
+<meta property="article:tag" content="dex2jar">
+<meta property="article:tag" content="gRPC">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-01 17:01" pubdate>
+          2026年9月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年9月1日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第八题「寻龙分金看缠山【grpc】」。请求走 <strong>gRPC(protobuf over HTTP/2)<strong>。<br>这题不难但”形态新”：读懂 gRPC 的服务/方法/消息 schema 后，不需要 <code>.proto</code>、不需要 codegen——</strong>手写 protobuf 编解码 + grpc 通用 stub 收发裸字节</strong>即可离线取数。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型：一个 gRPC UNARY 调用</li>
+<li>拆 schema：服务 / 方法 / 消息字段</li>
+<li>明文还是 TLS？</li>
+<li>手搓 protobuf + gRPC 通用 stub</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型：一个-gRPC-UNARY-调用"><a href="#一、请求模型：一个-gRPC-UNARY-调用" class="headerlink" title="一、请求模型：一个 gRPC UNARY 调用"></a>一、请求模型：一个 gRPC UNARY 调用</h2><p><code>ChallengeEightFragment</code> 翻页不是 Retrofit，而是一个 gRPC stub 调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">stub.SayHello(<br>    Req.newBuilder()<br>       .setPage(page)                       <span class="hljs-comment">// .OooO00o(page)</span><br>       .setSign(sign(page, currentTimeMillis))  <span class="hljs-comment">// .OooO0OO(...)</span><br>       .setTimestamp(currentTimeMillis)      <span class="hljs-comment">// .OooO0Oo(ts)</span><br>       .build(),<br>    callback);<br></code></pre></td></tr></table></figure>
+
+<p>签名很简单（纯 Java）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">MessageDigest</span> <span class="hljs-variable">md</span> <span class="hljs-operator">=</span> MessageDigest.getInstance(<span class="hljs-string">&quot;MD5&quot;</span>);   <span class="hljs-comment">// 算法名是加密字符串,解出来是 &quot;MD5&quot;</span><br>md.update(String.valueOf(page).getBytes());<br>md.update(String.valueOf(ms).getBytes());<br>sign = Base64.encodeToString(md.digest(), <span class="hljs-number">0</span>);          <span class="hljs-comment">// flag 0 = DEFAULT -&gt; 末尾带 &quot;\n&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>即 **<code>sign = Base64(MD5(str(page) + str(ms))) + &quot;\n&quot;</code>**。</p>
+<h2 id="二、拆-schema：服务-方法-消息字段"><a href="#二、拆-schema：服务-方法-消息字段" class="headerlink" title="二、拆 schema：服务 / 方法 / 消息字段"></a>二、拆 schema：服务 / 方法 / 消息字段</h2><p>gRPC 的 <code>MethodDescriptor</code> 在反编译里写得明明白白：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">MethodDescriptor.newBuilder()<br>   .setType(UNARY)<br>   .setFullMethodName(generateFullMethodName(<span class="hljs-string">&quot;challenge.Challenge&quot;</span>, <span class="hljs-string">&quot;SayHello&quot;</span>))<br>   ...<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>方法</strong>：<code>/challenge.Challenge/SayHello</code>（UNARY），即 HTTP/2 的 <code>:path</code>。</li>
+<li><strong>服务器</strong>：<code>ManagedChannelBuilder.forAddress(host, 50052)</code>，<code>host</code> 是加密字符串，解出来是 **<code>47.95.8.136</code>**（和第四题 UDP 同一台）。</li>
+</ul>
+<p>消息字段号从 protobuf 生成类的 <code>writeTo</code> 直接读：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 请求 Req.writeTo</span><br>codedOutputStream.writeUInt32(<span class="hljs-number">1</span>, page);   <span class="hljs-comment">// field 1 = page</span><br>codedOutputStream.writeUInt64(<span class="hljs-number">2</span>, ts);     <span class="hljs-comment">// field 2 = timestamp</span><br>codedOutputStream.writeString(<span class="hljs-number">3</span>, sign);   <span class="hljs-comment">// field 3 = sign</span><br><br><span class="hljs-comment">// 响应 Resp.writeTo:  repeated Item items = 1;</span><br><span class="hljs-comment">// 每个 Item.writeTo:  string value = 1;</span><br></code></pre></td></tr></table></figure>
+
+<p>于是请求/响应的 protobuf 结构完全清楚了。</p>
+<h2 id="三、明文还是-TLS？"><a href="#三、明文还是-TLS？" class="headerlink" title="三、明文还是 TLS？"></a>三、明文还是 TLS？</h2><p>channel 的构造是 <code>forAddress(host, 50052).usePlaintext().build()</code>——<strong>明文 h2c，没有 TLS</strong>（”so+tls” 是隔壁第六题的事）。这省掉了证书/pinning 的麻烦，直接连就行。</p>
+<h2 id="四、手搓-protobuf-gRPC-通用-stub"><a href="#四、手搓-protobuf-gRPC-通用-stub" class="headerlink" title="四、手搓 protobuf + gRPC 通用 stub"></a>四、手搓 protobuf + gRPC 通用 stub</h2><p>关键点：<strong>不需要 <code>.proto</code> 文件、不需要 protoc 生成代码</strong>。Python 的 <code>grpcio</code> 支持”通用调用”——自己序列化/反序列化裸 <code>bytes</code>，grpc 负责 HTTP/2 帧、gRPC 分帧（<code>[flag][4字节长度][protobuf]</code>）、trailers。</p>
+<p>protobuf 只有几种线格式，手写编解码足够：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> grpc, hashlib, base64, time<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">varint</span>(<span class="hljs-params">n</span>):<br>    o=<span class="hljs-string">b&quot;&quot;</span><br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:<br>        b=n&amp;<span class="hljs-number">0x7f</span>; n&gt;&gt;=<span class="hljs-number">7</span>; o+=<span class="hljs-built_in">bytes</span>([b|(<span class="hljs-number">0x80</span> <span class="hljs-keyword">if</span> n <span class="hljs-keyword">else</span> <span class="hljs-number">0</span>)])<br>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> n: <span class="hljs-keyword">break</span><br>    <span class="hljs-keyword">return</span> o<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">build_request</span>(<span class="hljs-params">page, ms</span>):<br>    sign=(base64.b64encode(hashlib.md5(<span class="hljs-built_in">str</span>(page).encode()+<span class="hljs-built_in">str</span>(ms).encode()).digest()).decode()+<span class="hljs-string">&quot;\n&quot;</span>).encode()<br>    <span class="hljs-keyword">return</span> (<span class="hljs-string">b&quot;\x08&quot;</span>+varint(page)                 <span class="hljs-comment"># f1 page  (tag 0x08 = field1,varint)</span><br>            + <span class="hljs-string">b&quot;\x10&quot;</span>+varint(ms)                 <span class="hljs-comment"># f2 timestamp (tag 0x10)</span><br>            + <span class="hljs-string">b&quot;\x1a&quot;</span>+varint(<span class="hljs-built_in">len</span>(sign))+sign)    <span class="hljs-comment"># f3 sign  (tag 0x1a = field3,len-delim)</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">parse_response</span>(<span class="hljs-params">data</span>):                        <span class="hljs-comment"># f1 repeated Item; Item f1 = string</span><br>    vals=[]; i=<span class="hljs-number">0</span><br>    <span class="hljs-keyword">while</span> i&lt;<span class="hljs-built_in">len</span>(data):<br>        <span class="hljs-keyword">if</span> data[i]!=<span class="hljs-number">0x0a</span>: <span class="hljs-keyword">break</span><br>        i+=<span class="hljs-number">1</span>; ln,i=readvarint(data,i); msg=data[i:i+ln]; i+=ln; j=<span class="hljs-number">0</span><br>        <span class="hljs-keyword">while</span> j&lt;<span class="hljs-built_in">len</span>(msg):<br>            <span class="hljs-keyword">if</span> msg[j]!=<span class="hljs-number">0x0a</span>: <span class="hljs-keyword">break</span><br>            j+=<span class="hljs-number">1</span>; l2,j=readvarint(msg,j); vals.append(<span class="hljs-built_in">int</span>(msg[j:j+l2])); j+=l2<br>    <span class="hljs-keyword">return</span> vals<br><br>ch=grpc.insecure_channel(<span class="hljs-string">&quot;47.95.8.136:50052&quot;</span>)    <span class="hljs-comment"># 明文 h2c</span><br>call=ch.unary_unary(<span class="hljs-string">&quot;/challenge.Challenge/SayHello&quot;</span>,<br>                    request_serializer=<span class="hljs-keyword">lambda</span> b:b, response_deserializer=<span class="hljs-keyword">lambda</span> b:b)<br><br>ms=<span class="hljs-built_in">int</span>(time.time()*<span class="hljs-number">1000</span>)<br><span class="hljs-built_in">print</span>(parse_response(call(build_request(<span class="hljs-number">1</span>, ms), timeout=<span class="hljs-number">15</span>)))   <span class="hljs-comment"># -&gt; 该页 20 个数</span><br></code></pre></td></tr></table></figure>
+
+<p>跑起来，<code>page 1</code> 返回的 20 个数与真机屏幕上显示的一模一样。逐页取即可离线复现（每页 20 个数）。服务器不校验时间戳新鲜度、也不封页码，<code>sign</code> 只要与 <code>page/ts</code> 自洽即可。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第八题的”难”只在<strong>形态</strong>——把标准 HTTP 换成了 gRPC。破法是”读 schema 而非抓包”：<code>MethodDescriptor</code> 给出服务/方法名，protobuf 生成类的 <code>writeTo</code> 给出字段号，加密字符串解出服务器地址。拿到这些，用 <code>grpcio</code> 的通用 stub + 手写 protobuf 就能离线收发，连 <code>.proto</code> 都不用。相比第六题（native+TLS+反调试）那种硬骨头，gRPC 这层”协议壳”其实是最薄的一层。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/dex2jar/">#dex2jar</a>
+      
+        <a href="/tags/gRPC/">#gRPC</a>
+      
+        <a href="/tags/protobuf/">#protobuf</a>
+      
+        <a href="/tags/HTTP2/">#HTTP2</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第八题离机复现-grpc手搓protobuf/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Looper%E5%8F%8D%E6%A8%A1%E6%8B%9F/" title="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶">
+                        <span class="hidden-mobile">猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
