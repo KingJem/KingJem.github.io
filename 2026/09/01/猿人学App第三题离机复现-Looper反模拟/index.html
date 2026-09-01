@@ -16,28 +16,29 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
+    <meta name="description" content="[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，服务器却拒绝一切请求。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 Looper.myLooper() 反模拟，再到在 Unicorn 里绕过它、做成真离线客户端。 ⚠️ 猿">
 <meta property="og:type" content="article">
-<meta property="og:title" content="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原">
-<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/index.html">
+<meta property="og:title" content="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&quot;字节全对却被拒&quot;的追凶">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Looper%E5%8F%8D%E6%A8%A1%E6%8B%9F/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
+<meta property="og:description" content="[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，服务器却拒绝一切请求。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 Looper.myLooper() 反模拟，再到在 Unicorn 里绕过它、做成真离线客户端。 ⚠️ 猿">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-09-01T05:22:35.000Z">
-<meta property="article:modified_time" content="2026-09-01T05:29:10.429Z">
+<meta property="article:published_time" content="2026-09-01T07:27:01.000Z">
+<meta property="article:modified_time" content="2026-09-01T07:28:26.910Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
 <meta property="article:tag" content="JNI">
-<meta property="article:tag" content="NETLINK">
-<meta property="article:tag" content="OLLVM">
+<meta property="article:tag" content="MD4">
+<meta property="article:tag" content="RegisterNatives">
 <meta property="article:tag" content="Unicorn">
-<meta property="article:tag" content="goron">
+<meta property="article:tag" content="anti-debug">
 <meta property="article:tag" content="猿人学">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原 - Ruhai&#39;s blogs</title>
+  <title>猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -194,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原"></span>
+            <span id="subtitle" data-typed-text="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶"></span>
           
         </div>
 
@@ -205,7 +206,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-09-01 13:22" pubdate>
+        <time datetime="2026-09-01 15:27" pubdate>
           2026年9月1日 下午
         </time>
       </span>
@@ -217,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.5k 字
+          3.6k 字
         
       </span>
     
@@ -228,7 +229,7 @@
         
         
         
-          30 分钟
+          31 分钟
         
       </span>
     
@@ -274,7 +275,7 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</h1>
+            <h1 style="display: none">猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</h1>
             
               <p class="note note-info">
                 
@@ -287,101 +288,68 @@
             <div class="markdown-body">
               
               <blockquote>
-<p>猿人学 App 第十三题「东风夜放花千树【封设备】」的<strong>离机复现</strong>记录：目标是<strong>不驱动 App</strong>，只靠逆向把 <code>device_id</code> 的生成算法搞清楚。<br>反爬点是”封设备”——请求要带 native 生成的 <code>device_id</code>，服务器按其中某段当”设备身份”限流。本文记录<strong>从 Unicorn 忠实模拟 <code>getDeviceId</code>，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python</strong> 的全过程。</p>
+<p>[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。<br>这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，<strong>服务器却拒绝一切请求</strong>。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 <strong><code>Looper.myLooper()</code> 反模拟</strong>，再到在 Unicorn 里绕过它、做成真离线客户端。</p>
 <p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
 </blockquote>
 <p><strong>本文目录</strong></p>
 <ul>
-<li>请求模型（静态反编译）</li>
-<li>用 Unicorn 模拟 getDeviceId</li>
-<li>单变量对照：锁定「设备身份」</li>
-<li>「封设备」的真相</li>
-<li>反成纯 Python（免 so / Unicorn）</li>
+<li>请求模型 + so 动态注册（真身与诱饵）</li>
+<li>Unicorn 模拟 sign：与真机对拍一致</li>
+<li>追凶(一)：字节全对，服务器却拒</li>
+<li>追凶(二)：设备时钟快了 78 秒</li>
+<li>追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟</li>
+<li>绕过 Looper，做成真离线</li>
 </ul>
 <span id="more"></span>
 
 <hr>
-<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeThirteenFragment</code> 的翻页逻辑很直白，<code>device_id</code> 来自 native：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">service.OooO0O0(getDeviceId(), page);   <span class="hljs-comment">// @POST(&quot;/api/app13&quot;) @Field(&quot;device_id&quot;) @Field(&quot;page&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">getDeviceId</span><span class="hljs-params">()</span>;      <span class="hljs-comment">// libthirteen.so，JNI_OnLoad 动态注册</span><br></code></pre></td></tr></table></figure>
+<h2 id="一、请求模型-so-动态注册"><a href="#一、请求模型-so-动态注册" class="headerlink" title="一、请求模型 + so 动态注册"></a>一、请求模型 + so 动态注册</h2><p><code>ChallengeThreeFragment</code> 翻页：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">byte</span>[] raw = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChallengeThreeNativeLib</span>().sign(page);   <span class="hljs-comment">// native</span><br><span class="hljs-type">String</span> <span class="hljs-variable">sign</span> <span class="hljs-operator">=</span> toHex(raw);                                 <span class="hljs-comment">// 大写 hex &quot;0123456789ABCDEF&quot;</span><br>service.OooO(page, sign);                                 <span class="hljs-comment">// @POST(&quot;/api/app3&quot;) @Field(&quot;page&quot;) @Field(&quot;sign&quot;)</span><br></code></pre></td></tr></table></figure>
 
-<ul>
-<li>端点：<code>POST /api/app13</code>，表单 <code>device_id</code> + <code>page</code>（登录后拦截器附加 <code>token</code>）。刷新 page=1、加载更多 page++。</li>
-</ul>
-<p>所以整题的核心，就是把 native <code>getDeviceId()</code> 弄清楚。</p>
-<h2 id="二、用-Unicorn-模拟-getDeviceId"><a href="#二、用-Unicorn-模拟-getDeviceId" class="headerlink" title="二、用 Unicorn 模拟 getDeviceId"></a>二、用 Unicorn 模拟 getDeviceId</h2><p><code>libthirteen.so</code> 被 goron/OLLVM 混淆、方法名运行时解密，jadx/CFR 都啃不动 <code>sign</code> 一类函数。于是用 <strong>Unicorn 忠实模拟</strong>，要点：</p>
+<p><code>ChallengeThreeNativeLib</code>：<code>static { System.loadLibrary(&quot;three&quot;); } public native byte[] sign(int);</code>。</p>
+<p>侦察 libthree.so：不加壳、不 goron；<code>sign</code> 有一个<strong>静态导出</strong> <code>Java_..._sign</code>。但题名叫「<strong>so动态注册</strong>」——真身其实是 <code>JNI_OnLoad</code> 里 <code>RegisterNatives</code> 注册的那个。用 Unicorn 模拟 <code>JNI_OnLoad</code>、在 <code>RegisterNatives</code> 处截获方法表，果然：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lisp">sign -&gt; <span class="hljs-number">0</span>x2104c  (签名 (<span class="hljs-name">I</span>)[B)<br></code></pre></td></tr></table></figure>
+
+<p><strong>静态导出是诱饵</strong>，动态注册的 <code>0x2104c</code> 才是真身（RegisterNatives 会覆盖同名静态导出）。</p>
+<h2 id="二、Unicorn-模拟-sign：与真机对拍一致"><a href="#二、Unicorn-模拟-sign：与真机对拍一致" class="headerlink" title="二、Unicorn 模拟 sign：与真机对拍一致"></a>二、Unicorn 模拟 sign：与真机对拍一致</h2><p>用 Unicorn 从 <code>0x2104c</code> 跑起来，打桩 JNIEnv/libc，捕获它 <code>NewByteArray + SetByteArrayRegion</code> 写出的 20 字节。函数里能看到 MD4 的 IV/常量，输入是 <code>sprintf(&quot;%d&quot;, page)</code> 与 <code>time()</code> 秒。</p>
+<p>对拍：Frida 在真机上直接调 <code>0x2104c</code> 取 20 字节，喂模拟器<strong>相同的秒</strong>——<strong>逐字节一致</strong>。看起来收工了。</p>
+<h2 id="三、追凶-一-：字节全对，服务器却拒"><a href="#三、追凶-一-：字节全对，服务器却拒" class="headerlink" title="三、追凶(一)：字节全对，服务器却拒"></a>三、追凶(一)：字节全对，服务器却拒</h2><p>把模拟器现算的 sign（转大写 hex）打 <code>/api/app3</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Access forbidden；please check request&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>逐字节正确、当前秒现算现提交、±300s 全扫、紧循环 25 次……<strong>全拒</strong>。而 app1/app2 从同一主机同一 IP 都正常，排除 IP 被封。诡异。</p>
+<h2 id="四、追凶-二-：设备时钟快了-78-秒"><a href="#四、追凶-二-：设备时钟快了-78-秒" class="headerlink" title="四、追凶(二)：设备时钟快了 78 秒"></a>四、追凶(二)：设备时钟快了 78 秒</h2><p>先确认 app 自己能不能加载第三题——截图一看：<strong>界面一直转圈、加载不出</strong>。再一比时钟：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">device</span>: <span class="hljs-number">1788242989</span>   host/server: <span class="hljs-number">1788242911</span>   -&gt; 设备快了 <span class="hljs-number">78</span> 秒<br></code></pre></td></tr></table></figure>
+
+<p>sign 内嵌的是 native <code>time()</code>（设备时钟）。设备快 78s → sign 带的是”未来时间” → 服务器判定不新鲜 → <strong>连 app 自己都过不了</strong>。root 下把设备时钟校准：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell su -c <span class="hljs-string">&quot;date @<span class="hljs-subst">$(host_epoch)</span>&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>再进第三题——<strong>app 出数据了</strong>（”请计算1-100页所有数字之和” + 一列数字）。机制确认：sign(page, 正确的秒) 有效。</p>
+<h2 id="五、追凶-三-：app-的-sign-和我的不一样-——-Looper-反模拟"><a href="#五、追凶-三-：app-的-sign-和我的不一样-——-Looper-反模拟" class="headerlink" title="五、追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟"></a>五、追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟</h2><p>可我主机的模拟器 sign 还是被拒。于是做了最关键的一步对比：<strong>hook app 主线程真实调用的 sign</strong>，和我模拟器/Frida（都在非主线程）产出的 sign 放一起——</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs llvm">app  (主线程) : <span class="hljs-number">12</span><span class="hljs-keyword">c</span><span class="hljs-number">6</span>bd<span class="hljs-number">63</span>f<span class="hljs-number">761505</span>b<span class="hljs-number">9569848</span><span class="hljs-keyword">c</span>...<br>emu  (模拟器) : <span class="hljs-number">21080</span><span class="hljs-keyword">c</span><span class="hljs-number">9</span>f<span class="hljs-number">52666229956984</span>... （任何秒都对不上）<br></code></pre></td></tr></table></figure>
+
+<p><strong>不一样！</strong> 反汇编 <code>sign</code> 核心，真相浮出水面：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs llvm">bl   <span class="hljs-variable">#0</span><span class="hljs-keyword">x</span><span class="hljs-number">20424</span>          <span class="hljs-comment">; x0 = env-&gt;CallStaticObjectMethodV(Looper, myLooper)</span><br>cbnz <span class="hljs-keyword">x</span><span class="hljs-number">8</span><span class="hljs-punctuation">,</span> valid_path    <span class="hljs-comment">; myLooper() != null -&gt; 走【有效】MD4 路径</span><br><span class="hljs-comment">; 否则(null,即模拟器/Frida 这种没有 Looper 的线程):</span><br>bl   <span class="hljs-variable">#0</span><span class="hljs-keyword">x</span><span class="hljs-number">1</span>f<span class="hljs-number">770</span>          <span class="hljs-comment">; 对中间值多做一次变换 -&gt; sign 被【污染】失效</span><br></code></pre></td></tr></table></figure>
+
+<p>字符串常量坐实：<code>android/os/Looper</code> + <code>myLooper</code> + <code>()Landroid/os/Looper;</code>。</p>
+<p><strong>这是专门的反模拟/反 Frida</strong>：<code>sign</code> 回调 <code>Looper.myLooper()</code>，只有在<strong>有 Looper 的线程</strong>（app 主线程）才生成有效 sign；在模拟器、或 Frida 主动调用所在的工作线程（都没有 Looper）上，sign 被故意搞坏。难怪逐字节”对拍一致”的是两个<strong>同样无效</strong>的版本。</p>
+<h2 id="六、绕过-Looper，做成真离线"><a href="#六、绕过-Looper，做成真离线" class="headerlink" title="六、绕过 Looper，做成真离线"></a>六、绕过 Looper，做成真离线</h2><p>对症下药：让模拟器的 JNIEnv 在这次回调上返回<strong>非空</strong>即可走有效分支。先打日志看 <code>sign()</code> 实际调了哪些 JNIEnv 索引：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">[<span class="hljs-attribute">6</span>=FindClass, <span class="hljs-attribute">113</span>=GetStaticMethodID, <span class="hljs-attribute">115</span>=CallStaticObjectMethodV, <span class="hljs-attribute">176</span>=NewByteArray, <span class="hljs-attribute">208</span>=SetByteArrayRegion]<br></code></pre></td></tr></table></figure>
+
+<p>于是把 <strong>索引 115（<code>CallStaticObjectMethodV</code>）桩成非空</strong>（伪造一个 Looper 指针）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> idx == <span class="hljs-number">115</span>: ret(<span class="hljs-number">0x6000</span>); <span class="hljs-keyword">return</span>   <span class="hljs-comment"># 假 Looper，绕过 myLooper()==null 的污染分支</span><br></code></pre></td></tr></table></figure>
+
+<p>再对拍——<strong>emu-match-offset = 0</strong>，模拟器产出的 sign 与 app 主线程<strong>完全一致</strong>！</p>
+<p>最后补上”时钟”这一环：服务器严格按自己的时钟校验 sign 内嵌的秒，而开发机时钟可能有偏差（我这台走代理，偏了 ~1.4s）。客户端做<strong>自校准</strong>——围绕本机当前秒试 <code>now, now-1, now-2 …</code>，命中一次就记住这个偏移：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> yuanrenxue_level3_emu <span class="hljs-keyword">import</span> gen_sign   <span class="hljs-comment"># Unicorn 模拟 sign(page, sec),已绕过 Looper</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page, s, cal=[<span class="hljs-literal">None</span>]</span>):<br>    offs = [cal[<span class="hljs-number">0</span>]] <span class="hljs-keyword">if</span> cal[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">else</span> [<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>,-<span class="hljs-number">2</span>,-<span class="hljs-number">3</span>,<span class="hljs-number">1</span>]<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">15</span>):<br>        <span class="hljs-keyword">for</span> off <span class="hljs-keyword">in</span> offs:<br>            sec = <span class="hljs-built_in">int</span>(time.time()) + off<br>            j = s.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app3&quot;</span>,<br>                       data=&#123;<span class="hljs-string">&quot;page&quot;</span>:page, <span class="hljs-string">&quot;sign&quot;</span>:gen_sign(page,sec).upper()&#125;,<br>                       headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">8</span>).json()<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">str</span>(j.get(<span class="hljs-string">&quot;status&quot;</span>)) == <span class="hljs-string">&quot;1&quot;</span>:<br>                cal[<span class="hljs-number">0</span>]=off<br>                <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br>        time.sleep(<span class="hljs-number">0.25</span>)<br></code></pre></td></tr></table></figure>
+
+<p>跑通——<strong>纯离线</strong>（Unicorn 模拟 + 自校准时钟，不碰手机）逐页取数。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第三题把”反离线”写进了 native 本身：</p>
 <ol>
-<li><strong>定位函数</strong>：模拟 <code>JNI_OnLoad</code>，在 <code>RegisterNatives</code> 处截获方法表 → 拿到 <code>getDeviceId @ 0x47944</code>（签名 <code>()Ljava/lang/String;</code>）。</li>
-<li><strong>JNI / libc 打桩</strong>：<code>JNIEnv</code> 用函数表逐槽分派（<code>NewStringUTF</code> 截获返回串）；实现 <code>clock_gettime</code>、AArch64 变参 <code>__vsnprintf_chk / __vsprintf_chk / vasprintf</code>、<code>strftime</code>、<code>random_device</code> 等。</li>
-<li><strong>goron 重定位坑</strong>：<code>R_AARCH64_ABS64</code> 导入符号要写 <code>stub + addend</code>（goron 会在调用点把 addend 抵消回 stub），漏加 addend 会跳飞。</li>
-<li><strong>NETLINK 应答</strong>（关键洞察）：getDeviceId 会 <code>socket(AF_NETLINK) + sendto + recvfrom</code> 向<strong>内核</strong>发 <code>RTM_GETLINK / RTM_GETADDR</code> <strong>读本机网卡 MAC / IP</strong>——它不是在连服务器！脚本伪造 netlink dump 应答让它跑完，就能拿到 <code>device_id</code>。</li>
+<li><strong>so动态注册</strong>：真身藏在 RegisterNatives，静态导出是诱饵；</li>
+<li><strong>Looper 反模拟</strong>：<code>myLooper()==null</code>（模拟器/Frida 工作线程）时故意产出无效 sign——这也解释了为什么”模拟器和 Frida 对拍一致”具有迷惑性，因为它俩都是无效版本；</li>
+<li><strong>时钟强校验</strong>：sign 内嵌 <code>time()</code> 秒，设备时钟一偏，连 app 自己都过不了。</li>
 </ol>
-<p>跑通后，观察格式串可知：device_id 是若干字节用 <code>%lX</code> 逐字节拼成的 80 位大写十六进制（40 字节），里头混了毫秒时间戳、MAC、random_device。</p>
-<h2 id="三、单变量对照：锁定「设备身份」"><a href="#三、单变量对照：锁定「设备身份」" class="headerlink" title="三、单变量对照：锁定「设备身份」"></a>三、单变量对照：锁定「设备身份」</h2><p>有了模拟器就能<strong>固定一个输入、只动另一个</strong>，逐字符 diff，把结构拆清楚：</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">4EA873FFEC6DBE37DF93 · EC7090 · [ 随 <span class="hljs-keyword">MAC</span> 变的 38 位 ] · B97F43A62E0D85C<br>   固定前缀(<span class="hljs-keyword">app</span>盐)      时间戳区        <span class="hljs-keyword">MAC</span> 派生区              固定尾(<span class="hljs-keyword">app</span>盐)<br></code></pre></td></tr></table></figure>
-
-<table>
-<thead>
-<tr>
-<th>变量</th>
-<th>是否影响 device_id</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>毫秒时间戳</td>
-<td>✅ 改变时间戳区（6 位十六进制）</td>
-</tr>
-<tr>
-<td><strong>本机 MAC</strong></td>
-<td>✅ <strong>改变中段 38 位</strong></td>
-</tr>
-<tr>
-<td>random_device</td>
-<td>❌ 调用了但<strong>不进 id</strong>（反模拟诱饵）</td>
-</tr>
-</tbody></table>
-<p>而且各段<strong>互相独立、无扩散</strong>：改 MAC 只动中段、改时间戳只动时间戳区，常量段纹丝不动。</p>
-<blockquote>
-<p>⚠️ 踩坑：一开始误判 MAC / random 都不影响 id——根因是**模拟器的 netlink 应答把 MAC 写死成 <code>02:00:00:00:00:00</code>**（环境变量没接进去），所以”改 MAC”其实没改到。把 MAC 真正接进 netlink 应答后，中段立刻随之变化，才看清 MAC 就是那段”设备身份”。</p>
-</blockquote>
-<h2 id="四、「封设备」的真相"><a href="#四、「封设备」的真相" class="headerlink" title="四、「封设备」的真相"></a>四、「封设备」的真相</h2><p>把 MAC 接对后再打服务器，行为就清楚了：</p>
-<table>
-<thead>
-<tr>
-<th>场景</th>
-<th>结果</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>同一 device_id（同 MAC）连续翻页</td>
-<td>约 2 次后 <code>设备号已被封锁</code></td>
-</tr>
-<tr>
-<td><strong>换新 MAC</strong> 的 device_id</td>
-<td>正常返回，可直接跳任意页</td>
-</tr>
-<tr>
-<td>随机 UUID / 乱改 device_id</td>
-<td><code>Access forbidden;please check request</code></td>
-</tr>
-</tbody></table>
-<p>即：服务器把 device_id 里的 <strong>MAC 段</strong>当”设备身份”，每设备限量后封；同时<strong>逐字节 checksum 校验</strong>整串，乱造无效。<strong>破解 = 每翻一页现造一个随机 MAC 的 device_id</strong>，服务器就当成一台新设备。</p>
-<h2 id="五、反成纯-Python（免-so-Unicorn）"><a href="#五、反成纯-Python（免-so-Unicorn）" class="headerlink" title="五、反成纯 Python（免 so / Unicorn）"></a>五、反成纯 Python（免 so / Unicorn）</h2><p>既然各段独立，就能把 MAC → 那段的映射彻底反出来。密集采样后发现：</p>
-<ol>
-<li><p><strong>6 个 MAC 字节各占一组 4 字符</strong>，<code>group_i = BASE_i XOR delta(mac[i])</code>；</p>
-</li>
-<li><p><strong>6 组共享同一个 delta 函数</strong>（只是各组常量基 BASE_i 不同）：</p>
-<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dns">delta(m) = (T[m&gt;&gt;<span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0</span>xf]<br>T = [<span class="hljs-number">0,1,2,3</span>,<span class="hljs-number">4,5,6,7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71,0x72</span>,<span class="hljs-number">0x73,0x74</span>,<span class="hljs-number">0x75,0x76</span>]   # <span class="hljs-number">16</span> 项<br></code></pre></td></tr></table></figure>
-
-<p>已验证 <code>m=0x7f → 0x776</code>、<code>0xff → 0x7676</code> 全部吻合，与模拟器逐字节对拍一致；</p>
-</li>
-<li><p>时间戳区只有 16bit（装不下完整毫秒），实测<strong>服务器不校验时间戳新鲜度</strong> → 固定一张旧模板即可，只替换 MAC 6 组。</p>
-</li>
-</ol>
-<p>于是 <code>gen_device_id()</code> = 取固定模板 + 按随机 MAC 做 6 组 XOR 替换，一行现造，运行期不再需要 so 和 Unicorn：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os, requests<br><br><span class="hljs-comment"># all-zero-MAC、固定时间戳的模板；仅 MAC 6 组会被替换</span><br>TEMPLATE = <span class="hljs-string">&quot;4EA873FFEC6DBE37DF93EC7090F47601AF844301FBB1943F3C75246E886225001B97F43A62E0D85C&quot;</span><br>T   = [<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71</span>,<span class="hljs-number">0x72</span>,<span class="hljs-number">0x73</span>,<span class="hljs-number">0x74</span>,<span class="hljs-number">0x75</span>,<span class="hljs-number">0x76</span>]   <span class="hljs-comment"># 16 项共享表</span><br>POS = [<span class="hljs-number">28</span>, <span class="hljs-number">34</span>, <span class="hljs-number">40</span>, <span class="hljs-number">46</span>, <span class="hljs-number">52</span>, <span class="hljs-number">58</span>]                                <span class="hljs-comment"># 6 个 MAC 组起始位置</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_delta</span>(<span class="hljs-params">m</span>): <span class="hljs-keyword">return</span> (T[m &gt;&gt; <span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0xf</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">gen_device_id</span>(<span class="hljs-params">mac=<span class="hljs-literal">None</span></span>):<br>    <span class="hljs-keyword">if</span> mac <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: mac = os.urandom(<span class="hljs-number">6</span>)     <span class="hljs-comment"># 随机 MAC = 一台新设备</span><br>    s = <span class="hljs-built_in">list</span>(TEMPLATE)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">6</span>):<br>        v = <span class="hljs-built_in">int</span>(TEMPLATE[POS[i]:POS[i]+<span class="hljs-number">4</span>], <span class="hljs-number">16</span>) ^ _delta(mac[i])<br>        h = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;v:04X&#125;</span>&quot;</span><br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>): s[POS[i]+k] = h[k]<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>.join(s)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page</span>):                            <span class="hljs-comment"># 每页换新 MAC，绕过封设备</span><br>    j = requests.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app13&quot;</span>,<br>                      data=&#123;<span class="hljs-string">&quot;device_id&quot;</span>: gen_device_id(), <span class="hljs-string">&quot;page&quot;</span>: <span class="hljs-built_in">str</span>(page)&#125;,<br>                      headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">15</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>))   <span class="hljs-comment"># 现造 device_id → 直连公网取回该页数据</span><br></code></pre></td></tr></table></figure>
-
-<p>到这一步，整条链路已经<strong>离机、零依赖</strong>：不碰手机、不加载 so、不跑 Unicorn，一行现造合法 <code>device_id</code> 就能任意翻页。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的”封设备”，本质是把一个并不复杂的算法（模板 + MAC 异或查表）藏进 goron 混淆的 native 里。拿到手的方法论：<strong>先用 Unicorn 把真实代码离机跑起来拿样本 → 单变量对照锁定结构 → 反成纯 Python</strong>。其中最关键的两个洞察是：<code>socket(AF_NETLINK)</code> 是读本机网卡而非连服务器；以及 device_id 里真正的”设备身份”是 MAC 段，轮换它即可当新设备。</p>
+<p>破法对应三步：Unicorn 跑 <code>JNI_OnLoad</code> 揪真身 → 把 <code>CallStaticObjectMethodV</code> 桩成非空绕过 Looper → 自校准时钟。这场”字节全对却被拒”的追凶，最大的教训是:<strong>对拍一致 ≠ 正确</strong>，当两边都跑在”被反制的环境”里时，它们会一致地错。</p>
 
               
             </div>
@@ -423,19 +391,21 @@
       
         <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
       
+        <a href="/tags/Frida/">#Frida</a>
+      
         <a href="/tags/Android/">#Android</a>
       
         <a href="/tags/JNI/">#JNI</a>
+      
+        <a href="/tags/MD4/">#MD4</a>
       
         <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
       
         <a href="/tags/Unicorn/">#Unicorn</a>
       
-        <a href="/tags/OLLVM/">#OLLVM</a>
+        <a href="/tags/RegisterNatives/">#RegisterNatives</a>
       
-        <a href="/tags/NETLINK/">#NETLINK</a>
-      
-        <a href="/tags/goron/">#goron</a>
+        <a href="/tags/anti-debug/">#anti-debug</a>
       
     </div>
   
@@ -447,8 +417,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</div>
-      <div>https://kingjem.github.io/2026/09/01/猿人学App第十三题封设备离机复现-deviceid纯Python还原/</div>
+      <div>猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第三题离机复现-Looper反模拟/</div>
     </div>
     <div class="license-meta">
       
@@ -490,18 +460,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/" title="猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" title="猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原">
-                        <span class="hidden-mobile">猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原</span>
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%94%B9%E7%89%88RC4%E8%BF%98%E5%8E%9F/" title="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原">
+                        <span class="hidden-mobile">猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
