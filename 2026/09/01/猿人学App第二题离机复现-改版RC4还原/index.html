@@ -16,30 +16,27 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="猿人学 App 第四题（UDP &#x2F; native，难度”困难”）的纯离机复现记录：不驱动 App，逆向 libfour.so 的请求逻辑。libfour.so 被 goron&#x2F;OLLVM 混淆，请求包由双 PRNG 造出。本文记录先看穿响应结构（头部即”位置表”）省掉逆 PRNG，再用 Unicorn 忠实模拟 echo_cli 造包、本机直连公网取值的全过程。 ⚠️ 猿人学闯关 App 是面向">
+    <meta name="description" content="[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 data 由 native 加密。这题的 so 不加壳、不混淆，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 encrypt、认出它是带 header 的改版 RC4，并用 Frida 主动调用当预言机对拍，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。 ⚠️ 猿人学闯关 A">
 <meta property="og:type" content="article">
-<meta property="og:title" content="猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包">
-<meta property="og:url" content="https://kingjem.github.io/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E9%80%A0UDP%E5%8C%85/index.html">
+<meta property="og:title" content="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%94%B9%E7%89%88RC4%E8%BF%98%E5%8E%9F/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="猿人学 App 第四题（UDP &#x2F; native，难度”困难”）的纯离机复现记录：不驱动 App，逆向 libfour.so 的请求逻辑。libfour.so 被 goron&#x2F;OLLVM 混淆，请求包由双 PRNG 造出。本文记录先看穿响应结构（头部即”位置表”）省掉逆 PRNG，再用 Unicorn 忠实模拟 echo_cli 造包、本机直连公网取值的全过程。 ⚠️ 猿人学闯关 App 是面向">
+<meta property="og:description" content="[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 data 由 native 加密。这题的 so 不加壳、不混淆，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 encrypt、认出它是带 header 的改版 RC4，并用 Frida 主动调用当预言机对拍，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。 ⚠️ 猿人学闯关 A">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-08-26T06:50:00.000Z">
-<meta property="article:modified_time" content="2026-09-01T05:36:34.782Z">
+<meta property="article:published_time" content="2026-09-01T05:56:34.000Z">
+<meta property="article:modified_time" content="2026-09-01T05:57:51.321Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Android">
-<meta property="article:tag" content="OLLVM">
+<meta property="article:tag" content="Frida">
 <meta property="article:tag" content="RC4">
-<meta property="article:tag" content="UDP">
-<meta property="article:tag" content="Unicorn">
 <meta property="article:tag" content="capstone">
-<meta property="article:tag" content="goron">
-<meta property="article:tag" content="lief">
+<meta property="article:tag" content="so">
 <meta property="article:tag" content="猿人学">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包 - Ruhai&#39;s blogs</title>
+  <title>猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -196,7 +193,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包"></span>
+            <span id="subtitle" data-typed-text="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原"></span>
           
         </div>
 
@@ -207,8 +204,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-08-26 14:50" pubdate>
-          2026年8月26日 下午
+        <time datetime="2026-09-01 13:56" pubdate>
+          2026年9月1日 下午
         </time>
       </span>
     
@@ -219,7 +216,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.8k 字
+          3.7k 字
         
       </span>
     
@@ -230,7 +227,7 @@
         
         
         
-          24 分钟
+          31 分钟
         
       </span>
     
@@ -276,7 +273,7 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包</h1>
+            <h1 style="display: none">猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</h1>
             
               <p class="note note-info">
                 
@@ -289,55 +286,57 @@
             <div class="markdown-body">
               
               <blockquote>
-<p>猿人学 App 第四题（UDP / native，难度”困难”）的<strong>纯离机复现</strong>记录：<strong>不驱动 App</strong>，逆向 <code>libfour.so</code> 的请求逻辑。<br><code>libfour.so</code> 被 <strong>goron/OLLVM</strong> 混淆，请求包由双 PRNG 造出。本文记录<strong>先看穿响应结构（头部即”位置表”）省掉逆 PRNG，再用 Unicorn 忠实模拟 <code>echo_cli</code> 造包、本机直连公网取值</strong>的全过程。</p>
+<p>[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 <code>data</code> 由 native 加密。<br>这题的 so <strong>不加壳、不混淆</strong>，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 <code>encrypt</code>、认出它是<strong>带 header 的改版 RC4</strong>，并用 <strong>Frida 主动调用当预言机对拍</strong>，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。</p>
 <p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
 </blockquote>
 <p><strong>本文目录</strong></p>
 <ul>
-<li>手上的静态素材</li>
-<li>协议与响应（最关键的发现）</li>
-<li>goron 造包：用 Unicorn 忠实模拟</li>
-<li>取值流程</li>
-<li>为什么第四题没做成纯 Python</li>
+<li>请求模型（静态反编译）</li>
+<li>libtwo.so 侦察：不加壳不混淆</li>
+<li>读 encrypt：header + 改版 RC4</li>
+<li>Frida 预言机对拍，定位两个坑</li>
+<li>纯 Python 还原</li>
 </ul>
 <span id="more"></span>
 
 <hr>
-<h2 id="一、手上的静态素材"><a href="#一、手上的静态素材" class="headerlink" title="一、手上的静态素材"></a>一、手上的静态素材</h2><p>从设备 <code>pull</code> 出 <code>base.apk</code> 后就再没碰过手机：</p>
-<ul>
-<li><code>base.apk</code> → <code>lib/arm64-v8a/libfour.so</code></li>
-<li>工具：<code>unicorn</code> + <code>lief</code> + <code>capstone</code>（模拟 / 反汇编 native），都是 pip 可装的纯 Python 库</li>
-</ul>
-<h2 id="二、协议与响应（最关键的发现）"><a href="#二、协议与响应（最关键的发现）" class="headerlink" title="二、协议与响应（最关键的发现）"></a>二、协议与响应（最关键的发现）</h2><p><code>ChallengeFourActivity.onCreate</code> 是 native，逻辑全在 <code>libfour.so</code>（arm64，<strong>goron/OLLVM</strong>：控制流扁平化 + 运行期填充的间接跳转表）。硬编码服务器 <strong><code>47.95.8.136:12000</code>（UDP）</strong>，关键符号：<code>echo_cli</code>（造包+发送）、<code>get_timestamp</code>、<code>xorshift64</code>、<code>RC4::*</code>、<code>minstd_rand</code>（LCG 48271）+ <code>uniform_int_distribution&lt;uint8&gt;</code>。</p>
-<p>先看响应（1024 字节）。最关键的发现是它的<strong>头部就是”位置表”<strong>——key 和 value 都散布在响应里，取值</strong>根本不用逆请求侧的 PRNG</strong>：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">resp</span>):<br>    key = <span class="hljs-built_in">bytes</span>(resp[resp[<span class="hljs-number">1</span>+i]]  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">16</span>))   <span class="hljs-comment"># resp[1..16] = 16 个 key 字节的位置</span><br>    vb  = <span class="hljs-built_in">bytes</span>(resp[resp[<span class="hljs-number">17</span>+i]] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>))     <span class="hljs-comment"># resp[17..20] = 4 个 value 字节的位置</span><br>    <span class="hljs-keyword">return</span> struct.unpack(<span class="hljs-string">&quot;&lt;I&quot;</span>, rc4(key, vb))[<span class="hljs-number">0</span>]          <span class="hljs-comment"># 数值 = uint32_LE(RC4(key, vbytes))</span><br></code></pre></td></tr></table></figure>
+<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeTwoFragment</code> 里翻页：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> String.format(<span class="hljs-string">&quot;%d:%d&quot;</span>, page, System.currentTimeMillis());   <span class="hljs-comment">// &quot;1:1788000000000&quot;</span><br><span class="hljs-type">byte</span>[] enc = NativeLib.encrypt(content.getBytes(UTF_8), currentTimeMillis);<br><span class="hljs-type">String</span> <span class="hljs-variable">data</span> <span class="hljs-operator">=</span> Base64.encodeToString(enc, <span class="hljs-number">10</span>);                                 <span class="hljs-comment">// flag 10 = URL_SAFE|NO_WRAP</span><br>service.OooOOo(data);                                                          <span class="hljs-comment">// @POST(&quot;/api/app2&quot;) @Field(&quot;data&quot;)</span><br></code></pre></td></tr></table></figure>
 
-<p>而且<strong>本机公网能直连 12000 端口</strong>，连一个全零包都能收到 1024 字节响应。所以只剩一个问题：<strong>如何构造一个携带指定时间戳的请求包</strong>。</p>
-<h2 id="三、goron-造包：用-Unicorn-忠实模拟"><a href="#三、goron-造包：用-Unicorn-忠实模拟" class="headerlink" title="三、goron 造包：用 Unicorn 忠实模拟"></a>三、goron 造包：用 Unicorn 忠实模拟</h2><p><code>echo_cli</code> 用 <code>get_timestamp()</code> 的毫秒时间戳派生 PRNG、组 255 字节包、<code>sendto</code> 发送。这段被 goron 的间接跳转（<code>realaddr = *(table+off) + delta</code> 大常量算术）包裹，纯静态啃代价高。于是**用 Unicorn 模拟 <code>echo_cli</code>**：</p>
+<p><code>NativeLib</code>（<code>com.yuanrenxue.challenge.two</code>）：<code>static { System.loadLibrary(&quot;two&quot;); }</code>，<code>public static native byte[] encrypt(byte[], long)</code>。核心就是 libtwo.so 的 <code>encrypt</code>。</p>
+<h2 id="二、libtwo-so-侦察：不加壳不混淆"><a href="#二、libtwo-so-侦察：不加壳不混淆" class="headerlink" title="二、libtwo.so 侦察：不加壳不混淆"></a>二、libtwo.so 侦察：不加壳不混淆</h2><p>拿 <code>lief</code>/<code>capstone</code> 一看就轻松了：libtwo.so 只有 <strong>10KB</strong>，没有 <code>UPX!</code>、<code>.text</code> 是正常指令（不是第十一题那种 <code>udf</code>），<code>encrypt</code> 是<strong>静态导出</strong> <code>Java_com_yuanrenxue_challenge_two_NativeLib_encrypt</code>，函数序言干净（<code>sub sp,sp,#0x50; stp x29,x30...</code>）。也没有第四题那种 goron 间接跳转。<strong>直接反汇编读</strong>即可。</p>
+<h2 id="三、读-encrypt：header-改版-RC4"><a href="#三、读-encrypt：header-改版-RC4" class="headerlink" title="三、读 encrypt：header + 改版 RC4"></a>三、读 encrypt：header + 改版 RC4</h2><p>外壳（<code>Java_..._encrypt</code>）逻辑很直白：</p>
 <ol>
-<li>按 program header 映射各 LOAD 段；</li>
-<li><strong>应用重定位</strong>（踩坑点）：<ul>
-<li><code>R_AARCH64_RELATIVE</code>：<code>*addr = addend</code>（填 goron 跳转表，addend 常是 <code>0xffffffff…</code> 负值靠 64 位回绕落回模块内）；</li>
-<li><code>R_AARCH64_ABS64</code>（导入符号）：**<code>*addr = stub + addend</code>** —— goron 会在调用点 <code>+(magic - state)</code> 把 addend 抵消回 <code>stub</code>。<strong>漏加 addend 会直接跳飞</strong>，这是最大的坑；</li>
+<li><code>GetByteArrayElements</code> 取明文指针、<code>GetArrayLength</code> 取长度 <code>len</code>；</li>
+<li>输出长度 = <code>len + 32</code>，<code>malloc</code>；</li>
+<li>调核心加密（<code>x0=明文, x1=输出, x2=len+32, x3=ts</code>）；</li>
+<li><code>NewByteArray(len+32)</code> + <code>SetByteArrayRegion</code> 返回。</li>
+</ol>
+<p>核心（<code>sub_c70</code>）读下来是一个<strong>带 32 字节 header 的改版 RC4</strong>：</p>
+<ul>
+<li>**header（输出前 32 字节）= key1(16) ++ key2(16)**：<ul>
+<li><code>key1</code>：由 ts 经一个 LCG 派生——<code>x = x*1103515245 + 12345</code>，取 <code>(x&gt;&gt;16)&amp;0x7fff</code>，正是 <strong>glibc <code>rand()</code></strong> 的内核；连续取 8 个、每个拆成 2 字节，凑 16 字节。</li>
+<li><code>key2</code>：<code>std::random_device</code> 生成的 16 随机字节。</li>
 </ul>
 </li>
-<li><strong>打桩</strong>：导入函数（malloc/memcpy/inet_addr/socket/clock_gettime/…）用 Python 实现或返回 0；<code>get_timestamp</code> hook 返回<strong>目标时间戳</strong>；<code>sendto</code> hook <strong>截获 255B 请求包</strong>并停机；</li>
-<li><strong>JNIEnv</strong>：<code>env* → 函数表 → 统一 stub</code>，所有 JNI 调用返回 0（造包不依赖 JNI 返回值）；</li>
-<li>置 <code>x0=0, x1=env, x2=obj</code>，从 <code>echo_cli</code> 跑到 <code>sendto</code>，拿到确定性请求包（同一时间戳稳定复现，不同时间戳不同）。</li>
+<li><strong>KSA</strong>：<code>S=0..255</code>，先用 key1 跑 <strong>768 次</strong>（= 3 遍），再用 key2 跑 768 次；</li>
+<li><strong>PRGA</strong>：对明文逐字节异或 keystream。</li>
+<li>两把 key 都写进 header 发给服务器 —— 服务器据此重建同一个 S 盒、还原 keystream 解密（类似”把密钥material 摊在包头”的思路）。</li>
+</ul>
+<p>KSA / PRGA 的 <code>j</code> 更新，都比标准 RC4 <strong>多一层 S 盒查表</strong>：</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs inform7">KSA :  j = S<span class="hljs-comment">[(j + S<span class="hljs-comment">[i%256]</span> + key<span class="hljs-comment">[i%16]</span>) &amp; 0xff]</span> ;  swap(S<span class="hljs-comment">[i%256]</span>, S<span class="hljs-comment">[j]</span>)<br>PRGA:  j = S<span class="hljs-comment">[(j + S<span class="hljs-comment">[a]</span>) &amp; 0xff]</span><br>       keystream = S<span class="hljs-comment">[ S<span class="hljs-comment">[ (S<span class="hljs-comment">[j]</span> + 1) &amp; 0xff ]</span> ]</span>  ;   swap(S<span class="hljs-comment">[a]</span>, S<span class="hljs-comment">[j]</span>) ;  a=(a+1)&amp;0xff<br></code></pre></td></tr></table></figure>
+
+<h2 id="四、Frida-预言机对拍，定位两个坑"><a href="#四、Frida-预言机对拍，定位两个坑" class="headerlink" title="四、Frida 预言机对拍，定位两个坑"></a>四、Frida 预言机对拍，定位两个坑</h2><p>只看反汇编，有两处极易翻车。这题 so 就在真机上跑着，直接 <strong>Frida 主动调用 <code>encrypt</code> 当预言机</strong>最省事：拿到 <code>env</code>（JavaVM → AttachCurrentThread），用 <code>NewByteArray/SetByteArrayRegion</code> 造入参，调 <code>Java_..._encrypt(env, 0, jarr, ts)</code>，再 <code>GetByteArrayElements</code> 读返回——喂任意 <code>(明文, ts)</code> 拿真机输出，和 Python 逐字节对拍。</p>
+<p>对拍逼出两个细节：</p>
+<ol>
+<li><strong>KSA 的 <code>j</code> 也带 S[] 包裹</strong>：反汇编里 <code>and w9,#0xff</code> 后还有一条 <code>ldrb w9,[x8,w9]</code>（<code>x8</code> 是 S 盒基址）。漏掉它，header 对、但密文全错。</li>
+<li><strong>key1 不能乱填</strong>：一开始以为两把 key 都能随机（都在 header 里嘛），结果服务器回 <code>status=2</code>。原因是<strong>服务器用明文里的 ts 重算 key1、和 header 里的 key1 比对</strong>——所以 <code>key1</code> 必须由 ts 经那套 LCG 派生；只有 <code>key2</code> 能随机。</li>
 </ol>
-<p>关键片段（重定位）：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> b.relocations:<br>    t, a, add = <span class="hljs-built_in">str</span>(r.<span class="hljs-built_in">type</span>), r.address, r.addend<br>    nm = r.symbol.name <span class="hljs-keyword">if</span> r.has_symbol <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">if</span>   <span class="hljs-string">&quot;RELATIVE&quot;</span> <span class="hljs-keyword">in</span> t:                      w(a, add)              <span class="hljs-comment"># base=0</span><br>    <span class="hljs-keyword">elif</span> <span class="hljs-string">&quot;ABS64&quot;</span> <span class="hljs-keyword">in</span> t <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;GLOB_DAT&quot;</span> <span class="hljs-keyword">in</span> t <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;JUMP_SLOT&quot;</span> <span class="hljs-keyword">in</span> t:<br>        <span class="hljs-keyword">if</span>   nm <span class="hljs-keyword">in</span> sym_va:                     w(a, sym_va[nm]+add)<br>        <span class="hljs-keyword">elif</span> nm:                               w(a, stub_for(nm)+add) <span class="hljs-comment"># goron: stub+addend</span><br>        <span class="hljs-keyword">else</span>:                                  w(a, add)<br></code></pre></td></tr></table></figure>
+<p>对齐这两点后，Python 输出与真机 <code>encrypt</code> <strong>逐字节一致</strong>，服务器也返回 <code>status=1</code>。</p>
+<h2 id="五、纯-Python-还原"><a href="#五、纯-Python-还原" class="headerlink" title="五、纯 Python 还原"></a>五、纯 Python 还原</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> base64, os, time, requests<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_lcg</span>(<span class="hljs-params">x</span>): <span class="hljs-keyword">return</span> ((x*<span class="hljs-number">1103515245</span> + <span class="hljs-number">12345</span>) &gt;&gt; <span class="hljs-number">16</span>) &amp; <span class="hljs-number">0x7fff</span>        <span class="hljs-comment"># glibc rand</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_key1</span>(<span class="hljs-params">ms</span>):<br>    v=ms &amp; <span class="hljs-number">0xffffffff</span>; b=<span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>        v=_lcg(v); b.append((v&gt;&gt;<span class="hljs-number">8</span>)&amp;<span class="hljs-number">0xff</span>); b.append(v&amp;<span class="hljs-number">0xff</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>(b)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_encrypt</span>(<span class="hljs-params">pt, k1, k2</span>):<br>    S=<span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>)); jj=<span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> (k1,k2):                       <span class="hljs-comment"># KSA 各 768 次(先 key1 后 key2)</span><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">768</span>):<br>            si=i%<span class="hljs-number">256</span><br>            jj=S[(jj+S[si]+key[i%<span class="hljs-number">16</span>])&amp;<span class="hljs-number">0xff</span>]    <span class="hljs-comment"># 带 S[] 包裹</span><br>            S[si],S[jj]=S[jj],S[si]<br>    out=<span class="hljs-built_in">bytearray</span>(k1+k2); a=<span class="hljs-number">0</span>                  <span class="hljs-comment"># header = key1 ++ key2</span><br>    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> pt:                               <span class="hljs-comment"># PRGA(改版)</span><br>        jj=S[(jj+S[a])&amp;<span class="hljs-number">0xff</span>]<br>        t=S[S[(S[jj]+<span class="hljs-number">1</span>)&amp;<span class="hljs-number">0xff</span>]]<br>        out.append(p^t); S[a],S[jj]=S[jj],S[a]; a=(a+<span class="hljs-number">1</span>)&amp;<span class="hljs-number">0xff</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>(out)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">data</span>(<span class="hljs-params">page, ms</span>):<br>    <span class="hljs-keyword">return</span> base64.urlsafe_b64encode(_encrypt(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;page&#125;</span>:<span class="hljs-subst">&#123;ms&#125;</span>&quot;</span>.encode(), _key1(ms), os.urandom(<span class="hljs-number">16</span>))).decode()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page, s</span>):<br>    ms=<span class="hljs-built_in">int</span>(time.time()*<span class="hljs-number">1000</span>)<br>    j=s.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app2&quot;</span>, data=&#123;<span class="hljs-string">&quot;data&quot;</span>:data(page,ms)&#125;,<br>             headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">10</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>, requests.Session()))   <span class="hljs-comment"># key1 由 ts 派生、key2 随机 -&gt; 服务器认，取回该页数据</span><br></code></pre></td></tr></table></figure>
 
-<p><code>get_timestamp</code> / <code>sendto</code> 的 hook：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> addr == sym[<span class="hljs-string">&#x27;_Z13get_timestampv&#x27;</span>]:  ret(<span class="hljs-variable language_">self</span>.TS); <span class="hljs-keyword">return</span>          <span class="hljs-comment"># 喂目标时间戳</span><br>...<br><span class="hljs-keyword">if</span> nm == <span class="hljs-string">&quot;sendto&quot;</span>:  <span class="hljs-variable language_">self</span>.sendbuf = read(x1, x2); ret(x2); stop()     <span class="hljs-comment"># 截获请求包</span><br></code></pre></td></tr></table></figure>
-
-<h2 id="四、取值流程"><a href="#四、取值流程" class="headerlink" title="四、取值流程"></a>四、取值流程</h2><p>题目要”获取某个指定时刻的当前数值”，只要把目标时间戳喂给被模拟的 <code>get_timestamp</code>，就得到对应的请求包：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">build_packet</span><span class="hljs-params">(<span class="hljs-number">1640391171671</span>)</span></span>  →  <span class="hljs-number">255</span>B 请求包<br>   →  本机 UDP 直发 <span class="hljs-number">47.95</span>.<span class="hljs-number">8.136</span>:<span class="hljs-number">12000</span>  →  收 <span class="hljs-number">1024</span>B 响应<br>   →  <span class="hljs-built_in">decode</span>(响应)  →  该时刻数值<br></code></pre></td></tr></table></figure>
-
-<p>服务器接受任意时间戳并返回 <code>f(时间戳)</code>，所以把题目给的固定时刻喂进去即得确定结果——全程离机，只依赖 <code>unicorn</code> 造包 + 本机 UDP 直连。</p>
-<h2 id="五、为什么第四题没做成纯-Python？"><a href="#五、为什么第四题没做成纯-Python？" class="headerlink" title="五、为什么第四题没做成纯 Python？"></a>五、为什么第四题没做成纯 Python？</h2><p>顺手也把造包往纯 Python 方向挖了挖：它<strong>不用 RC4</strong>；用两个 PRNG——<code>xorshift64</code> 链（种子=<strong>完整毫秒 ts</strong>）+ <code>minstd_rand</code>（种子≈<strong>秒级 <code>ts//1000</code><strong>，同秒同流）+ libc++ <code>uniform_int_distribution&lt;uint8&gt;</code>；包体是</strong>交错 XOR 块</strong>（每 16 字节 = <code>明文^掩码</code> 与 <code>明文</code> 字节交错），且调用次数<strong>随数据变长</strong>（不同 ts 下 xorshift 286 vs 297 次）。</p>
-<p>结论：这段造包是一段<strong>定制、混淆、双 PRNG + 变长循环</strong>的逻辑，不是标准算法。对这类 OLLVM native，<strong>用 CPU 模拟器执行真实机器码</strong>才是稳健、忠实、同样离机的正解——依赖只有 <code>unicorn</code>/<code>lief</code>，都是 pip 可装的纯 Python 可调库。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的方法论对照上一篇第五题很有意思：<strong>先判断”是不是标准算法”<strong>。第五题的签名是标准 MD4 的变体，能干净还原成纯 Python；而第四题的造包是定制的双 PRNG 逻辑，就别硬啃混淆——用 Unicorn 把真实机器码离机跑起来。另外一个省时的洞察是：很多”看起来随机”的响应包，其实是</strong>位置表 + 对称解密</strong>，取值根本无需逆请求侧的 PRNG。</p>
+<p>到这一步就完全离机：不碰手机、纯 Python 复刻 native 的改版 RC4 即可逐页取数。<code>key2</code> 随机、<code>ts</code> 也不卡新鲜度，只要 <code>key1</code> 与 <code>ts</code> 自洽即可。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>“so 层加密”听着唬人，实际这题 so 既不加壳也不混淆，<code>encrypt</code> 是个可直读的改版 RC4。真正的经验是：<strong>别只信眼睛</strong>——so 就在真机上，Frida 主动调用当预言机对拍，几秒就能揪出”KSA 少一层 S[] 包裹””key1 必须由 ts 派生”这种纯看反汇编容易漏的细节。往后第十一题会遇到加壳（读不了就 dump 内存），第四题会遇到 goron（读不动就 Unicorn 模拟），本题则是”读得动，但要对拍验证”的典型。</p>
 
               
             </div>
@@ -379,23 +378,17 @@
       
         <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
       
+        <a href="/tags/Frida/">#Frida</a>
+      
         <a href="/tags/Android/">#Android</a>
       
         <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
       
+        <a href="/tags/so/">#so</a>
+      
         <a href="/tags/RC4/">#RC4</a>
       
         <a href="/tags/capstone/">#capstone</a>
-      
-        <a href="/tags/OLLVM/">#OLLVM</a>
-      
-        <a href="/tags/Unicorn/">#Unicorn</a>
-      
-        <a href="/tags/goron/">#goron</a>
-      
-        <a href="/tags/UDP/">#UDP</a>
-      
-        <a href="/tags/lief/">#lief</a>
       
     </div>
   
@@ -407,8 +400,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包</div>
-      <div>https://kingjem.github.io/2026/08/26/猿人学App第四题离机复现-Unicorn模拟goron造UDP包/</div>
+      <div>猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第二题离机复现-改版RC4还原/</div>
     </div>
     <div class="license-meta">
       
@@ -420,7 +413,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年8月26日</div>
+          <div>2026年9月1日</div>
         </div>
       
       
@@ -450,18 +443,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" title="猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/08/17/%E9%80%86%E5%90%91%E7%94%A8%E7%9A%84Skill%E5%92%8CMCP-%E5%85%AC%E5%BC%80%E4%BB%93%E5%BA%93%E6%B8%85%E5%8D%95/" title="逆向用的 Skill 和 MCP：公开仓库清单">
-                        <span class="hidden-mobile">逆向用的 Skill 和 MCP：公开仓库清单</span>
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E9%80%86%E5%90%91%E9%97%AF%E5%85%B3%E7%B3%BB%E5%88%97-%E6%80%BB%E7%9B%AE%E5%BD%95/" title="猿人学 App 逆向闯关系列 · 总目录">
+                        <span class="hidden-mobile">猿人学 App 逆向闯关系列 · 总目录</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
