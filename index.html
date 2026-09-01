@@ -215,15 +215,99 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E5%8D%81%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-upx%E8%84%B1%E5%A3%B3%E4%B8%8E%E5%B0%81%E8%AE%BE%E5%A4%87/" target="_self">
-          猿人学 App 第十一、十三题离机复现：upx 脱壳与「封设备」的纯 Python 还原
+        <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/" target="_self">
+          猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原
         </a>
       </h1>
 
-      <a class="index-excerpt" href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E5%8D%81%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-upx%E8%84%B1%E5%A3%B3%E4%B8%8E%E5%B0%81%E8%AE%BE%E5%A4%87/" target="_self">
+      <a class="index-excerpt" href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/" target="_self">
         <div>
           
-          继[第四、五题]之后，再记两道猿人学 App 闯关题的离机复现。这两题都是”分页数字列表求和”，反爬点都藏在 native：  第十三题「东风夜放花千树【封设备】」：请求带 native 生成的 device_id，服务器按其中的 MAC 段当”设备身份”限流。破解后把整套 device_id 算法反成了一张 16 项查表的纯 Python。 第十一题「学诗谩有惊人句【upx壳】」：请求参数 d
+          猿人学 App 第十一题「学诗谩有惊人句【upx壳】」的离机复现记录。请求参数 data 由一个 UPX 加壳的 libeleven.so 生成。本文记录识别 upx 壳 → 从进程内存 dump 出解密后的代码 → 定位 data() → Frida 取样 → 还原出自定义 Base64 算法的全过程。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-09-01 13:25" pubdate>
+              2026-09-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/JNI/">#JNI</a>
+            
+              <a href="/tags/UPX/">#UPX</a>
+            
+              <a href="/tags/%E8%84%B1%E5%A3%B3/">#脱壳</a>
+            
+              <a href="/tags/%E5%86%85%E5%AD%98dump/">#内存dump</a>
+            
+              <a href="/tags/Base64/">#Base64</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" target="_self">
+          猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" target="_self">
+        <div>
+          
+          猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠
         </div>
       </a>
 
@@ -269,27 +353,21 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Frida/">#Frida</a>
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
               <a href="/tags/JNI/">#JNI</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
-              <a href="/tags/UPX/">#UPX</a>
-            
-              <a href="/tags/%E8%84%B1%E5%A3%B3/">#脱壳</a>
-            
-              <a href="/tags/%E5%86%85%E5%AD%98dump/">#内存dump</a>
-            
               <a href="/tags/NETLINK/">#NETLINK</a>
             
-              <a href="/tags/Base64/">#Base64</a>
+              <a href="/tags/goron/">#goron</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+              <a href="/tags/OLLVM/">#OLLVM</a>
             
           </div>
         
@@ -357,23 +435,23 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
               <a href="/tags/Frida/">#Frida</a>
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
               <a href="/tags/JNI/">#JNI</a>
-            
-              <a href="/tags/Unicorn/">#Unicorn</a>
             
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
-              <a href="/tags/dex2jar/">#dex2jar</a>
+              <a href="/tags/Unicorn/">#Unicorn</a>
+            
+              <a href="/tags/goron/">#goron</a>
             
               <a href="/tags/OLLVM/">#OLLVM</a>
             
-              <a href="/tags/goron/">#goron</a>
+              <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/MD4/">#MD4</a>
             
@@ -733,9 +811,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Frida/">#Frida</a>
-            
               <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
             
               <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
             
@@ -877,11 +955,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/tags/%E5%8F%8D%E7%88%AC/">#反爬</a>
+            
               <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
             
               <a href="/tags/Python/">#Python</a>
-            
-              <a href="/tags/%E5%8F%8D%E7%88%AC/">#反爬</a>
             
               <a href="/tags/JA3/">#JA3</a>
             
@@ -950,9 +1028,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Android/">#Android</a>
-            
               <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Android/">#Android</a>
             
               <a href="/tags/SKRoot/">#SKRoot</a>
             
@@ -1170,17 +1248,17 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Akamai/">#Akamai</a>
+            
+              <a href="/tags/Frida/">#Frida</a>
+            
               <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
             
               <a href="/tags/mitmproxy/">#mitmproxy</a>
             
-              <a href="/tags/Frida/">#Frida</a>
-            
               <a href="/tags/Android/">#Android</a>
-            
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
-              <a href="/tags/Akamai/">#Akamai</a>
             
               <a href="/tags/unidbg/">#unidbg</a>
             
@@ -1252,11 +1330,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
-            
               <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
             
               <a href="/tags/Python/">#Python</a>
+            
+              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
             
               <a href="/tags/nodriver/">#nodriver</a>
             
@@ -1438,9 +1516,9 @@
             
               <a href="/tags/MCP/">#MCP</a>
             
-              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
-            
               <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
             
               <a href="/tags/Camoufox/">#Camoufox</a>
             
@@ -1602,94 +1680,6 @@
               <a href="/tags/%E5%88%B7%E6%9C%BA/">#刷机</a>
             
               <a href="/tags/%E5%8D%95%E6%9D%BF%E6%9C%BA/">#单板机</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2026/07/29/FlowTrans%E4%B8%8Eandroid-capture-skill%E4%B8%80%E9%94%AE%E5%AE%89%E5%8D%93%E6%8A%93%E5%8C%85/" target="_self">
-          <img src="/img/cover-flowtrans.svg" srcset="/img/loading.gif" lazyload alt="两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/07/29/FlowTrans%E4%B8%8Eandroid-capture-skill%E4%B8%80%E9%94%AE%E5%AE%89%E5%8D%93%E6%8A%93%E5%8C%85/" target="_self">
-          两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/07/29/FlowTrans%E4%B8%8Eandroid-capture-skill%E4%B8%80%E9%94%AE%E5%AE%89%E5%8D%93%E6%8A%93%E5%8C%85/" target="_self">
-        <div>
-          
-          承接上一篇《Android 抓包实战全流程:FlowTrans + mitmweb + pproxy + Frida,从解密到重放》——那篇讲”为什么”和”怎么跑通”,这篇把里面的工具沉淀成了两个可以直接用的开源仓库,并把整条链路收敛成一两条命令。  在受限网络里抓一个”只对海外开放、做了证书固定、还忽略系统代理”的安卓 App,光”装 CA + 开代理”是不够的。我把踩过的坑固化成了两个东西:
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-07-29 10:00" pubdate>
-              2026-07-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Claude-Code/">#Claude Code</a>
-            
-              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
-            
-              <a href="/tags/mitmproxy/">#mitmproxy</a>
-            
-              <a href="/tags/mitmweb/">#mitmweb</a>
-            
-              <a href="/tags/Frida/">#Frida</a>
-            
-              <a href="/tags/FlowTrans/">#FlowTrans</a>
-            
-              <a href="/tags/Android/">#Android</a>
-            
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
           </div>
         

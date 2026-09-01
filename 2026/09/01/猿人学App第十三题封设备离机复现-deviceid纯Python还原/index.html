@@ -16,30 +16,28 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="承接上一篇《Android 抓包实战全流程:FlowTrans + mitmweb + pproxy + Frida,从解密到重放》——那篇讲”为什么”和”怎么跑通”,这篇把里面的工具沉淀成了两个可以直接用的开源仓库,并把整条链路收敛成一两条命令。  在受限网络里抓一个”只对海外开放、做了证书固定、还忽略系统代理”的安卓 App,光”装 CA + 开代理”是不够的。我把踩过的坑固化成了两个东西:">
+    <meta name="description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
 <meta property="og:type" content="article">
-<meta property="og:title" content="两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令">
-<meta property="og:url" content="https://kingjem.github.io/2026/07/29/FlowTrans%E4%B8%8Eandroid-capture-skill%E4%B8%80%E9%94%AE%E5%AE%89%E5%8D%93%E6%8A%93%E5%8C%85/index.html">
+<meta property="og:title" content="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="承接上一篇《Android 抓包实战全流程:FlowTrans + mitmweb + pproxy + Frida,从解密到重放》——那篇讲”为什么”和”怎么跑通”,这篇把里面的工具沉淀成了两个可以直接用的开源仓库,并把整条链路收敛成一两条命令。  在受限网络里抓一个”只对海外开放、做了证书固定、还忽略系统代理”的安卓 App,光”装 CA + 开代理”是不够的。我把踩过的坑固化成了两个东西:">
+<meta property="og:description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://kingjem.github.io/img/cover-flowtrans.svg">
-<meta property="article:published_time" content="2026-07-29T02:00:00.000Z">
-<meta property="article:modified_time" content="2026-07-29T09:33:49.978Z">
+<meta property="article:published_time" content="2026-09-01T05:22:35.000Z">
+<meta property="article:modified_time" content="2026-09-01T05:29:10.429Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Android">
-<meta property="article:tag" content="Claude Code">
-<meta property="article:tag" content="FlowTrans">
-<meta property="article:tag" content="Frida">
-<meta property="article:tag" content="mitmproxy">
-<meta property="article:tag" content="mitmweb">
-<meta property="article:tag" content="抓包">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="NETLINK">
+<meta property="article:tag" content="OLLVM">
+<meta property="article:tag" content="Unicorn">
+<meta property="article:tag" content="goron">
+<meta property="article:tag" content="猿人学">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://kingjem.github.io/img/cover-flowtrans.svg">
   
   
-  <title>两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令 - Ruhai&#39;s blogs</title>
+  <title>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -190,13 +188,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/cover-flowtrans.svg') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令"></span>
+            <span id="subtitle" data-typed-text="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原"></span>
           
         </div>
 
@@ -207,8 +205,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-07-29 10:00" pubdate>
-          2026年7月29日 上午
+        <time datetime="2026-09-01 13:22" pubdate>
+          2026年9月1日 下午
         </time>
       </span>
     
@@ -219,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.7k 字
+          3.5k 字
         
       </span>
     
@@ -230,7 +228,7 @@
         
         
         
-          23 分钟
+          30 分钟
         
       </span>
     
@@ -276,12 +274,12 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令</h1>
+            <h1 style="display: none">猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</h1>
             
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2026年7月29日 下午
+                    本文最后更新于：2026年9月1日 下午
                   
                 
               </p>
@@ -289,81 +287,101 @@
             <div class="markdown-body">
               
               <blockquote>
-<p>承接上一篇<a href="/2026/07/20/Android%E6%8A%93%E5%8C%85%E5%AE%9E%E6%88%98%E5%85%A8%E6%B5%81%E7%A8%8B-FlowTrans-mitmweb-Frida-%E9%87%8D%E6%94%BE/">《Android 抓包实战全流程:FlowTrans + mitmweb + pproxy + Frida,从解密到重放》</a>——那篇讲”为什么”和”怎么跑通”,这篇把里面的工具沉淀成了两个可以直接用的开源仓库,并把整条链路收敛成一两条命令。</p>
+<p>猿人学 App 第十三题「东风夜放花千树【封设备】」的<strong>离机复现</strong>记录：目标是<strong>不驱动 App</strong>，只靠逆向把 <code>device_id</code> 的生成算法搞清楚。<br>反爬点是”封设备”——请求要带 native 生成的 <code>device_id</code>，服务器按其中某段当”设备身份”限流。本文记录<strong>从 Unicorn 忠实模拟 <code>getDeviceId</code>，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python</strong> 的全过程。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
 </blockquote>
-<p>在受限网络里抓一个”只对海外开放、做了证书固定、还忽略系统代理”的安卓 App,光”装 CA + 开代理”是不够的。我把踩过的坑固化成了两个东西:</p>
+<p><strong>本文目录</strong></p>
 <ul>
-<li><strong><a target="_blank" rel="noopener" href="https://github.com/KingJem/FlowTrans">FlowTrans</a></strong> —— 设备端的转发器(mihomo TUN)。</li>
-<li><strong><a target="_blank" rel="noopener" href="https://github.com/KingJem/android-capture-skill">android-capture-skill</a></strong> —— PC 端的一键编排(Claude Code skill),把 FlowTrans + mitmweb + Frida 串起来。</li>
+<li>请求模型（静态反编译）</li>
+<li>用 Unicorn 模拟 getDeviceId</li>
+<li>单变量对照：锁定「设备身份」</li>
+<li>「封设备」的真相</li>
+<li>反成纯 Python（免 so / Unicorn）</li>
 </ul>
-<p>两者可以分开用,也可以合起来”一条命令抓包”。</p>
 <span id="more"></span>
 
-<h2 id="为什么需要-FlowTrans-App-根本不认系统代理"><a href="#为什么需要-FlowTrans-App-根本不认系统代理" class="headerlink" title="为什么需要 FlowTrans:App 根本不认系统代理"></a>为什么需要 FlowTrans:App 根本不认系统代理</h2><p>大多数现代 App(OkHttp / Cronet)<strong>不读系统 HTTP 代理</strong>,所以 <code>settings put global http_proxy</code> 对它们无效。正确做法是用 <strong>VpnService/TUN 在三层透明劫持</strong>,把流量强制导向 PC 上的 mitmproxy。FlowTrans 就是干这个的:</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">App</span> ─▶ FlowTrans TUN(透明) ─▶ 设备 <span class="hljs-number">127.0.0.1:8080</span> ─▶ adb reverse ─▶ PC mitmweb ─▶ 互联网<br></code></pre></td></tr></table></figure>
+<hr>
+<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeThirteenFragment</code> 的翻页逻辑很直白，<code>device_id</code> 来自 native：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">service.OooO0O0(getDeviceId(), page);   <span class="hljs-comment">// @POST(&quot;/api/app13&quot;) @Field(&quot;device_id&quot;) @Field(&quot;page&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">getDeviceId</span><span class="hljs-params">()</span>;      <span class="hljs-comment">// libthirteen.so，JNI_OnLoad 动态注册</span><br></code></pre></td></tr></table></figure>
 
-<p>它基于 mihomo 内核(预编译内置,不用装 Go/NDK),支持<strong>全局</strong>或<strong>按应用</strong>路由,走 <code>adb reverse</code> 隧道就能绕开公司网络的 AP 隔离/防火墙。</p>
-<h3 id="FlowTrans-用法-GUI"><a href="#FlowTrans-用法-GUI" class="headerlink" title="FlowTrans 用法(GUI)"></a>FlowTrans 用法(GUI)</h3><ol>
-<li>PC 上跑 mitmproxy:<code>mitmweb --listen-host 0.0.0.0 -p 8080</code></li>
-<li>FlowTrans 里新建 profile,上游填 <code>127.0.0.1:8080</code>(HTTP),Wi-Fi 连不上 PC 时配合 <code>adb reverse tcp:8080 tcp:8080</code></li>
-<li>选<strong>全局</strong>或<strong>按应用</strong>,点<strong>开始转发</strong>(同意 VPN 授权)</li>
-<li>mitmweb 里看流量</li>
-</ol>
-<h3 id="FlowTrans-用法-纯-adb-可脚本化"><a href="#FlowTrans-用法-纯-adb-可脚本化" class="headerlink" title="FlowTrans 用法(纯 adb,可脚本化)"></a>FlowTrans 用法(纯 adb,可脚本化)</h3><p>不想点屏幕?GUI 那套有等价的命令行版(改路由 prefs 需要 root):</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell am force-stop com.flowtrans                 <span class="hljs-comment"># 先停,prefs 是内存缓存、退出会回写</span><br>adb reverse tcp:8080 tcp:8080                          <span class="hljs-comment"># 隧道</span><br>adb shell su -c <span class="hljs-string">&quot;am start-foreground-service -n com.flowtrans/.vpn.FlowVpnService -a com.flowtrans.action.START&quot;</span>   <span class="hljs-comment"># 起 VPN(必须 root)</span><br></code></pre></td></tr></table></figure>
-
-<p>写抓包名单、SELinux 上下文保留等完整细节,见仓库 README 的 <a target="_blank" rel="noopener" href="https://github.com/KingJem/FlowTrans#command-line-control-adb">Command-line control (adb)</a>。</p>
-<h3 id="让-App-信任-mitmproxy-的证书-root"><a href="#让-App-信任-mitmproxy-的证书-root" class="headerlink" title="让 App 信任 mitmproxy 的证书(root)"></a>让 App 信任 mitmproxy 的证书(root)</h3><p>Android 7+ 默认不信任用户 CA,Android 14 系统证书库还搬进了不可写的 Conscrypt APEX。抓别家 App 得把 mitmproxy 的 CA 装进<strong>系统</strong>库——root 设备用 <a target="_blank" rel="noopener" href="https://github.com/ys1231/MoveCertificate">MoveCertificate</a> 模块最省事,重启生效。</p>
-<h2 id="android-capture-skill-把整条链路收敛成一条命令"><a href="#android-capture-skill-把整条链路收敛成一条命令" class="headerlink" title="android-capture-skill:把整条链路收敛成一条命令"></a>android-capture-skill:把整条链路收敛成一条命令</h2><p>有了 FlowTrans 解决”传输”,还剩下:起 mitmweb、建隧道、设抓包目标、处理证书固定(Frida 脱壳)、换海外出口……手动一层层敲很累。<strong>android-capture-skill</strong> 把这些封装进一个 Python 入口 <code>capture.py</code>(它其实是个 <a target="_blank" rel="noopener" href="https://claude.com/claude-code">Claude Code</a> skill,但纯命令行也能直接跑),全程 <code>adb</code>、不碰屏幕。</p>
-<h3 id="一键抓包"><a href="#一键抓包" class="headerlink" title="一键抓包"></a>一键抓包</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1) 环境预检:PC(python/mitmproxy/...)+ 手机(root/FlowTrans/frida-server/证书一致性)</span><br>python scripts/capture.py preflight<br><br><span class="hljs-comment"># 2) 一条命令:设目标 + adb reverse + 起 mitmweb(直连) + 起 FlowTrans TUN VPN</span><br>python scripts/capture.py flowtrans --pkg com.example.app --mitmweb<br></code></pre></td></tr></table></figure>
-
-<p>mitmweb UI 在 <code>http://127.0.0.1:8081</code>,登录密码 <code>flowtrans</code>。想抓所有 App 用 <code>--all</code>;换目标再跑一次 <code>flowtrans --pkg &lt;新包&gt; --mitmweb</code> 即可;停止 <code>flowtrans --stop</code>。</p>
-<h3 id="亮点"><a href="#亮点" class="headerlink" title="亮点"></a>亮点</h3><ul>
-<li><strong>preflight 先兜底</strong>:证书不一致(mitmweb 的 CA ≠ 设备信任的 CA)会直接报出来,省得你开着转发抓半天全是 TLS 失败还找不到原因。</li>
-<li><strong>海外出口</strong>:抓只对某地区开放的 App(如美区应用),加 <code>--us-proxy scheme://host:port#user:pass</code>(或环境变量 <code>CAPTURE_US_PROXY</code>),自动经 pproxy 链一个海外代理出网。凭据只走参数/环境变量,不写进脚本。</li>
-<li><strong>证书固定兜底</strong>:第三方 SDK 正常、只有主域名握手失败 = pinning,用内置的 Frida 脚本脱壳(<code>objection</code> 快速验证 / <code>unpin.compiled.js</code> 常驻 / <code>--native</code> 应对 BoringSSL)。</li>
-<li><strong>抓完能重放</strong>:仓库里还写了”脱离 App 用 curl 重放接口”的方法论——核心一句话:<strong>JWT 的 <code>iss</code> ≠ 它的获取入口</strong>,靠 mitmweb 的 HTTP API 脚本化定位 token 下发点。</li>
+<ul>
+<li>端点：<code>POST /api/app13</code>，表单 <code>device_id</code> + <code>page</code>（登录后拦截器附加 <code>token</code>）。刷新 page=1、加载更多 page++。</li>
 </ul>
-<h3 id="在-mitmweb-里筛请求"><a href="#在-mitmweb-里筛请求" class="headerlink" title="在 mitmweb 里筛请求"></a>在 mitmweb 里筛请求</h3><p>顶部搜索框用 mitmproxy 过滤语法:<code>~d 域名</code>、<code>~u URL</code>、<code>~m POST</code>、<code>~c 200</code>、<code>~bs 响应体正则</code>、<code>~t json</code>,用 <code>&amp; | !</code> 组合。离线筛存档:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mitmdump -nr scripts/captures/&lt;x&gt;.flows <span class="hljs-string">&quot;~d api.example.com &amp; ~m POST&quot;</span> --flow-detail 2<br></code></pre></td></tr></table></figure>
+<p>所以整题的核心，就是把 native <code>getDeviceId()</code> 弄清楚。</p>
+<h2 id="二、用-Unicorn-模拟-getDeviceId"><a href="#二、用-Unicorn-模拟-getDeviceId" class="headerlink" title="二、用 Unicorn 模拟 getDeviceId"></a>二、用 Unicorn 模拟 getDeviceId</h2><p><code>libthirteen.so</code> 被 goron/OLLVM 混淆、方法名运行时解密，jadx/CFR 都啃不动 <code>sign</code> 一类函数。于是用 <strong>Unicorn 忠实模拟</strong>，要点：</p>
+<ol>
+<li><strong>定位函数</strong>：模拟 <code>JNI_OnLoad</code>，在 <code>RegisterNatives</code> 处截获方法表 → 拿到 <code>getDeviceId @ 0x47944</code>（签名 <code>()Ljava/lang/String;</code>）。</li>
+<li><strong>JNI / libc 打桩</strong>：<code>JNIEnv</code> 用函数表逐槽分派（<code>NewStringUTF</code> 截获返回串）；实现 <code>clock_gettime</code>、AArch64 变参 <code>__vsnprintf_chk / __vsprintf_chk / vasprintf</code>、<code>strftime</code>、<code>random_device</code> 等。</li>
+<li><strong>goron 重定位坑</strong>：<code>R_AARCH64_ABS64</code> 导入符号要写 <code>stub + addend</code>（goron 会在调用点把 addend 抵消回 stub），漏加 addend 会跳飞。</li>
+<li><strong>NETLINK 应答</strong>（关键洞察）：getDeviceId 会 <code>socket(AF_NETLINK) + sendto + recvfrom</code> 向<strong>内核</strong>发 <code>RTM_GETLINK / RTM_GETADDR</code> <strong>读本机网卡 MAC / IP</strong>——它不是在连服务器！脚本伪造 netlink dump 应答让它跑完，就能拿到 <code>device_id</code>。</li>
+</ol>
+<p>跑通后，观察格式串可知：device_id 是若干字节用 <code>%lX</code> 逐字节拼成的 80 位大写十六进制（40 字节），里头混了毫秒时间戳、MAC、random_device。</p>
+<h2 id="三、单变量对照：锁定「设备身份」"><a href="#三、单变量对照：锁定「设备身份」" class="headerlink" title="三、单变量对照：锁定「设备身份」"></a>三、单变量对照：锁定「设备身份」</h2><p>有了模拟器就能<strong>固定一个输入、只动另一个</strong>，逐字符 diff，把结构拆清楚：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">4EA873FFEC6DBE37DF93 · EC7090 · [ 随 <span class="hljs-keyword">MAC</span> 变的 38 位 ] · B97F43A62E0D85C<br>   固定前缀(<span class="hljs-keyword">app</span>盐)      时间戳区        <span class="hljs-keyword">MAC</span> 派生区              固定尾(<span class="hljs-keyword">app</span>盐)<br></code></pre></td></tr></table></figure>
 
-<h2 id="两者怎么配合"><a href="#两者怎么配合" class="headerlink" title="两者怎么配合"></a>两者怎么配合</h2><p>简单说:<strong>FlowTrans 负责”把流量弄过来”,skill 负责”把剩下的都办了”。</strong></p>
 <table>
 <thead>
 <tr>
-<th>关注点</th>
-<th>谁来做</th>
+<th>变量</th>
+<th>是否影响 device_id</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>App 忽略代理 → 透明劫持</td>
-<td>FlowTrans TUN</td>
+<td>毫秒时间戳</td>
+<td>✅ 改变时间戳区（6 位十六进制）</td>
 </tr>
 <tr>
-<td>起 mitmweb / 隧道 / 设目标 / 起停 VPN</td>
-<td>skill 的 <code>capture.py flowtrans</code></td>
+<td><strong>本机 MAC</strong></td>
+<td>✅ <strong>改变中段 38 位</strong></td>
 </tr>
 <tr>
-<td>证书固定</td>
-<td>skill 调 Frida 脱壳</td>
-</tr>
-<tr>
-<td>海外出口</td>
-<td>skill 的 <code>--us-proxy</code>(pproxy 链)</td>
-</tr>
-<tr>
-<td>环境自检</td>
-<td>skill 的 <code>preflight</code></td>
+<td>random_device</td>
+<td>❌ 调用了但<strong>不进 id</strong>（反模拟诱饵）</td>
 </tr>
 </tbody></table>
-<h2 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h2><ul>
-<li>转发器:<strong><a target="_blank" rel="noopener" href="https://github.com/KingJem/FlowTrans">https://github.com/KingJem/FlowTrans</a></strong></li>
-<li>一键抓包:<strong><a target="_blank" rel="noopener" href="https://github.com/KingJem/android-capture-skill">https://github.com/KingJem/android-capture-skill</a></strong></li>
-</ul>
-<p>两个仓库都带了完整 README 和排障文档。欢迎 star / issue。</p>
+<p>而且各段<strong>互相独立、无扩散</strong>：改 MAC 只动中段、改时间戳只动时间戳区，常量段纹丝不动。</p>
 <blockquote>
-<p>⚠️ 仅用于<strong>授权范围内</strong>的安全测试、调试自己的 App、学习研究。请遵守你所检测 App 适用的服务条款与法律。</p>
+<p>⚠️ 踩坑：一开始误判 MAC / random 都不影响 id——根因是**模拟器的 netlink 应答把 MAC 写死成 <code>02:00:00:00:00:00</code>**（环境变量没接进去），所以”改 MAC”其实没改到。把 MAC 真正接进 netlink 应答后，中段立刻随之变化，才看清 MAC 就是那段”设备身份”。</p>
 </blockquote>
+<h2 id="四、「封设备」的真相"><a href="#四、「封设备」的真相" class="headerlink" title="四、「封设备」的真相"></a>四、「封设备」的真相</h2><p>把 MAC 接对后再打服务器，行为就清楚了：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同一 device_id（同 MAC）连续翻页</td>
+<td>约 2 次后 <code>设备号已被封锁</code></td>
+</tr>
+<tr>
+<td><strong>换新 MAC</strong> 的 device_id</td>
+<td>正常返回，可直接跳任意页</td>
+</tr>
+<tr>
+<td>随机 UUID / 乱改 device_id</td>
+<td><code>Access forbidden;please check request</code></td>
+</tr>
+</tbody></table>
+<p>即：服务器把 device_id 里的 <strong>MAC 段</strong>当”设备身份”，每设备限量后封；同时<strong>逐字节 checksum 校验</strong>整串，乱造无效。<strong>破解 = 每翻一页现造一个随机 MAC 的 device_id</strong>，服务器就当成一台新设备。</p>
+<h2 id="五、反成纯-Python（免-so-Unicorn）"><a href="#五、反成纯-Python（免-so-Unicorn）" class="headerlink" title="五、反成纯 Python（免 so / Unicorn）"></a>五、反成纯 Python（免 so / Unicorn）</h2><p>既然各段独立，就能把 MAC → 那段的映射彻底反出来。密集采样后发现：</p>
+<ol>
+<li><p><strong>6 个 MAC 字节各占一组 4 字符</strong>，<code>group_i = BASE_i XOR delta(mac[i])</code>；</p>
+</li>
+<li><p><strong>6 组共享同一个 delta 函数</strong>（只是各组常量基 BASE_i 不同）：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dns">delta(m) = (T[m&gt;&gt;<span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0</span>xf]<br>T = [<span class="hljs-number">0,1,2,3</span>,<span class="hljs-number">4,5,6,7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71,0x72</span>,<span class="hljs-number">0x73,0x74</span>,<span class="hljs-number">0x75,0x76</span>]   # <span class="hljs-number">16</span> 项<br></code></pre></td></tr></table></figure>
+
+<p>已验证 <code>m=0x7f → 0x776</code>、<code>0xff → 0x7676</code> 全部吻合，与模拟器逐字节对拍一致；</p>
+</li>
+<li><p>时间戳区只有 16bit（装不下完整毫秒），实测<strong>服务器不校验时间戳新鲜度</strong> → 固定一张旧模板即可，只替换 MAC 6 组。</p>
+</li>
+</ol>
+<p>于是 <code>gen_device_id()</code> = 取固定模板 + 按随机 MAC 做 6 组 XOR 替换，一行现造，运行期不再需要 so 和 Unicorn：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os, requests<br><br><span class="hljs-comment"># all-zero-MAC、固定时间戳的模板；仅 MAC 6 组会被替换</span><br>TEMPLATE = <span class="hljs-string">&quot;4EA873FFEC6DBE37DF93EC7090F47601AF844301FBB1943F3C75246E886225001B97F43A62E0D85C&quot;</span><br>T   = [<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71</span>,<span class="hljs-number">0x72</span>,<span class="hljs-number">0x73</span>,<span class="hljs-number">0x74</span>,<span class="hljs-number">0x75</span>,<span class="hljs-number">0x76</span>]   <span class="hljs-comment"># 16 项共享表</span><br>POS = [<span class="hljs-number">28</span>, <span class="hljs-number">34</span>, <span class="hljs-number">40</span>, <span class="hljs-number">46</span>, <span class="hljs-number">52</span>, <span class="hljs-number">58</span>]                                <span class="hljs-comment"># 6 个 MAC 组起始位置</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_delta</span>(<span class="hljs-params">m</span>): <span class="hljs-keyword">return</span> (T[m &gt;&gt; <span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0xf</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">gen_device_id</span>(<span class="hljs-params">mac=<span class="hljs-literal">None</span></span>):<br>    <span class="hljs-keyword">if</span> mac <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: mac = os.urandom(<span class="hljs-number">6</span>)     <span class="hljs-comment"># 随机 MAC = 一台新设备</span><br>    s = <span class="hljs-built_in">list</span>(TEMPLATE)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">6</span>):<br>        v = <span class="hljs-built_in">int</span>(TEMPLATE[POS[i]:POS[i]+<span class="hljs-number">4</span>], <span class="hljs-number">16</span>) ^ _delta(mac[i])<br>        h = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;v:04X&#125;</span>&quot;</span><br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>): s[POS[i]+k] = h[k]<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>.join(s)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page</span>):                            <span class="hljs-comment"># 每页换新 MAC，绕过封设备</span><br>    j = requests.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app13&quot;</span>,<br>                      data=&#123;<span class="hljs-string">&quot;device_id&quot;</span>: gen_device_id(), <span class="hljs-string">&quot;page&quot;</span>: <span class="hljs-built_in">str</span>(page)&#125;,<br>                      headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">15</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>))   <span class="hljs-comment"># 现造 device_id → 直连公网取回该页数据</span><br></code></pre></td></tr></table></figure>
+
+<p>到这一步，整条链路已经<strong>离机、零依赖</strong>：不碰手机、不加载 so、不跑 Unicorn，一行现造合法 <code>device_id</code> 就能任意翻页。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的”封设备”，本质是把一个并不复杂的算法（模板 + MAC 异或查表）藏进 goron 混淆的 native 里。拿到手的方法论：<strong>先用 Unicorn 把真实代码离机跑起来拿样本 → 单变量对照锁定结构 → 反成纯 Python</strong>。其中最关键的两个洞察是：<code>socket(AF_NETLINK)</code> 是读本机网卡而非连服务器；以及 device_id 里真正的”设备身份”是 MAC 段，轮换它即可当新设备。</p>
 
               
             </div>
@@ -403,21 +421,21 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Claude-Code/">#Claude Code</a>
-      
         <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-      
-        <a href="/tags/Frida/">#Frida</a>
-      
-        <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
-      
-        <a href="/tags/mitmproxy/">#mitmproxy</a>
-      
-        <a href="/tags/mitmweb/">#mitmweb</a>
       
         <a href="/tags/Android/">#Android</a>
       
-        <a href="/tags/FlowTrans/">#FlowTrans</a>
+        <a href="/tags/JNI/">#JNI</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/Unicorn/">#Unicorn</a>
+      
+        <a href="/tags/NETLINK/">#NETLINK</a>
+      
+        <a href="/tags/goron/">#goron</a>
+      
+        <a href="/tags/OLLVM/">#OLLVM</a>
       
     </div>
   
@@ -429,8 +447,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>两个开源小工具：FlowTrans + android-capture-skill，把安卓抓包做成一条命令</div>
-      <div>https://kingjem.github.io/2026/07/29/FlowTrans与android-capture-skill一键安卓抓包/</div>
+      <div>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第十三题封设备离机复现-deviceid纯Python还原/</div>
     </div>
     <div class="license-meta">
       
@@ -442,7 +460,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年7月29日</div>
+          <div>2026年9月1日</div>
         </div>
       
       
@@ -472,9 +490,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/07/30/linux/%E9%A6%99%E6%A9%99%E6%B4%BE5Plus-SD%E5%8D%A1%E5%88%B7%E6%9C%BA%E6%95%99%E7%A8%8B/" title="香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程">
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/" title="猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程</span>
+                        <span class="hidden-mobile">猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -482,8 +500,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/07/27/IP%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7%E6%8C%87%E5%8D%97%E5%88%A4%E6%96%AD%E4%BD%8F%E5%AE%85IP%E8%BF%98%E6%98%AF%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83/" title="IP 类型检测工具指南：判断住宅 IP 还是数据中心">
-                        <span class="hidden-mobile">IP 类型检测工具指南：判断住宅 IP 还是数据中心</span>
+                      <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E4%B8%8E%E5%8F%98%E5%BD%A2MD4/" title="猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原">
+                        <span class="hidden-mobile">猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

@@ -16,27 +16,29 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="本文为转载内容  原标题：Frida 脚本一键持久化方案：将 Frida 脚本打包至 Xposed 模块、直接注入 APP、so、dll 原作者：MicroBlock（吾爱破解论坛 uid&#x3D;2086814） 原始出处：吾爱破解论坛 https:&#x2F;&#x2F;www.52pojie.cn&#x2F;thread-2071836-1-1.html 发表时间：2025-11-12  本文转载自吾爱破解论坛，版权归原作者">
+    <meta name="description" content="猿人学 App 第十一题「学诗谩有惊人句【upx壳】」的离机复现记录。请求参数 data 由一个 UPX 加壳的 libeleven.so 生成。本文记录识别 upx 壳 → 从进程内存 dump 出解密后的代码 → 定位 data() → Frida 取样 → 还原出自定义 Base64 算法的全过程。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【转载】Frida 脚本一键持久化方案：打包为 Xposed 模块、注入 APP &#x2F; so &#x2F; dll">
-<meta property="og:url" content="https://kingjem.github.io/2025/11/12/%E9%80%86%E5%90%91/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91Frida%E8%84%9A%E6%9C%AC%E4%B8%80%E9%94%AE%E6%8C%81%E4%B9%85%E5%8C%96-%E6%89%93%E5%8C%85Xposed%E6%A8%A1%E5%9D%97-%E6%B3%A8%E5%85%A5so-dll/index.html">
+<meta property="og:title" content="猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="本文为转载内容  原标题：Frida 脚本一键持久化方案：将 Frida 脚本打包至 Xposed 模块、直接注入 APP、so、dll 原作者：MicroBlock（吾爱破解论坛 uid&#x3D;2086814） 原始出处：吾爱破解论坛 https:&#x2F;&#x2F;www.52pojie.cn&#x2F;thread-2071836-1-1.html 发表时间：2025-11-12  本文转载自吾爱破解论坛，版权归原作者">
+<meta property="og:description" content="猿人学 App 第十一题「学诗谩有惊人句【upx壳】」的离机复现记录。请求参数 data 由一个 UPX 加壳的 libeleven.so 生成。本文记录识别 upx 壳 → 从进程内存 dump 出解密后的代码 → 定位 data() → Frida 取样 → 还原出自定义 Base64 算法的全过程。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-11-11T17:18:00.000Z">
-<meta property="article:modified_time" content="2026-08-14T02:30:59.569Z">
+<meta property="article:published_time" content="2026-09-01T05:25:00.000Z">
+<meta property="article:modified_time" content="2026-09-01T05:29:10.439Z">
 <meta property="article:author" content="Ruhai">
-<meta property="article:tag" content="ELF">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Base64">
 <meta property="article:tag" content="Frida">
-<meta property="article:tag" content="PE">
-<meta property="article:tag" content="Xposed">
-<meta property="article:tag" content="安卓逆向">
-<meta property="article:tag" content="持久化">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="UPX">
+<meta property="article:tag" content="内存dump">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="脱壳">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>【转载】Frida 脚本一键持久化方案：打包为 Xposed 模块、注入 APP / so / dll - Ruhai&#39;s blogs</title>
+  <title>猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -193,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="【转载】Frida 脚本一键持久化方案：打包为 Xposed 模块、注入 APP / so / dll"></span>
+            <span id="subtitle" data-typed-text="猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原"></span>
           
         </div>
 
@@ -204,8 +206,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-11-12 01:18" pubdate>
-          2025年11月12日 凌晨
+        <time datetime="2026-09-01 13:25" pubdate>
+          2026年9月1日 下午
         </time>
       </span>
     
@@ -216,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.6k 字
+          3k 字
         
       </span>
     
@@ -227,7 +229,7 @@
         
         
         
-          30 分钟
+          25 分钟
         
       </span>
     
@@ -273,12 +275,12 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">【转载】Frida 脚本一键持久化方案：打包为 Xposed 模块、注入 APP / so / dll</h1>
+            <h1 style="display: none">猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原</h1>
             
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2026年8月14日 上午
+                    本文最后更新于：2026年9月1日 下午
                   
                 
               </p>
@@ -286,108 +288,47 @@
             <div class="markdown-body">
               
               <blockquote>
-<p><strong>本文为转载内容</strong></p>
+<p>猿人学 App 第十一题「学诗谩有惊人句【upx壳】」的<strong>离机复现</strong>记录。请求参数 <code>data</code> 由一个 <strong>UPX 加壳</strong>的 <code>libeleven.so</code> 生成。本文记录<strong>识别 upx 壳 → 从进程内存 dump 出解密后的代码 → 定位 <code>data()</code> → Frida 取样 → 还原出自定义 Base64 算法</strong>的全过程。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
 <ul>
-<li><strong>原标题</strong>：Frida 脚本一键持久化方案：将 Frida 脚本打包至 Xposed 模块、直接注入 APP、so、dll</li>
-<li><strong>原作者</strong>：MicroBlock（吾爱破解论坛 uid=2086814）</li>
-<li><strong>原始出处</strong>：吾爱破解论坛 <a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-2071836-1-1.html">https://www.52pojie.cn/thread-2071836-1-1.html</a></li>
-<li><strong>发表时间</strong>：2025-11-12</li>
+<li>请求模型（静态反编译）</li>
+<li>识别 upx 壳</li>
+<li>内存 dump 脱壳</li>
+<li>定位 data() 并 Frida 取样</li>
+<li>算法还原：自定义 Base64</li>
 </ul>
-<p>本文转载自吾爱破解论坛，版权归原作者 MicroBlock 所有，转载仅供学习交流使用。</p>
-<p><strong>关于配图</strong>：原帖中包含大量代码截图，均托管在 52pojie 论坛附件服务器上，需登录论坛且带有效会话才能访问，无法在站外正常显示，因此本文未内嵌这些图片。文中在对应位置以 <code>【原帖配图：xxx】</code> 标注，完整截图请移步 <a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-2071836-1-1.html">原帖</a> 查看。相关代码均已开源，见文末仓库地址。</p>
-</blockquote>
-<h2 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h2><p>最近在开发某款 APP 的功能扩展时，我使用 Frida 编写了大量逻辑，但不想再逐行翻译成 Xposed 代码。于是决定将 Frida 直接固化到 APP 中。</p>
-<p>最初尝试使用 frida-gadget，但在 Android 16 上遇到问题：脚本完全不执行，也没有任何错误提示，只好放弃。</p>
-<p>在网上搜索后，没有找到便捷的持久化方案，于是决定自己动手实现。</p>
-<p>我的目标是：只需运行一行命令，就能自动打包出 Xposed 模块、已固化 Frida 脚本的 APP 包，以及可注入运行 Frida 脚本的 <code>.so</code> 和 <code>.dll</code> 文件。</p>
-<p>当然，最终这个目标顺利实现了。如果你只是想打包 Frida 脚本，而不关心具体原理，可以直接使用以下工具：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/std-microblock/fripack/">https://github.com/std-microblock/fripack/</a></li>
-</ul>
-<h2 id="自编译-Frida"><a href="#自编译-Frida" class="headerlink" title="自编译 Frida"></a>自编译 Frida</h2><p>既然要自己动手，自然要做得尽善尽美。一方面需要掩盖 Frida 的某些特征，另一方面也要尽量减小体积。此外，我还希望将脚本直接嵌入二进制文件中，而不是作为独立文件存在。于是，我开始研究如何自行编译 Frida，类似于实现一个自定义的 frida-gadget。</p>
-<p>首先，我们来看一下 Frida 的代码架构：</p>
-<blockquote>
-<p>【原帖配图：Frida 代码架构简化示意图（image.png）】</p>
-</blockquote>
-<p>（注：此为简化示意图。实际上，frida-inject 和 frida-server 注入的是 frida-agent，但整体结构类似。）</p>
-<p>可以看到，Frida Gadget 实际上是通过调用 <strong>Frida-GumJS</strong> 来执行我们的脚本。因此，我们也可以编写一个程序，调用 Frida-GumJS 来执行脚本。为了实现这一点，首先需要编译出 Frida-GumJS 库。</p>
-<p>Frida-GumJS 通常包含两个引擎：<strong>V8</strong> 和 <strong>QuickJS</strong>。V8 执行效率高，但体积较大；QuickJS 体积较小。为了减小最终生成的二进制文件体积，我关闭了 V8 和内置的 Database，并参考 Florida 的 CI 流程，编写了一个 GitHub CI 来编译 Frida-GumJS：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/FriRebuild/fripack-inject">https://github.com/FriRebuild/fripack-inject</a></li>
-</ul>
-<p>接着，我创建了一个 xmake 项目，首先实现调用 GumJS 执行脚本的功能：</p>
-<blockquote>
-<p>【原帖配图：调用 GumJS 执行脚本的代码】</p>
-</blockquote>
-<p>为了便于后续嵌入 JS 脚本，我设计了一个带有特定 <strong>Magic 标记</strong>的结构体：</p>
-<blockquote>
-<p>【原帖配图：带 Magic 标记的配置结构体】</p>
-</blockquote>
-<p>这样，在生成 <code>.so</code> 文件时，就可以通过扫描 Magic 标记找到这个配置结构，然后通过设置 <code>data_size</code> 和 <code>data_offset</code> 来指定脚本数据在二进制文件中的存储位置。</p>
-<p>接下来，我们需要编写一个 CLI 工具，将脚本数据嵌入到二进制文件中。这里我选择了使用 <strong>Rust</strong> 来实现。</p>
-<h2 id="将数据嵌入二进制文件"><a href="#将数据嵌入二进制文件" class="headerlink" title="将数据嵌入二进制文件"></a>将数据嵌入二进制文件</h2><h3 id="ELF-文件编辑"><a href="#ELF-文件编辑" class="headerlink" title="ELF 文件编辑"></a>ELF 文件编辑</h3><p>ELF 文件的主要结构包括 <strong>Section</strong> 和 <strong>Segment</strong>，其中数据通过 Segment 映射到内存中。我们只需新建一个 Segment，将脚本数据放入其中，并确保其加载到内存中。然后，计算出该数据映射的虚拟地址与 <code>g_embedded_config</code> 虚拟地址之间的偏移量，这样我们自制的 frida-gadget 就能正确加载数据了。</p>
-<p>听起来很简单，我们来实现一下：</p>
-<blockquote>
-<p>【原帖配图：新建 Segment 嵌入脚本数据的代码】</p>
-</blockquote>
-<p>需要特别注意：对于需要加载到内存中的 Segment（<code>PT_LOAD</code>），其 <code>vaddr</code> 必须按 <strong>4K 或 16K 对齐</strong>，否则 dl 可能不会正确映射，且不会报错。</p>
-<p>同时，由于新增了 Segment 和 Section，我们还需要扩展 PE 文件头的大小：</p>
-<blockquote>
-<p>【原帖配图：扩展文件头大小的代码】</p>
-</blockquote>
-<p>运行后却发现报错：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">.note sh_offset at 0x270, must be larger than 0x28a<br></code></pre></td></tr></table></figure>
+<span id="more"></span>
 
-<p>这是怎么回事？原来是因为新增的 Segment 和 Section 导致 ELF 头变大，与原有的部分 Section 发生了重叠。我们需要将这些重叠的 Section 在文件中的数据及其 <code>p_offset</code> 移动到文件末尾：</p>
-<blockquote>
-<p>【原帖配图：将重叠 Section 移到文件末尾的代码】</p>
-</blockquote>
-<p>再次运行，这次没有报错了。但将文件放到手机中加载时，又出现了新错误：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">PT_PHDR segment is not covered by a PT_LOAD segment<br></code></pre></td></tr></table></figure>
-
-<p>这个问题比较奇怪，网上资料也很少。我猜测 <code>PT_PHDR</code> Segment 本身不会被映射到内存中，它需要一个 <code>PT_LOAD</code> Segment 来帮助加载。于是，我们找到覆盖 <code>PT_PHDR</code> Segment 的那个 Segment，并将其扩展的大小同步到 <code>PT_PHDR</code> Segment：</p>
-<blockquote>
-<p>【原帖配图：同步 PT_PHDR 大小的代码】</p>
-</blockquote>
-<p>接着，我们找到 Magic 标记在二进制文件中的位置，定位其所在的 Segment，并获取其 <code>vaddr</code>：</p>
-<blockquote>
-<p>【原帖配图：定位 Magic 标记所在 Segment 的代码】</p>
-</blockquote>
-<p>计算出偏移量后，将其填入二进制文件中：</p>
-<blockquote>
-<p>【原帖配图：写入偏移量的代码】</p>
-</blockquote>
-<h3 id="PE-文件编辑"><a href="#PE-文件编辑" class="headerlink" title="PE 文件编辑"></a>PE 文件编辑</h3><p>PE 文件的处理逻辑类似。虽然编辑 ELF 花了大半天时间，踩了不少坑，但编写 PE 编辑代码只用了十分钟。不得不说，PE 的设计比 ELF 更优秀（除了那个强制要求 ordinal 的 EAT），而且几乎没有遇到什么坑。以下是相关代码：</p>
-<blockquote>
-<p>【原帖配图：PE 文件编辑代码】</p>
-</blockquote>
-<p>至此，我们得到了一个<strong>无需任何外部文件依赖、加载即自动执行脚本</strong>的二进制文件。</p>
-<h2 id="加载二进制文件到目标进程"><a href="#加载二进制文件到目标进程" class="headerlink" title="加载二进制文件到目标进程"></a>加载二进制文件到目标进程</h2><p>接下来，只需要想办法将这个二进制文件加载到目标进程中。实现方式有很多，例如：</p>
-<ol>
-<li>重新打包 APK，对 APP 自带的 <code>.so</code> 文件使用 patchelf，将我们的 <code>.so</code> 加入其依赖项。</li>
-<li>重新打包 APK，在某个初始化类中添加静态初始化代码，调用 <code>System.loadLibrary</code> 加载我们的 <code>.so</code>。</li>
-<li>编写 Xposed 模块，利用其在目标进程中执行代码的特性来加载 <code>.so</code>。</li>
-<li>对于 Windows，使用多种 DLL 注入手段加载我们的 DLL。</li>
-<li>对于 Linux，使用 <code>LD_PRELOAD</code> 或其他映射方法加载我们的 <code>.so</code>。</li>
-<li>编写 Zygisk 模块，直接对特定 APP 加载我们的 <code>.so</code>。</li>
-</ol>
-<p>目前，我已实现了前五种加载方式。受篇幅所限，这里仅介绍 <strong>Xposed</strong> 的实现方式。</p>
-<h2 id="生成-Xposed-模块来加载-so"><a href="#生成-Xposed-模块来加载-so" class="headerlink" title="生成 Xposed 模块来加载 .so"></a>生成 Xposed 模块来加载 .so</h2><p>Xposed 模块会在目标进程中执行代码，因此我们只需在 <code>xposed_init</code> 类的 <code>initZygote</code> 方法中获取模块的 APK 路径，然后使用 <code>System.load</code> 加载其中的 <code>.so</code> 文件即可。</p>
-<p>但问题在于，我们需要生成的是一个 APK 文件。我不想依赖过于笨重的 gradlew，也不想手动处理安卓特有的压缩格式、aapt2 编码、zipalign 等步骤。因此，我选择直接生成 <strong>apktool 工程</strong>，然后使用 apktool 构建 Xposed 模块的 APK。这样只需安装 apktool，即可方便地完成生成。</p>
-<p>Xposed 模块的主要特征包括：<code>AndroidManifest</code> 中的几个特殊 metadata，以及 <code>/assets/</code> 文件夹中的 <code>xposed_init</code> 和 <code>native_init</code> 文件。我们直接手动构建 apktool 的文件结构，并编写一段 Smali 代码，继承 <code>IXposedHookZygoteInit</code> 和 <code>IXposedHookLoadPackage</code>，以实现加载 <code>.so</code> 的逻辑：</p>
-<blockquote>
-<p>【原帖配图：Xposed 模块 Smali 代码】</p>
-</blockquote>
-<p>最后使用 <code>apktool b</code> 命令，即可构建出 Xposed 模块。</p>
-<p>至此，我们已经实现了从 Frida 脚本一键打包生成 Xposed 模块的大部分逻辑。</p>
-<h2 id="相关仓库"><a href="#相关仓库" class="headerlink" title="相关仓库"></a>相关仓库</h2><ul>
-<li>fripack（打包工具）：<a target="_blank" rel="noopener" href="https://github.com/std-microblock/fripack/">https://github.com/std-microblock/fripack/</a></li>
-<li>fripack-inject（自编译 Frida-GumJS 的 CI）：<a target="_blank" rel="noopener" href="https://github.com/FriRebuild/fripack-inject">https://github.com/FriRebuild/fripack-inject</a></li>
-</ul>
 <hr>
-<blockquote>
-<p>本文转载自吾爱破解论坛，原作者 <strong>MicroBlock</strong>，原帖地址：<a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-2071836-1-1.html">https://www.52pojie.cn/thread-2071836-1-1.html</a>。版权归原作者所有，转载仅供学习交流，侵删。</p>
-</blockquote>
+<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeElevenFragment</code>：<code>POST /api/app11</code>，<strong>单字段 <code>data</code></strong> = native <code>String data(int page)</code>（libeleven.so）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">service.OooO0oO(data(page));          <span class="hljs-comment">// @POST(&quot;/api/app11&quot;) @Field(&quot;data&quot;)</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">data</span><span class="hljs-params">(<span class="hljs-type">int</span> i)</span>;    <span class="hljs-comment">// static &#123; System.loadLibrary(&quot;eleven&quot;); &#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>刷新 page=1、加载更多 page++。整题核心就是弄清 native <code>data(page)</code> 生成的那个字符串。</p>
+<h2 id="二、识别-upx-壳"><a href="#二、识别-upx-壳" class="headerlink" title="二、识别 upx 壳"></a>二、识别 upx 壳</h2><p>拿 <code>lief</code> / <code>capstone</code> 看磁盘上的 <code>libeleven.so</code>：<code>.text</code> 全是 <code>udf</code>（未定义指令）、节内容不可读、notes 损坏。搜字符串能看到 <code>UPX!</code> 与 <code>$Info: This file is packed</code>——<strong>是 UPX 壳</strong>，但 <code>UPX0 / UPX1</code> 节名被抹掉了（标准 <code>upx -d</code> 靠这俩节名识别，抹掉即拒绝脱壳）。</p>
+<p>试着<strong>离线用 Unicorn 跑壳的解密 stub</strong>（<code>DT_INIT</code>）来自解密：结果它疯狂 <code>mmap</code>（<code>svc #0</code>，syscall <code>0xDE</code>）约 90 万次、疑似<strong>反模拟死循环</strong>——不实际。于是换思路：既然壳在真机上一定会把代码解密到内存，那就<strong>从内存里 dump</strong>。</p>
+<h2 id="三、内存-dump-脱壳"><a href="#三、内存-dump-脱壳" class="headerlink" title="三、内存 dump 脱壳"></a>三、内存 dump 脱壳</h2><p>在 App 里打开第 11 题 → <code>System.loadLibrary(&quot;eleven&quot;)</code> 触发壳解密。root 看 <code>/proc/pid/maps</code>：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">6ca9ac9000</span>-<span class="hljs-number">6</span>ca9b09000 r-xp ... /libeleven.so     # 打包数据(udf)，文件映射<br><span class="hljs-attribute">6ca9b09000</span>-<span class="hljs-number">6</span>ca9b89000 r-xp <span class="hljs-number">00000000</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span> <span class="hljs-number">0</span>      # ← 解密后的真实代码(匿名 r-x 区)<br></code></pre></td></tr></table></figure>
+
+<p>解密后的原始代码，就落在<strong>紧邻文件映射之后的匿名可执行区</strong>（本例 <code>base+0x40000</code> 起、0x80000 大小）。用 <code>dd if=/proc/pid/mem</code> 把它 dump 出来，反汇编即为明文（能看到 <code>data</code>、<code>(I)Ljava/lang/String;</code> 等字符串，说明脱壳成功）。</p>
+<h2 id="四、定位-data-并-Frida-取样"><a href="#四、定位-data-并-Frida-取样" class="headerlink" title="四、定位 data() 并 Frida 取样"></a>四、定位 data() 并 Frida 取样</h2><p>在 dump 里搜 <code>JNINativeMethod</code> 表——它由三个指针组成：<code>name → &quot;data&quot;</code>、<code>sig → &quot;(I)Ljava/lang/String;&quot;</code>、<code>fnPtr</code>。据此定位 <strong><code>data()</code> @ 模块基址 + 0x41cb4</strong>。</p>
+<p>反汇编 <code>data()</code>：大量 <code>std::ostringstream</code> 拼接、一个 <code>/1000</code> 的时间戳魔数——纯静态啃 C++ 代价高。直接 <strong>Frida 主动调用</strong>取样更快：Frida 17 已移除 Java 桥，但 hook / 调用 <strong>native</strong> 不需要它；拿到 <code>env</code> 后用 <strong>JNI 函数表</strong>手动调 <code>GetStringUTFChars</code> 读返回串即可。</p>
+<p>主动调 <code>data(page)</code> 得到样本：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">page</span> 0   -&gt;</span> co0uYLIacJcRYTguYLKj<br><span class="hljs-function"><span class="hljs-title">page</span> 1   -&gt;</span> cT0uYLIacJcRYTguYLKa<br><span class="hljs-function"><span class="hljs-title">page</span> 100 -&gt;</span> cT4WrJgjroIRcL/scTgjYJ4=<br></code></pre></td></tr></table></figure>
+
+<p>观察：同页同时刻<strong>确定性</strong>；页码位数越多、密文越长（<code>==</code> 补位）→ 明文里含 <code>str(page)</code>。字符集像 Base64，但顺序被打乱。</p>
+<h2 id="五、算法还原：自定义-Base64"><a href="#五、算法还原：自定义-Base64" class="headerlink" title="五、算法还原：自定义 Base64"></a>五、算法还原：自定义 Base64</h2><p>密文是<strong>自定义字母表 Base64</strong>。字母表就藏在解密后的 rodata 里（一段 64 字符、是标准表的置换）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">CUST</span> = <span class="hljs-number">45</span>AogfZw/<span class="hljs-number">9</span>+FcYrSVH1TKM7k3BebEtqCIGPJyQD60lUXpNmhWuRLds8jainzv2Ox<br><span class="hljs-attr">STD</span>  = ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/<br></code></pre></td></tr></table></figure>
+
+<p>把密文按 <code>CUST→STD</code> 映射后做标准 Base64 解码，明文赫然是：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">page</span> 0   -&gt;</span> <span class="hljs-string">&quot;0:1788232511757&quot;</span><br><span class="hljs-function"><span class="hljs-title">page</span> 100 -&gt;</span> <span class="hljs-string">&quot;100:1788232511760&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>即 <strong>明文 = <code>f&quot;{page}:{毫秒时间戳}&quot;</code><strong>。再测服务器对时间戳的态度：now / 1 小时前 / 30 天前 / 2020 年 / 甚至 <code>0</code>——</strong>全部照常返回数据</strong>，说明<strong>不校验时间戳新鲜度</strong>。于是时间戳可以随便填，整个 <code>data</code> 生成就是一行纯 Python：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> base64, requests<br><br>CUST = <span class="hljs-string">&quot;45AogfZw/9+FcYrSVH1TKM7k3BebEtqCIGPJyQD60lUXpNmhWuRLds8jainzv2Ox&quot;</span><br>STD  = <span class="hljs-string">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</span><br>_ENC = <span class="hljs-built_in">str</span>.maketrans(STD, CUST)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">data</span>(<span class="hljs-params">page, ms=<span class="hljs-number">0</span></span>):                       <span class="hljs-comment"># ms 服务器不校验，默认 0</span><br>    <span class="hljs-keyword">return</span> base64.b64encode(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;page&#125;</span>:<span class="hljs-subst">&#123;ms&#125;</span>&quot;</span>.encode()).decode().translate(_ENC)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page</span>):<br>    j = requests.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app11&quot;</span>,<br>                      data=&#123;<span class="hljs-string">&quot;data&quot;</span>: data(page)&#125;,<br>                      headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">15</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>))   <span class="hljs-comment"># 纯 Python 现造 data 参数 → 直连公网取回该页数据</span><br></code></pre></td></tr></table></figure>
+
+<p>到这一步就<strong>彻底离机</strong>了：不需要设备、不需要 Frida、不需要 so，一行 <code>data(page)</code> 即可任意翻页。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的”upx壳”只是把 <code>data</code> 的生成逻辑藏进加壳 native——真读懂后，它不过是 <code>{页码}:{时间戳}</code> 的自定义 Base64，连时间戳都不验。方法论上值得记的两点：<strong>对抗性的壳别硬啃离线脱壳，直接从进程内存 dump 解密后代码</strong>；以及 Frida 17 无 Java 桥时，靠 <strong>JNI 函数表</strong>照样能 hook / 主动调用 native 拿样本。</p>
 
               
             </div>
@@ -405,8 +346,15 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
   
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
   
 
       </span>
@@ -424,15 +372,19 @@
       
         <a href="/tags/Frida/">#Frida</a>
       
-        <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/">#安卓逆向</a>
+        <a href="/tags/Android/">#Android</a>
       
-        <a href="/tags/Xposed/">#Xposed</a>
+        <a href="/tags/JNI/">#JNI</a>
       
-        <a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96/">#持久化</a>
+        <a href="/tags/UPX/">#UPX</a>
       
-        <a href="/tags/ELF/">#ELF</a>
+        <a href="/tags/%E8%84%B1%E5%A3%B3/">#脱壳</a>
       
-        <a href="/tags/PE/">#PE</a>
+        <a href="/tags/%E5%86%85%E5%AD%98dump/">#内存dump</a>
+      
+        <a href="/tags/Base64/">#Base64</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
       
     </div>
   
@@ -444,8 +396,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>【转载】Frida 脚本一键持久化方案：打包为 Xposed 模块、注入 APP / so / dll</div>
-      <div>https://kingjem.github.io/2025/11/12/逆向/【转载】Frida脚本一键持久化-打包Xposed模块-注入so-dll/</div>
+      <div>猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第十一题upx壳离机复现-内存dump脱壳与自定义Base64/</div>
     </div>
     <div class="license-meta">
       
@@ -457,7 +409,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年11月12日</div>
+          <div>2026年9月1日</div>
         </div>
       
       
@@ -487,18 +439,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/04/php-%E5%A4%84%E7%90%86%E9%87%8D%E8%AF%BB%E5%AD%97%E7%AC%A6/" title="PHP如何使用 Unicode 标准化移除字符串中的重音符号">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">PHP如何使用 Unicode 标准化移除字符串中的重音符号</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/09/08/traefik%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="traefik 配置教程">
-                        <span class="hidden-mobile">traefik 配置教程</span>
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" title="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原">
+                        <span class="hidden-mobile">猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
