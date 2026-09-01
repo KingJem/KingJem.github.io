@@ -16,31 +16,28 @@
   <meta name="author" content="Ruhai">
   <meta name="keywords" content="python go java Android js">
   
-    <meta name="description" content="两道猿人学 App 闯关题的纯离机复现记录:目标是不驱动 App、只靠逆向,用独立脚本把数据取出来。  第五题(HTTP &#x2F; dex,难度”简单”):端点靠反射 Retrofit 运行期注解读出,签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4 —— 最终还原成零依赖纯 Python。 第四题(UDP &#x2F; native,难度”困难”):libfour.s">
+    <meta name="description" content="猿人学 App 第五题（HTTP &#x2F; dex，难度”简单”）的纯离机复现记录：不驱动 App，只靠逆向把签名算法搞清楚。端点靠反射 Retrofit 运行期注解读出；签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4——本文记录怎么在反编译失败的情况下，用 ASM 插桩 dump 执行轨迹反推出这个变形，并还原成零依赖纯 Python。 ⚠️ 猿人学闯关">
 <meta property="og:type" content="article">
-<meta property="og:title" content="猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原">
-<meta property="og:url" content="https://kingjem.github.io/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E4%B8%8E%E5%8F%98%E5%BD%A2MD4/index.html">
+<meta property="og:title" content="猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/index.html">
 <meta property="og:site_name" content="Ruhai&#39;s blogs">
-<meta property="og:description" content="两道猿人学 App 闯关题的纯离机复现记录:目标是不驱动 App、只靠逆向,用独立脚本把数据取出来。  第五题(HTTP &#x2F; dex,难度”简单”):端点靠反射 Retrofit 运行期注解读出,签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4 —— 最终还原成零依赖纯 Python。 第四题(UDP &#x2F; native,难度”困难”):libfour.s">
+<meta property="og:description" content="猿人学 App 第五题（HTTP &#x2F; dex，难度”简单”）的纯离机复现记录：不驱动 App，只靠逆向把签名算法搞清楚。端点靠反射 Retrofit 运行期注解读出；签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4——本文记录怎么在反编译失败的情况下，用 ASM 插桩 dump 执行轨迹反推出这个变形，并还原成零依赖纯 Python。 ⚠️ 猿人学闯关">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-26T06:55:07.000Z">
-<meta property="article:modified_time" content="2026-08-26T06:57:11.247Z">
+<meta property="article:modified_time" content="2026-09-01T05:36:34.772Z">
 <meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="ASM插桩">
 <meta property="article:tag" content="Android">
-<meta property="article:tag" content="Frida">
-<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="JVM预言机">
 <meta property="article:tag" content="MD4">
 <meta property="article:tag" content="OLLVM">
-<meta property="article:tag" content="RC4">
-<meta property="article:tag" content="Unicorn">
 <meta property="article:tag" content="dex2jar">
-<meta property="article:tag" content="goron">
 <meta property="article:tag" content="猿人学">
 <meta property="article:tag" content="逆向">
 <meta name="twitter:card" content="summary_large_image">
   
   
-  <title>猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原 - Ruhai&#39;s blogs</title>
+  <title>猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原 - Ruhai&#39;s blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -197,7 +194,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原"></span>
+            <span id="subtitle" data-typed-text="猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原"></span>
           
         </div>
 
@@ -220,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.7k 字
+          3.9k 字
         
       </span>
     
@@ -231,7 +228,7 @@
         
         
         
-          56 分钟
+          33 分钟
         
       </span>
     
@@ -277,12 +274,12 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原</h1>
+            <h1 style="display: none">猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原</h1>
             
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2026年8月26日 下午
+                    本文最后更新于：2026年9月1日 下午
                   
                 
               </p>
@@ -290,31 +287,34 @@
             <div class="markdown-body">
               
               <blockquote>
-<p>两道猿人学 App 闯关题的<strong>纯离机复现</strong>记录:目标是<strong>不驱动 App</strong>、只靠逆向,用独立脚本把数据取出来。</p>
-<ul>
-<li>第五题(HTTP / dex,难度”简单”):端点靠反射 Retrofit 运行期注解读出,签名是 <code>assets/encrypted.dex</code> 里一个被 <strong>OLLVM 混淆的变形 MD4</strong> —— 最终<strong>还原成零依赖纯 Python</strong>。</li>
-<li>第四题(UDP / native,难度”困难”):<code>libfour.so</code> 被 <strong>goron/OLLVM</strong> 混淆,请求包由双 PRNG 造出 —— 用 <strong>Unicorn 忠实模拟 <code>echo_cli</code></strong> 造包,本机直连公网取值。</li>
-</ul>
-<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场;本文仅用于授权范围内的学习研究,请遵守相关服务条款与法律。</p>
+<p>猿人学 App 第五题（HTTP / dex，难度”简单”）的<strong>纯离机复现</strong>记录：<strong>不驱动 App</strong>，只靠逆向把签名算法搞清楚。<br>端点靠反射 Retrofit 运行期注解读出；签名是 <code>assets/encrypted.dex</code> 里一个被 <strong>OLLVM 混淆的变形 MD4</strong>——本文记录<strong>怎么在反编译失败的情况下，用 ASM 插桩 dump 执行轨迹反推出这个变形，并还原成零依赖纯 Python</strong>。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
 </blockquote>
-<p>这次的约束很明确:<strong>不碰手机、不驱动 App</strong>,产物是能独立跑的脚本。于是全程只做两件事——静态把算法读出来,或用模拟器/预言机把真实代码离机跑起来。</p>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>手上的静态素材</li>
+<li>请求模型（静态反编译）</li>
+<li>签名：OLLVM 包裹的变形 MD4</li>
+<li>纯 Python 还原 + JVM 预言机对拍</li>
+<li>取数与反爬</li>
+</ul>
 <span id="more"></span>
 
-<h2 id="零、手上的静态素材"><a href="#零、手上的静态素材" class="headerlink" title="零、手上的静态素材"></a>零、手上的静态素材</h2><p>从设备 <code>pull</code> 出 <code>base.apk</code> 后就再没碰过手机。关键素材:</p>
-<ul>
-<li><code>base.apk</code> → <code>classes*.dex</code>(dex2jar 转 <code>app.jar</code>)、<code>lib/arm64-v8a/libfour.so</code>、<code>assets/encrypted.dex</code></li>
-<li>工具:<code>androguard</code>(纯 Python 反编译)、<code>dex2jar</code> + 本机 Temurin JDK(把提取出的类当<strong>离机预言机</strong>跑)、<code>jadx</code>/<code>CFR</code>(反编译)、ASM(字节码插桩)、<code>unicorn</code> + <code>lief</code> + <code>capstone</code>(模拟/反汇编 native)</li>
-</ul>
 <hr>
-<h2 id="一、第五题-变形-MD4-的纯-Python-还原"><a href="#一、第五题-变形-MD4-的纯-Python-还原" class="headerlink" title="一、第五题:变形 MD4 的纯 Python 还原"></a>一、第五题:变形 MD4 的纯 Python 还原</h2><h3 id="1-1-请求模型-静态反编译"><a href="#1-1-请求模型-静态反编译" class="headerlink" title="1.1 请求模型(静态反编译)"></a>1.1 请求模型(静态反编译)</h3><p><code>ChallengeFiveFragment</code> 的翻页逻辑很直白:</p>
+<h2 id="一、手上的静态素材"><a href="#一、手上的静态素材" class="headerlink" title="一、手上的静态素材"></a>一、手上的静态素材</h2><p>从设备 <code>pull</code> 出 <code>base.apk</code> 后就再没碰过手机：</p>
+<ul>
+<li><code>base.apk</code> → <code>classes*.dex</code>（dex2jar 转 <code>app.jar</code>）、<code>assets/encrypted.dex</code></li>
+<li>工具：<code>androguard</code>（纯 Python 反编译）、<code>dex2jar</code> + 本机 Temurin JDK（把提取出的类当<strong>离机预言机</strong>跑）、<code>jadx</code>/<code>CFR</code>（反编译）、ASM（字节码插桩）</li>
+</ul>
+<h2 id="二、请求模型（静态反编译）"><a href="#二、请求模型（静态反编译）" class="headerlink" title="二、请求模型（静态反编译）"></a>二、请求模型（静态反编译）</h2><p><code>ChallengeFiveFragment</code> 的翻页逻辑很直白：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> page + <span class="hljs-string">&quot;:&quot;</span> + System.currentTimeMillis();   <span class="hljs-comment">// 例:&quot;1:1787308899669&quot;</span><br><span class="hljs-type">String</span> <span class="hljs-variable">sign</span>    <span class="hljs-operator">=</span> DexUtils.OooO0O0(ctx, <span class="hljs-built_in">this</span>, content);       <span class="hljs-comment">// 32 位十六进制</span><br>service.OooOOOo(content, sign);<br></code></pre></td></tr></table></figure>
 
-<p>端点不用解字符串加密——Retrofit 的 <code>@POST/@Field</code> 是 <strong>RUNTIME 注解</strong>,<code>dex2jar</code> 转 jar 后直接反射接口就能读出来:</p>
+<p>端点不用解字符串加密——Retrofit 的 <code>@POST/@Field</code> 是 <strong>RUNTIME 注解</strong>，<code>dex2jar</code> 转 jar 后直接反射接口就能读出来：</p>
 <figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@FormUrlEncoded</span> <span class="hljs-variable">@POST</span>(<span class="hljs-string">&quot;/api/app5&quot;</span>)<br><span class="hljs-built_in">OooOOOo</span>(<span class="hljs-variable">@Field</span>(<span class="hljs-string">&quot;content&quot;</span>) content, <span class="hljs-variable">@Field</span>(<span class="hljs-string">&quot;sign&quot;</span>) sign)<br></code></pre></td></tr></table></figure>
 
-<p>即 <code>POST https://www.python-spider.com/api/app5</code>,表单 <code>content=页号:毫秒</code>、<code>sign=签名</code>;响应 JSON 每页 10 个数字,且<strong>按页号确定性返回</strong>。</p>
-<h3 id="1-2-签名-OLLVM-包裹的变形-MD4"><a href="#1-2-签名-OLLVM-包裹的变形-MD4" class="headerlink" title="1.2 签名:OLLVM 包裹的变形 MD4"></a>1.2 签名:OLLVM 包裹的变形 MD4</h3><p><code>DexUtils.OooO0O0</code> 把 <code>assets/encrypted.dex</code>(<strong>逐字节 XOR 0xA6</strong>)内存加载,调用 <code>com.yuanrenxue.challenge.five.Sign.sign()</code>。这个 <code>sign()</code> 有 <strong>21938 条指令</strong>、控制流扁平化 + 字符串加密,jadx 和 CFR 都无法反编译主体——但辅助函数 <code>f/g/h</code> 和常量 <code>0x5A827999</code>/<code>0x6ED9EBA1</code> 一眼就是 <strong>MD4</strong>。</p>
-<p>麻烦的是 <code>md4(content) ≠ 实测签名</code>。于是换个思路:<strong>用 ASM 给 <code>ff/gg/hh</code> 插桩</strong>,跑一次 dump 出执行轨迹(每步的 <code>a,b,c,d, 消息字, 移位</code>),再把每步的消息字反查回下标,还原出完整调度。结论——这是一个<strong>四处被改动的 MD4</strong>:</p>
+<p>即 <code>POST /api/app5</code>，表单 <code>content=页号:毫秒</code>、<code>sign=签名</code>；响应 JSON 每页 10 个数字，且<strong>按页号确定性返回</strong>。</p>
+<h2 id="三、签名：OLLVM-包裹的变形-MD4"><a href="#三、签名：OLLVM-包裹的变形-MD4" class="headerlink" title="三、签名：OLLVM 包裹的变形 MD4"></a>三、签名：OLLVM 包裹的变形 MD4</h2><p><code>DexUtils.OooO0O0</code> 把 <code>assets/encrypted.dex</code>（<strong>逐字节 XOR 0xA6</strong>）内存加载，调用 <code>com.yuanrenxue.challenge.five.Sign.sign()</code>。这个 <code>sign()</code> 有 <strong>21938 条指令</strong>、控制流扁平化 + 字符串加密，jadx 和 CFR 都无法反编译主体——但辅助函数 <code>f/g/h</code> 和常量 <code>0x5A827999</code>/<code>0x6ED9EBA1</code> 一眼就是 <strong>MD4</strong>。</p>
+<p>麻烦的是 <code>md4(content) ≠ 实测签名</code>。于是换思路：<strong>用 ASM 给 <code>ff/gg/hh</code> 插桩</strong>，跑一次 dump 出执行轨迹（每步的 <code>a,b,c,d, 消息字, 移位</code>），再把每步的消息字反查回下标，还原出完整调度。结论——这是一个<strong>四处被改动的 MD4</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -346,82 +346,20 @@
 <tr>
 <td>预处理</td>
 <td>无</td>
-<td>正式 48 步前对字 0 多做一次 <code>a=rotl(a+F(b,c,d)+X0,5)</code>(<strong>只改 a、不轮换</strong>)</td>
+<td>正式 48 步前对字 0 多做一次 <code>a=rotl(a+F(b,c,d)+X0,5)</code>（<strong>只改 a、不轮换</strong>）</td>
 </tr>
 <tr>
 <td>输出</td>
 <td>定长 hex</td>
-<td>4 个结果字各自 <code>Integer.toHexString</code>(<strong>逐字丢前导 0</strong>)拼接</td>
+<td>4 个结果字各自 <code>Integer.toHexString</code>（<strong>逐字丢前导 0</strong>）拼接</td>
 </tr>
 </tbody></table>
-<p>纯 Python 复现后,用 dex2jar 把 <code>Sign</code> 类跑在本机 JVM 上当预言机,<strong>360 组随机输入 0 差异</strong>。核心实现:</p>
+<h2 id="四、纯-Python-还原-JVM-预言机对拍"><a href="#四、纯-Python-还原-JVM-预言机对拍" class="headerlink" title="四、纯 Python 还原 + JVM 预言机对拍"></a>四、纯 Python 还原 + JVM 预言机对拍</h2><p>按上面反推的调度纯 Python 复现；再用 dex2jar 把 <code>Sign</code> 类跑在<strong>本机 JVM 上当预言机</strong>，喂随机输入对拍——<strong>360 组 0 差异</strong>才算真复现。核心实现：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> struct<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_F</span>(<span class="hljs-params">x,y,z</span>): <span class="hljs-keyword">return</span> (x&amp;y)|((~x&amp;<span class="hljs-number">0xffffffff</span>)&amp;z)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_G</span>(<span class="hljs-params">x,y,z</span>): <span class="hljs-keyword">return</span> (x&amp;y)|(x&amp;z)|(y&amp;z)<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_H</span>(<span class="hljs-params">x,y,z</span>): <span class="hljs-keyword">return</span> x^y^z<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">lrot</span>(<span class="hljs-params">x,n</span>): x&amp;=<span class="hljs-number">0xffffffff</span>; <span class="hljs-keyword">return</span> ((x&lt;&lt;n)|(x&gt;&gt;(<span class="hljs-number">32</span>-n)))&amp;<span class="hljs-number">0xffffffff</span><br><span class="hljs-comment"># 49 步调度:第 0 步为预处理(只更新 a,不轮换)</span><br>_SCHED=[(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>),<br> (<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">1</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">2</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">3</span>,<span class="hljs-number">19</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">4</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">5</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">6</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">7</span>,<span class="hljs-number">19</span>),<br> (<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">8</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">9</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">10</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">11</span>,<span class="hljs-number">19</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">12</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">13</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">14</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;ff&#x27;</span>,<span class="hljs-number">15</span>,<span class="hljs-number">19</span>),<br> (<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">8</span>,<span class="hljs-number">7</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">12</span>,<span class="hljs-number">13</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">1</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">5</span>,<span class="hljs-number">5</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">9</span>,<span class="hljs-number">7</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">13</span>,<span class="hljs-number">13</span>),<br> (<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">6</span>,<span class="hljs-number">5</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">10</span>,<span class="hljs-number">7</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">14</span>,<span class="hljs-number">13</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">3</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">7</span>,<span class="hljs-number">5</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">11</span>,<span class="hljs-number">7</span>),(<span class="hljs-string">&#x27;gg&#x27;</span>,<span class="hljs-number">15</span>,<span class="hljs-number">13</span>),<br> (<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">4</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">12</span>,<span class="hljs-number">15</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">10</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">6</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">14</span>,<span class="hljs-number">15</span>),<br> (<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">1</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">9</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">5</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">13</span>,<span class="hljs-number">15</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">3</span>,<span class="hljs-number">3</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">11</span>,<span class="hljs-number">9</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">7</span>,<span class="hljs-number">11</span>),(<span class="hljs-string">&#x27;hh&#x27;</span>,<span class="hljs-number">15</span>,<span class="hljs-number">15</span>)]<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">sign</span>(<span class="hljs-params">content</span>):<br>    M=content.encode(); b=<span class="hljs-built_in">bytearray</span>(M); b.append(<span class="hljs-number">0x80</span>)<br>    <span class="hljs-keyword">while</span> <span class="hljs-built_in">len</span>(b)%<span class="hljs-number">64</span>!=<span class="hljs-number">56</span>: b.append(<span class="hljs-number">0</span>)<br>    b+=struct.pack(<span class="hljs-string">&#x27;&lt;Q&#x27;</span>,<span class="hljs-built_in">len</span>(M)*<span class="hljs-number">8</span>)<br>    A,B,C,D=<span class="hljs-number">0x67452301</span>,<span class="hljs-number">0xefcdab89</span>,<span class="hljs-number">0xEFCDAB98</span>,<span class="hljs-number">0x10325476</span>     <span class="hljs-comment"># C 被篡改</span><br>    X=<span class="hljs-built_in">list</span>(struct.unpack(<span class="hljs-string">&#x27;&lt;16I&#x27;</span>,b[:<span class="hljs-number">64</span>])); a,bb,c,d=A,B,C,D<br>    <span class="hljs-keyword">for</span> i,(t,idx,s) <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(_SCHED):<br>        fn=_F <span class="hljs-keyword">if</span> t==<span class="hljs-string">&#x27;ff&#x27;</span> <span class="hljs-keyword">else</span> (_G <span class="hljs-keyword">if</span> t==<span class="hljs-string">&#x27;gg&#x27;</span> <span class="hljs-keyword">else</span> _H)<br>        K=<span class="hljs-number">0</span> <span class="hljs-keyword">if</span> t==<span class="hljs-string">&#x27;ff&#x27;</span> <span class="hljs-keyword">else</span> (<span class="hljs-number">0x5a827999</span> <span class="hljs-keyword">if</span> t==<span class="hljs-string">&#x27;gg&#x27;</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0x6ed9eba1</span>)<br>        na=lrot((a+fn(bb,c,d)+X[idx]+K)&amp;<span class="hljs-number">0xffffffff</span>,s)<br>        <span class="hljs-keyword">if</span> i: a,bb,c,d=d,na,bb,c        <span class="hljs-comment"># 标准 MD4 轮换</span><br>        <span class="hljs-keyword">else</span>: a=na                      <span class="hljs-comment"># 预处理:不轮换</span><br>    A=(A+a)&amp;<span class="hljs-number">0xffffffff</span>;B=(B+bb)&amp;<span class="hljs-number">0xffffffff</span>;C=(C+c)&amp;<span class="hljs-number">0xffffffff</span>;D=(D+d)&amp;<span class="hljs-number">0xffffffff</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>.join(<span class="hljs-built_in">format</span>(w&amp;<span class="hljs-number">0xffffffff</span>,<span class="hljs-string">&#x27;x&#x27;</span>) <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> (A,B,C,D))  <span class="hljs-comment"># 逐字 toHexString</span><br></code></pre></td></tr></table></figure>
 
-<h3 id="1-3-取数与反爬"><a href="#1-3-取数与反爬" class="headerlink" title="1.3 取数与反爬"></a>1.3 取数与反爬</h3><p>纯 Python 客户端对 1..100 页各取一次求和即可。服务器对同 IP <strong>限频</strong>(约 60 次/窗口后 <code>403 Access forbidden</code>),对策是请求间隔 ~0.7s + 403 退避(重试时用<strong>新时间戳重新签名</strong>)。</p>
-<p><strong>答案:1–100 页数字之和 = <code>5167231</code></strong>(与 App 内提交一致)。</p>
-<hr>
-<h2 id="二、第四题-Unicorn-模拟-goron-so-造包"><a href="#二、第四题-Unicorn-模拟-goron-so-造包" class="headerlink" title="二、第四题:Unicorn 模拟 goron so 造包"></a>二、第四题:Unicorn 模拟 goron so 造包</h2><h3 id="2-1-协议与响应-最关键的发现"><a href="#2-1-协议与响应-最关键的发现" class="headerlink" title="2.1 协议与响应(最关键的发现)"></a>2.1 协议与响应(最关键的发现)</h3><p><code>ChallengeFourActivity.onCreate</code> 是 native,逻辑全在 <code>libfour.so</code>(arm64,<strong>goron/OLLVM</strong>:控制流扁平化 + 运行期填充的间接跳转表)。硬编码服务器 <strong><code>47.95.8.136:12000</code>(UDP)</strong>,关键符号:<code>echo_cli</code>(造包+发送)、<code>get_timestamp</code>、<code>xorshift64</code>、<code>RC4::*</code>、<code>minstd_rand</code>(LCG 48271)+<code>uniform_int_distribution&lt;uint8&gt;</code>。</p>
-<p>先看响应(1024 字节)。最关键的发现是它的<strong>头部就是”位置表”<strong>——key 和 value 都散布在响应里,取值</strong>根本不用逆请求侧的 PRNG</strong>:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">resp</span>):<br>    key = <span class="hljs-built_in">bytes</span>(resp[resp[<span class="hljs-number">1</span>+i]]  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">16</span>))   <span class="hljs-comment"># resp[1..16] = 16 个 key 字节的位置</span><br>    vb  = <span class="hljs-built_in">bytes</span>(resp[resp[<span class="hljs-number">17</span>+i]] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>))     <span class="hljs-comment"># resp[17..20] = 4 个 value 字节的位置</span><br>    <span class="hljs-keyword">return</span> struct.unpack(<span class="hljs-string">&quot;&lt;I&quot;</span>, rc4(key, vb))[<span class="hljs-number">0</span>]          <span class="hljs-comment"># 数值 = uint32_LE(RC4(key, vbytes))</span><br></code></pre></td></tr></table></figure>
-
-<p>而且<strong>本机公网能直连 12000 端口</strong>,连一个全零包都能收到 1024 字节响应。所以只剩一个问题:<strong>如何构造一个携带指定时间戳的请求包</strong>。</p>
-<h3 id="2-2-goron-造包-用-Unicorn-忠实模拟"><a href="#2-2-goron-造包-用-Unicorn-忠实模拟" class="headerlink" title="2.2 goron 造包:用 Unicorn 忠实模拟"></a>2.2 goron 造包:用 Unicorn 忠实模拟</h3><p><code>echo_cli</code> 用 <code>get_timestamp()</code> 的毫秒时间戳派生 PRNG、组 255 字节包、<code>sendto</code> 发送。这段被 goron 的间接跳转(<code>realaddr = *(table+off) + delta</code> 大常量算术)包裹,纯静态啃代价高。于是<strong>用 Unicorn 模拟 <code>echo_cli</code></strong>:</p>
-<ol>
-<li>按 program header 映射各 LOAD 段;</li>
-<li><strong>应用重定位</strong>(踩坑点):<ul>
-<li><code>R_AARCH64_RELATIVE</code>:<code>*addr = addend</code>(填 goron 跳转表,addend 常是 <code>0xffffffff…</code> 负值靠 64 位回绕落回模块内);</li>
-<li><code>R_AARCH64_ABS64</code>(导入符号):<strong><code>*addr = stub + addend</code></strong> —— goron 会在调用点 <code>+(magic - state)</code> 把 addend 抵消回 <code>stub</code>。<strong>漏加 addend 会直接跳飞</strong>,这是最大的坑;</li>
-</ul>
-</li>
-<li><strong>打桩</strong>:导入函数(malloc/memcpy/inet_addr/socket/clock_gettime/…)用 Python 实现或返回 0;<code>get_timestamp</code> hook 返回<strong>目标时间戳</strong>;<code>sendto</code> hook <strong>截获 255B 请求包</strong>并停机;</li>
-<li><strong>JNIEnv</strong>:<code>env* → 函数表 → 统一 stub</code>,所有 JNI 调用返回 0(造包不依赖 JNI 返回值);</li>
-<li>置 <code>x0=0, x1=env, x2=obj</code>,从 <code>echo_cli</code> 跑到 <code>sendto</code>,拿到确定性请求包(同一时间戳稳定复现,不同时间戳不同)。</li>
-</ol>
-<p>关键片段(重定位):</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> b.relocations:<br>    t, a, add = <span class="hljs-built_in">str</span>(r.<span class="hljs-built_in">type</span>), r.address, r.addend<br>    nm = r.symbol.name <span class="hljs-keyword">if</span> r.has_symbol <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">if</span>   <span class="hljs-string">&quot;RELATIVE&quot;</span> <span class="hljs-keyword">in</span> t:                      w(a, add)              <span class="hljs-comment"># base=0</span><br>    <span class="hljs-keyword">elif</span> <span class="hljs-string">&quot;ABS64&quot;</span> <span class="hljs-keyword">in</span> t <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;GLOB_DAT&quot;</span> <span class="hljs-keyword">in</span> t <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;JUMP_SLOT&quot;</span> <span class="hljs-keyword">in</span> t:<br>        <span class="hljs-keyword">if</span>   nm <span class="hljs-keyword">in</span> sym_va:                     w(a, sym_va[nm]+add)<br>        <span class="hljs-keyword">elif</span> nm:                               w(a, stub_for(nm)+add) <span class="hljs-comment"># goron: stub+addend</span><br>        <span class="hljs-keyword">else</span>:                                  w(a, add)<br></code></pre></td></tr></table></figure>
-
-<p><code>get_timestamp</code> / <code>sendto</code> 的 hook:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> addr == sym[<span class="hljs-string">&#x27;_Z13get_timestampv&#x27;</span>]:  ret(<span class="hljs-variable language_">self</span>.TS); <span class="hljs-keyword">return</span>          <span class="hljs-comment"># 喂目标时间戳</span><br>...<br><span class="hljs-keyword">if</span> nm == <span class="hljs-string">&quot;sendto&quot;</span>:  <span class="hljs-variable language_">self</span>.sendbuf = read(x1, x2); ret(x2); stop()     <span class="hljs-comment"># 截获请求包</span><br></code></pre></td></tr></table></figure>
-
-<h3 id="2-3-取值"><a href="#2-3-取值" class="headerlink" title="2.3 取值"></a>2.3 取值</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">build_packet</span><span class="hljs-params">(<span class="hljs-number">1640391171671</span>)</span></span>  →  <span class="hljs-number">255</span>B 请求包<br>   →  本机 UDP 直发 <span class="hljs-number">47.95</span>.<span class="hljs-number">8.136</span>:<span class="hljs-number">12000</span>  →  收 <span class="hljs-number">1024</span>B 响应<br>   →  <span class="hljs-built_in">decode</span>(响应)  →  <span class="hljs-number">1213060963</span><br></code></pre></td></tr></table></figure>
-
-<p>**答案:<code>1640391171671</code> 时刻数值 = <code>1213060963</code>**。服务器接受任意时间戳并返回 <code>f(时间戳)</code>,所以把 2021 年的固定值喂进去即得确定答案。</p>
-<h3 id="2-4-为什么第四题没做成纯-Python"><a href="#2-4-为什么第四题没做成纯-Python" class="headerlink" title="2.4 为什么第四题没做成纯 Python?"></a>2.4 为什么第四题没做成纯 Python?</h3><p>顺手也把造包往纯 Python 方向挖了挖:它<strong>不用 RC4</strong>;用两个 PRNG——<code>xorshift64</code> 链(种子=<strong>完整毫秒 ts</strong>)+ <code>minstd_rand</code>(种子≈<strong>秒级 <code>ts//1000</code></strong>,同秒同流)+ libc++ <code>uniform_int_distribution&lt;uint8&gt;</code>;包体是<strong>交错 XOR 块</strong>(每 16 字节 = <code>明文^掩码</code> 与 <code>明文</code> 字节交错),且调用次数<strong>随数据变长</strong>(不同 ts 下 xorshift 286 vs 297 次)。</p>
-<p>结论:第五题的签名是<strong>标准 MD4 的变体</strong>,能干净还原成纯 Python;而第四题的造包是一段<strong>定制、混淆、双 PRNG + 变长循环</strong>的逻辑,不是标准算法。对这类 OLLVM native,<strong>用 CPU 模拟器执行真实机器码</strong>才是稳健、忠实、同样离机的正解——依赖只有 <code>unicorn</code>/<code>lief</code>,都是 pip 可装的纯 Python 可调库。</p>
-<hr>
-<h2 id="三、工具链小结"><a href="#三、工具链小结" class="headerlink" title="三、工具链小结"></a>三、工具链小结</h2><table>
-<thead>
-<tr>
-<th>场景</th>
-<th>手段</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>读端点/接口签名</td>
-<td>Retrofit RUNTIME 注解反射(dex2jar → jar → 反射),免解字符串加密</td>
-</tr>
-<tr>
-<td>dex 层混淆算法</td>
-<td>解密 dex → dex2jar → <strong>本机 JVM 当离机预言机</strong>;ASM 插桩 dump 执行轨迹反推算法</td>
-</tr>
-<tr>
-<td>native 层 OLLVM/goron</td>
-<td><strong>Unicorn 模拟</strong>;重定位对导入 <code>ABS64</code> 要写 <code>stub+addend</code>;hook 关键函数(时间戳/收发)</td>
-</tr>
-<tr>
-<td>协议还原</td>
-<td>先看响应结构——很多”随机”包其实是<strong>位置表 + 对称解密</strong>,取值无需逆请求侧 PRNG</td>
-</tr>
-<tr>
-<td>Frida 17 注意</td>
-<td>Java 桥被移出核心,需 <code>frida-compile</code> 打包 <code>frida-java-bridge</code>(本文最终未用设备,仅作对照)</td>
-</tr>
-</tbody></table>
-<h2 id="四、结语"><a href="#四、结语" class="headerlink" title="四、结语"></a>四、结语</h2><p>两题一个共同心得:**先判断”是不是标准算法”**。是(第五题的 MD4 变体)就静态还原成纯代码;不是(第四题的定制造包)就别硬啃混淆,用模拟器/预言机把真实代码离机跑起来——同样是逆向,同样离机,但省下的时间是数量级的。</p>
-<ul>
-<li>第四题答案:<code>1640391171671</code> → <strong><code>1213060963</code></strong></li>
-<li>第五题答案:1–100 页之和 → <strong><code>5167231</code></strong></li>
-</ul>
+<h2 id="五、取数与反爬"><a href="#五、取数与反爬" class="headerlink" title="五、取数与反爬"></a>五、取数与反爬</h2><p>有了纯 Python 的 <code>sign()</code>，客户端就能自己拼 <code>content=页号:毫秒</code> + 签名，直连公网逐页取数。服务器对同 IP <strong>限频</strong>（约 60 次/窗口后 <code>403 Access forbidden</code>），对策是请求间隔 ~0.7s + 403 退避（重试时用<strong>新时间戳重新签名</strong>）。</p>
+<p>到这一步就完全离机、零依赖了：不碰手机、不加载 dex，纯 Python 复刻签名即可翻页取数。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的关键判断是**”是不是标准算法”<strong>——<code>f/g/h</code> + 那两个常量一露头，就该往 MD4 靠。真正花功夫的是确认它被</strong>四处魔改<strong>：靠 ASM 插桩 dump 执行轨迹、再用本机 JVM 当预言机对拍，才敢说”干净还原成纯 Python”。对可反编译失败但本质是标准算法变体的 dex 层混淆，</strong>插桩取轨迹 + 预言机对拍**是很省事的正解。</p>
 
               
             </div>
@@ -463,25 +401,19 @@
       
         <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
       
-        <a href="/tags/Frida/">#Frida</a>
-      
         <a href="/tags/Android/">#Android</a>
-      
-        <a href="/tags/JNI/">#JNI</a>
-      
-        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
-      
-        <a href="/tags/Unicorn/">#Unicorn</a>
-      
-        <a href="/tags/goron/">#goron</a>
-      
-        <a href="/tags/OLLVM/">#OLLVM</a>
       
         <a href="/tags/dex2jar/">#dex2jar</a>
       
         <a href="/tags/MD4/">#MD4</a>
       
-        <a href="/tags/RC4/">#RC4</a>
+        <a href="/tags/OLLVM/">#OLLVM</a>
+      
+        <a href="/tags/ASM%E6%8F%92%E6%A1%A9/">#ASM插桩</a>
+      
+        <a href="/tags/JVM%E9%A2%84%E8%A8%80%E6%9C%BA/">#JVM预言机</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
       
     </div>
   
@@ -493,8 +425,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原</div>
-      <div>https://kingjem.github.io/2026/08/26/猿人学App第四五题离机复现-Unicorn模拟goron与变形MD4/</div>
+      <div>猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原</div>
+      <div>https://kingjem.github.io/2026/08/26/猿人学App第五题离机复现-变形MD4纯Python还原/</div>
     </div>
     <div class="license-meta">
       
@@ -546,8 +478,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/08/17/%E9%80%86%E5%90%91%E7%94%A8%E7%9A%84Skill%E5%92%8CMCP-%E5%85%AC%E5%BC%80%E4%BB%93%E5%BA%93%E6%B8%85%E5%8D%95/" title="逆向用的 Skill 和 MCP：公开仓库清单">
-                        <span class="hidden-mobile">逆向用的 Skill 和 MCP：公开仓库清单</span>
+                      <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E9%80%A0UDP%E5%8C%85/" title="猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包">
+                        <span class="hidden-mobile">猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

@@ -277,6 +277,8 @@
             
               <a href="/tags/JNI/">#JNI</a>
             
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
               <a href="/tags/UPX/">#UPX</a>
             
               <a href="/tags/%E8%84%B1%E5%A3%B3/">#脱壳</a>
@@ -284,8 +286,6 @@
               <a href="/tags/%E5%86%85%E5%AD%98dump/">#内存dump</a>
             
               <a href="/tags/Base64/">#Base64</a>
-            
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
           </div>
         
@@ -359,6 +359,8 @@
             
               <a href="/tags/JNI/">#JNI</a>
             
+              <a href="/tags/OLLVM/">#OLLVM</a>
+            
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/Unicorn/">#Unicorn</a>
@@ -366,8 +368,6 @@
               <a href="/tags/NETLINK/">#NETLINK</a>
             
               <a href="/tags/goron/">#goron</a>
-            
-              <a href="/tags/OLLVM/">#OLLVM</a>
             
           </div>
         
@@ -381,15 +381,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E4%B8%8E%E5%8F%98%E5%BD%A2MD4/" target="_self">
-          猿人学 App 第四、五题离机复现：Unicorn 模拟 goron so 与变形 MD4 的纯 Python 还原
+        <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" target="_self">
+          猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原
         </a>
       </h1>
 
-      <a class="index-excerpt" href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E4%B8%8E%E5%8F%98%E5%BD%A2MD4/" target="_self">
+      <a class="index-excerpt" href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" target="_self">
         <div>
           
-          两道猿人学 App 闯关题的纯离机复现记录:目标是不驱动 App、只靠逆向,用独立脚本把数据取出来。  第五题(HTTP &#x2F; dex,难度”简单”):端点靠反射 Retrofit 运行期注解读出,签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4 —— 最终还原成零依赖纯 Python。 第四题(UDP &#x2F; native,难度”困难”):libfour.s
+          猿人学 App 第五题（HTTP &#x2F; dex，难度”简单”）的纯离机复现记录：不驱动 App，只靠逆向把签名算法搞清楚。端点靠反射 Retrofit 运行期注解读出；签名是 assets&#x2F;encrypted.dex 里一个被 OLLVM 混淆的变形 MD4——本文记录怎么在反编译失败的情况下，用 ASM 插桩 dump 执行轨迹反推出这个变形，并还原成零依赖纯 Python。 ⚠️ 猿人学闯关
         </div>
       </a>
 
@@ -437,11 +437,91 @@
             
               <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
-              <a href="/tags/Frida/">#Frida</a>
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/dex2jar/">#dex2jar</a>
+            
+              <a href="/tags/MD4/">#MD4</a>
+            
+              <a href="/tags/OLLVM/">#OLLVM</a>
+            
+              <a href="/tags/ASM%E6%8F%92%E6%A1%A9/">#ASM插桩</a>
+            
+              <a href="/tags/JVM%E9%A2%84%E8%A8%80%E6%9C%BA/">#JVM预言机</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E9%80%A0UDP%E5%8C%85/" target="_self">
+          猿人学 App 第四题离机复现：Unicorn 忠实模拟 goron so 造 UDP 包
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%9B%9B%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Unicorn%E6%A8%A1%E6%8B%9Fgoron%E9%80%A0UDP%E5%8C%85/" target="_self">
+        <div>
+          
+          猿人学 App 第四题（UDP &#x2F; native，难度”困难”）的纯离机复现记录：不驱动 App，逆向 libfour.so 的请求逻辑。libfour.so 被 goron&#x2F;OLLVM 混淆，请求包由双 PRNG 造出。本文记录先看穿响应结构（头部即”位置表”）省掉逆 PRNG，再用 Unicorn 忠实模拟 echo_cli 造包、本机直连公网取值的全过程。 ⚠️ 猿人学闯关 App 是面向
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-26 14:50" pubdate>
+              2026-08-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/JNI/">#JNI</a>
+              <a href="/tags/OLLVM/">#OLLVM</a>
             
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
@@ -449,13 +529,13 @@
             
               <a href="/tags/goron/">#goron</a>
             
-              <a href="/tags/OLLVM/">#OLLVM</a>
-            
-              <a href="/tags/dex2jar/">#dex2jar</a>
-            
-              <a href="/tags/MD4/">#MD4</a>
-            
               <a href="/tags/RC4/">#RC4</a>
+            
+              <a href="/tags/UDP/">#UDP</a>
+            
+              <a href="/tags/lief/">#lief</a>
+            
+              <a href="/tags/capstone/">#capstone</a>
             
           </div>
         
@@ -1609,77 +1689,6 @@
               <a href="/tags/%E9%9D%99%E6%80%81IP/">#静态IP</a>
             
               <a href="/tags/%E9%A6%99%E6%A9%99%E6%B4%BE/">#香橙派</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/07/30/linux/%E9%A6%99%E6%A9%99%E6%B4%BE5Plus-SD%E5%8D%A1%E5%88%B7%E6%9C%BA%E6%95%99%E7%A8%8B/" target="_self">
-          香橙派 5 Plus (Orange Pi 5 Plus) SD 卡刷机完整教程
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/07/30/linux/%E9%A6%99%E6%A9%99%E6%B4%BE5Plus-SD%E5%8D%A1%E5%88%B7%E6%9C%BA%E6%95%99%E7%A8%8B/" target="_self">
-        <div>
-          
-          香橙派 5 Plus 用的是瑞芯微 RK3588（4×A76 + 4×A55，8nm，自带 6 TOPS NPU），跑 Linux 做小服务器、跑 Docker、跑云手机、跑本地模型都很合适。但它和树莓派不一样：RK3588 的启动介质有优先级，板子上可能同时存在 SPI Flash、eMMC、NVMe 和 SD 卡四个可启动位置，新手最常见的坑不是「卡没刷好」，而是「卡刷好了但板子没从卡启动」。
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-07-30 10:20" pubdate>
-              2026-07-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E7%B3%BB%E7%BB%9F%E6%8A%98%E8%85%BE/" class="category-chain-item">系统折腾</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/RK3588/">#RK3588</a>
-            
-              <a href="/tags/Linux/">#Linux</a>
-            
-              <a href="/tags/%E9%A6%99%E6%A9%99%E6%B4%BE/">#香橙派</a>
-            
-              <a href="/tags/Orange-Pi-5-Plus/">#Orange Pi 5 Plus</a>
-            
-              <a href="/tags/%E5%88%B7%E6%9C%BA/">#刷机</a>
-            
-              <a href="/tags/%E5%8D%95%E6%9D%BF%E6%9C%BA/">#单板机</a>
             
           </div>
         
