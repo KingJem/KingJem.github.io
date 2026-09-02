@@ -215,6 +215,164 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E9%A2%98ReactNative%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E9%AD%94%E6%94%B9MD4/" target="_self">
+          猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E9%A2%98ReactNative%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E9%AD%94%E6%94%B9MD4/" target="_self">
+        <div>
+          
+          [猿人学 App 逆向系列]第十题。这题不是 Fragment,而是一个 RNActivity——React Native 应用,取数逻辑在打包好的 index.android.bundle 里。好消息是这份 bundle 是明文压缩 JS(不是 Hermes 字节码),签名算法能直接读。坏消息是它把签名做成了一个魔改 MD4,长得像标准 MD4、却对不上——差点被”想当然”骗过去。本文记录:定
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-09-02 15:00" pubdate>
+              2026-09-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+              <a href="/tags/MD4/">#MD4</a>
+            
+              <a href="/tags/ReactNative/">#ReactNative</a>
+            
+              <a href="/tags/Hermes/">#Hermes</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B9%9D%E9%A2%98%E5%8F%8C%E5%90%91%E8%AF%81%E4%B9%A6%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%8A%A0%E5%87%BAmTLS%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%81%E4%B9%A6/" target="_self">
+          猿人学 App 第九题「双向证书」离机复现:从 APK 抠出 mTLS 客户端证书
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B9%9D%E9%A2%98%E5%8F%8C%E5%90%91%E8%AF%81%E4%B9%A6%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%8A%A0%E5%87%BAmTLS%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%81%E4%B9%A6/" target="_self">
+        <div>
+          
+          [猿人学 App 逆向系列]第九题「借问酒家何处有」。这题没有 sign——请求体只有一个 page。它的全部防护压在传输层:服务器开了 mTLS(双向 TLS),握手时要求客户端出示一张 App 内置的客户端证书,拿不出来就连不上,自然也抓不到、爬不动。破法很直接:把客户端证书从 APK 里抠出来,自己在 Python 里当客户端证书用。难点全在”证书藏在哪、密码是什么”——而这些字符串都被混
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-09-02 14:30" pubdate>
+              2026-09-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+            
+              <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+              <a href="/tags/mTLS/">#mTLS</a>
+            
+              <a href="/tags/%E5%8F%8C%E5%90%91%E8%AF%81%E4%B9%A6/">#双向证书</a>
+            
+              <a href="/tags/BouncyCastle/">#BouncyCastle</a>
+            
+              <a href="/tags/OkHttp/">#OkHttp</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Blutter%E5%8F%8D%E7%BC%96%E8%AF%91DartAOT%E8%BF%98%E5%8E%9FHMAC%E7%AD%BE%E5%90%8D/" target="_self">
           猿人学 App 第七题「flutter」离机复现:Blutter 反编译 Dart AOT，还原 HMAC 双盐签名
         </a>
@@ -273,8 +431,6 @@
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
-            
               <a href="/tags/Flutter/">#Flutter</a>
             
               <a href="/tags/Dart-AOT/">#Dart AOT</a>
@@ -282,6 +438,8 @@
               <a href="/tags/Blutter/">#Blutter</a>
             
               <a href="/tags/HMAC/">#HMAC</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
           </div>
         
@@ -353,9 +511,9 @@
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/dex2jar/">#dex2jar</a>
-            
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+              <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/gRPC/">#gRPC</a>
             
@@ -437,9 +595,9 @@
             
               <a href="/tags/JNI/">#JNI</a>
             
-              <a href="/tags/MD4/">#MD4</a>
-            
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
+              <a href="/tags/MD4/">#MD4</a>
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
@@ -521,11 +679,11 @@
             
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
+              <a href="/tags/so/">#so</a>
+            
               <a href="/tags/RC4/">#RC4</a>
             
               <a href="/tags/capstone/">#capstone</a>
-            
-              <a href="/tags/so/">#so</a>
             
           </div>
         
@@ -673,13 +831,13 @@
             
               <a href="/tags/Android/">#Android</a>
             
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
               <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/MD4/">#MD4</a>
             
               <a href="/tags/%E7%AD%BE%E5%90%8D/">#签名</a>
-            
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
           </div>
         
@@ -841,11 +999,11 @@
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
+              <a href="/tags/OLLVM/">#OLLVM</a>
+            
               <a href="/tags/NETLINK/">#NETLINK</a>
             
               <a href="/tags/goron/">#goron</a>
-            
-              <a href="/tags/OLLVM/">#OLLVM</a>
             
           </div>
         
@@ -917,11 +1075,11 @@
             
               <a href="/tags/Android/">#Android</a>
             
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+            
               <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/MD4/">#MD4</a>
-            
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/OLLVM/">#OLLVM</a>
             
@@ -1003,17 +1161,17 @@
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
-              <a href="/tags/goron/">#goron</a>
+              <a href="/tags/RC4/">#RC4</a>
+            
+              <a href="/tags/capstone/">#capstone</a>
             
               <a href="/tags/OLLVM/">#OLLVM</a>
             
-              <a href="/tags/RC4/">#RC4</a>
+              <a href="/tags/goron/">#goron</a>
             
               <a href="/tags/UDP/">#UDP</a>
             
               <a href="/tags/lief/">#lief</a>
-            
-              <a href="/tags/capstone/">#capstone</a>
             
           </div>
         
@@ -1081,9 +1239,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
               <a href="/tags/MCP/">#MCP</a>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
               <a href="/tags/JSVMP/">#JSVMP</a>
             
@@ -1442,17 +1600,17 @@
             
               <a href="/tags/Python/">#Python</a>
             
-              <a href="/tags/%E8%A1%A5%E7%8E%AF%E5%A2%83/">#补环境</a>
-            
-              <a href="/tags/V8/">#V8</a>
+              <a href="/tags/never-jscore/">#never-jscore</a>
             
               <a href="/tags/JS%E9%80%86%E5%90%91/">#JS逆向</a>
             
-              <a href="/tags/never-jscore/">#never-jscore</a>
+              <a href="/tags/V8/">#V8</a>
             
               <a href="/tags/deno-core/">#deno_core</a>
             
               <a href="/tags/Hook/">#Hook</a>
+            
+              <a href="/tags/%E8%A1%A5%E7%8E%AF%E5%A2%83/">#补环境</a>
             
           </div>
         
@@ -1597,148 +1755,6 @@
               <a href="/tags/%E5%86%85%E6%A0%B8/">#内核</a>
             
               <a href="/tags/%E5%85%8DRoot%E6%A3%80%E6%B5%8B/">#免Root检测</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/08/14/%E9%80%86%E5%90%91/bestV8%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E7%BA%AF%E5%87%80V8%E8%A1%A5%E7%8E%AF%E5%A2%83%E8%B7%91JS/" target="_self">
-          bestV8 使用教程：纯净 V8 环境跑 JS，做补环境调试
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/08/14/%E9%80%86%E5%90%91/bestV8%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-%E7%BA%AF%E5%87%80V8%E8%A1%A5%E7%8E%AF%E5%A2%83%E8%B7%91JS/" target="_self">
-        <div>
-          
-          本文为整理性内容，基于官方开源仓库的公开资料编写  官方 Release 仓库：https:&#x2F;&#x2F;github.com&#x2F;BestToYou&#x2F;bestV8_release（作者公众号：二进制科学） Python 封装库 PyBestV8：https:&#x2F;&#x2F;github.com&#x2F;wangluozhe&#x2F;pybestV8（作者 wangluozhe）  bestV8 是一个开源免费、可以直接跑 JS 的逆向
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-14 11:30" pubdate>
-              2026-08-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
-              <a href="/tags/Python/">#Python</a>
-            
-              <a href="/tags/bestV8/">#bestV8</a>
-            
-              <a href="/tags/%E8%A1%A5%E7%8E%AF%E5%A2%83/">#补环境</a>
-            
-              <a href="/tags/V8/">#V8</a>
-            
-              <a href="/tags/JS%E9%80%86%E5%90%91/">#JS逆向</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/08/14/%E9%80%86%E5%90%91/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%AB%99%E5%9C%A8%E5%B7%A8%E4%BA%BA%E7%9A%84%E8%82%A9%E8%86%80%E4%B8%8A-%E7%94%A8LLVM%E5%8F%8D%E6%B7%B7%E6%B7%86WebAssembly/" target="_self">
-          【翻译】站在巨人的肩膀上：用 LLVM 反混淆 WebAssembly
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/08/14/%E9%80%86%E5%90%91/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%AB%99%E5%9C%A8%E5%B7%A8%E4%BA%BA%E7%9A%84%E8%82%A9%E8%86%80%E4%B8%8A-%E7%94%A8LLVM%E5%8F%8D%E6%B7%B7%E6%B7%86WebAssembly/" target="_self">
-        <div>
-          
-          本文为翻译 &#x2F; 转载内容  原标题：Standing on the Shoulders of Giants: De-Obfuscating WebAssembly Using LLVM 原作者：Vikas Gupta、Peter Garba（Thales Cybersecurity &amp; Digital Identity, CDI） 原始出处：Black Hat Asia 2025 议题演
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-08-14 10:30" pubdate>
-              2026-08-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
-              <a href="/tags/%E5%8F%8D%E6%B7%B7%E6%B7%86/">#反混淆</a>
-            
-              <a href="/tags/WebAssembly/">#WebAssembly</a>
-            
-              <a href="/tags/Wasm/">#Wasm</a>
-            
-              <a href="/tags/LLVM/">#LLVM</a>
-            
-              <a href="/tags/hCaptcha/">#hCaptcha</a>
             
           </div>
         

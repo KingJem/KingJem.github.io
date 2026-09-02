@@ -1,0 +1,786 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第十题。这题不是 Fragment,而是一个 RNActivity——React Native 应用,取数逻辑在打包好的 index.android.bundle 里。好消息是这份 bundle 是明文压缩 JS(不是 Hermes 字节码),签名算法能直接读。坏消息是它把签名做成了一个魔改 MD4,长得像标准 MD4、却对不上——差点被”想当然”骗过去。本文记录:定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E9%A2%98ReactNative%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E9%AD%94%E6%94%B9MD4/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第十题。这题不是 Fragment,而是一个 RNActivity——React Native 应用,取数逻辑在打包好的 index.android.bundle 里。好消息是这份 bundle 是明文压缩 JS(不是 Hermes 字节码),签名算法能直接读。坏消息是它把签名做成了一个魔改 MD4,长得像标准 MD4、却对不上——差点被”想当然”骗过去。本文记录:定">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-02T07:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T05:46:23.339Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Hermes">
+<meta property="article:tag" content="MD4">
+<meta property="article:tag" content="ReactNative">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-02 15:00" pubdate>
+          2026年9月2日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          42 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年9月2日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第十题。这题不是 Fragment,而是一个 <code>RNActivity</code>——<strong>React Native</strong> 应用,取数逻辑在打包好的 <code>index.android.bundle</code> 里。<br>好消息是这份 bundle 是<strong>明文压缩 JS</strong>(不是 Hermes 字节码),签名算法能直接读。坏消息是它把签名做成了一个<strong>魔改 MD4</strong>,长得像标准 MD4、却对不上——差点被”想当然”骗过去。<br>本文记录:定位 RN 的签名 → 想当然用标准 MD4 吃 403 → 用 node 直跑 bundle 拿 ground truth → 发现是魔改 MD4 → 逐字转写成纯 Python。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>定位:RNActivity + index.android.bundle</li>
+<li>读 bundle:sign_hex(page:ms)</li>
+<li>想当然的坑:标准 MD4 → 403</li>
+<li>node 直跑拿 ground truth:它不是标准 MD4</li>
+<li>逐字转写魔改 MD4 → 纯 Python</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、定位-RNActivity-index-android-bundle"><a href="#一、定位-RNActivity-index-android-bundle" class="headerlink" title="一、定位:RNActivity + index.android.bundle"></a>一、定位:RNActivity + index.android.bundle</h2><p>第十题在 Fragment 列表里根本没有 <code>ChallengeTenFragment</code>——它是个独立 Activity:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// RNActivity (@Page 名 &quot;题目十&quot;)</span><br><span class="hljs-built_in">this</span>.reactRootView = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReactRootView</span>(<span class="hljs-built_in">this</span>);<br><span class="hljs-built_in">this</span>.reactRootView.startReactApplication(mgr, <span class="hljs-string">&quot;rn_module&quot;</span>, <span class="hljs-literal">null</span>);<br></code></pre></td></tr></table></figure>
+
+<p><code>ReactRootView</code> + <code>rn_module</code> = <strong>React Native</strong>。RN 的业务代码全在 <code>assets/index.android.bundle</code>。看一眼文件头:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">head</span> -c 20 assets/index.android.bundle</span><br>var __BUNDLE_START_TIME=...<br></code></pre></td></tr></table></figure>
+
+<p><code>var __BUNDLE_START_TIME</code> 说明是 <strong>Metro 打的明文 JS bundle</strong>(不是 Hermes <code>.hbc</code> 字节码),761KB 压缩 JS——<strong>算法可读</strong>,省去了反编译 Hermes 的麻烦。</p>
+<h2 id="二、读-bundle-sign-hex-page-ms"><a href="#二、读-bundle-sign-hex-page-ms" class="headerlink" title="二、读 bundle:sign_hex(page:ms)"></a>二、读 bundle:sign_hex(page:ms)</h2><p>直接在 bundle 里搜端点,顺出 <code>loadData</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js">n = <span class="hljs-string">&quot;https://www.python-spider.com/api/app10&quot;</span>,<br>o = (<span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>).<span class="hljs-title function_">getTime</span>(),                          <span class="hljs-comment">// 毫秒时间戳</span><br>l = (<span class="hljs-number">0</span>, <span class="hljs-title function_">r</span>(d[<span class="hljs-number">10</span>]).<span class="hljs-property">sign_hex</span>)(<span class="hljs-variable language_">this</span>.<span class="hljs-property">page</span> + <span class="hljs-string">&quot;:&quot;</span> + o),   <span class="hljs-comment">// sign = sign_hex(&quot;page:ms&quot;)</span><br>(<span class="hljs-keyword">new</span> f.<span class="hljs-property">default</span>).<span class="hljs-title function_">fetchData</span>(n, &#123; <span class="hljs-attr">page</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">page</span>, <span class="hljs-attr">t</span>: o, <span class="hljs-attr">sign</span>: l &#125;)<br></code></pre></td></tr></table></figure>
+
+<p><code>fetchData</code> 是 <code>fetch(url, {method:&quot;post&quot;, headers:{&quot;Content-Type&quot;:&quot;application/json&quot;}, body:JSON.stringify({page,t,sign})})</code>。</p>
+<p>所以请求模型是:<strong>POST /api/app10,JSON body <code>{page, t:ms, sign}</code></strong>,而 <code>sign = sign_hex(&quot;page:ms&quot;)</code>。</p>
+<p>再找 <code>sign_hex</code> 的定义:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">e.<span class="hljs-property">sign_hex</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">u</span>)&#123; <span class="hljs-keyword">return</span> <span class="hljs-title function_">h</span>(<span class="hljs-title function_">t</span>(<span class="hljs-title function_">i</span>(u), u.<span class="hljs-property">length</span>*n)) &#125;; <span class="hljs-keyword">var</span> n = <span class="hljs-number">8</span>;<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">t</span>(<span class="hljs-params">n,t</span>)&#123;<br>  n[t&gt;&gt;<span class="hljs-number">5</span>]|=<span class="hljs-number">128</span>&lt;&lt;t%<span class="hljs-number">32</span>, n[<span class="hljs-number">14</span>+(t+<span class="hljs-number">64</span>&gt;&gt;&gt;<span class="hljs-number">9</span>&lt;&lt;<span class="hljs-number">4</span>)]=t;                     <span class="hljs-comment">// 经典 MD 填充</span><br>  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> u=<span class="hljs-number">1732584193</span>,i=-<span class="hljs-number">271733879</span>,h=-<span class="hljs-number">1732584194</span>,v=<span class="hljs-number">271733878</span>, d=<span class="hljs-number">0</span>; d&lt;n.<span class="hljs-property">length</span>; d+=<span class="hljs-number">16</span>)&#123; ... &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>初值 <code>1732584193/-271733879/-1732584194/271733878</code> = <code>0x67452301/0xefcdab89/0x98badcfe/0x10325476</code>——<strong>MD4/MD5 的标准 IV</strong>;三轮里出现常量 <code>0x5A827999</code>、<code>0x6ED9EBA1</code>,移位 <code>3,7,11,19</code>——<strong>这是 MD4</strong>。</p>
+<h2 id="三、想当然的坑-标准-MD4-→-403"><a href="#三、想当然的坑-标准-MD4-→-403" class="headerlink" title="三、想当然的坑:标准 MD4 → 403"></a>三、想当然的坑:标准 MD4 → 403</h2><p>看到这里很容易下结论:”就是标准 MD4 嘛”。于是直接拿现成的纯 Python MD4 上:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">sign = hex_md4(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;page&#125;</span>:<span class="hljs-subst">&#123;ms&#125;</span>&quot;</span>)     <span class="hljs-comment"># 标准 MD4</span><br>requests.post(URL, json=&#123;<span class="hljs-string">&quot;page&quot;</span>:page,<span class="hljs-string">&quot;t&quot;</span>:ms,<span class="hljs-string">&quot;sign&quot;</span>:sign&#125;)<br><span class="hljs-comment"># -&gt; 403 &#123;&quot;status&quot;:&quot;0&quot;,&quot;message&quot;:&quot;Access forbidden;please check request&quot;&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>403。做个判别:<strong>对的 sign、错的 sign、干脆不带 sign,三者返回一模一样的 403</strong>——看起来像是 sign 校验之前就被拦(WAF/请求头层面)。抓一条真机请求看头部:头很普通(<code>okhttp/4.9.2</code> + json),唯一区别是走 <strong>HTTP/2</strong>。</p>
+<p>但真正的破绽在 body 里——把真机的 sign 和我算的一比:</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs maxima"><span class="hljs-built_in">content</span> = <span class="hljs-string">&quot;1:1788326879974&quot;</span><br>真机 <span class="hljs-built_in">sign</span> = <span class="hljs-number">0a2ed050f876c3d9d26527b495d693d5</span><br>我的 MD4  = 1b702147b101a235162b10f69b5ab351     ← 不一样!<br></code></pre></td></tr></table></figure>
+
+<p><strong>根本不是我”想当然”的那个 MD4。</strong> 之前的 403,不是 WAF,就是 sign 算错了(错 sign 和无 sign 恰好走同一个拒绝分支)。</p>
+<h2 id="四、node-直跑拿-ground-truth-它不是标准-MD4"><a href="#四、node-直跑拿-ground-truth-它不是标准-MD4" class="headerlink" title="四、node 直跑拿 ground truth:它不是标准 MD4"></a>四、node 直跑拿 ground truth:它不是标准 MD4</h2><p>bundle 是明文 JS,那最没有争议的办法就是<strong>把 <code>sign_hex</code> 抠出来直接用 node 跑</strong>,拿一份权威输出:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">node -e <span class="hljs-string">&#x27;&lt;sign_hex 及其依赖函数&gt;; console.log(sign_hex(&quot;abc&quot;))&#x27;</span><br><span class="hljs-comment"># -&gt; 0eb1b355494de8a49cd2e1d030e38267</span><br></code></pre></td></tr></table></figure>
+
+<p>而<strong>标准</strong> MD4(“abc”) = <code>a448017aaf21d8525fc10ae87aa6729d</code>。两者不同 → <strong>这是一个魔改 MD4</strong>。</p>
+<p>差在哪?细看它的轮函数:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">u</span>(<span class="hljs-params">n,t,u,c,f,o</span>)&#123; <span class="hljs-keyword">return</span> <span class="hljs-title function_">a</span>((i=<span class="hljs-title function_">a</span>(<span class="hljs-title function_">a</span>(t,n),<span class="hljs-title function_">a</span>(c,o)))&lt;&lt;(h=f)|i&gt;&gt;&gt;<span class="hljs-number">32</span>-h, u); <span class="hljs-keyword">var</span> i,h &#125;<br><span class="hljs-keyword">function</span> <span class="hljs-title function_">c</span>(<span class="hljs-params">n,t,c,f,o,a</span>)&#123; <span class="hljs-keyword">return</span> <span class="hljs-title function_">u</span>(c&amp;f|~c&amp;t, n,<span class="hljs-number">0</span>,o,a,<span class="hljs-number">0</span>)            &#125;  <span class="hljs-comment">// F,但参数序被打乱</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">f</span>(<span class="hljs-params">n,t,c,f,o,a</span>)&#123; <span class="hljs-keyword">return</span> <span class="hljs-title function_">u</span>(t&amp;c|t&amp;f|c&amp;f, n,<span class="hljs-number">0</span>,o,a,<span class="hljs-number">1518500249</span>)&#125;  <span class="hljs-comment">// G</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">o</span>(<span class="hljs-params">n,t,c,f,o,a</span>)&#123; <span class="hljs-keyword">return</span> <span class="hljs-title function_">u</span>(t^c^f, n,<span class="hljs-number">0</span>,o,a,<span class="hljs-number">1859775393</span>)      &#125;  <span class="hljs-comment">// H</span><br></code></pre></td></tr></table></figure>
+
+<p>外层那串 <code>u=c(u,i,h,v,...)</code>、<code>v=c(v,u,i,h,...)</code>… 的<strong>状态字轮换顺序是 <code>u,v,h,i</code></strong>,而 <code>F/G/H</code> 里参与运算的三个字的<strong>位置也和标准 MD4 不同</strong>。IV、常量、移位全是标准的,唯独 <code>F/G/H</code> 的”喂参顺序”被换了——<strong>足以让输出彻底改变,却又骗过”一眼 MD4”的直觉。</strong></p>
+<h2 id="五、逐字转写魔改-MD4-→-纯-Python"><a href="#五、逐字转写魔改-MD4-→-纯-Python" class="headerlink" title="五、逐字转写魔改 MD4 → 纯 Python"></a>五、逐字转写魔改 MD4 → 纯 Python</h2><p>既然只是参数序/轮换不同,那就<strong>照着 JS 一比一转写</strong>,不做任何”标准化”想当然,再拿 node 和真机抓包双重对拍:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python">M = <span class="hljs-number">0xffffffff</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rotl</span>(<span class="hljs-params">i, s</span>): i &amp;= M; <span class="hljs-keyword">return</span> ((i &lt;&lt; s) | (i &gt;&gt; (<span class="hljs-number">32</span> - s))) &amp; M<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">C</span>(<span class="hljs-params">n,t,c,f,o,a</span>): <span class="hljs-keyword">return</span> rotl((n + (((c&amp;f)|((c^M)&amp;t)) &amp; M) + o) &amp; M, a)                 <span class="hljs-comment"># R1 K=0</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">F</span>(<span class="hljs-params">n,t,c,f,o,a</span>): <span class="hljs-keyword">return</span> rotl((n + (((t&amp;c)|(t&amp;f)|(c&amp;f)) &amp; M) + o + <span class="hljs-number">0x5a827999</span>) &amp; M, a)   <span class="hljs-comment"># R2</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">H</span>(<span class="hljs-params">n,t,c,f,o,a</span>): <span class="hljs-keyword">return</span> rotl((n + ((t^c^f) &amp; M) + o + <span class="hljs-number">0x6ed9eba1</span>) &amp; M, a)               <span class="hljs-comment"># R3</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">core</span>(<span class="hljs-params">x, nbits</span>):<br>    x[nbits&gt;&gt;<span class="hljs-number">5</span>] = x.get(nbits&gt;&gt;<span class="hljs-number">5</span>,<span class="hljs-number">0</span>) | (<span class="hljs-number">128</span> &lt;&lt; (nbits%<span class="hljs-number">32</span>)); x[<span class="hljs-number">14</span>+((nbits+<span class="hljs-number">64</span>&gt;&gt;<span class="hljs-number">9</span>)&lt;&lt;<span class="hljs-number">4</span>)] = nbits<br>    u,i,h,v = <span class="hljs-number">0x67452301</span>,<span class="hljs-number">0xefcdab89</span>,<span class="hljs-number">0x98badcfe</span>,<span class="hljs-number">0x10325476</span><br>    g = <span class="hljs-keyword">lambda</span> k: x.get(k,<span class="hljs-number">0</span>) &amp; M<br>    <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, ((<span class="hljs-built_in">max</span>(x)+<span class="hljs-number">16</span>)&amp;~<span class="hljs-number">15</span>), <span class="hljs-number">16</span>):<br>        l,A,C_,b = u,i,h,v<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> (<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">8</span>,<span class="hljs-number">12</span>):     <span class="hljs-comment"># R1,移位 3/7/11/19,状态轮换 u,v,h,i</span><br>            u=C(u,i,h,v,g(d+k),<span class="hljs-number">3</span>);  v=C(v,u,i,h,g(d+k+<span class="hljs-number">1</span>),<span class="hljs-number">7</span>)<br>            h=C(h,v,u,i,g(d+k+<span class="hljs-number">2</span>),<span class="hljs-number">11</span>); i=C(i,h,v,u,g(d+k+<span class="hljs-number">3</span>),<span class="hljs-number">19</span>)<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> (<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>):      <span class="hljs-comment"># R2,移位 3/5/9/13,X 序 0,4,8,12 ...</span><br>            u=F(u,i,h,v,g(d+k),<span class="hljs-number">3</span>);  v=F(v,u,i,h,g(d+k+<span class="hljs-number">4</span>),<span class="hljs-number">5</span>)<br>            h=F(h,v,u,i,g(d+k+<span class="hljs-number">8</span>),<span class="hljs-number">9</span>); i=F(i,h,v,u,g(d+k+<span class="hljs-number">12</span>),<span class="hljs-number">13</span>)<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> (<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>,<span class="hljs-number">3</span>):      <span class="hljs-comment"># R3,移位 3/9/11/15,X 序 0,8,4,12 ...</span><br>            u=H(u,i,h,v,g(d+k),<span class="hljs-number">3</span>);  v=H(v,u,i,h,g(d+k+<span class="hljs-number">8</span>),<span class="hljs-number">9</span>)<br>            h=H(h,v,u,i,g(d+k+<span class="hljs-number">4</span>),<span class="hljs-number">11</span>); i=H(i,h,v,u,g(d+k+<span class="hljs-number">12</span>),<span class="hljs-number">15</span>)<br>        u=(u+l)&amp;M; i=(i+A)&amp;M; h=(h+C_)&amp;M; v=(v+b)&amp;M<br>    <span class="hljs-keyword">return</span> [u,i,h,v]<br></code></pre></td></tr></table></figure>
+
+<p>对拍:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">assert</span> sign_hex(<span class="hljs-string">&quot;1:1788326879974&quot;</span>) == <span class="hljs-string">&quot;0a2ed050f876c3d9d26527b495d693d5&quot;</span>  <span class="hljs-comment"># == 真机抓包</span><br><span class="hljs-keyword">assert</span> sign_hex(<span class="hljs-string">&quot;abc&quot;</span>)            == <span class="hljs-string">&quot;0eb1b355494de8a49cd2e1d030e38267&quot;</span>  <span class="hljs-comment"># == node 直跑</span><br></code></pre></td></tr></table></figure>
+
+<p>两条都过,换上正确 sign 后 <strong>HTTP/1.1 直接 200</strong>——说明当初 403 跟 HTTP/2 无关,纯粹是 sign 错了。之后自己发请求、翻 100 页求和即可(服务器偶发空页,重试补齐)。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第十题的两层皮:</p>
+<ol>
+<li><strong>壳是 React Native</strong>——业务在 <code>index.android.bundle</code>;所幸是明文 JS(不是 Hermes),搜端点顺出 <code>sign_hex(&quot;page:ms&quot;)</code>;</li>
+<li><strong>核是魔改 MD4</strong>——IV/常量/移位全标准,唯独 <code>F/G/H</code> 参数序与状态轮换被换掉,输出和标准 MD4 完全不同。</li>
+</ol>
+<p>最大的教训是那句”一眼 MD4”的<strong>想当然</strong>:magic number 对上不代表算法一致。<strong>明文 JS 的最大优势,就是能直接 node 跑出 ground truth</strong>——用它一对拍,李逵李鬼立现,再逐字转写就稳了。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/MD4/">#MD4</a>
+      
+        <a href="/tags/ReactNative/">#ReactNative</a>
+      
+        <a href="/tags/Hermes/">#Hermes</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第十题「React Native」离机复现:魔改 MD4 藏在 JS Bundle 里</div>
+      <div>https://kingjem.github.io/2026/09/02/猿人学App第十题ReactNative离机复现-魔改MD4/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B9%9D%E9%A2%98%E5%8F%8C%E5%90%91%E8%AF%81%E4%B9%A6%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%8A%A0%E5%87%BAmTLS%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%81%E4%B9%A6/" title="猿人学 App 第九题「双向证书」离机复现:从 APK 抠出 mTLS 客户端证书">
+                        <span class="hidden-mobile">猿人学 App 第九题「双向证书」离机复现:从 APK 抠出 mTLS 客户端证书</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
