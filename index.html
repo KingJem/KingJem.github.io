@@ -215,15 +215,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-reFlutter%E6%8A%93%E5%8C%85%E7%BB%84%E5%90%88%E6%8B%B3/" target="_self">
-          猿人学 App 第七题「flutter」离机复现：reFlutter 引擎替换 + adb reverse 抓包组合拳
+        <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Blutter%E5%8F%8D%E7%BC%96%E8%AF%91DartAOT%E8%BF%98%E5%8E%9FHMAC%E7%AD%BE%E5%90%8D/" target="_self">
+          猿人学 App 第七题「flutter」离机复现:Blutter 反编译 Dart AOT，还原 HMAC 双盐签名
         </a>
       </h1>
 
-      <a class="index-excerpt" href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-reFlutter%E6%8A%93%E5%8C%85%E7%BB%84%E5%90%88%E6%8B%B3/" target="_self">
+      <a class="index-excerpt" href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Blutter%E5%8F%8D%E7%BC%96%E8%AF%91DartAOT%E8%BF%98%E5%8E%9FHMAC%E7%AD%BE%E5%90%8D/" target="_self">
         <div>
           
-          [猿人学 App 逆向系列]第七题「衣带渐宽终不悔【flutter】」。这是一个 Flutter 应用，取数逻辑在 Dart AOT（libapp.so），用 Flutter 自带的 BoringSSL 走 HTTPS——Flutter 抓包是出了名的难。本文记录踩过的坑，以及最终跑通的一套组合拳：reFlutter 产出关 pinning 的引擎 → root 只替换 libflutter.s
+          [猿人学 App 逆向系列]第七题「衣带渐宽终不悔【flutter】」。取数逻辑在 Flutter 的 Dart AOT 快照（libapp.so） 里，用 Flutter 自带 BoringSSL 走 HTTPS。本系列坚持离机约束：不驱动 App、不靠抓包当答案。抓包只是定位算法、拿对拍样本的手段；真正的目标是把签名算法从 Dart AOT 里读出来，用纯 Python 自算签名、自发请求。
         </div>
       </a>
 
@@ -231,7 +231,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-09-02 10:01" pubdate>
+            <time datetime="2026-09-02 12:30" pubdate>
               2026-09-02
             </time>
           </div>
@@ -271,19 +271,17 @@
             
               <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
-              <a href="/tags/%E6%8A%93%E5%8C%85/">#抓包</a>
-            
-              <a href="/tags/mitmproxy/">#mitmproxy</a>
-            
               <a href="/tags/Android/">#Android</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/Flutter/">#Flutter</a>
             
-              <a href="/tags/reFlutter/">#reFlutter</a>
+              <a href="/tags/Dart-AOT/">#Dart AOT</a>
             
-              <a href="/tags/BoringSSL/">#BoringSSL</a>
+              <a href="/tags/Blutter/">#Blutter</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+              <a href="/tags/HMAC/">#HMAC</a>
             
           </div>
         
@@ -355,9 +353,9 @@
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
-            
               <a href="/tags/dex2jar/">#dex2jar</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/gRPC/">#gRPC</a>
             
@@ -439,13 +437,13 @@
             
               <a href="/tags/JNI/">#JNI</a>
             
+              <a href="/tags/MD4/">#MD4</a>
+            
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
               <a href="/tags/RegisterNatives/">#RegisterNatives</a>
-            
-              <a href="/tags/MD4/">#MD4</a>
             
               <a href="/tags/anti-debug/">#anti-debug</a>
             
@@ -523,11 +521,11 @@
             
               <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
-              <a href="/tags/so/">#so</a>
-            
               <a href="/tags/RC4/">#RC4</a>
             
               <a href="/tags/capstone/">#capstone</a>
+            
+              <a href="/tags/so/">#so</a>
             
           </div>
         
@@ -675,13 +673,13 @@
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+              <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/MD4/">#MD4</a>
             
-              <a href="/tags/dex2jar/">#dex2jar</a>
-            
               <a href="/tags/%E7%AD%BE%E5%90%8D/">#签名</a>
+            
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
           </div>
         
@@ -843,11 +841,11 @@
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
-              <a href="/tags/OLLVM/">#OLLVM</a>
-            
               <a href="/tags/NETLINK/">#NETLINK</a>
             
               <a href="/tags/goron/">#goron</a>
+            
+              <a href="/tags/OLLVM/">#OLLVM</a>
             
           </div>
         
@@ -919,11 +917,11 @@
             
               <a href="/tags/Android/">#Android</a>
             
-              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+              <a href="/tags/dex2jar/">#dex2jar</a>
             
               <a href="/tags/MD4/">#MD4</a>
             
-              <a href="/tags/dex2jar/">#dex2jar</a>
+              <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
             
               <a href="/tags/OLLVM/">#OLLVM</a>
             
@@ -1005,17 +1003,17 @@
             
               <a href="/tags/Unicorn/">#Unicorn</a>
             
-              <a href="/tags/RC4/">#RC4</a>
-            
-              <a href="/tags/capstone/">#capstone</a>
+              <a href="/tags/goron/">#goron</a>
             
               <a href="/tags/OLLVM/">#OLLVM</a>
             
-              <a href="/tags/goron/">#goron</a>
+              <a href="/tags/RC4/">#RC4</a>
             
               <a href="/tags/UDP/">#UDP</a>
             
               <a href="/tags/lief/">#lief</a>
+            
+              <a href="/tags/capstone/">#capstone</a>
             
           </div>
         
