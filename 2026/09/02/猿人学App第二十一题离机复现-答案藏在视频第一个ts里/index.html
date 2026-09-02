@@ -1,0 +1,778 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第二十一题「二十四桥明月夜【m3u8】」。这题不翻页取数,而是”看视频交答案”型:ExoPlayer 播放一段 HLS 视频,你把答案填进输入框,提交到 app_check 校验。有意思的是——视频画面里根本没有答案。本文记录怎么排除画面&#x2F;音频&#x2F;元数据,最终定位到”答案 &#x3D; 视频第一个 ts 分片的 MD5”。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第二十一题「二十四桥明月夜」离机复现:答案藏在视频第一个 ts 里">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%80%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E7%AD%94%E6%A1%88%E8%97%8F%E5%9C%A8%E8%A7%86%E9%A2%91%E7%AC%AC%E4%B8%80%E4%B8%AAts%E9%87%8C/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第二十一题「二十四桥明月夜【m3u8】」。这题不翻页取数,而是”看视频交答案”型:ExoPlayer 播放一段 HLS 视频,你把答案填进输入框,提交到 app_check 校验。有意思的是——视频画面里根本没有答案。本文记录怎么排除画面&#x2F;音频&#x2F;元数据,最终定位到”答案 &#x3D; 视频第一个 ts 分片的 MD5”。 ⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-02T08:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T07:04:09.201Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="ExoPlayer">
+<meta property="article:tag" content="HLS">
+<meta property="article:tag" content="ffmpeg">
+<meta property="article:tag" content="m3u8">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第二十一题「二十四桥明月夜」离机复现:答案藏在视频第一个 ts 里 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第二十一题「二十四桥明月夜」离机复现:答案藏在视频第一个 ts 里"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-02 16:30" pubdate>
+          2026年9月2日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第二十一题「二十四桥明月夜」离机复现:答案藏在视频第一个 ts 里</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年9月2日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第二十一题「二十四桥明月夜【m3u8】」。这题不翻页取数,而是”看视频交答案”型:ExoPlayer 播放一段 HLS 视频,你把答案填进输入框,提交到 <code>app_check</code> 校验。<br>有意思的是——<strong>视频画面里根本没有答案</strong>。本文记录怎么排除画面/音频/元数据,最终定位到”答案 = 视频第一个 ts 分片的 MD5”。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型：一个视频 + 一个校验接口</li>
+<li>拿到视频：AES-128 加密的 HLS</li>
+<li>排除法：画面、音频、元数据里都没有答案</li>
+<li>答案 = 第一个 ts 的 MD5</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型：一个视频-一个校验接口"><a href="#一、请求模型：一个视频-一个校验接口" class="headerlink" title="一、请求模型：一个视频 + 一个校验接口"></a>一、请求模型：一个视频 + 一个校验接口</h2><p><code>ChallengeTwentyOneFragment</code> 里没有翻页逻辑,只有:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 播放一段 HLS 视频(URL 是混淆字符串,解出来见下)</span><br>player.setMediaItem(MediaItem.fromUri(&lt;video_url&gt;));<br><span class="hljs-comment">// 输入框 + 提交按钮</span><br>onClick: api.OooOo0(<span class="hljs-number">48</span>, editText.getEditValue(), token);   <span class="hljs-comment">// POST challenge/api/app_check</span><br></code></pre></td></tr></table></figure>
+
+<p><code>OooOo0(id, anw, token)</code> 对应 <code>challenge/api/app_check</code>——就是<strong>通关答案提交接口</strong>,<code>id=48</code> 是本题。所以第二十一题<strong>没有数据 API</strong>,核心是”搞到那个要填进输入框的答案”。</p>
+<p>混淆字符串用 JVM 预言机解一下(把 dex2jar 出的 <code>app.jar</code> 挂上,直接调解密函数):</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">video_url = https:<span class="hljs-regexp">//</span>www.python-spider.com<span class="hljs-regexp">/static/</span>app<span class="hljs-regexp">/media/</span>stream.m3u8<br></code></pre></td></tr></table></figure>
+
+<h2 id="二、拿到视频：AES-128-加密的-HLS"><a href="#二、拿到视频：AES-128-加密的-HLS" class="headerlink" title="二、拿到视频：AES-128 加密的 HLS"></a>二、拿到视频：AES-128 加密的 HLS</h2><p><code>stream.m3u8</code> 是个加密的点播流:</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs oxygene">#EXTM3U<br>#EXT-X-KEY:<span class="hljs-keyword">METHOD</span>=<span class="hljs-title function_">AES</span>-128,<span class="hljs-title function_">URI</span>=&quot;.../<span class="hljs-title function_">enc</span>.<span class="hljs-title function_">key</span>&quot;,<span class="hljs-title function_">IV</span>=0<span class="hljs-title function_">x76E4CF6C</span>...<br>#<span class="hljs-title function_">EXTINF</span>:<span class="hljs-number">6.006</span>,<br>segment-<span class="hljs-number">0</span>.ts<br>#EXTINF:<span class="hljs-number">6.006</span>,<br>segment-<span class="hljs-number">1</span>.ts<br>... 共 <span class="hljs-number">4</span> 段 ...<br>#EXT-X-ENDLIST<br></code></pre></td></tr></table></figure>
+
+<p>ffmpeg 能自己去拉 key、解密、拼接:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ffmpeg -allowed_extensions ALL -i <span class="hljs-string">&quot;https://www.python-spider.com/static/app/media/stream.m3u8&quot;</span> -c copy out.mp4<br></code></pre></td></tr></table></figure>
+
+<p>拿到一段约 23 秒的视频。</p>
+<h2 id="三、排除法：画面、音频、元数据里都没有答案"><a href="#三、排除法：画面、音频、元数据里都没有答案" class="headerlink" title="三、排除法：画面、音频、元数据里都没有答案"></a>三、排除法：画面、音频、元数据里都没有答案</h2><p>按”看视频取答案”的惯性,先去画面里找数字:</p>
+<ul>
+<li><strong>逐帧扫描 + 拼接图</strong>:整段就是一段黑白海面空镜,没有任何数字/文字叠加。</li>
+<li><strong>场景切换检测</strong>(<code>select=&#39;gt(scene,0.15)&#39;</code>):0 个切换帧——没有一闪而过的叠加。</li>
+<li><strong>多帧平均</strong>(<code>tmix</code>,静止的水印会保留、流动的水面会糊掉):平均出来还是海面,没有隐藏水印。</li>
+<li><strong>音频</strong>:<code>astats</code> 显示 <code>Max level: 0.0</code>——<strong>音轨全静音</strong>,不可能是播报/DTMF/摩尔斯。</li>
+<li><strong>TS 元数据 / ID3</strong>:解密后的 ts 里只有 H264 + AAC,没有可读的答案串。</li>
+</ul>
+<p><strong>画面、音频、元数据全排除</strong>。视频本身(“二十四桥明月夜”的空镜)只是主题装饰,答案不在它”演的内容”里,而在它”作为文件”的属性上。</p>
+<h2 id="四、答案-第一个-ts-的-MD5"><a href="#四、答案-第一个-ts-的-MD5" class="headerlink" title="四、答案 = 第一个 ts 的 MD5"></a>四、答案 = 第一个 ts 的 MD5</h2><p>这类题的答案落点,常是”对某个资源做个哈希”。这题的答案就是——<strong>视频第一个分片 <code>segment-0.ts</code> 原始字节(下载来的加密 ts,不用解密)的 MD5</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> hashlib, requests<br><span class="hljs-keyword">from</span> urllib.parse <span class="hljs-keyword">import</span> urljoin<br><br>M3U8 = <span class="hljs-string">&quot;https://www.python-spider.com/static/app/media/stream.m3u8&quot;</span><br>m3u8 = requests.get(M3U8, timeout=<span class="hljs-number">15</span>).text<br>seg = <span class="hljs-built_in">next</span>(l.strip() <span class="hljs-keyword">for</span> l <span class="hljs-keyword">in</span> m3u8.splitlines() <span class="hljs-keyword">if</span> l.strip() <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> l.startswith(<span class="hljs-string">&quot;#&quot;</span>))  <span class="hljs-comment"># 第一个分片</span><br>ts  = requests.get(urljoin(M3U8, seg), timeout=<span class="hljs-number">30</span>).content                                <span class="hljs-comment"># 原始字节</span><br><span class="hljs-built_in">print</span>(hashlib.md5(ts).hexdigest())   <span class="hljs-comment"># -&gt; 提交到 app_check(id=48)的 anw</span><br></code></pre></td></tr></table></figure>
+
+<p>把这个 MD5 填进输入框提交,即通关。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第二十一题的坑在于<strong>惯性</strong>:一看到”播放视频”,就下意识去画面里找答案,结果逐帧、平均、音频、元数据一通折腾全是空。<strong>当所有”内容通道”都排除时,就该换个角度——答案往往不在视频演了什么,而在这个文件本身</strong>(整段 md5、首个分片 md5、文件大小、时长等)。这里正是”第一个 ts 的 MD5”。</p>
+<p>离机复现只要:读 m3u8 → 取第一个分片 → 算 MD5。连解密都不用。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/HLS/">#HLS</a>
+      
+        <a href="/tags/m3u8/">#m3u8</a>
+      
+        <a href="/tags/ExoPlayer/">#ExoPlayer</a>
+      
+        <a href="/tags/ffmpeg/">#ffmpeg</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第二十一题「二十四桥明月夜」离机复现:答案藏在视频第一个 ts 里</div>
+      <div>https://kingjem.github.io/2026/09/02/猿人学App第二十一题离机复现-答案藏在视频第一个ts里/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月2日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-STOMP%E4%B8%8Enative%E9%AD%94%E6%94%B9TEA/" title="猿人学 App 第二十二题「书中自有黄金屋」离机复现:STOMP + native 魔改 TEA">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猿人学 App 第二十二题「书中自有黄金屋」离机复现:STOMP + native 魔改 TEA</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Lua%E9%87%8C%E7%9A%84%E5%A4%A7%E7%AB%AFMD5/" title="猿人学 App 第二十题「昨夜星辰昨夜风」离机复现:Lua 里的大端 MD5">
+                        <span class="hidden-mobile">猿人学 App 第二十题「昨夜星辰昨夜风」离机复现:Lua 里的大端 MD5</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
