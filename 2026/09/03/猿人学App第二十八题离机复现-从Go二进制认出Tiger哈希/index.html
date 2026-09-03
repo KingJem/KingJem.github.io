@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第二十八题「一池新水碧荷圆【GoNDK】」。签名由 Go 写的 NDK 库(gomobile 打的 libgojni.so)计算。Go 二进制乍看是个 1.4MB 的黑盒,但它有个”送分”特性——panic 信息里带着源码文件路径,一眼就能看出用了什么。本文记录:靠源码路径认出 Tiger 哈希 → Frida hook 对拍 → 从 so 里抠 S-box 做纯 P">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第二十八题「GoNDK」离机复现：从 Go 二进制认出 Tiger 哈希">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/03/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AB%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E4%BB%8EGo%E4%BA%8C%E8%BF%9B%E5%88%B6%E8%AE%A4%E5%87%BATiger%E5%93%88%E5%B8%8C/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第二十八题「一池新水碧荷圆【GoNDK】」。签名由 Go 写的 NDK 库(gomobile 打的 libgojni.so)计算。Go 二进制乍看是个 1.4MB 的黑盒,但它有个”送分”特性——panic 信息里带着源码文件路径,一眼就能看出用了什么。本文记录:靠源码路径认出 Tiger 哈希 → Frida hook 对拍 → 从 so 里抠 S-box 做纯 P">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-03T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-03T06:03:08.437Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Tiger">
+<meta property="article:tag" content="gomobile">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第二十八题「GoNDK」离机复现：从 Go 二进制认出 Tiger 哈希 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第二十八题「GoNDK」离机复现：从 Go 二进制认出 Tiger 哈希"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-03 14:00" pubdate>
+          2026年9月3日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第二十八题「GoNDK」离机复现：从 Go 二进制认出 Tiger 哈希</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年9月3日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第二十八题「一池新水碧荷圆【GoNDK】」。签名由 <strong>Go 写的 NDK 库</strong>(gomobile 打的 libgojni.so)计算。<br>Go 二进制乍看是个 1.4MB 的黑盒,但它有个”送分”特性——<strong>panic 信息里带着源码文件路径</strong>,一眼就能看出用了什么。本文记录:靠源码路径认出 <strong>Tiger 哈希</strong> → Frida hook 对拍 → 从 so 里抠 S-box 做纯 Python 还原 → 补上 token 这道坑。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型：content 和第一题一样</li>
+<li>Go 二进制的”送分题”:panic 路径暴露源码</li>
+<li>Frida hook getSign 对拍</li>
+<li>从 libgojni.so 抠出 Tiger 的 S-box</li>
+<li>补最后一道坑：token</li>
+<li>纯 Python 复现</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型：content-和第一题一样"><a href="#一、请求模型：content-和第一题一样" class="headerlink" title="一、请求模型：content 和第一题一样"></a>一、请求模型：content 和第一题一样</h2><p><code>ChallengeTwentyEightFragment</code> 里:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> &#123; System.loadLibrary(<span class="hljs-string">&quot;gojni&quot;</span>); &#125;       <span class="hljs-comment">// Go 的 gomobile 产物</span><br><span class="hljs-comment">// com.yuanrenxue.challenge.twentyeight.sign.Sign</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">getSign</span><span class="hljs-params">(<span class="hljs-type">byte</span>[] bArr)</span>;<br><br><span class="hljs-comment">// 翻页:</span><br><span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>sb.append(<span class="hljs-string">&quot;page=&quot;</span>);                 <span class="hljs-comment">// (混淆字符串,解出来是 &quot;page=&quot;)</span><br>sb.append(page);<br>sb.append(System.currentTimeMillis());<br><span class="hljs-type">String</span> <span class="hljs-variable">sign</span> <span class="hljs-operator">=</span> Sign.getSign(sb.toString().getBytes());   <span class="hljs-comment">// content = &quot;page=&quot;+page+ms</span><br>api.OooOo0o(page, sign, ms);        <span class="hljs-comment">// POST /api/app28  @Field page/sign/ts</span><br></code></pre></td></tr></table></figure>
+
+<p>**content = <code>&quot;page=&quot; + page + ms</code>**——和第一题一模一样的格式(第一题那次是 dex 层 MD4)。这次 <code>getSign</code> 是 Go native,得进 libgojni.so 里看。</p>
+<h2 id="二、Go-二进制的”送分题”-panic-路径暴露源码"><a href="#二、Go-二进制的”送分题”-panic-路径暴露源码" class="headerlink" title="二、Go 二进制的”送分题”:panic 路径暴露源码"></a>二、Go 二进制的”送分题”:panic 路径暴露源码</h2><p>Go 的 release 库体积大、符号也常被裁,但有个几乎没法去掉的特征:<strong><code>panic</code>/错误信息里嵌了编译时的源码文件绝对路径</strong>(<code>file:line</code>)。<code>strings</code> 一扫:</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs vim">$ strings libgojni.<span class="hljs-keyword">so</span> | <span class="hljs-keyword">grep</span> <span class="hljs-string">&#x27;\.go&#x27;</span><br>.../challenge-twenty-eight/<span class="hljs-keyword">sign</span>/<span class="hljs-keyword">sign</span>.<span class="hljs-keyword">go</span><br>.../challenge-twenty-eight/<span class="hljs-keyword">sign</span>/compress.<span class="hljs-keyword">go</span><br>.../challenge-twenty-eight/<span class="hljs-keyword">sign</span>/tiger.<span class="hljs-keyword">go</span>        # &lt;-- Tiger!<br>...<span class="hljs-keyword">runtime</span>/... (标准库)<br></code></pre></td></tr></table></figure>
+
+<p>还有 <code>challenge-twenty-eight/sign.(*digest).Reset</code> / <code>.Sum</code> 这种方法名。**<code>tiger.go</code> + <code>compress.go</code> + <code>digest</code> = Tiger 哈希**——一个 192 位(24 字节 / 48 hex)的老牌哈希。方向瞬间明确:签名就是 <code>Tiger(content)</code>。</p>
+<blockquote>
+<p>Go 逆向的第一步永远是 <code>strings | grep .go</code>——它经常直接把作者的意图(用了哪个算法/库)写在脸上。</p>
+</blockquote>
+<h2 id="三、Frida-hook-getSign-对拍"><a href="#三、Frida-hook-getSign-对拍" class="headerlink" title="三、Frida hook getSign 对拍"></a>三、Frida hook getSign 对拍</h2><p>猜到 Tiger,先用 Frida 抓一条真机 <code>(content -&gt; sign)</code> 坐实。<code>getSign</code> 是标准 JNI 导出 <code>Java_..._Sign_getSign(JNIEnv*, jclass, jbyteArray)</code>,用 JNI 函数表读入参数组、读返回串:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// Frida 17:Process.findModuleByName;JNI 函数表 GetArrayLength=171 / GetByteArrayElements=184 / GetStringUTFChars=169</span><br><span class="hljs-keyword">var</span> addr = <span class="hljs-title class_">Process</span>.<span class="hljs-title function_">findModuleByName</span>(<span class="hljs-string">&quot;libgojni.so&quot;</span>)<br>  .<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;Java_com_yuanrenxue_challenge_twentyeight_sign_Sign_getSign&quot;</span>);<br><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(addr, &#123;<br>  <span class="hljs-title function_">onEnter</span>(<span class="hljs-params">a</span>)&#123; <span class="hljs-keyword">var</span> e=a[<span class="hljs-number">0</span>], ft=e.<span class="hljs-title function_">readPointer</span>();<br>    <span class="hljs-keyword">var</span> L=<span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(ft.<span class="hljs-title function_">add</span>(<span class="hljs-number">171</span>*<span class="hljs-number">8</span>).<span class="hljs-title function_">readPointer</span>(),<span class="hljs-string">&#x27;int&#x27;</span>,[<span class="hljs-string">&#x27;pointer&#x27;</span>,<span class="hljs-string">&#x27;pointer&#x27;</span>]);<br>    <span class="hljs-keyword">var</span> G=<span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(ft.<span class="hljs-title function_">add</span>(<span class="hljs-number">184</span>*<span class="hljs-number">8</span>).<span class="hljs-title function_">readPointer</span>(),<span class="hljs-string">&#x27;pointer&#x27;</span>,[<span class="hljs-string">&#x27;pointer&#x27;</span>,<span class="hljs-string">&#x27;pointer&#x27;</span>,<span class="hljs-string">&#x27;pointer&#x27;</span>]);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">env</span>=e; <span class="hljs-variable language_">this</span>.<span class="hljs-property">content</span>=<span class="hljs-title function_">G</span>(e,a[<span class="hljs-number">2</span>],<span class="hljs-title function_">ptr</span>(<span class="hljs-number">0</span>)).<span class="hljs-title function_">readUtf8String</span>(<span class="hljs-title function_">L</span>(e,a[<span class="hljs-number">2</span>]));<br>  &#125;,<br>  <span class="hljs-title function_">onLeave</span>(<span class="hljs-params">ret</span>)&#123; <span class="hljs-keyword">var</span> e=<span class="hljs-variable language_">this</span>.<span class="hljs-property">env</span>,ft=e.<span class="hljs-title function_">readPointer</span>();<br>    <span class="hljs-keyword">var</span> S=<span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(ft.<span class="hljs-title function_">add</span>(<span class="hljs-number">169</span>*<span class="hljs-number">8</span>).<span class="hljs-title function_">readPointer</span>(),<span class="hljs-string">&#x27;pointer&#x27;</span>,[<span class="hljs-string">&#x27;pointer&#x27;</span>,<span class="hljs-string">&#x27;pointer&#x27;</span>,<span class="hljs-string">&#x27;pointer&#x27;</span>]);<br>    <span class="hljs-title function_">send</span>(<span class="hljs-string">&quot;content=&quot;</span>+<span class="hljs-variable language_">this</span>.<span class="hljs-property">content</span>+<span class="hljs-string">&quot; sign=&quot;</span>+<span class="hljs-title function_">S</span>(e,ret,<span class="hljs-title function_">ptr</span>(<span class="hljs-number">0</span>)).<span class="hljs-title function_">readCString</span>());<br>  &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>抓到:<code>content = &quot;page=11788414311409&quot;</code>,<code>sign = 4f4b4a5335c657e68f1cfae616291d8bebf8b69501e1e763</code>。</p>
+<p>拿 <code>rhash --tiger</code> 一对:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">printf</span> <span class="hljs-string">&#x27;page=11788414311409&#x27;</span> | rhash --tiger -<br>4f4b4a5335c657e68f1cfae616291d8bebf8b69501e1e763    <span class="hljs-comment"># 逐位一致 ✓</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>确认:sign = 标准 Tiger/192(小端字节序输出)。</strong></p>
+<h2 id="四、从-libgojni-so-抠出-Tiger-的-S-box"><a href="#四、从-libgojni-so-抠出-Tiger-的-S-box" class="headerlink" title="四、从 libgojni.so 抠出 Tiger 的 S-box"></a>四、从 libgojni.so 抠出 Tiger 的 S-box</h2><p>要做<strong>纯 Python</strong> 客户端,得有 Tiger。Python 没有内置 Tiger,而它的 4 张 S-box 是 8KB 固定常量,自己按官方口令生成很容易写错(我第一版就错了)。<strong>最稳的办法:直接从 libgojni.so 的 <code>.rodata</code> 里把 S-box 抠出来。</strong></p>
+<p>Tiger 的 <code>t1[0]</code> 是公开已知的 <code>0x02AAB17CF7E90C5E</code>,拿它当锚点:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> struct<br>d = <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;libgojni.so&quot;</span>,<span class="hljs-string">&quot;rb&quot;</span>).read()<br>i = d.find(struct.pack(<span class="hljs-string">&quot;&lt;Q&quot;</span>, <span class="hljs-number">0x02AAB17CF7E90C5E</span>))   <span class="hljs-comment"># 命中 -&gt; S-box 起点</span><br>tables = struct.unpack(<span class="hljs-string">&quot;&lt;1024Q&quot;</span>, d[i:i+<span class="hljs-number">1024</span>*<span class="hljs-number">8</span>])     <span class="hljs-comment"># 4×256 个 uint64</span><br><span class="hljs-comment"># 校验:t2[0]=0xE6A6BE5A05A12138, t3[0]=0xF49FCC2FF1DAF39B, t4[0]=0x5B0E608526323C55 ✓</span><br></code></pre></td></tr></table></figure>
+
+<p>有了正确的 S-box,自己写的 Tiger 压缩函数(3 趟、乘子 5/7/9、key_schedule、0x01 填充)立刻就对了:<code>Tiger(&quot;&quot;)</code> = <code>3293ac63…</code>(标准测试向量),样本也逐位一致。把这 8KB base64 内嵌进脚本即可。</p>
+<h2 id="五、补最后一道坑：token"><a href="#五、补最后一道坑：token" class="headerlink" title="五、补最后一道坑：token"></a>五、补最后一道坑：token</h2><p>算法对了,直接请求却回 <code>{&quot;error&quot;: &quot;pass&quot;}</code>(403)。抓一条<strong>真机</strong> app28 请求对比才发现:除了 <code>page/sign/ts</code>,请求还带了一个 <strong><code>token</code></strong>(登录态)。补上就 200 了:</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dts">POST <span class="hljs-keyword">/api/</span>app28<br><span class="hljs-symbol">token:</span> <span class="hljs-params">&lt;登录 token&gt;</span>                 <span class="hljs-meta"># &lt;-- 缺这个就 &#123;<span class="hljs-string">&quot;error&quot;</span>:<span class="hljs-string">&quot;pass&quot;</span>&#125;</span><br><span class="hljs-attr">page</span><span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-variable">&amp;sign</span>=<span class="hljs-params">&lt;tiger&gt;</span><span class="hljs-variable">&amp;ts</span>=<span class="hljs-params">&lt;ms&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>token 存在设备 MMKV 的 <code>com.yuanrenxue.match.utils.KEY_TOKEN</code>,过期换新即可。</p>
+<h2 id="六、纯-Python-复现"><a href="#六、纯-Python-复现" class="headerlink" title="六、纯 Python 复现"></a>六、纯 Python 复现</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> time, requests<br><span class="hljs-comment"># tiger(): 上面从 so 抠出的 S-box + 标准 Tiger 压缩(见完整脚本)</span><br><br>TOKEN = <span class="hljs-string">&quot;&lt;设备 MMKV KEY_TOKEN&gt;&quot;</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">sign</span>(<span class="hljs-params">page, ms</span>): <span class="hljs-keyword">return</span> tiger((<span class="hljs-string">&quot;page=%d%d&quot;</span> % (page, ms)).encode())<br><br>sess = requests.Session(); total = <span class="hljs-number">0</span><br><span class="hljs-keyword">for</span> page <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">101</span>):<br>    ms = <span class="hljs-built_in">int</span>(time.time()*<span class="hljs-number">1000</span>)<br>    r = sess.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app28&quot;</span>,<br>                  data=&#123;<span class="hljs-string">&quot;page&quot;</span>:page, <span class="hljs-string">&quot;sign&quot;</span>:sign(page,ms), <span class="hljs-string">&quot;ts&quot;</span>:ms&#125;,<br>                  headers=&#123;<span class="hljs-string">&quot;token&quot;</span>:TOKEN, <span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">15</span>).json()<br>    total += <span class="hljs-built_in">sum</span>(<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>]) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> r[<span class="hljs-string">&quot;data&quot;</span>])   <span class="hljs-comment"># 每页 10 个数</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;ANSWER =&quot;</span>, total)<br></code></pre></td></tr></table></figure>
+
+<p>自检(Frida 那条)+ 服务器 200 双通过,逐页求和即通关。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第二十八题的破解链很”教科书”:</p>
+<ol>
+<li>**Go 二进制先 <code>strings | grep .go</code>**——<code>tiger.go</code> 直接点名算法;</li>
+<li><strong>Frida hook <code>getSign</code> 对拍</strong>坐实是标准 Tiger(别忘了 Frida 17 用 <code>Process.findModuleByName</code> + JNI 函数表读 jbyteArray/jstring);</li>
+<li><strong>纯 Python 需要 S-box 时,从 so 里抠比自己生成靠谱</strong>——用已知首值 <code>0x02AAB17CF7E90C5E</code> 当锚点一抓一个准;</li>
+<li>**算法对了还进不去,就去抓真机请求补”环境”**——这题少的是 <code>token</code>。</li>
+</ol>
+<p>一句话:<strong>Go/gomobile 看着唬人,但它把源码路径写在 panic 里;认出经典算法 + 从二进制抠常量,比硬啃汇编省事得多。</strong></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/Golang/">#Golang</a>
+      
+        <a href="/tags/gomobile/">#gomobile</a>
+      
+        <a href="/tags/Tiger/">#Tiger</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第二十八题「GoNDK」离机复现：从 Go 二进制认出 Tiger 哈希</div>
+      <div>https://kingjem.github.io/2026/09/03/猿人学App第二十八题离机复现-从Go二进制认出Tiger哈希/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月3日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/02/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E4%BB%8ERustNDK%E9%87%8C%E6%8A%A0%E5%87%BA%E6%A0%87%E5%87%86XTEA/" title="猿人学 App 第二十三题「rustndk」离机复现:从 Rust NDK 里抠出标准 XTEA">
+                        <span class="hidden-mobile">猿人学 App 第二十三题「rustndk」离机复现:从 Rust NDK 里抠出标准 XTEA</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

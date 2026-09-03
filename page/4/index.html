@@ -215,6 +215,77 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" target="_self">
+          curl-impersonate JA3 指纹原理与复现
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/04/09/curl-impersonate-JA3-TLS-Fingerprint/" target="_self">
+        <div>
+          
+          curl-impersonate JA3 指纹原理与复现前言本文通过实际抓包验证，深入分析 curl-impersonate 的 TLS 指纹生成机制，并完整复现了 curl_chrome110 的 JA3 哈希计算全过程。  环境说明：curl-impersonate 安装于 &#x2F;root&#x2F;PycharmProjects&#x2F;python-api&#x2F;curl-impersonate&#x2F;  一、curl-i
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-04-09 11:00" pubdate>
+              2026-04-09
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" class="category-chain-item">网络安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
+            
+              <a href="/tags/TLS/">#TLS</a>
+            
+              <a href="/tags/JA3/">#JA3</a>
+            
+              <a href="/tags/JA4/">#JA4</a>
+            
+              <a href="/tags/curl-impersonate/">#curl-impersonate</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/">#网络爬虫</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2026/03/23/AI-JS%E9%80%86%E5%90%91%E6%8A%80%E8%83%BD%E5%BA%93%E5%85%A8%E6%99%AF%E8%B0%83%E7%A0%94/" target="_self">
           AI + JS 逆向工具 &amp; 技能库全景调研
         </a>
@@ -331,9 +402,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
-            
               <a href="/tags/MCP/">#MCP</a>
+            
+              <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
             
               <a href="/tags/Claude/">#Claude</a>
             
@@ -736,95 +807,17 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Python/">#Python</a>
+              <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
             
               <a href="/tags/Playwright/">#Playwright</a>
             
-              <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/">#反爬虫</a>
+              <a href="/tags/Python/">#Python</a>
             
               <a href="/tags/Scrapling/">#Scrapling</a>
             
               <a href="/tags/%E7%88%AC%E8%99%AB%E6%A1%86%E6%9E%B6/">#爬虫框架</a>
             
               <a href="/tags/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8F%96/">#网络抓取</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
-          BrowserForge：智能浏览器指纹与请求头生成器
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
-        <div>
-          
-          简介BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 Apify fingerprint-suite 的 Python 重新实现。 核心特性 🎯 真实流量模拟 - 使用贝叶斯生成网络模拟实际网络流量 ⚡ 极速运行 - 运行时仅需 0.1-0.2 毫秒 👤 简单易用 - 对人类友好的 API 设计 🔧
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-17 11:25" pubdate>
-              2026-03-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="category-chain-item">网络请求</a>
-  
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/BrowserForge/">#BrowserForge</a>
-            
-              <a href="/tags/%E6%8C%87%E7%BA%B9%E7%94%9F%E6%88%90/">#指纹生成</a>
-            
-              <a href="/tags/%E8%AF%B7%E6%B1%82%E5%A4%B4/">#请求头</a>
-            
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
-              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
-            
-              <a href="/tags/Python/">#Python</a>
             
           </div>
         
@@ -892,8 +885,6 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
               <a href="/tags/Camoufox/">#Camoufox</a>
             
               <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B%E6%B5%8F%E8%A7%88%E5%99%A8/">#反检测浏览器</a>
@@ -902,7 +893,87 @@
             
               <a href="/tags/Playwright/">#Playwright</a>
             
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
               <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">#自动化</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
+          BrowserForge：智能浏览器指纹与请求头生成器
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2026/03/17/BrowserForge%EF%BC%9A%E6%99%BA%E8%83%BD%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8C%87%E7%BA%B9%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%A4%B4%E7%94%9F%E6%88%90%E5%99%A8/" target="_self">
+        <div>
+          
+          简介BrowserForge 是一个智能的浏览器请求头和指纹生成器，它使用贝叶斯生成网络来模拟真实世界中不同浏览器、操作系统和设备的分布频率。它是 Apify fingerprint-suite 的 Python 重新实现。 核心特性 🎯 真实流量模拟 - 使用贝叶斯生成网络模拟实际网络流量 ⚡ 极速运行 - 运行时仅需 0.1-0.2 毫秒 👤 简单易用 - 对人类友好的 API 设计 🔧
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-17 11:25" pubdate>
+              2026-03-17
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="category-chain-item">网络请求</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/BrowserForge/">#BrowserForge</a>
+            
+              <a href="/tags/%E6%8C%87%E7%BA%B9%E7%94%9F%E6%88%90/">#指纹生成</a>
+            
+              <a href="/tags/%E8%AF%B7%E6%B1%82%E5%A4%B4/">#请求头</a>
+            
+              <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
+            
+              <a href="/tags/Python/">#Python</a>
             
           </div>
         
@@ -1308,46 +1379,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/chromium%E7%BC%96%E8%AF%91/">#chromium编译</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2025/07/23/RabbitMQ%E4%BD%BF%E7%94%A8%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97/" target="_self">
-          RabbitMQ使用优先级队列
-        </a>
-      </h1>
-
-      <a class="index-excerpt" href="/2025/07/23/RabbitMQ%E4%BD%BF%E7%94%A8%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97/" target="_self">
-        <div>
-          
-          1234567891011121314151617import pikacredentials &#x3D; pika.PlainCredentials(&quot;guest&quot;, &quot;guest&quot;)connection &#x3D; pika.BlockingConnection(pika.ConnectionParameters(host&#x3D;&#x27;localhost&#x27;,
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-07-23 18:09" pubdate>
-              2025-07-23
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/RabbitMQ/">#RabbitMQ</a>
             
           </div>
         
