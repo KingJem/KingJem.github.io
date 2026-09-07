@@ -24,7 +24,7 @@
 <meta property="og:description" content="[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，服务器却拒绝一切请求。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 Looper.myLooper() 反模拟，再到在 Unicorn 里绕过它、做成真离线客户端。 ⚠️ 猿">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-09-01T07:27:01.000Z">
-<meta property="article:modified_time" content="2026-09-01T07:28:26.910Z">
+<meta property="article:modified_time" content="2026-09-07T06:34:26.828Z">
 <meta property="article:author" content="Ruhai">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Frida">
@@ -218,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.6k 字
+          4.3k 字
         
       </span>
     
@@ -229,7 +229,7 @@
         
         
         
-          31 分钟
+          36 分钟
         
       </span>
     
@@ -280,7 +280,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2026年9月1日 下午
+                    本文最后更新于：2026年9月7日 下午
                   
                 
               </p>
@@ -343,6 +343,16 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> yuanrenxue_level3_emu <span class="hljs-keyword">import</span> gen_sign   <span class="hljs-comment"># Unicorn 模拟 sign(page, sec),已绕过 Looper</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page, s, cal=[<span class="hljs-literal">None</span>]</span>):<br>    offs = [cal[<span class="hljs-number">0</span>]] <span class="hljs-keyword">if</span> cal[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">else</span> [<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>,-<span class="hljs-number">2</span>,-<span class="hljs-number">3</span>,<span class="hljs-number">1</span>]<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">15</span>):<br>        <span class="hljs-keyword">for</span> off <span class="hljs-keyword">in</span> offs:<br>            sec = <span class="hljs-built_in">int</span>(time.time()) + off<br>            j = s.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app3&quot;</span>,<br>                       data=&#123;<span class="hljs-string">&quot;page&quot;</span>:page, <span class="hljs-string">&quot;sign&quot;</span>:gen_sign(page,sec).upper()&#125;,<br>                       headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">8</span>).json()<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">str</span>(j.get(<span class="hljs-string">&quot;status&quot;</span>)) == <span class="hljs-string">&quot;1&quot;</span>:<br>                cal[<span class="hljs-number">0</span>]=off<br>                <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br>        time.sleep(<span class="hljs-number">0.25</span>)<br></code></pre></td></tr></table></figure>
 
 <p>跑通——<strong>纯离线</strong>（Unicorn 模拟 + 自校准时钟，不碰手机）逐页取数。</p>
+<h2 id="七、提交-app-check-的-id-不是题号"><a href="#七、提交-app-check-的-id-不是题号" class="headerlink" title="七、提交:app_check 的 id 不是题号"></a>七、提交:app_check 的 id 不是题号</h2><p>拿到 100 页 1000 个数之和(答案 <code>5012057</code>)后,提交走 <code>POST challenge/api/app_check</code>,参数 <code>id / anw / token</code>。<strong>坑:<code>id</code> 不是显示的题号。</strong></p>
+<p>翻 <code>RefreshHeadViewAdapter</code>(所有列表式题目共用的提交适配器),提交按钮回调是:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// f8087OooO0oO 由构造参数 RefreshHeadViewAdapter(N) 设定</span><br>api.OooOo0(<span class="hljs-built_in">this</span>.f8087OooO0oO, editValue, token);   <span class="hljs-comment">// = app_check(id, anw, token)</span><br></code></pre></td></tr></table></figure>
+
+<p>各题的 <code>id</code> 就是它 <code>new RefreshHeadViewAdapter(N)</code> 里的 N:默认(第1题)=26、第2题=27、<strong>第三题=28</strong>、第29题=67……(活动类题目如第4题=30/第6题=32 则是 <code>OooOo0(常量,...)</code> 硬编码)。一度按”题号+26”猜成 id=29 提交,回 <code>Wrong answer</code>(29 是相邻的隐藏题);改回 <strong>id=28</strong> 即:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;status_code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;state&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>教训:提交端点冷却长、错一次刷新窗口,<strong>id 一定要先从 so/dex 里抠准</strong>,别按题号想当然。</p>
+</blockquote>
 <h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第三题把”反离线”写进了 native 本身：</p>
 <ol>
 <li><strong>so动态注册</strong>：真身藏在 RegisterNatives，静态导出是诱饵；</li>
