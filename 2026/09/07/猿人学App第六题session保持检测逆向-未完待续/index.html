@@ -1,0 +1,815 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第六题「session保持检测」，难度标”简单”、实为地狱。取数逻辑整个在 native onCreate 里：一个把 libcurl + OpenSSL 静态链接进去、goron 混淆、带反调试 + 伪 pinning 的原生 HTTP 客户端。本文记录一条完整的攻坚链：反 root 机制分析 → 磁盘 .so 打补丁绕过伪 pinning → stealth-fr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试&#x2F;伪 pinning 拆解请求算法（未完待续）">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/07/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%85%AD%E9%A2%98session%E4%BF%9D%E6%8C%81%E6%A3%80%E6%B5%8B%E9%80%86%E5%90%91-%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第六题「session保持检测」，难度标”简单”、实为地狱。取数逻辑整个在 native onCreate 里：一个把 libcurl + OpenSSL 静态链接进去、goron 混淆、带反调试 + 伪 pinning 的原生 HTTP 客户端。本文记录一条完整的攻坚链：反 root 机制分析 → 磁盘 .so 打补丁绕过伪 pinning → stealth-fr">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-07T03:20:00.000Z">
+<meta property="article:modified_time" content="2026-09-07T02:54:21.251Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="Ghidra">
+<meta property="article:tag" content="MT19937">
+<meta property="article:tag" content="反检测">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续） - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-07 11:20" pubdate>
+          2026年9月7日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          50 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续）</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年9月7日 上午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第六题「session保持检测」，难度标”简单”、实为<strong>地狱</strong>。取数逻辑整个在 <strong>native <code>onCreate</code></strong> 里：一个把 <strong>libcurl + OpenSSL 静态链接进去、goron 混淆、带反调试 + 伪 pinning</strong> 的原生 HTTP 客户端。<br>本文记录一条<strong>完整的攻坚链</strong>：反 root 机制分析 → <strong>磁盘 .so 打补丁绕过伪 pinning</strong> → <strong>stealth-frida 复活反检测</strong> → OpenSSL 符号全 hook → Stalker 调用图 → Ghidra 反编译，逐字段拆解这套”session保持”的请求算法。</p>
+<p><strong>诚实声明</strong>：最后一个字段 <code>data</code>（96 字节自定义 cipher）我没能完全还原——本文如实标注为”未完待续”，把踩到的墙和确认的边界写清楚。逆向本就不总是圆满，记录过程本身有价值。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>题目形态：一切都在 native onCreate</li>
+<li>第一道墙：反 root（只对 Frida 注入崩）</li>
+<li>第二道墙：伪 pinning（bundled CA blob）—— bind-mount 磁盘 .so 打补丁</li>
+<li>第三道墙：反 Frida —— stealth-frida（rusda）复活</li>
+<li>一把钥匙开所有锁：OpenSSL 符号全 hook</li>
+<li>拆解 session保持 算法</li>
+<li>上 Ghidra：确认 MT19937 + AES</li>
+<li>未完成的 <code>data</code>：诚实的边界</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、题目形态：一切都在-native-onCreate"><a href="#一、题目形态：一切都在-native-onCreate" class="headerlink" title="一、题目形态：一切都在 native onCreate"></a>一、题目形态：一切都在 native onCreate</h2><p>第 6 题有独立包 <code>com.yuanrenxue.challenge.six</code>，<code>ChallengeSixActivity</code> 的 <code>onCreate</code> 本身是 <strong>native</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> &#123; System.loadLibrary(<span class="hljs-string">&quot;six&quot;</span>); &#125;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle bundle)</span>;   <span class="hljs-comment">// 整个取数 + 填 20 个 TextView 都在这里</span><br></code></pre></td></tr></table></figure>
+
+<p><code>strings libsix.so</code> 一扫就露馅：</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-symbol">https:</span>//curl.haxx.se/...          <span class="hljs-meta"># libcurl 静态链接</span><br><span class="hljs-symbol">https:</span>//www.openssl<span class="hljs-meta">.org</span>/...       <span class="hljs-meta"># OpenSSL 静态链接</span><br>github.com/amimo/goron.git        <span class="hljs-meta"># goron 混淆(和第4题同款)</span><br></code></pre></td></tr></table></figure>
+
+<p>即：native 里用<strong>静态链接的 libcurl 自己发 HTTPS 取数</strong>，业务全在 so，且 goron 混淆（控制流平坦化 + 字符串加密 + <code>blr x8</code> GOT 间接调用）。</p>
+<p>反汇编定位到 curl 配置点：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs llvm">CURLOPT_URL          <span class="hljs-title">@0</span><span class="hljs-keyword">x</span><span class="hljs-number">13</span>f<span class="hljs-number">1</span>b<span class="hljs-number">8</span>   -&gt; https://www.python-spider.com/api/app<span class="hljs-number">6</span><br>CURLOPT_POSTFIELDS   <span class="hljs-title">@0</span><span class="hljs-keyword">x</span><span class="hljs-number">11</span>a<span class="hljs-number">13</span><span class="hljs-keyword">c</span>   -&gt; POST<br>CURLOPT_SSL_VERIFYPEER<span class="hljs-operator">=</span><span class="hljs-number">0</span> / VERIFYHOST<span class="hljs-operator">=</span><span class="hljs-number">0</span>   (一条分支)<br>CURLOPT_CAINFO       <span class="hljs-title">@0</span><span class="hljs-keyword">x</span><span class="hljs-number">13</span>f<span class="hljs-number">294</span>   (另一条分支<span class="hljs-punctuation">,</span>指向 bundled CA)<br></code></pre></td></tr></table></figure>
+
+<h2 id="二、第一道墙：反-root（只对-Frida-注入崩）"><a href="#二、第一道墙：反-root（只对-Frida-注入崩）" class="headerlink" title="二、第一道墙：反 root（只对 Frida 注入崩）"></a>二、第一道墙：反 root（只对 Frida 注入崩）</h2><p>直接开第 6 题会崩。反汇编 crash 链，发现 <strong>4 处直接 <code>svc #0</code> 系统调用</strong>（<code>faccessat</code> 查 su/magisk 文件、读 <code>/proc/self/*</code>），<strong>绕开 libc</strong>——所以 <code>hook access()</code> 这类思路无效。检测到异常后不显式 <code>crash()</code>，而是<strong>污染 OLLVM 平坦化的状态变量</strong>，导致 dispatch 越界 SIGSEGV。</p>
+<p>但关键实验发现：<strong>用 root <code>am start</code> 直接开第 6 题不崩，只有 Frida 注入进程时才崩</strong>。也就是说反 root 对”设备已 root”宽容，只对”进程里有 frida-agent”敏感（扫 maps/线程名）。</p>
+<blockquote>
+<p>教训：<strong>纯网络抓包对它完全隐形</strong>——反 root 只盯进程内注入。</p>
+</blockquote>
+<h2 id="三、第二道墙：伪-pinning-——-bind-mount-磁盘-so-打补丁"><a href="#三、第二道墙：伪-pinning-——-bind-mount-磁盘-so-打补丁" class="headerlink" title="三、第二道墙：伪 pinning —— bind-mount 磁盘 .so 打补丁"></a>三、第二道墙：伪 pinning —— bind-mount 磁盘 .so 打补丁</h2><p><code>POST /api/app6</code> 的证书校验分两条路：一条 <code>VERIFYPEER=0</code>（app_stop 等框架请求走这条，能 MITM），一条 <strong><code>CAINFO</code> 指向 APK 里 <code>assets/cacert.pem</code>（Mozilla CA 包）以 <code>CAINFO_BLOB</code> 内存加载</strong>——app6 数据请求走这条，拒绝 mitmproxy 的自签证书。这就是<strong>伪 pinning</strong>。</p>
+<p>破法很干净：<code>libsix.so</code> 是<strong>解压到磁盘</strong> <code>/data/app/.../lib/arm64/libsix.so</code> 加载的（不是从 APK 直读）。把校验分支 NOP 掉即可，<strong>无需重签/重装/丢 token</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 0x13f1c8 的 tbz(证书校验分支) -&gt; NOP,强制走 VERIFYPEER=0</span><br><span class="hljs-comment"># /data/app 的 apk_data_file 被 SELinux 挡写,改用 patch 副本 + bind-mount 覆盖</span><br>su 0 sh -c <span class="hljs-string">&#x27;</span><br><span class="hljs-string">  cp /data/local/tmp/libsix.bak /data/local/tmp/libsix_p.so</span><br><span class="hljs-string">  printf &quot;\x1f\x20\x03\xd5&quot; | dd of=/data/local/tmp/libsix_p.so bs=1 seek=$((0x13f1c8)) count=4 conv=notrunc</span><br><span class="hljs-string">  chcon u:object_r:apk_data_file:s0 /data/local/tmp/libsix_p.so</span><br><span class="hljs-string">  mount -o bind /data/local/tmp/libsix_p.so /data/app/.../lib/arm64/libsix.so</span><br><span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>反篡改不自校验 .text</strong>（patch 后不崩），mitm 直接解密。抓到明文请求：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs dts">POST <span class="hljs-keyword">/api/</span>app6   (HTTP/<span class="hljs-number">2</span>, curl/<span class="hljs-number">8.7</span><span class="hljs-number">.1</span>)<br>  <span class="hljs-meta"># 一整套<span class="hljs-string">&quot;元素周期表&quot;</span>命名的头:</span><br><span class="hljs-symbol">  aluminium:</span> <span class="hljs-params">&lt;base64(MD5 hex)&gt;</span>          sulphur: <span class="hljs-params">&lt;base64(MD5 hex)&gt;</span><br>  beryllium<span class="hljs-keyword">/neon/</span>nitrogen: <span class="hljs-params">&lt;SHA256 hex&gt;</span><br>  boron<span class="hljs-keyword">/carbon/</span>fluorine<span class="hljs-keyword">/helium/</span>hydrogen<span class="hljs-keyword">/lithium/</span><br>  magnesium<span class="hljs-keyword">/oxygen/</span>phosphorus<span class="hljs-keyword">/silicon/</span>sodium: <span class="hljs-params">&lt;各不相同的打乱 base62 字母表&gt;</span><br><span class="hljs-symbol">  body:</span><br><span class="hljs-symbol">    data:</span> <span class="hljs-params">&lt;<span class="hljs-number">192</span> hex = <span class="hljs-number">96</span>字节&gt;</span><br><span class="hljs-symbol">    page:</span> base64(<span class="hljs-string">&quot;11259374:&lt;ms&gt;:&lt;32位nonce&gt;&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>服务器回 <code>403 &quot;session保持检测&quot;</code>——因为 mitm 重新序列化 HTTP/2 破坏了 session 连续性（直连不经 mitm 时是 200）。但我们已经拿到<strong>真实请求模板</strong>。</p>
+<h2 id="四、第三道墙：反-Frida-——-stealth-frida（rusda）复活"><a href="#四、第三道墙：反-Frida-——-stealth-frida（rusda）复活" class="headerlink" title="四、第三道墙：反 Frida —— stealth-frida（rusda）复活"></a>四、第三道墙：反 Frida —— stealth-frida（rusda）复活</h2><p>要看内部算法必须 hook，但 Frida 注入就崩（反 root）。解法是 <strong>stealth-frida</strong>：把 frida-server + 注入 agent 里所有 <code>frida</code>/<code>gum</code>/<code>gmain</code>/<code>gum-js-loop</code> 签名串改名重编。</p>
+<p>对照 <a href="https://kingjem.github.io/2026/08/14/%E9%80%86%E5%90%91/Frida%E5%8F%8D%E6%A3%80%E6%B5%8B%E4%B8%89%E4%BB%B6%E5%A5%97%E5%AF%B9%E6%AF%94-Florida-rusda-fridare/">Frida 反检测三件套</a>，Pixel 6 + Sentry 检测场景选 **<a target="_blank" rel="noopener" href="https://github.com/taisuii/rusda">rusda</a>**（三层魔改、实测过 Sentry）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># rusda-server 版本与 frida-python 对齐,非默认端口</span><br>su 0 sh -c <span class="hljs-string">&#x27;setenforce 0; /data/local/tmp/rusda-server -l 127.0.0.1:8765&#x27;</span><br>adb forward tcp:8765 tcp:8765<br></code></pre></td></tr></table></figure>
+
+<p><strong>attach 后 app 存活、不崩——反 frida 被绕过，可任意 hook。</strong> 万能钥匙到手。</p>
+<h2 id="五、一把钥匙开所有锁：OpenSSL-符号全-hook"><a href="#五、一把钥匙开所有锁：OpenSSL-符号全-hook" class="headerlink" title="五、一把钥匙开所有锁：OpenSSL 符号全 hook"></a>五、一把钥匙开所有锁：OpenSSL 符号全 hook</h2><p>枚举 <code>libsix.so</code> 符号：<strong>7130 个，是完整 OpenSSL 不是 stripped BoringSSL</strong>！直接按名 hook：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// Frida 17: Process.findModuleByName; 无 Java 桥</span><br><span class="hljs-keyword">var</span> m = <span class="hljs-title class_">Process</span>.<span class="hljs-title function_">findModuleByName</span>(<span class="hljs-string">&quot;libsix.so&quot;</span>);<br>[<span class="hljs-string">&quot;EVP_DigestUpdate&quot;</span>,<span class="hljs-string">&quot;EVP_EncryptInit_ex&quot;</span>,<span class="hljs-string">&quot;EVP_EncryptUpdate&quot;</span>,<br> <span class="hljs-string">&quot;SHA256_Update&quot;</span>,<span class="hljs-string">&quot;SHA256_Final&quot;</span>,<span class="hljs-string">&quot;MD5_Update&quot;</span>,<span class="hljs-string">&quot;MD5_Final&quot;</span>,<br> <span class="hljs-string">&quot;AES_set_encrypt_key&quot;</span>,<span class="hljs-string">&quot;EVP_CipherInit_ex&quot;</span>].<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">n</span>)&#123;<br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(m.<span class="hljs-title function_">findExportByName</span>(n), &#123;...&#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>配合 <code>nghttp2_submit_request</code>（拿 HTTP/2 header 名值对）、<code>0x11a144</code>（POST body）、Stalker（调用图），逐字段对拍。</p>
+<h2 id="六、拆解-session保持-算法"><a href="#六、拆解-session保持-算法" class="headerlink" title="六、拆解 session保持 算法"></a>六、拆解 session保持 算法</h2><p>同一请求里 hook 到 crypto + header，逐个对应上：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-number">11</span> 个<span class="hljs-string">&quot;元素字母表&quot;</span>头(boron/carbon/.../sodium) = 各自随机打乱的 <span class="hljs-built_in">base62</span>(<span class="hljs-number">62</span>字符)<br><span class="hljs-attribute">page</span>      = <span class="hljs-built_in">base64</span>(<span class="hljs-string">&quot;11259374:&lt;ms毫秒&gt;:&lt;32位随机nonce&gt;&quot;</span>)<br>aluminium = <span class="hljs-built_in">base64</span>(<span class="hljs-built_in">hex</span>(<span class="hljs-built_in">MD5</span>(silicon 头的字母表)))         ✓ 离线复现验证通过<br>beryllium = <span class="hljs-built_in">hex</span>(<span class="hljs-built_in">SHA256</span>(boron 头的字母表))                ✓ 离线复现验证通过<br>key       = 某个字母表头的前 <span class="hljs-number">16</span> 字符<br>iv        = 另一个字母表头的前 <span class="hljs-number">16</span> 字符<br><span class="hljs-function"><span class="hljs-title">AES-128-CBC</span><span class="hljs-params">(page_b64, key, iv)</span></span> → <span class="hljs-number">80</span>字节密文             ✓ 逐字节对上 EVP 输出<br></code></pre></td></tr></table></figure>
+
+<p>那些看似 decoy 的”元素周期表”头其实<strong>携带 AES key/iv 材料 + 被哈希成 sign</strong>——服务器用头里的字母表反推 key/iv、验哈希，这就是”session保持”的本质（session 态全塞在头里，服务端可复算）。</p>
+<h2 id="七、上-Ghidra：确认-MT19937-AES"><a href="#七、上-Ghidra：确认-MT19937-AES" class="headerlink" title="七、上 Ghidra：确认 MT19937 + AES"></a>七、上 Ghidra：确认 MT19937 + AES</h2><p>Stalker 拿到 body 构造函数的完整调用图后，按 crypto 指令密度排序 + Ghidra 反编译（<code>analyzeHeadless</code> + Java 脚本，注意 imageBase=0x100000 要给地址加偏移），确认了两个核心：</p>
+<p><strong>MT19937（梅森旋转）</strong>——生成 11 个字母表 + nonce：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// FUN_0023c3e4: 铁证 0x9908b0df(MAG01) + 624/397 + tempering 掩码</span><br>*(state + idx*<span class="hljs-number">8</span>) = (upper &amp; <span class="hljs-number">1</span>) * <span class="hljs-number">0x9908b0df</span> ^ state[(idx+<span class="hljs-number">397</span>)%<span class="hljs-number">624</span>] ^ (y&gt;&gt;<span class="hljs-number">1</span>);<br>uVar3 = temper ^ (temper &amp; <span class="hljs-number">0x9d2c5680</span>) ^ ((...) &amp; <span class="hljs-number">0xefc60000</span>);   <span class="hljs-comment">// tempering</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>AES-128-CBC 函数</strong>——<code>FUN_00218900(out, plaintext, len, key, iv)</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">ctx = EVP_CIPHER_CTX_new();<br>EVP_CipherInit_ex(ctx, EVP_aes_128_cbc(), ...);   <span class="hljs-comment">// key_len==16, iv_len==16</span><br>EVP_CipherUpdate(ctx, out, &amp;outl, plaintext, len);<br>EVP_CipherFinal_ex(...);                          <span class="hljs-comment">// page_b64(76) -&gt; 80字节密文</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="八、未完成的-data：诚实的边界"><a href="#八、未完成的-data：诚实的边界" class="headerlink" title="八、未完成的 data：诚实的边界"></a>八、未完成的 <code>data</code>：诚实的边界</h2><p>到这里 <code>page</code> / <code>aluminium</code> / <code>beryllium</code> / <code>AES字段</code> / <code>key,iv来源</code> / <code>11字母表</code> 全部拆清、离线可复现。<strong>唯独 body 里的 <code>data</code>（96字节）没能还原</strong>，如实记录我撞到的墙：</p>
+<p><strong><code>data</code> 确定不是什么</strong>（Ghidra + 动态双向排除）：</p>
+<ul>
+<li>❌ 不是 <code>AES(page_b64)</code>——那个只有 80 字节，且值对不上；</li>
+<li>❌ 不是 MT19937 随机字节（任何字节序/偏移/低字节都不匹配）；</li>
+<li>❌ 不是 <code>page XOR MT</code> 流密码；</li>
+<li>❌ 不是 <code>uniform_int_distribution</code> 输出（那个范围 0-57，是洗牌用）；</li>
+<li>❌ Stalker 追到的 251 个函数里，<strong>没有一个是字节级 cipher</strong>（只有 MT + 字符串解密 XOR + 跳转表分发）。</li>
+</ul>
+<p><strong>为什么卡住</strong>：<code>data</code> 的生成函数经 <strong>goron 间接调用</strong>（<code>blr x8</code>，x8 从 GOT 动态算）到达——Ghidra 静态 XREF 全失效（GOT slot 无静态引用者）；动态 hook 每个疑似点都落在 std::string/vtable 机制上空转；它大概率在 <code>onCreate</code> 更早处、经我追不到的间接跳转算出，且<strong>用了非标准自定义算法</strong>（不走任何 OpenSSL 原语）。</p>
+<blockquote>
+<p>这不是”没努力”，是这个字段被 <strong>goron 间接 + C++ 对象化 + 非标准自定义算法</strong>三重埋到了当前工具链（stealth-frida + 符号 hook + Stalker + Ghidra）的极限。逆向到这一步，诚实标注边界比硬凑一个”看起来完整”的结论更有价值。</p>
+</blockquote>
+<p><strong>TODO</strong>：逐个反编译 <code>onCreate</code> 全部 goron 间接目标定位 <code>data</code> cipher 核心，或换更强的去混淆/符号执行手段。留待后续。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第 6 题这条链，值钱的是<strong>方法论</strong>：</p>
+<ol>
+<li><strong>反 root 先做空对照</strong>——搞清它到底盯什么（这题只盯 Frida 注入，网络抓包无视它）；</li>
+<li><strong>伪 pinning 别硬 MITM</strong>——so 是磁盘加载的，<code>bind-mount</code> 打补丁绕证书校验，不重签不丢 token；</li>
+<li><strong>反 Frida 上 stealth-frida</strong>（rusda/Florida）——版本对齐、非默认端口，一 attach 满盘皆活；</li>
+<li><strong>静态链接 OpenSSL 是送分</strong>——符号没 stripped，按名 hook <code>EVP_*</code>/<code>SHA256_*</code>/<code>MD5_*</code> 逐字段对拍；</li>
+<li><strong>Ghidra 兜底穿透 C++/goron</strong>——<code>analyzeHeadless</code> + Java 脚本批量反编译，认出 MT19937/AES；</li>
+<li><strong>啃不动就诚实标注</strong>——<code>data</code> 这最后一层留白，写清边界。</li>
+</ol>
+<p>一句话：<strong>这题的 CTF 精髓是”绕过 native 反调试/伪 pinning，把 session保持 的请求算法看明白”——这条链我走通了；<code>data</code> 那 10% 是纯运气式深挖，留作未完待续。</strong></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E5%8F%8D%E6%A3%80%E6%B5%8B/">#反检测</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/Ghidra/">#Ghidra</a>
+      
+        <a href="/tags/MT19937/">#MT19937</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续）</div>
+      <div>https://kingjem.github.io/2026/09/07/猿人学App第六题session保持检测逆向-未完待续/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月7日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/03/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%83%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%8A%A0%E5%87%BAwebpack%E9%87%8C%E7%9A%84%E9%AD%94%E6%94%B9SHA1/" title="猿人学 App 第二十七题「Weex」离机复现：抠出 webpack 里的魔改 SHA1">
+                        <span class="hidden-mobile">猿人学 App 第二十七题「Weex」离机复现：抠出 webpack 里的魔改 SHA1</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
