@@ -1,0 +1,814 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，服务器却拒绝一切请求。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 Looper.myLooper() 反模拟，再到在 Unicorn 里绕过它、做成真离线客户端。 ⚠️ 猿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&quot;字节全对却被拒&quot;的追凶">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Looper%E5%8F%8D%E6%A8%A1%E6%8B%9F/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，服务器却拒绝一切请求。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 Looper.myLooper() 反模拟，再到在 Unicorn 里绕过它、做成真离线客户端。 ⚠️ 猿">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-01T07:27:01.000Z">
+<meta property="article:modified_time" content="2026-11-24T09:51:40.392Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="MD4">
+<meta property="article:tag" content="RegisterNatives">
+<meta property="article:tag" content="Unicorn">
+<meta property="article:tag" content="anti-debug">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-01 15:27" pubdate>
+          2026年9月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年11月24日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第三篇。第三题「众里寻他千百度【so动态注册】」的 sign 由 native 生成。<br>这题是目前最曲折的一道:sign 逐字节逆出来了、模拟器和真机对拍一致，<strong>服务器却拒绝一切请求</strong>。本文完整记录这场追凶——从”设备时钟快 78 秒”，到最终揪出 native 里的 <strong><code>Looper.myLooper()</code> 反模拟</strong>，再到在 Unicorn 里绕过它、做成真离线客户端。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型 + so 动态注册（真身与诱饵）</li>
+<li>Unicorn 模拟 sign：与真机对拍一致</li>
+<li>追凶(一)：字节全对，服务器却拒</li>
+<li>追凶(二)：设备时钟快了 78 秒</li>
+<li>追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟</li>
+<li>绕过 Looper，做成真离线</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型-so-动态注册"><a href="#一、请求模型-so-动态注册" class="headerlink" title="一、请求模型 + so 动态注册"></a>一、请求模型 + so 动态注册</h2><p><code>ChallengeThreeFragment</code> 翻页：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">byte</span>[] raw = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChallengeThreeNativeLib</span>().sign(page);   <span class="hljs-comment">// native</span><br><span class="hljs-type">String</span> <span class="hljs-variable">sign</span> <span class="hljs-operator">=</span> toHex(raw);                                 <span class="hljs-comment">// 大写 hex &quot;0123456789ABCDEF&quot;</span><br>service.OooO(page, sign);                                 <span class="hljs-comment">// @POST(&quot;/api/app3&quot;) @Field(&quot;page&quot;) @Field(&quot;sign&quot;)</span><br></code></pre></td></tr></table></figure>
+
+<p><code>ChallengeThreeNativeLib</code>：<code>static { System.loadLibrary(&quot;three&quot;); } public native byte[] sign(int);</code>。</p>
+<p>侦察 libthree.so：不加壳、不 goron；<code>sign</code> 有一个<strong>静态导出</strong> <code>Java_..._sign</code>。但题名叫「<strong>so动态注册</strong>」——真身其实是 <code>JNI_OnLoad</code> 里 <code>RegisterNatives</code> 注册的那个。用 Unicorn 模拟 <code>JNI_OnLoad</code>、在 <code>RegisterNatives</code> 处截获方法表，果然：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lisp">sign -&gt; <span class="hljs-number">0</span>x2104c  (签名 (<span class="hljs-name">I</span>)[B)<br></code></pre></td></tr></table></figure>
+
+<p><strong>静态导出是诱饵</strong>，动态注册的 <code>0x2104c</code> 才是真身（RegisterNatives 会覆盖同名静态导出）。</p>
+<h2 id="二、Unicorn-模拟-sign：与真机对拍一致"><a href="#二、Unicorn-模拟-sign：与真机对拍一致" class="headerlink" title="二、Unicorn 模拟 sign：与真机对拍一致"></a>二、Unicorn 模拟 sign：与真机对拍一致</h2><p>用 Unicorn 从 <code>0x2104c</code> 跑起来，打桩 JNIEnv&#x2F;libc，捕获它 <code>NewByteArray + SetByteArrayRegion</code> 写出的 20 字节。函数里能看到 MD4 的 IV&#x2F;常量，输入是 <code>sprintf(&quot;%d&quot;, page)</code> 与 <code>time()</code> 秒。</p>
+<p>对拍：Frida 在真机上直接调 <code>0x2104c</code> 取 20 字节，喂模拟器<strong>相同的秒</strong>——<strong>逐字节一致</strong>。看起来收工了。</p>
+<h2 id="三、追凶-一-：字节全对，服务器却拒"><a href="#三、追凶-一-：字节全对，服务器却拒" class="headerlink" title="三、追凶(一)：字节全对，服务器却拒"></a>三、追凶(一)：字节全对，服务器却拒</h2><p>把模拟器现算的 sign（转大写 hex）打 <code>/api/app3</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Access forbidden；please check request&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>逐字节正确、当前秒现算现提交、±300s 全扫、紧循环 25 次……<strong>全拒</strong>。而 app1&#x2F;app2 从同一主机同一 IP 都正常，排除 IP 被封。诡异。</p>
+<h2 id="四、追凶-二-：设备时钟快了-78-秒"><a href="#四、追凶-二-：设备时钟快了-78-秒" class="headerlink" title="四、追凶(二)：设备时钟快了 78 秒"></a>四、追凶(二)：设备时钟快了 78 秒</h2><p>先确认 app 自己能不能加载第三题——截图一看：<strong>界面一直转圈、加载不出</strong>。再一比时钟：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">device</span>: <span class="hljs-number">1788242989</span>   host/server: <span class="hljs-number">1788242911</span>   -&gt; 设备快了 <span class="hljs-number">78</span> 秒<br></code></pre></td></tr></table></figure>
+
+<p>sign 内嵌的是 native <code>time()</code>（设备时钟）。设备快 78s → sign 带的是”未来时间” → 服务器判定不新鲜 → <strong>连 app 自己都过不了</strong>。root 下把设备时钟校准：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell su -c <span class="hljs-string">&quot;date @<span class="hljs-subst">$(host_epoch)</span>&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>再进第三题——<strong>app 出数据了</strong>（”请计算1-100页所有数字之和” + 一列数字）。机制确认：sign(page, 正确的秒) 有效。</p>
+<h2 id="五、追凶-三-：app-的-sign-和我的不一样-——-Looper-反模拟"><a href="#五、追凶-三-：app-的-sign-和我的不一样-——-Looper-反模拟" class="headerlink" title="五、追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟"></a>五、追凶(三)：app 的 sign 和我的不一样 —— Looper 反模拟</h2><p>可我主机的模拟器 sign 还是被拒。于是做了最关键的一步对比：<strong>hook app 主线程真实调用的 sign</strong>，和我模拟器&#x2F;Frida（都在非主线程）产出的 sign 放一起——</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs llvm">app  (主线程) : <span class="hljs-number">12</span><span class="hljs-keyword">c</span><span class="hljs-number">6</span>bd<span class="hljs-number">63</span>f<span class="hljs-number">761505</span>b<span class="hljs-number">9569848</span><span class="hljs-keyword">c</span>...<br>emu  (模拟器) : <span class="hljs-number">21080</span><span class="hljs-keyword">c</span><span class="hljs-number">9</span>f<span class="hljs-number">52666229956984</span>... （任何秒都对不上）<br></code></pre></td></tr></table></figure>
+
+<p><strong>不一样！</strong> 反汇编 <code>sign</code> 核心，真相浮出水面：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs llvm">bl   <span class="hljs-variable">#0</span><span class="hljs-keyword">x</span><span class="hljs-number">20424</span>          <span class="hljs-comment">; x0 = env-&gt;CallStaticObjectMethodV(Looper, myLooper)</span><br>cbnz <span class="hljs-keyword">x</span><span class="hljs-number">8</span><span class="hljs-punctuation">,</span> valid_path    <span class="hljs-comment">; myLooper() != null -&gt; 走【有效】MD4 路径</span><br><span class="hljs-comment">; 否则(null,即模拟器/Frida 这种没有 Looper 的线程):</span><br>bl   <span class="hljs-variable">#0</span><span class="hljs-keyword">x</span><span class="hljs-number">1</span>f<span class="hljs-number">770</span>          <span class="hljs-comment">; 对中间值多做一次变换 -&gt; sign 被【污染】失效</span><br></code></pre></td></tr></table></figure>
+
+<p>字符串常量坐实：<code>android/os/Looper</code> + <code>myLooper</code> + <code>()Landroid/os/Looper;</code>。</p>
+<p><strong>这是专门的反模拟&#x2F;反 Frida</strong>：<code>sign</code> 回调 <code>Looper.myLooper()</code>，只有在<strong>有 Looper 的线程</strong>（app 主线程）才生成有效 sign；在模拟器、或 Frida 主动调用所在的工作线程（都没有 Looper）上，sign 被故意搞坏。难怪逐字节”对拍一致”的是两个<strong>同样无效</strong>的版本。</p>
+<h2 id="六、绕过-Looper，做成真离线"><a href="#六、绕过-Looper，做成真离线" class="headerlink" title="六、绕过 Looper，做成真离线"></a>六、绕过 Looper，做成真离线</h2><p>对症下药：让模拟器的 JNIEnv 在这次回调上返回<strong>非空</strong>即可走有效分支。先打日志看 <code>sign()</code> 实际调了哪些 JNIEnv 索引：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">[<span class="hljs-attribute">6</span>=FindClass, <span class="hljs-attribute">113</span>=GetStaticMethodID, <span class="hljs-attribute">115</span>=CallStaticObjectMethodV, <span class="hljs-attribute">176</span>=NewByteArray, <span class="hljs-attribute">208</span>=SetByteArrayRegion]<br></code></pre></td></tr></table></figure>
+
+<p>于是把 <strong>索引 115（<code>CallStaticObjectMethodV</code>）桩成非空</strong>（伪造一个 Looper 指针）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> idx == <span class="hljs-number">115</span>: ret(<span class="hljs-number">0x6000</span>); <span class="hljs-keyword">return</span>   <span class="hljs-comment"># 假 Looper，绕过 myLooper()==null 的污染分支</span><br></code></pre></td></tr></table></figure>
+
+<p>再对拍——<strong>emu-match-offset &#x3D; 0</strong>，模拟器产出的 sign 与 app 主线程<strong>完全一致</strong>！</p>
+<p>最后补上”时钟”这一环：服务器严格按自己的时钟校验 sign 内嵌的秒，而开发机时钟可能有偏差（我这台走代理，偏了 ~1.4s）。客户端做<strong>自校准</strong>——围绕本机当前秒试 <code>now, now-1, now-2 …</code>，命中一次就记住这个偏移：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> yuanrenxue_level3_emu <span class="hljs-keyword">import</span> gen_sign   <span class="hljs-comment"># Unicorn 模拟 sign(page, sec),已绕过 Looper</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page, s, cal=[<span class="hljs-literal">None</span>]</span>):<br>    offs = [cal[<span class="hljs-number">0</span>]] <span class="hljs-keyword">if</span> cal[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">else</span> [<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>,-<span class="hljs-number">2</span>,-<span class="hljs-number">3</span>,<span class="hljs-number">1</span>]<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">15</span>):<br>        <span class="hljs-keyword">for</span> off <span class="hljs-keyword">in</span> offs:<br>            sec = <span class="hljs-built_in">int</span>(time.time()) + off<br>            j = s.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app3&quot;</span>,<br>                       data=&#123;<span class="hljs-string">&quot;page&quot;</span>:page, <span class="hljs-string">&quot;sign&quot;</span>:gen_sign(page,sec).upper()&#125;,<br>                       headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">8</span>).json()<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">str</span>(j.get(<span class="hljs-string">&quot;status&quot;</span>)) == <span class="hljs-string">&quot;1&quot;</span>:<br>                cal[<span class="hljs-number">0</span>]=off<br>                <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br>        time.sleep(<span class="hljs-number">0.25</span>)<br></code></pre></td></tr></table></figure>
+
+<p>跑通——<strong>纯离线</strong>（Unicorn 模拟 + 自校准时钟，不碰手机）逐页取数。</p>
+<h2 id="七、提交-app-check-的-id-不是题号"><a href="#七、提交-app-check-的-id-不是题号" class="headerlink" title="七、提交:app_check 的 id 不是题号"></a>七、提交:app_check 的 id 不是题号</h2><p>拿到 100 页 1000 个数之和(答案 <code>5012057</code>)后,提交走 <code>POST challenge/api/app_check</code>,参数 <code>id / anw / token</code>。<strong>坑:<code>id</code> 不是显示的题号。</strong></p>
+<p>翻 <code>RefreshHeadViewAdapter</code>(所有列表式题目共用的提交适配器),提交按钮回调是:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// f8087OooO0oO 由构造参数 RefreshHeadViewAdapter(N) 设定</span><br>api.OooOo0(<span class="hljs-built_in">this</span>.f8087OooO0oO, editValue, token);   <span class="hljs-comment">// = app_check(id, anw, token)</span><br></code></pre></td></tr></table></figure>
+
+<p>各题的 <code>id</code> 就是它 <code>new RefreshHeadViewAdapter(N)</code> 里的 N:默认(第1题)&#x3D;26、第2题&#x3D;27、<strong>第三题&#x3D;28</strong>、第29题&#x3D;67……(活动类题目如第4题&#x3D;30&#x2F;第6题&#x3D;32 则是 <code>OooOo0(常量,...)</code> 硬编码)。一度按”题号+26”猜成 id&#x3D;29 提交,回 <code>Wrong answer</code>(29 是相邻的隐藏题);改回 <strong>id&#x3D;28</strong> 即:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;status_code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;state&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>教训:提交端点冷却长、错一次刷新窗口,<strong>id 一定要先从 so&#x2F;dex 里抠准</strong>,别按题号想当然。</p>
+</blockquote>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>第三题把”反离线”写进了 native 本身：</p>
+<ol>
+<li><strong>so动态注册</strong>：真身藏在 RegisterNatives，静态导出是诱饵；</li>
+<li><strong>Looper 反模拟</strong>：<code>myLooper()==null</code>（模拟器&#x2F;Frida 工作线程）时故意产出无效 sign——这也解释了为什么”模拟器和 Frida 对拍一致”具有迷惑性，因为它俩都是无效版本；</li>
+<li><strong>时钟强校验</strong>：sign 内嵌 <code>time()</code> 秒，设备时钟一偏，连 app 自己都过不了。</li>
+</ol>
+<p>破法对应三步：Unicorn 跑 <code>JNI_OnLoad</code> 揪真身 → 把 <code>CallStaticObjectMethodV</code> 桩成非空绕过 Looper → 自校准时钟。这场”字节全对却被拒”的追凶，最大的教训是:<strong>对拍一致 ≠ 正确</strong>，当两边都跑在”被反制的环境”里时，它们会一致地错。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/JNI/">#JNI</a>
+      
+        <a href="/tags/MD4/">#MD4</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/Unicorn/">#Unicorn</a>
+      
+        <a href="/tags/RegisterNatives/">#RegisterNatives</a>
+      
+        <a href="/tags/anti-debug/">#anti-debug</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第三题离机复现-Looper反模拟/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%85%AB%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-grpc%E6%89%8B%E6%90%93protobuf/" title="猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猿人学 App 第八题「grpc」离机复现：手搓 protobuf + gRPC 通用 stub</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%94%B9%E7%89%88RC4%E8%BF%98%E5%8E%9F/" title="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原">
+                        <span class="hidden-mobile">猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

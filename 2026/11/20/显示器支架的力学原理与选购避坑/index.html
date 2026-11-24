@@ -1,0 +1,1023 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="为什么有的支架&quot;推到哪停到哪&quot;，有的却总往下坠或者往上飘？本文从重力力矩和零自由长度弹簧讲起，拆解六种支撑原理的优缺点，指出全网测评几乎都不提的那个关键参数——最低承重，复盘我双十一买错的一拖二支架，并说明同一个参数在加挂笔记本时如何反过来把贵的那支淘汰掉。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="显示器支架的力学原理与选购避坑：从零自由长度弹簧到我买错的那一个">
+<meta property="og:url" content="https://kingjem.github.io/2026/11/20/%E6%98%BE%E7%A4%BA%E5%99%A8%E6%94%AF%E6%9E%B6%E7%9A%84%E5%8A%9B%E5%AD%A6%E5%8E%9F%E7%90%86%E4%B8%8E%E9%80%89%E8%B4%AD%E9%81%BF%E5%9D%91/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="为什么有的支架&quot;推到哪停到哪&quot;，有的却总往下坠或者往上飘？本文从重力力矩和零自由长度弹簧讲起，拆解六种支撑原理的优缺点，指出全网测评几乎都不提的那个关键参数——最低承重，复盘我双十一买错的一拖二支架，并说明同一个参数在加挂笔记本时如何反过来把贵的那支淘汰掉。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-20T07:30:00.000Z">
+<meta property="article:modified_time" content="2026-11-24T09:51:40.391Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="人体工学">
+<meta property="article:tag" content="力学">
+<meta property="article:tag" content="显示器支架">
+<meta property="article:tag" content="选购">
+<meta property="article:tag" content="避坑">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>显示器支架的力学原理与选购避坑：从零自由长度弹簧到我买错的那一个 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="显示器支架的力学原理与选购避坑：从零自由长度弹簧到我买错的那一个"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-20 15:30" pubdate>
+          2026年11月20日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">显示器支架的力学原理与选购避坑：从零自由长度弹簧到我买错的那一个</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年11月24日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <p>桌上两台 27 寸，一台 Redmi G Pro 27U，一台 LG 27U552。想要的效果很简单：单手推，推到哪停到哪，松手不坠也不弹。</p>
+<p>就这么个朴素需求，我查进去才发现，这背后是个比想象中讲究得多的力学问题 —— 而且市面上绝大部分测评内容，连最关键的那个参数都不提。</p>
+<p>最后我还是买错了。这篇把原理和坑一起记下来。</p>
+<span id="more"></span>
+
+<h2 id="一、”丝滑”到底是个什么物理问题"><a href="#一、”丝滑”到底是个什么物理问题" class="headerlink" title="一、”丝滑”到底是个什么物理问题"></a>一、”丝滑”到底是个什么物理问题</h2><p>先把问题说准确。</p>
+<p>一条长度为 <code>L</code> 的臂，末端挂着质量 <code>m</code> 的屏幕，臂与水平方向夹角为 <code>θ</code>。绕支点的重力力矩是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">τ_重力 = m · g · L · cos θ<br></code></pre></td></tr></table></figure>
+
+<p>注意这个 <code>cos θ</code>：</p>
+<table>
+<thead>
+<tr>
+<th>臂的姿态</th>
+<th>θ</th>
+<th>cos θ</th>
+<th>重力力矩</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>水平伸直</td>
+<td>0°</td>
+<td>1</td>
+<td><strong>最大</strong></td>
+</tr>
+<tr>
+<td>抬起 45°</td>
+<td>45°</td>
+<td>0.71</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>竖直朝上</td>
+<td>90°</td>
+<td>0</td>
+<td><strong>为零</strong></td>
+</tr>
+</tbody></table>
+<p><strong>重力对支架的”拉扯”不是一个常数，它随角度变化，而且是按余弦规律变化的。</strong></p>
+<p>所以”推到哪停到哪”（物理上叫<strong>中性平衡</strong>）要求的不是”弹簧力够大”，而是：配重机构在<strong>每一个角度</strong>产生的反向力矩，都要恰好等于当下的重力力矩。</p>
+<p>换句话说 —— <strong>配重机构的力矩曲线，必须也长成 <code>cos θ</code> 的形状。</strong></p>
+<p>这是个曲线形状匹配问题，不是力量大小问题。想明白这一点，后面所有的设计取舍就都讲得通了。</p>
+<h2 id="二、零自由长度弹簧：唯一优雅的解"><a href="#二、零自由长度弹簧：唯一优雅的解" class="headerlink" title="二、零自由长度弹簧：唯一优雅的解"></a>二、零自由长度弹簧：唯一优雅的解</h2><p>有没有一种弹簧，天然就能产生 <code>cos θ</code> 形状的力矩？有，而且解法非常漂亮。</p>
+<h3 id="几何布置"><a href="#几何布置" class="headerlink" title="几何布置"></a>几何布置</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">  A  ← 弹簧上端，固定在支点正上方 a 处<br>  |\<br>  | \  s（弹簧当前长度）<br>a |  \<br>  |   \<br>  O----●----------------[屏幕]<br> 支点   ↑                  ↑<br>    距支点 b 处           距支点 L<br>    （弹簧下端接在臂上）<br><br>  臂与水平面夹角 θ<br></code></pre></td></tr></table></figure>
+
+<h3 id="关键概念：零自由长度弹簧"><a href="#关键概念：零自由长度弹簧" class="headerlink" title="关键概念：零自由长度弹簧"></a>关键概念：零自由长度弹簧</h3><p>普通弹簧有一个<strong>自然长度</strong> <code>L₀</code>，拉力是 <code>F = k · (s − L₀)</code> —— 只有拉伸超出自然长度的部分才产生力。</p>
+<p>而**零自由长度弹簧（zero-free-length spring）**是一种理想弹簧，它的自然长度为 0，拉力直接正比于当前长度：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">F = k · s<br></code></pre></td></tr></table></figure>
+
+<p>这种弹簧的弹性势能就是 <code>½ · k · s²</code>。</p>
+<h3 id="推导"><a href="#推导" class="headerlink" title="推导"></a>推导</h3><p>由余弦定理，弹簧当前长度满足：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">s² = a² + b² − 2ab · sin θ<br></code></pre></td></tr></table></figure>
+
+<p>代入势能：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">E_弹簧 = ½k · s²<br>       = ½k(a² + b²) − k·a·b · sin θ<br></code></pre></td></tr></table></figure>
+
+<p>而屏幕的重力势能（末端高度为 <code>L · sin θ</code>）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">E_重力 = m · g · L · sin θ<br></code></pre></td></tr></table></figure>
+
+<p>两者相加：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">E_总 = ½k(a² + b²) + (m·g·L − k·a·b) · sin θ<br>       └──── 常数 ────┘   └──── 这一项 ────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>当 <code>k · a · b = m · g · L</code> 时，<code>sin θ</code> 前面的系数变成 0，总势能退化成一个常数 —— 与角度完全无关。</strong></p>
+<p>势能处处相等 &#x3D; 任意位置都是平衡位置 &#x3D; 推到哪停到哪。</p>
+<p>从力矩角度看是同一件事：对势能求导，弹簧产生的力矩是 <code>k·a·b·cos θ</code>，和重力的 <code>m·g·L·cos θ</code> <strong>曲线形状完全一致</strong>，所以能在全行程上逐点抵消。</p>
+<p>这就是 1932 年 Anglepoise 台灯的原理，也是今天所有好支架的理论地基。</p>
+<h2 id="三、现实：没有真正的零自由长度弹簧"><a href="#三、现实：没有真正的零自由长度弹簧" class="headerlink" title="三、现实：没有真正的零自由长度弹簧"></a>三、现实：没有真正的零自由长度弹簧</h2><p>问题来了 —— 自然长度为 0 的弹簧不存在。真实的螺旋弹簧 <code>L₀ &gt; 0</code>，那个 <code>L₀</code> 项会破坏精确抵消。</p>
+<p>于是工程上衍生出六种做法：</p>
+<table>
+<thead>
+<tr>
+<th>原理</th>
+<th>力矩曲线</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>纯摩擦 &#x2F; 锁紧</strong></td>
+<td>不匹配，靠静摩擦硬扛</td>
+<td>便宜、不漂移</td>
+<td>要拧螺丝才能调，谈不上丝滑</td>
+</tr>
+<tr>
+<td><strong>普通螺旋弹簧</strong></td>
+<td>近似，靠预张力 + 延长挂钩逼近</td>
+<td>结构简单、耐久</td>
+<td>行程两端误差大</td>
+</tr>
+<tr>
+<td><strong>恒力弹簧</strong>（卷簧）</td>
+<td>恒力 + 凸轮整形</td>
+<td>力值极稳、寿命长</td>
+<td>贵，结构复杂</td>
+</tr>
+<tr>
+<td><strong>气弹簧</strong>（氮气 + 油）</td>
+<td>近似恒力 + 连杆整形</td>
+<td>手感顺滑、体积小</td>
+<td>会泄压下坠、温度敏感</td>
+</tr>
+<tr>
+<td><strong>配重块</strong></td>
+<td>天然完美匹配</td>
+<td>原理上最准、零衰减</td>
+<td>又大又重，桌面支架用不了</td>
+</tr>
+<tr>
+<td><strong>电动丝杆</strong></td>
+<td>自锁，无需配平</td>
+<td>承重任意、精确</td>
+<td>要供电、调一下等半天</td>
+</tr>
+</tbody></table>
+<h3 id="这里有个容易被忽略的事实"><a href="#这里有个容易被忽略的事实" class="headerlink" title="这里有个容易被忽略的事实"></a>这里有个容易被忽略的事实</h3><p><strong>恒力弹簧和气弹簧，本身都是”近似恒力”的</strong> —— 它们的输出力几乎不随行程变化，这意味着它们<strong>天然完全不满足零自由长度条件</strong>。</p>
+<p>那它们怎么做到全程平衡的？靠<strong>连杆几何和凸轮型面</strong>。厂商用机械结构把这个”恒力”整形成一条 <code>cos θ</code> 曲线。</p>
+<p><strong>整形得好不好，就是贵支架和便宜支架的全部差距。</strong></p>
+<p>便宜支架为什么”中间还行，推到最高或压到最低就开始漂”？因为凸轮型面只在中段拟合得住，两端跑偏了。这不是做工问题，是设计问题 —— 你没法靠拧紧螺丝修好它。</p>
+<h2 id="四、全网测评都不提的那个参数：最低承重"><a href="#四、全网测评都不提的那个参数：最低承重" class="headerlink" title="四、全网测评都不提的那个参数：最低承重"></a>四、全网测评都不提的那个参数：最低承重</h2><p>回到平衡条件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">k · a · b = m · g · L<br></code></pre></td></tr></table></figure>
+
+<p><code>a</code>、<code>b</code>、<code>L</code> 是出厂定死的几何尺寸，<code>m</code> 是你屏幕的重量 —— 唯一能调的只有弹簧劲度 <code>k</code>。支架背后那颗调节螺丝，调的就是它，范围是 <code>[k_min, k_max]</code>。</p>
+<p>于是：</p>
+<ul>
+<li>屏幕太重，<code>m·g·L &gt; k_max·a·b</code> → <strong>顶不住，往下坠</strong>。这就是「最大承重」。</li>
+<li>屏幕太轻，<code>m·g·L &lt; k_min·a·b</code> → <strong>压不下去，往上飘</strong>。这就是「最低承重」。</li>
+</ul>
+<p><strong>往上飘比往下坠更让人崩溃</strong> —— 往下坠你还能理解成”东西不行”，往上飘会让你怀疑是不是装反了。</p>
+<h3 id="为什么大承重支架反而危险"><a href="#为什么大承重支架反而危险" class="headerlink" title="为什么大承重支架反而危险"></a>为什么大承重支架反而危险</h3><p>要支撑 15kg，<code>k_max</code> 就得足够大，这通常意味着换一根更硬的弹簧 —— 而<strong>更硬的弹簧，<code>k_min</code> 也跟着水涨船高</strong>。</p>
+<p>所以标着「承重 2–15kg」的支架，<strong>真正该看的是前面那个 2，不是后面那个 15</strong>。很多人冲着”承重大&#x3D;结实”去买大承重型号，结果轻屏幕根本配不平。</p>
+<h3 id="而这个数，中文内容里基本查不到"><a href="#而这个数，中文内容里基本查不到" class="headerlink" title="而这个数，中文内容里基本查不到"></a>而这个数，中文内容里基本查不到</h3><p>我把能找的都翻了一遍：松能、北弧的官方页面和商品详情，<strong>最低承重基本不公开</strong>。所谓”硬核测评”也只抄最大承重。</p>
+<p>我那台 <strong>4.2kg 的 LG</strong>，正好落在危险区间 —— 它是我整个选购过程中最大的风险点，但几乎没有任何一篇测评会告诉你该关心这个。</p>
+<h2 id="五、一拖二，还是两个单臂？"><a href="#五、一拖二，还是两个单臂？" class="headerlink" title="五、一拖二，还是两个单臂？"></a>五、一拖二，还是两个单臂？</h2><h3 id="先纠正我自己的一个错误"><a href="#先纠正我自己的一个错误" class="headerlink" title="先纠正我自己的一个错误"></a>先纠正我自己的一个错误</h3><p>我一开始的判断是：一拖二（单底座双臂）没法对两块屏独立配平，所以 4.7kg 和 4.2kg 的组合必然有一块是歪的。</p>
+<p><strong>这是错的。</strong> 主流一拖二的每条臂都有独立的弹簧和独立的调节螺丝，两块屏完全可以分别配平。我把这条划掉。</p>
+<h3 id="一拖二真正的三个问题"><a href="#一拖二真正的三个问题" class="headerlink" title="一拖二真正的三个问题"></a>一拖二真正的三个问题</h3><ol>
+<li><strong>力矩全压在一个夹持点上。</strong> 两块屏加起来快 9kg，再乘上伸出去的力臂，全部由一个夹子承担。桌板边缘的局部压强和长期形变风险都在这里。</li>
+<li><strong>双臂卡位。</strong> 两条臂共用一根立柱，调一块屏的时候另一块挡路，转到某些角度就互相顶住，调不过去。</li>
+<li><strong>中缝合不拢。</strong> 两条臂各自的回转几何决定了两块屏中间有一道缝，而且这道缝的宽度不是你能调的。</li>
+</ol>
+<p>而一拖二的优点只有一个：<strong>只占一个夹持位</strong>。</p>
+<p>所以结论很清楚 —— <strong>如果你的桌子本来就能夹两个位置，一拖二的唯一优点直接归零，剩下三个缺点白拿。</strong></p>
+<h2 id="六、我买了，三个坑全中"><a href="#六、我买了，三个坑全中" class="headerlink" title="六、我买了，三个坑全中"></a>六、我买了，三个坑全中</h2><p>双十一买的<strong>北弧 E350 EZ-2</strong>（一拖二），打折后到手 <strong>¥200</strong>。装上之后：</p>
+<ul>
+<li>有缝 ✅</li>
+<li>调整难 ✅</li>
+<li>双臂卡位 ✅</li>
+</ul>
+<p>三条预判一条没落下。</p>
+<h3 id="还有一个没预料到的：背板根本不是平的"><a href="#还有一个没预料到的：背板根本不是平的" class="headerlink" title="还有一个没预料到的：背板根本不是平的"></a>还有一个没预料到的：背板根本不是平的</h3><p><strong>Redmi G Pro 27U 的 VESA 区域是一块圆形塑料底盘，不是一块平板。</strong></p>
+<p>具体长这样：圆盘中间有一条矩形<strong>凹槽</strong>，四个 VESA 孔分布在凹槽的四个角上；凹槽里还卧着三颗固定圆盘的大螺丝（上二、右下一），以及一块圆形凸起；左右两侧各有两个长条卡槽，是原装支架快拆卡扣的位置。</p>
+<p>问题就出在这个结构上：<strong>四个孔不在一块”平地”上。</strong> 支架的方形转接板压上去，先顶到的是凹槽边沿和那三颗更高的螺丝头，根本接触不到孔位周围的平面 —— 不垫起来的话，螺丝是在把转接板往悬空的位置硬拽。</p>
+<p>所以<strong>必须加垫圈</strong>，把转接板垫到高于凹槽边沿的位置，让受力落在垫圈和孔位之间，而不是靠螺丝悬着。</p>
+<blockquote>
+<p>另外圆盘上贴着「保修封条 撕毁无效」。别想着把这块盘拆了换个平面 —— 拆了保修就没了。</p>
+</blockquote>
+<p><strong>买之前没有任何一篇资料、任何一篇测评提过这件事。</strong> 规格表里”支持 VESA 100×100”这句话是真的，但它不会告诉你那四个孔长在一条沟里。</p>
+<p>至于桌子 —— 宜家 UTESPELARE 160×80 电竞桌。宜家官方产品文案里明确写了，后面那条钢网横梁就是<strong>给显示器支架夹的</strong>，而且用的是复数（”clamp a pair of monitor arms to it”）。</p>
+<p>**也就是说，我本来就能夹两个单臂。**一拖二那个”省一个夹持位”的唯一优点，在我这张桌子上从一开始就不成立。</p>
+<p>不过有件事得说公道：<strong>这支架打折到手才 ¥200。</strong></p>
+<p>一拖二 ¥200，摊下来一条臂 ¥100。而回头看第三节就会发现 —— <strong>这三个毛病根本不是运气不好，是被价格决定的。</strong></p>
+<p>让力矩曲线在全行程上贴住 <code>cos θ</code> 的那套东西（凸轮型面、连杆几何、弹簧选型与配对），恰恰是整个支架里最花钱的部分。¥100 一条臂，根本没有这笔预算。所以便宜支架不是”做工差”，而是<strong>它压根就没打算在行程两端把曲线拟合住</strong> —— 中段能用，就交付了。</p>
+<p>真正扎心的也不是这 ¥200，而是：我为了一个我根本不需要的优点（省一个夹持位），主动选择了三个确定会遇到的缺点。而”桌子能夹两个”这件事，我花两分钟就能确认，却是整个过程中最后才想起来去查的。</p>
+<h2 id="七、延伸：再挂一台笔记本？同一个参数会反咬你"><a href="#七、延伸：再挂一台笔记本？同一个参数会反咬你" class="headerlink" title="七、延伸：再挂一台笔记本？同一个参数会反咬你"></a>七、延伸：再挂一台笔记本？同一个参数会反咬你</h2><p>换成两条单臂之后，很自然会想到下一步：能不能再挂一台笔记本？</p>
+<p><strong>接口上毫无问题。</strong> 市面上的 VESA 笔记本托盘（StarTech、BenQ LTB01、各家通用款，承重普遍 4.5–5kg）就是当成一块”屏幕”拧到臂上去的，75&#x2F;100 孔位通用。</p>
+<p>但有三件事值得先算清楚。</p>
+<h3 id="1-你没有空余的臂"><a href="#1-你没有空余的臂" class="headerlink" title="1. 你没有空余的臂"></a>1. 你没有空余的臂</h3><p>两条臂，两块屏，<strong>空余的 VESA 头是零</strong>。托盘要独占一条完整的臂 —— 所以实际预算是三条臂，不是两条。</p>
+<h3 id="2-最低承重会反咬，而且专咬贵的那支"><a href="#2-最低承重会反咬，而且专咬贵的那支" class="headerlink" title="2. 最低承重会反咬，而且专咬贵的那支"></a>2. 最低承重会反咬，而且专咬贵的那支</h3><p>这是第四节那个参数的延伸案例，也是我觉得最值得记下来的一条。</p>
+<p>笔记本 + 托盘的总重大概是这个量级（托盘自重通常 1kg 上下）：</p>
+<table>
+<thead>
+<tr>
+<th>笔记本</th>
+<th>自重</th>
+<th>加托盘后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MacBook Air 13</td>
+<td>1.24kg</td>
+<td><strong>≈ 2.2kg</strong></td>
+</tr>
+<tr>
+<td>MacBook Pro 14</td>
+<td>1.55kg</td>
+<td>≈ 2.6kg</td>
+</tr>
+<tr>
+<td>MacBook Pro 16</td>
+<td>2.1kg</td>
+<td>≈ 3.1kg</td>
+</tr>
+<tr>
+<td>15 寸 Windows 本</td>
+<td>1.8–2.2kg</td>
+<td>≈ 2.8–3.2kg</td>
+</tr>
+</tbody></table>
+<p>对照两个候选的最低承重：</p>
+<table>
+<thead>
+<tr>
+<th>支架</th>
+<th>最低承重</th>
+<th>挂轻薄本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>REDMI 支架臂</td>
+<td>1.9kg</td>
+<td>✅ 通过</td>
+</tr>
+<tr>
+<td>爱格升 Ergotron LX</td>
+<td>3.2kg</td>
+<td>❌ <strong>低于下限，会往上飘</strong></td>
+</tr>
+</tbody></table>
+<p><strong>讽刺的地方在这里：贵的那支反而不行。</strong></p>
+<p>爱格升 LX 是前面唯一把最低承重和弹簧类型都公开的”一步到位”选项，但它那个 3.2kg 的下限，意味着<strong>几乎所有轻薄本挂上去都会顶着往上跑</strong>。爱格升自己出了专门的 Notebook Tray 配件，部分原因就是要靠托盘自重把总重顶进可调区间 —— 这是个补丁，不是巧合。</p>
+<p><strong>同一个参数，换一种负载，就从”够用”变成”出局”。</strong> 而你在买支架的时候，大概率不会想到半年后要挂个笔记本。</p>
+<h3 id="3-别只比重量，要比力矩"><a href="#3-别只比重量，要比力矩" class="headerlink" title="3. 别只比重量，要比力矩"></a>3. 别只比重量，要比力矩</h3><p>再回到 <code>τ = m·g·L</code>。</p>
+<p>显示器的重心基本贴在 VESA 板后面，三五厘米。但<strong>笔记本是放在一块向前伸出的托盘上的</strong>，重心往前推了 10–15cm。</p>
+<p>以 REDMI 臂 43.5cm 的前后行程算，加上托盘偏移，等效力臂从约 43cm 变成约 58cm —— <strong>力矩凭空多出三成</strong>。</p>
+<p>实际体验就是：按重量算明明在范围内，装上去却总是往下点头；你只能把弹簧拧得更紧，然后发现快拧到头了。</p>
+<p><strong>规格表上那个”承重 X kg”，默认你挂的是一块重心贴着板的显示器。挂托盘要自己把这笔账加回去。</strong></p>
+<h3 id="4-但先问一句：真的需要挂上去吗"><a href="#4-但先问一句：真的需要挂上去吗" class="headerlink" title="4. 但先问一句：真的需要挂上去吗"></a>4. 但先问一句：真的需要挂上去吗</h3><p>我桌子 160cm，两块 27 寸占掉 122.6cm，<strong>还剩 37cm</strong>。一台 14–16 寸笔记本展开约 32–36cm —— 放得下，但基本贴着边。</p>
+<p>所以挂起来确实有理由。但如果目的只是<strong>把笔记本垫到合适高度</strong>，一个几十块的桌面铝合金抬升架就能解决，不占臂、不吃承重、不用算力矩。</p>
+<p>而如果笔记本只是当主机用、不需要它的屏幕，<strong>合盖竖放的竖立架能把占用从 32cm 压到 5cm</strong> —— 代价是散热，高负载机型合盖容易降频，这条得自己掂量。</p>
+<p>一条臂 ¥299 + 托盘 ¥100 + 第三个夹持点的力矩叠加，<strong>去换一个 ¥40 竖立架就能解决的问题</strong>，并不划算。</p>
+<blockquote>
+<p>顺带一个选购信号，和本文的主题一脉相承：买抬升架时看商品页有没有标<strong>板材厚度</strong>。真铝合金会写 3mm &#x2F; 5mm &#x2F; 6mm，铝塑板冒充的一般只含糊说”铝合金材质”。<strong>不敢写的数字通常不好看</strong> —— 和最低承重是同一个道理。</p>
+</blockquote>
+<h2 id="八、顺带说说调研过程中的信息污染"><a href="#八、顺带说说调研过程中的信息污染" class="headerlink" title="八、顺带说说调研过程中的信息污染"></a>八、顺带说说调研过程中的信息污染</h2><p>这部分值得单独拎出来，因为它影响的不只是支架。</p>
+<p><strong>1. “87 位用户真实体验”是 AI 拼的。</strong><br>某值得买上一篇标题带「87位用户真实体验」的长测评，挂在品牌页下面。通读之后基本可以确认是 AI 批量生成的营销稿 —— 没有可核验的个体细节，所有”用户”的措辞结构高度雷同，结论整齐地指向同一个型号。</p>
+<p><strong>2. 京东商品规格页是 JS 渲染 + 反爬的。</strong><br>想用脚本把几个型号的参数拉下来横向对比？抓不到，返回的是个空壳。只能人工一页页看。</p>
+<p><strong>3. 最低承重全网没人提。</strong><br>前面说过了，这是最该写进标题的参数，却连一篇测评都没覆盖。</p>
+<p><strong>4. 同一台显示器，不同字段给出不同孔距 —— 而我按”多数派”押错了。</strong><br>Redmi G Pro 27U 的<strong>标准 VESA 接口是 100×100</strong>，但规格表的「挂壁式」一栏写的是 75×75。这两个数指的根本不是同一件事。</p>
+<p>我查的时候，ZOL、PConline、Gizmochina 都写 75×75，只有一篇写 100×100。我当时的判断是”三比一，少数那篇大概抄错了”——<strong>按信源数量投票，而不是去搞清楚这个字段到底在说什么。</strong> 结果三个站点抄的是同一栏，而那栏不是我要的那栏。</p>
+<p>教训很直白：<strong>信源数量不等于正确性，尤其当它们可能抄自同一处时。</strong> 真正该做的是搞明白字段的定义，哪怕只有一个信源。</p>
+<p><strong>结果很讽刺：整个过程里最可靠的一手信源，是京东规格表里那几个毫不起眼的字段。</strong></p>
+<ul>
+<li>「<strong>工作原理</strong>」：机械式 &#x2F; 气压式 &#x2F; 液压式 —— 一个词就把核心原理定死了，比一万字测评都有用。</li>
+<li>「<strong>挂壁式</strong>」：标的是壁挂套件孔距，<strong>不是</strong>标准 VESA 接口，别拿它去选支架。</li>
+</ul>
+<p>这些字段没人愿意写进测评，因为它们不性感。但它们是厂商必须填、而且填错要担责的地方。</p>
+<h2 id="九、如果重来，我的决策清单"><a href="#九、如果重来，我的决策清单" class="headerlink" title="九、如果重来，我的决策清单"></a>九、如果重来，我的决策清单</h2><ol>
+<li><strong>先量实际重量</strong>（不含底座）和 VESA 孔距。我这两台是：Redmi G Pro 27U 约 4.7kg、LG 27U552 约 4.2kg，<strong>两台都是 100×100</strong>，不需要转接板。<blockquote>
+<p>⚠️ 这里有个坑我自己踩了：Redmi 这台在规格表的「<strong>挂壁式</strong>」一栏写的是 75×75，那是壁挂套件的数字，<strong>标准 VESA 接口是 100×100</strong>。详见第八节。</p>
+</blockquote>
+</li>
+<li><strong>查最低承重</strong>，确认它比你<strong>最轻</strong>那块屏还低至少 1kg。查不到就别买 —— 厂商不写，通常不是因为它好看。</li>
+<li><strong>查「工作原理」字段</strong>。机械式（恒力&#x2F;螺旋弹簧）长期稳定；气压式手感好但有 3–10 年泄压下坠的窗口期，这时候要看质保年限能不能覆盖。</li>
+<li><strong>默认买两个单臂</strong>，除非桌面只有一个能夹的位置。</li>
+<li><strong>预算够就一步到位</strong>上恒力弹簧的（爱格升 LX 这类），它是少数把最低承重和弹簧类型都明确公开的。<blockquote>
+<p>⚠️ 但注意第七节那个反转：LX 的最低承重是 3.2kg，<strong>如果你以后想挂笔记本，或者有更轻的屏幕，这个下限会直接把你挡在外面</strong>。”一步到位”要先确认”位”在哪。</p>
+</blockquote>
+</li>
+<li><strong>把未来的负载也算进去。</strong> 今天只有两块屏，不代表明年不会加一台笔记本、一块竖屏或者一个补光灯。选支架时留出的不是承重上限的余量，而是<strong>下限的余量</strong> —— 上限不够可以换臂，下限太高是硬伤。</li>
+</ol>
+<h3 id="候选对比"><a href="#候选对比" class="headerlink" title="候选对比"></a>候选对比</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>最低承重</th>
+<th>弹簧类型</th>
+<th>价格（单臂）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>北弧 E350 EZ-2（我买的）</td>
+<td>❌ 未公开</td>
+<td>❌ 未公开</td>
+<td><strong>~¥100</strong>（一拖二 ¥200 摊）</td>
+</tr>
+<tr>
+<td>松能 HT-Zero</td>
+<td>❌ 未公开</td>
+<td>✅ 机械式</td>
+<td>~¥400</td>
+</tr>
+<tr>
+<td>小米&#x2F;REDMI 支架臂</td>
+<td>✅ 1.9kg</td>
+<td>❓ 未公开</td>
+<td>¥299</td>
+</tr>
+<tr>
+<td>爱格升 Ergotron LX</td>
+<td>✅ 3.2kg</td>
+<td>✅ 恒力卷簧</td>
+<td>¥900–1300</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>关于 REDMI 支架臂需要说明：它的最低承重 1.9kg 是公开的（对轻屏幕很友好），但<strong>弹簧类型官方和所有新闻稿都没写</strong>。厂商口径一直是「双弹簧专利结构」「两侧弹簧同步出力」「通过 30000 次以上疲劳测试」—— 用词倾向机械簧（气弹簧通常会直接叫”气弹簧&#x2F;气压杆”，”疲劳测试”也是金属疲劳的术语），但这是推断，<strong>不是实锤</strong>。买之前自己去商品页核一下「工作原理」字段。</p>
+</blockquote>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>这件事给我的教训<strong>不是”该买贵的”</strong> —— ¥200 买个教训不算贵，这支架我大概率还会凑合用着。</p>
+<p>真正的两条是：</p>
+<p><strong>一、先想清楚你的约束条件，再去看产品参数。</strong><br>我花了大量时间比较各家的最大承重、伸缩行程、材质工艺，却没有先花两分钟确认一件事 —— 我的桌子能夹几个支架。而那恰恰是唯一决定一拖二该不该买的问题。</p>
+<p><strong>二、价格本身就是一条参数，而且是最诚实的那条。</strong><br>支架的”丝滑”不是靠堆料堆出来的，是靠把力矩曲线拟合准 —— 而拟合精度要花钱。看到一条臂 ¥100，你就该知道自己会拿到一条什么样的曲线。这个判断比任何测评都准，因为厂商可以不写最低承重、不写工作原理，但改不了标价。</p>
+<p>参数表会把你的注意力引向厂商愿意公开的那些数字。真正会卡住你的，往往是他们没写的那个 —— 以及那个你天天看见、却从没当成参数看的数字：价格。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9D%82%E8%B0%88/" class="category-chain-item">杂谈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%98%BE%E7%A4%BA%E5%99%A8%E6%94%AF%E6%9E%B6/">#显示器支架</a>
+      
+        <a href="/tags/%E4%BA%BA%E4%BD%93%E5%B7%A5%E5%AD%A6/">#人体工学</a>
+      
+        <a href="/tags/%E5%8A%9B%E5%AD%A6/">#力学</a>
+      
+        <a href="/tags/%E9%80%89%E8%B4%AD/">#选购</a>
+      
+        <a href="/tags/%E9%81%BF%E5%9D%91/">#避坑</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>显示器支架的力学原理与选购避坑：从零自由长度弹簧到我买错的那一个</div>
+      <div>https://kingjem.github.io/2026/11/20/显示器支架的力学原理与选购避坑/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月20日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/11/24/Cloudflare%E5%85%8D%E8%B4%B9%E5%AD%98%E5%82%A8%E4%B8%8E%E7%9B%91%E6%8E%A7%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/" title="白嫖 Cloudflare：免费存储（图床/网盘）与监控类开源项目调研">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">白嫖 Cloudflare：免费存储（图床/网盘）与监控类开源项目调研</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/07/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%85%AD%E9%A2%98session%E4%BF%9D%E6%8C%81%E6%A3%80%E6%B5%8B%E9%80%86%E5%90%91-%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD/" title="猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续）">
+                        <span class="hidden-mobile">猿人学 App 第六题「session保持检测」逆向：绕过 native 反调试/伪 pinning 拆解请求算法（未完待续）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

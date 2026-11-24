@@ -1,0 +1,834 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%89%E9%A2%98%E5%B0%81%E8%AE%BE%E5%A4%87%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-deviceid%E7%BA%AFPython%E8%BF%98%E5%8E%9F/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="猿人学 App 第十三题「东风夜放花千树【封设备】」的离机复现记录：目标是不驱动 App，只靠逆向把 device_id 的生成算法搞清楚。反爬点是”封设备”——请求要带 native 生成的 device_id，服务器按其中某段当”设备身份”限流。本文记录从 Unicorn 忠实模拟 getDeviceId，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python 的全过程。 ⚠">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-01T05:22:35.000Z">
+<meta property="article:modified_time" content="2026-11-24T09:51:40.393Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="JNI">
+<meta property="article:tag" content="NETLINK">
+<meta property="article:tag" content="OLLVM">
+<meta property="article:tag" content="Unicorn">
+<meta property="article:tag" content="goron">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-01 13:22" pubdate>
+          2026年9月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年11月24日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>猿人学 App 第十三题「东风夜放花千树【封设备】」的<strong>离机复现</strong>记录：目标是<strong>不驱动 App</strong>，只靠逆向把 <code>device_id</code> 的生成算法搞清楚。<br>反爬点是”封设备”——请求要带 native 生成的 <code>device_id</code>，服务器按其中某段当”设备身份”限流。本文记录<strong>从 Unicorn 忠实模拟 <code>getDeviceId</code>，到单变量对照锁定算法结构，最后反成一张 16 项查表的纯 Python</strong> 的全过程。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型（静态反编译）</li>
+<li>用 Unicorn 模拟 getDeviceId</li>
+<li>单变量对照：锁定「设备身份」</li>
+<li>「封设备」的真相</li>
+<li>反成纯 Python（免 so &#x2F; Unicorn）</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeThirteenFragment</code> 的翻页逻辑很直白，<code>device_id</code> 来自 native：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">service.OooO0O0(getDeviceId(), page);   <span class="hljs-comment">// @POST(&quot;/api/app13&quot;) @Field(&quot;device_id&quot;) @Field(&quot;page&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">getDeviceId</span><span class="hljs-params">()</span>;      <span class="hljs-comment">// libthirteen.so，JNI_OnLoad 动态注册</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>端点：<code>POST /api/app13</code>，表单 <code>device_id</code> + <code>page</code>（登录后拦截器附加 <code>token</code>）。刷新 page&#x3D;1、加载更多 page++。</li>
+</ul>
+<p>所以整题的核心，就是把 native <code>getDeviceId()</code> 弄清楚。</p>
+<h2 id="二、用-Unicorn-模拟-getDeviceId"><a href="#二、用-Unicorn-模拟-getDeviceId" class="headerlink" title="二、用 Unicorn 模拟 getDeviceId"></a>二、用 Unicorn 模拟 getDeviceId</h2><p><code>libthirteen.so</code> 被 goron&#x2F;OLLVM 混淆、方法名运行时解密，jadx&#x2F;CFR 都啃不动 <code>sign</code> 一类函数。于是用 <strong>Unicorn 忠实模拟</strong>，要点：</p>
+<ol>
+<li><strong>定位函数</strong>：模拟 <code>JNI_OnLoad</code>，在 <code>RegisterNatives</code> 处截获方法表 → 拿到 <code>getDeviceId @ 0x47944</code>（签名 <code>()Ljava/lang/String;</code>）。</li>
+<li><strong>JNI &#x2F; libc 打桩</strong>：<code>JNIEnv</code> 用函数表逐槽分派（<code>NewStringUTF</code> 截获返回串）；实现 <code>clock_gettime</code>、AArch64 变参 <code>__vsnprintf_chk / __vsprintf_chk / vasprintf</code>、<code>strftime</code>、<code>random_device</code> 等。</li>
+<li><strong>goron 重定位坑</strong>：<code>R_AARCH64_ABS64</code> 导入符号要写 <code>stub + addend</code>（goron 会在调用点把 addend 抵消回 stub），漏加 addend 会跳飞。</li>
+<li><strong>NETLINK 应答</strong>（关键洞察）：getDeviceId 会 <code>socket(AF_NETLINK) + sendto + recvfrom</code> 向<strong>内核</strong>发 <code>RTM_GETLINK / RTM_GETADDR</code> <strong>读本机网卡 MAC &#x2F; IP</strong>——它不是在连服务器！脚本伪造 netlink dump 应答让它跑完，就能拿到 <code>device_id</code>。</li>
+</ol>
+<p>跑通后，观察格式串可知：device_id 是若干字节用 <code>%lX</code> 逐字节拼成的 80 位大写十六进制（40 字节），里头混了毫秒时间戳、MAC、random_device。</p>
+<h2 id="三、单变量对照：锁定「设备身份」"><a href="#三、单变量对照：锁定「设备身份」" class="headerlink" title="三、单变量对照：锁定「设备身份」"></a>三、单变量对照：锁定「设备身份」</h2><p>有了模拟器就能<strong>固定一个输入、只动另一个</strong>，逐字符 diff，把结构拆清楚：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">4EA873FFEC6DBE37DF93 · EC7090 · [ 随 <span class="hljs-keyword">MAC</span> 变的 38 位 ] · B97F43A62E0D85C<br>   固定前缀(<span class="hljs-keyword">app</span>盐)      时间戳区        <span class="hljs-keyword">MAC</span> 派生区              固定尾(<span class="hljs-keyword">app</span>盐)<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>是否影响 device_id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>毫秒时间戳</td>
+<td>✅ 改变时间戳区（6 位十六进制）</td>
+</tr>
+<tr>
+<td><strong>本机 MAC</strong></td>
+<td>✅ <strong>改变中段 38 位</strong></td>
+</tr>
+<tr>
+<td>random_device</td>
+<td>❌ 调用了但<strong>不进 id</strong>（反模拟诱饵）</td>
+</tr>
+</tbody></table>
+<p>而且各段<strong>互相独立、无扩散</strong>：改 MAC 只动中段、改时间戳只动时间戳区，常量段纹丝不动。</p>
+<blockquote>
+<p>⚠️ 踩坑：一开始误判 MAC &#x2F; random 都不影响 id——根因是<strong>模拟器的 netlink 应答把 MAC 写死成 <code>02:00:00:00:00:00</code></strong>（环境变量没接进去），所以”改 MAC”其实没改到。把 MAC 真正接进 netlink 应答后，中段立刻随之变化，才看清 MAC 就是那段”设备身份”。</p>
+</blockquote>
+<h2 id="四、「封设备」的真相"><a href="#四、「封设备」的真相" class="headerlink" title="四、「封设备」的真相"></a>四、「封设备」的真相</h2><p>把 MAC 接对后再打服务器，行为就清楚了：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同一 device_id（同 MAC）连续翻页</td>
+<td>约 2 次后 <code>设备号已被封锁</code></td>
+</tr>
+<tr>
+<td><strong>换新 MAC</strong> 的 device_id</td>
+<td>正常返回，可直接跳任意页</td>
+</tr>
+<tr>
+<td>随机 UUID &#x2F; 乱改 device_id</td>
+<td><code>Access forbidden;please check request</code></td>
+</tr>
+</tbody></table>
+<p>即：服务器把 device_id 里的 <strong>MAC 段</strong>当”设备身份”，每设备限量后封；同时<strong>逐字节 checksum 校验</strong>整串，乱造无效。<strong>破解 &#x3D; 每翻一页现造一个随机 MAC 的 device_id</strong>，服务器就当成一台新设备。</p>
+<h2 id="五、反成纯-Python（免-so-Unicorn）"><a href="#五、反成纯-Python（免-so-Unicorn）" class="headerlink" title="五、反成纯 Python（免 so &#x2F; Unicorn）"></a>五、反成纯 Python（免 so &#x2F; Unicorn）</h2><p>既然各段独立，就能把 MAC → 那段的映射彻底反出来。密集采样后发现：</p>
+<ol>
+<li><p><strong>6 个 MAC 字节各占一组 4 字符</strong>，<code>group_i = BASE_i XOR delta(mac[i])</code>；</p>
+</li>
+<li><p><strong>6 组共享同一个 delta 函数</strong>（只是各组常量基 BASE_i 不同）：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dns">delta(m) = (T[m&gt;&gt;<span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0</span>xf]<br>T = [<span class="hljs-number">0,1,2,3</span>,<span class="hljs-number">4,5,6,7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71,0x72</span>,<span class="hljs-number">0x73,0x74</span>,<span class="hljs-number">0x75,0x76</span>]   # <span class="hljs-number">16</span> 项<br></code></pre></td></tr></table></figure>
+
+<p>已验证 <code>m=0x7f → 0x776</code>、<code>0xff → 0x7676</code> 全部吻合，与模拟器逐字节对拍一致；</p>
+</li>
+<li><p>时间戳区只有 16bit（装不下完整毫秒），实测<strong>服务器不校验时间戳新鲜度</strong> → 固定一张旧模板即可，只替换 MAC 6 组。</p>
+</li>
+</ol>
+<p>于是 <code>gen_device_id()</code> &#x3D; 取固定模板 + 按随机 MAC 做 6 组 XOR 替换，一行现造，运行期不再需要 so 和 Unicorn：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os, requests<br><br><span class="hljs-comment"># all-zero-MAC、固定时间戳的模板；仅 MAC 6 组会被替换</span><br>TEMPLATE = <span class="hljs-string">&quot;4EA873FFEC6DBE37DF93EC7090F47601AF844301FBB1943F3C75246E886225001B97F43A62E0D85C&quot;</span><br>T   = [<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>, <span class="hljs-number">0x71</span>,<span class="hljs-number">0x72</span>,<span class="hljs-number">0x73</span>,<span class="hljs-number">0x74</span>,<span class="hljs-number">0x75</span>,<span class="hljs-number">0x76</span>]   <span class="hljs-comment"># 16 项共享表</span><br>POS = [<span class="hljs-number">28</span>, <span class="hljs-number">34</span>, <span class="hljs-number">40</span>, <span class="hljs-number">46</span>, <span class="hljs-number">52</span>, <span class="hljs-number">58</span>]                                <span class="hljs-comment"># 6 个 MAC 组起始位置</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_delta</span>(<span class="hljs-params">m</span>): <span class="hljs-keyword">return</span> (T[m &gt;&gt; <span class="hljs-number">4</span>] &lt;&lt; <span class="hljs-number">8</span>) | T[m &amp; <span class="hljs-number">0xf</span>]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">gen_device_id</span>(<span class="hljs-params">mac=<span class="hljs-literal">None</span></span>):<br>    <span class="hljs-keyword">if</span> mac <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>: mac = os.urandom(<span class="hljs-number">6</span>)     <span class="hljs-comment"># 随机 MAC = 一台新设备</span><br>    s = <span class="hljs-built_in">list</span>(TEMPLATE)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">6</span>):<br>        v = <span class="hljs-built_in">int</span>(TEMPLATE[POS[i]:POS[i]+<span class="hljs-number">4</span>], <span class="hljs-number">16</span>) ^ _delta(mac[i])<br>        h = <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;v:04X&#125;</span>&quot;</span><br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>): s[POS[i]+k] = h[k]<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>.join(s)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page</span>):                            <span class="hljs-comment"># 每页换新 MAC，绕过封设备</span><br>    j = requests.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app13&quot;</span>,<br>                      data=&#123;<span class="hljs-string">&quot;device_id&quot;</span>: gen_device_id(), <span class="hljs-string">&quot;page&quot;</span>: <span class="hljs-built_in">str</span>(page)&#125;,<br>                      headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">15</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>))   <span class="hljs-comment"># 现造 device_id → 直连公网取回该页数据</span><br></code></pre></td></tr></table></figure>
+
+<p>到这一步，整条链路已经<strong>离机、零依赖</strong>：不碰手机、不加载 so、不跑 Unicorn，一行现造合法 <code>device_id</code> 就能任意翻页。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这题的”封设备”，本质是把一个并不复杂的算法（模板 + MAC 异或查表）藏进 goron 混淆的 native 里。拿到手的方法论：<strong>先用 Unicorn 把真实代码离机跑起来拿样本 → 单变量对照锁定结构 → 反成纯 Python</strong>。其中最关键的两个洞察是：<code>socket(AF_NETLINK)</code> 是读本机网卡而非连服务器；以及 device_id 里真正的”设备身份”是 MAC 段，轮换它即可当新设备。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/JNI/">#JNI</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/Unicorn/">#Unicorn</a>
+      
+        <a href="/tags/OLLVM/">#OLLVM</a>
+      
+        <a href="/tags/NETLINK/">#NETLINK</a>
+      
+        <a href="/tags/goron/">#goron</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第十三题「封设备」离机复现：device_id 从 Unicorn 模拟到纯 Python 还原</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第十三题封设备离机复现-deviceid纯Python还原/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98upx%E5%A3%B3%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%86%85%E5%AD%98dump%E8%84%B1%E5%A3%B3%E4%B8%8E%E8%87%AA%E5%AE%9A%E4%B9%89Base64/" title="猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猿人学 App 第十一题「upx壳」离机复现：内存 dump 脱壳 + 自定义 Base64 还原</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/26/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%94%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E5%8F%98%E5%BD%A2MD4%E7%BA%AFPython%E8%BF%98%E5%8E%9F/" title="猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原">
+                        <span class="hidden-mobile">猿人学 App 第五题离机复现：OLLVM 包裹的变形 MD4 纯 Python 还原</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

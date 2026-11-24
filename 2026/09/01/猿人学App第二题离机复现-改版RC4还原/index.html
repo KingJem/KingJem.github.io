@@ -1,0 +1,787 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 data 由 native 加密。这题的 so 不加壳、不混淆，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 encrypt、认出它是带 header 的改版 RC4，并用 Frida 主动调用当预言机对拍，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。 ⚠️ 猿人学闯关 A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原">
+<meta property="og:url" content="https://kingjem.github.io/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%BA%8C%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-%E6%94%B9%E7%89%88RC4%E8%BF%98%E5%8E%9F/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 data 由 native 加密。这题的 so 不加壳、不混淆，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 encrypt、认出它是带 header 的改版 RC4，并用 Frida 主动调用当预言机对拍，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。 ⚠️ 猿人学闯关 A">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-01T05:56:34.000Z">
+<meta property="article:modified_time" content="2026-11-24T09:51:40.392Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frida">
+<meta property="article:tag" content="RC4">
+<meta property="article:tag" content="capstone">
+<meta property="article:tag" content="so">
+<meta property="article:tag" content="猿人学">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-01 13:56" pubdate>
+          2026年9月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          31 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年11月24日 下午
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>[猿人学 App 逆向系列]第二篇。第二题「简单的 so 层加密」：请求参数 <code>data</code> 由 native 加密。<br>这题的 so <strong>不加壳、不混淆</strong>，可以直接反汇编读算法——是练”读一个改版 RC4”的好素材。本文记录怎么读 <code>encrypt</code>、认出它是<strong>带 header 的改版 RC4</strong>，并用 <strong>Frida 主动调用当预言机对拍</strong>，定位两个只看反汇编容易漏的细节，最后还原成纯 Python。</p>
+<p>⚠️ 猿人学闯关 App 是面向逆向练习的 CTF 式靶场；本文仅用于授权范围内的学习研究，请遵守相关服务条款与法律。</p>
+</blockquote>
+<p><strong>本文目录</strong></p>
+<ul>
+<li>请求模型（静态反编译）</li>
+<li>libtwo.so 侦察：不加壳不混淆</li>
+<li>读 encrypt：header + 改版 RC4</li>
+<li>Frida 预言机对拍，定位两个坑</li>
+<li>纯 Python 还原</li>
+</ul>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、请求模型（静态反编译）"><a href="#一、请求模型（静态反编译）" class="headerlink" title="一、请求模型（静态反编译）"></a>一、请求模型（静态反编译）</h2><p><code>ChallengeTwoFragment</code> 里翻页：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> String.format(<span class="hljs-string">&quot;%d:%d&quot;</span>, page, System.currentTimeMillis());   <span class="hljs-comment">// &quot;1:1788000000000&quot;</span><br><span class="hljs-type">byte</span>[] enc = NativeLib.encrypt(content.getBytes(UTF_8), currentTimeMillis);<br><span class="hljs-type">String</span> <span class="hljs-variable">data</span> <span class="hljs-operator">=</span> Base64.encodeToString(enc, <span class="hljs-number">10</span>);                                 <span class="hljs-comment">// flag 10 = URL_SAFE|NO_WRAP</span><br>service.OooOOo(data);                                                          <span class="hljs-comment">// @POST(&quot;/api/app2&quot;) @Field(&quot;data&quot;)</span><br></code></pre></td></tr></table></figure>
+
+<p><code>NativeLib</code>（<code>com.yuanrenxue.challenge.two</code>）：<code>static { System.loadLibrary(&quot;two&quot;); }</code>，<code>public static native byte[] encrypt(byte[], long)</code>。核心就是 libtwo.so 的 <code>encrypt</code>。</p>
+<h2 id="二、libtwo-so-侦察：不加壳不混淆"><a href="#二、libtwo-so-侦察：不加壳不混淆" class="headerlink" title="二、libtwo.so 侦察：不加壳不混淆"></a>二、libtwo.so 侦察：不加壳不混淆</h2><p>拿 <code>lief</code>&#x2F;<code>capstone</code> 一看就轻松了：libtwo.so 只有 <strong>10KB</strong>，没有 <code>UPX!</code>、<code>.text</code> 是正常指令（不是第十一题那种 <code>udf</code>），<code>encrypt</code> 是<strong>静态导出</strong> <code>Java_com_yuanrenxue_challenge_two_NativeLib_encrypt</code>，函数序言干净（<code>sub sp,sp,#0x50; stp x29,x30...</code>）。也没有第四题那种 goron 间接跳转。<strong>直接反汇编读</strong>即可。</p>
+<h2 id="三、读-encrypt：header-改版-RC4"><a href="#三、读-encrypt：header-改版-RC4" class="headerlink" title="三、读 encrypt：header + 改版 RC4"></a>三、读 encrypt：header + 改版 RC4</h2><p>外壳（<code>Java_..._encrypt</code>）逻辑很直白：</p>
+<ol>
+<li><code>GetByteArrayElements</code> 取明文指针、<code>GetArrayLength</code> 取长度 <code>len</code>；</li>
+<li>输出长度 &#x3D; <code>len + 32</code>，<code>malloc</code>；</li>
+<li>调核心加密（<code>x0=明文, x1=输出, x2=len+32, x3=ts</code>）；</li>
+<li><code>NewByteArray(len+32)</code> + <code>SetByteArrayRegion</code> 返回。</li>
+</ol>
+<p>核心（<code>sub_c70</code>）读下来是一个<strong>带 32 字节 header 的改版 RC4</strong>：</p>
+<ul>
+<li><strong>header（输出前 32 字节）&#x3D; key1(16) ++ key2(16)</strong>：<ul>
+<li><code>key1</code>：由 ts 经一个 LCG 派生——<code>x = x*1103515245 + 12345</code>，取 <code>(x&gt;&gt;16)&amp;0x7fff</code>，正是 <strong>glibc <code>rand()</code></strong> 的内核；连续取 8 个、每个拆成 2 字节，凑 16 字节。</li>
+<li><code>key2</code>：<code>std::random_device</code> 生成的 16 随机字节。</li>
+</ul>
+</li>
+<li><strong>KSA</strong>：<code>S=0..255</code>，先用 key1 跑 <strong>768 次</strong>（&#x3D; 3 遍），再用 key2 跑 768 次；</li>
+<li><strong>PRGA</strong>：对明文逐字节异或 keystream。</li>
+<li>两把 key 都写进 header 发给服务器 —— 服务器据此重建同一个 S 盒、还原 keystream 解密（类似”把密钥material 摊在包头”的思路）。</li>
+</ul>
+<p>KSA &#x2F; PRGA 的 <code>j</code> 更新，都比标准 RC4 <strong>多一层 S 盒查表</strong>：</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs inform7">KSA :  j = S<span class="hljs-comment">[(j + S<span class="hljs-comment">[i%256]</span> + key<span class="hljs-comment">[i%16]</span>) &amp; 0xff]</span> ;  swap(S<span class="hljs-comment">[i%256]</span>, S<span class="hljs-comment">[j]</span>)<br>PRGA:  j = S<span class="hljs-comment">[(j + S<span class="hljs-comment">[a]</span>) &amp; 0xff]</span><br>       keystream = S<span class="hljs-comment">[ S<span class="hljs-comment">[ (S<span class="hljs-comment">[j]</span> + 1) &amp; 0xff ]</span> ]</span>  ;   swap(S<span class="hljs-comment">[a]</span>, S<span class="hljs-comment">[j]</span>) ;  a=(a+1)&amp;0xff<br></code></pre></td></tr></table></figure>
+
+<h2 id="四、Frida-预言机对拍，定位两个坑"><a href="#四、Frida-预言机对拍，定位两个坑" class="headerlink" title="四、Frida 预言机对拍，定位两个坑"></a>四、Frida 预言机对拍，定位两个坑</h2><p>只看反汇编，有两处极易翻车。这题 so 就在真机上跑着，直接 <strong>Frida 主动调用 <code>encrypt</code> 当预言机</strong>最省事：拿到 <code>env</code>（JavaVM → AttachCurrentThread），用 <code>NewByteArray/SetByteArrayRegion</code> 造入参，调 <code>Java_..._encrypt(env, 0, jarr, ts)</code>，再 <code>GetByteArrayElements</code> 读返回——喂任意 <code>(明文, ts)</code> 拿真机输出，和 Python 逐字节对拍。</p>
+<p>对拍逼出两个细节：</p>
+<ol>
+<li><strong>KSA 的 <code>j</code> 也带 S[] 包裹</strong>：反汇编里 <code>and w9,#0xff</code> 后还有一条 <code>ldrb w9,[x8,w9]</code>（<code>x8</code> 是 S 盒基址）。漏掉它，header 对、但密文全错。</li>
+<li><strong>key1 不能乱填</strong>：一开始以为两把 key 都能随机（都在 header 里嘛），结果服务器回 <code>status=2</code>。原因是<strong>服务器用明文里的 ts 重算 key1、和 header 里的 key1 比对</strong>——所以 <code>key1</code> 必须由 ts 经那套 LCG 派生；只有 <code>key2</code> 能随机。</li>
+</ol>
+<p>对齐这两点后，Python 输出与真机 <code>encrypt</code> <strong>逐字节一致</strong>，服务器也返回 <code>status=1</code>。</p>
+<h2 id="五、纯-Python-还原"><a href="#五、纯-Python-还原" class="headerlink" title="五、纯 Python 还原"></a>五、纯 Python 还原</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> base64, os, time, requests<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_lcg</span>(<span class="hljs-params">x</span>): <span class="hljs-keyword">return</span> ((x*<span class="hljs-number">1103515245</span> + <span class="hljs-number">12345</span>) &gt;&gt; <span class="hljs-number">16</span>) &amp; <span class="hljs-number">0x7fff</span>        <span class="hljs-comment"># glibc rand</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_key1</span>(<span class="hljs-params">ms</span>):<br>    v=ms &amp; <span class="hljs-number">0xffffffff</span>; b=<span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">8</span>):<br>        v=_lcg(v); b.append((v&gt;&gt;<span class="hljs-number">8</span>)&amp;<span class="hljs-number">0xff</span>); b.append(v&amp;<span class="hljs-number">0xff</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>(b)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_encrypt</span>(<span class="hljs-params">pt, k1, k2</span>):<br>    S=<span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>)); jj=<span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> (k1,k2):                       <span class="hljs-comment"># KSA 各 768 次(先 key1 后 key2)</span><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">768</span>):<br>            si=i%<span class="hljs-number">256</span><br>            jj=S[(jj+S[si]+key[i%<span class="hljs-number">16</span>])&amp;<span class="hljs-number">0xff</span>]    <span class="hljs-comment"># 带 S[] 包裹</span><br>            S[si],S[jj]=S[jj],S[si]<br>    out=<span class="hljs-built_in">bytearray</span>(k1+k2); a=<span class="hljs-number">0</span>                  <span class="hljs-comment"># header = key1 ++ key2</span><br>    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> pt:                               <span class="hljs-comment"># PRGA(改版)</span><br>        jj=S[(jj+S[a])&amp;<span class="hljs-number">0xff</span>]<br>        t=S[S[(S[jj]+<span class="hljs-number">1</span>)&amp;<span class="hljs-number">0xff</span>]]<br>        out.append(p^t); S[a],S[jj]=S[jj],S[a]; a=(a+<span class="hljs-number">1</span>)&amp;<span class="hljs-number">0xff</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>(out)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">data</span>(<span class="hljs-params">page, ms</span>):<br>    <span class="hljs-keyword">return</span> base64.urlsafe_b64encode(_encrypt(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;page&#125;</span>:<span class="hljs-subst">&#123;ms&#125;</span>&quot;</span>.encode(), _key1(ms), os.urandom(<span class="hljs-number">16</span>))).decode()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-params">page, s</span>):<br>    ms=<span class="hljs-built_in">int</span>(time.time()*<span class="hljs-number">1000</span>)<br>    j=s.post(<span class="hljs-string">&quot;https://www.python-spider.com/api/app2&quot;</span>, data=&#123;<span class="hljs-string">&quot;data&quot;</span>:data(page,ms)&#125;,<br>             headers=&#123;<span class="hljs-string">&quot;User-Agent&quot;</span>:<span class="hljs-string">&quot;okhttp/4.9.2&quot;</span>&#125;, timeout=<span class="hljs-number">10</span>).json()<br>    <span class="hljs-keyword">return</span> [<span class="hljs-built_in">int</span>(x[<span class="hljs-string">&quot;value&quot;</span>].strip()) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> j[<span class="hljs-string">&quot;data&quot;</span>]]<br><br><span class="hljs-built_in">print</span>(fetch(<span class="hljs-number">1</span>, requests.Session()))   <span class="hljs-comment"># key1 由 ts 派生、key2 随机 -&gt; 服务器认，取回该页数据</span><br></code></pre></td></tr></table></figure>
+
+<p>到这一步就完全离机：不碰手机、纯 Python 复刻 native 的改版 RC4 即可逐页取数。<code>key2</code> 随机、<code>ts</code> 也不卡新鲜度，只要 <code>key1</code> 与 <code>ts</code> 自洽即可。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>“so 层加密”听着唬人，实际这题 so 既不加壳也不混淆，<code>encrypt</code> 是个可直读的改版 RC4。真正的经验是：<strong>别只信眼睛</strong>——so 就在真机上，Frida 主动调用当预言机对拍，几秒就能揪出”KSA 少一层 S[] 包裹””key1 必须由 ts 派生”这种纯看反汇编容易漏的细节。往后第十一题会遇到加壳（读不了就 dump 内存），第四题会遇到 goron（读不动就 Unicorn 模拟），本题则是”读得动，但要对拍验证”的典型。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" class="category-chain-item">技术笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/%E6%8A%93%E5%8C%85%E9%80%86%E5%90%91/" class="category-chain-item">抓包逆向</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%80%86%E5%90%91/">#逆向</a>
+      
+        <a href="/tags/Frida/">#Frida</a>
+      
+        <a href="/tags/Android/">#Android</a>
+      
+        <a href="/tags/%E7%8C%BF%E4%BA%BA%E5%AD%A6/">#猿人学</a>
+      
+        <a href="/tags/so/">#so</a>
+      
+        <a href="/tags/RC4/">#RC4</a>
+      
+        <a href="/tags/capstone/">#capstone</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>猿人学 App 第二题「简单的 so 层加密」离机复现：一个改版 RC4 的完整还原</div>
+      <div>https://kingjem.github.io/2026/09/01/猿人学App第二题离机复现-改版RC4还原/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E7%AC%AC%E4%B8%89%E9%A2%98%E7%A6%BB%E6%9C%BA%E5%A4%8D%E7%8E%B0-Looper%E5%8F%8D%E6%A8%A1%E6%8B%9F/" title="猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猿人学 App 第三题「so 动态注册」离机复现：Looper 反模拟与一场&#34;字节全对却被拒&#34;的追凶</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/09/01/%E7%8C%BF%E4%BA%BA%E5%AD%A6App%E9%80%86%E5%90%91%E9%97%AF%E5%85%B3%E7%B3%BB%E5%88%97-%E6%80%BB%E7%9B%AE%E5%BD%95/" title="猿人学 App 逆向闯关系列 · 总目录">
+                        <span class="hidden-mobile">猿人学 App 逆向闯关系列 · 总目录</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

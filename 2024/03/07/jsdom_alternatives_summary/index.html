@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ruhai">
+  <meta name="keywords" content="python go java Android js">
+  
+    <meta name="description" content="JSDOM 替代方案：总结与比较jsdom 是一个在 Node.js 中模拟浏览器环境的强大工具，但对 Web 标准的高度保真度牺牲了性能。本文按场景分类整理了各类替代方案，帮助你快速选型。  一、Node.js 完整浏览器 DOM 模拟（对标 jsdom）1. Happy DOM（强烈推荐，现代替代 jsdom） 定位： 轻量、高性能 DOM 实现，API 对齐浏览器 优势： 原生支持 ES M">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSDOM 替代方案：总结与比较">
+<meta property="og:url" content="https://kingjem.github.io/2024/03/07/jsdom_alternatives_summary/index.html">
+<meta property="og:site_name" content="Ruhai&#39;s blogs">
+<meta property="og:description" content="JSDOM 替代方案：总结与比较jsdom 是一个在 Node.js 中模拟浏览器环境的强大工具，但对 Web 标准的高度保真度牺牲了性能。本文按场景分类整理了各类替代方案，帮助你快速选型。  一、Node.js 完整浏览器 DOM 模拟（对标 jsdom）1. Happy DOM（强烈推荐，现代替代 jsdom） 定位： 轻量、高性能 DOM 实现，API 对齐浏览器 优势： 原生支持 ES M">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-22T16:00:00.000Z">
+<meta property="article:author" content="Ruhai">
+<meta property="article:tag" content="Happy DOM">
+<meta property="article:tag" content="JSDOM">
+<meta property="article:tag" content="Playwright">
+<meta property="article:tag" content="cheerio">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>JSDOM 替代方案：总结与比较 - Ruhai&#39;s blogs</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"kingjem.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JSDOM 替代方案：总结与比较"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-08 00:00" pubdate>
+          2024年3月8日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JSDOM 替代方案：总结与比较</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2026年7月23日 凌晨
+                  
+                
+              </p>
+            
+            <div class="markdown-body">
+              
+              <h1 id="JSDOM-替代方案：总结与比较"><a href="#JSDOM-替代方案：总结与比较" class="headerlink" title="JSDOM 替代方案：总结与比较"></a>JSDOM 替代方案：总结与比较</h1><p><code>jsdom</code> 是一个在 Node.js 中模拟浏览器环境的强大工具，但对 Web 标准的高度保真度牺牲了性能。本文按场景分类整理了各类替代方案，帮助你快速选型。</p>
+<hr>
+<h2 id="一、Node-js-完整浏览器-DOM-模拟（对标-jsdom）"><a href="#一、Node-js-完整浏览器-DOM-模拟（对标-jsdom）" class="headerlink" title="一、Node.js 完整浏览器 DOM 模拟（对标 jsdom）"></a>一、Node.js 完整浏览器 DOM 模拟（对标 jsdom）</h2><h3 id="1-Happy-DOM（强烈推荐，现代替代-jsdom）"><a href="#1-Happy-DOM（强烈推荐，现代替代-jsdom）" class="headerlink" title="1. Happy DOM（强烈推荐，现代替代 jsdom）"></a>1. Happy DOM（强烈推荐，现代替代 jsdom）</h3><ul>
+<li><strong>定位：</strong> 轻量、高性能 DOM 实现，API 对齐浏览器</li>
+<li><strong>优势：</strong><ul>
+<li>原生支持 ES Module，开箱即用</li>
+<li>对 CSSOM、事件、表单、iframe、fetch 完善支持</li>
+<li>渲染速度远高于 jsdom，内存占用低</li>
+<li><strong>Vitest 默认 DOM 环境就是 happy-dom</strong></li>
+</ul>
+</li>
+<li><strong>适用：</strong> 单元测试、SSR 页面解析、爬虫</li>
+<li><strong>安装：</strong> <code>npm install happy-dom</code></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; <span class="hljs-title class_">Window</span> &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;happy-dom&#x27;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-variable language_">window</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Window</span>();<br><span class="hljs-keyword">const</span> <span class="hljs-variable language_">document</span> = <span class="hljs-variable language_">window</span>.<span class="hljs-property">document</span>;<br><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">innerHTML</span> = <span class="hljs-string">&#x27;&lt;div&gt;test&lt;/div&gt;&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-linkedom"><a href="#2-linkedom" class="headerlink" title="2. linkedom"></a>2. linkedom</h3><ul>
+<li><strong>特点：</strong> 基于纯 DOM 标准实现，不依赖任何浏览器二进制</li>
+<li><strong>区别：</strong> 比 jsdom 更精简，无冗余 XML 解析逻辑，适合爬虫、页面抓取</li>
+<li><strong>环境：</strong> Node.js &#x2F; Deno</li>
+<li><strong>安装：</strong> <code>npm install linkedom</code></li>
+</ul>
+<h3 id="3-deno-dom"><a href="#3-deno-dom" class="headerlink" title="3. deno-dom"></a>3. deno-dom</h3><ul>
+<li><strong>特点：</strong> Deno 官方 DOM 库，基于 Rust + WebAssembly 构建，完全 W3C 标准，性能极强</li>
+<li><strong>适用：</strong> 跨 runtime 项目、Deno 原生应用</li>
+</ul>
+<hr>
+<h2 id="二、轻量-DOM-解析（只解析-HTML，不模拟完整浏览器）"><a href="#二、轻量-DOM-解析（只解析-HTML，不模拟完整浏览器）" class="headerlink" title="二、轻量 DOM 解析（只解析 HTML，不模拟完整浏览器）"></a>二、轻量 DOM 解析（只解析 HTML，不模拟完整浏览器）</h2><h3 id="1-cheerio（jQuery-风格，爬虫首选）"><a href="#1-cheerio（jQuery-风格，爬虫首选）" class="headerlink" title="1. cheerio（jQuery 风格，爬虫首选）"></a>1. cheerio（jQuery 风格，爬虫首选）</h3><ul>
+<li><strong>特点：</strong> 只提供 DOM 查询接口，无 window &#x2F; 事件 &#x2F; JS 执行，纯静态解析 HTML</li>
+<li><strong>速度：</strong> 天花板级别，无任何浏览器开销</li>
+<li><strong>场景：</strong> 网页爬虫、HTML 内容提取、静态模板处理</li>
+<li><strong>安装：</strong> <code>npm install cheerio</code></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> cheerio <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;cheerio&#x27;</span>;<br><span class="hljs-keyword">const</span> $ = cheerio.<span class="hljs-title function_">load</span>(<span class="hljs-string">&#x27;&lt;h1&gt;hello&lt;/h1&gt;&#x27;</span>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>($(<span class="hljs-string">&#x27;h1&#x27;</span>).<span class="hljs-title function_">text</span>());<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-parse5（底层-HTML-标准解析器）"><a href="#2-parse5（底层-HTML-标准解析器）" class="headerlink" title="2. parse5（底层 HTML 标准解析器）"></a>2. parse5（底层 HTML 标准解析器）</h3><ul>
+<li><strong>特点：</strong> W3C 标准 HTML5 解析库，只生成 DOM 树，无操作 API</li>
+<li><strong>底层依赖：</strong> jsdom、happy-dom 底层都基于 parse5</li>
+<li><strong>适用：</strong> 自封装自定义 DOM 工具</li>
+</ul>
+<h3 id="3-domhandler-domutils"><a href="#3-domhandler-domutils" class="headerlink" title="3. domhandler + domutils"></a>3. domhandler + domutils</h3><ul>
+<li><strong>特点：</strong> parse5 配套工具，提供遍历、查询 DOM 节点</li>
+<li><strong>定位：</strong> 轻量化替代 cheerio</li>
+</ul>
+<hr>
+<h2 id="三、浏览器-SSR-渲染类"><a href="#三、浏览器-SSR-渲染类" class="headerlink" title="三、浏览器 &#x2F; SSR 渲染类"></a>三、浏览器 &#x2F; SSR 渲染类</h2><h3 id="1-Puppeteer-Playwright（真实无头浏览器）"><a href="#1-Puppeteer-Playwright（真实无头浏览器）" class="headerlink" title="1. Puppeteer &#x2F; Playwright（真实无头浏览器）"></a>1. Puppeteer &#x2F; Playwright（真实无头浏览器）</h3><ul>
+<li><strong>和 jsdom 的本质区别：</strong> 启动 Chromium&#x2F;Firefox 真实浏览器内核，能执行复杂 JS、渲染动画、支持 Canvas&#x2F;WebGL</li>
+<li><strong>适用：</strong> 需要真实页面交互、复杂前端框架渲染、截图、自动化爬虫</li>
+<li><strong>缺点：</strong> 启动慢、占用资源大</li>
+</ul>
+<h3 id="2-Vue-React-框架专属-SSR"><a href="#2-Vue-React-框架专属-SSR" class="headerlink" title="2. Vue &#x2F; React 框架专属 SSR"></a>2. Vue &#x2F; React 框架专属 SSR</h3><ul>
+<li><code>@vue/server-renderer</code>：只渲染 Vue 组件，不通用 HTML 解析</li>
+<li><code>react-dom/server</code>：只渲染 React 组件，不通用 HTML 解析</li>
+<li><strong>适用：</strong> Vue&#x2F;React 项目服务端渲染</li>
+</ul>
+<hr>
+<h2 id="四、测试专用-DOM-环境"><a href="#四、测试专用-DOM-环境" class="headerlink" title="四、测试专用 DOM 环境"></a>四、测试专用 DOM 环境</h2><table>
+<thead>
+<tr>
+<th>库</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Vitest + happy-dom</strong></td>
+<td>现代首选，替代 Jest + jsdom</td>
+</tr>
+<tr>
+<td><strong>Jest + jsdom</strong></td>
+<td>Jest 内置 DOM 模拟，就是封装 jsdom</td>
+</tr>
+<tr>
+<td><strong>@stencil&#x2F;core MockDocument</strong></td>
+<td>WebComponent 专用轻量 DOM</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="对比表格"><a href="#对比表格" class="headerlink" title="对比表格"></a>对比表格</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>jsdom</th>
+<th>happy-dom</th>
+<th>linkedom</th>
+<th>cheerio</th>
+<th>Playwright</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>环境</strong></td>
+<td>Node.js</td>
+<td>Node.js</td>
+<td>Node.js &#x2F; Deno</td>
+<td>Node.js</td>
+<td>Node.js (带浏览器)</td>
+</tr>
+<tr>
+<td><strong>完整浏览器环境</strong></td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+<td>✅ 完整</td>
+<td>❌ 仅静态查询</td>
+<td>✅ 真实内核</td>
+</tr>
+<tr>
+<td><strong>执行页面 JS</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅ 完整</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>中等</td>
+<td>极快</td>
+<td>快</td>
+<td>极速</td>
+<td>慢</td>
+</tr>
+<tr>
+<td><strong>标准符合性</strong></td>
+<td>高</td>
+<td>中</td>
+<td>低</td>
+<td>—</td>
+<td>最高（真实浏览器）</td>
+</tr>
+<tr>
+<td><strong>最佳场景</strong></td>
+<td>老项目兼容</td>
+<td>现代测试 &#x2F; SSR</td>
+<td>爬虫 &#x2F; 轻量化 DOM</td>
+<td>纯爬虫 &#x2F; 文本提取</td>
+<td>真实交互 &#x2F; 截图</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="选型速查"><a href="#选型速查" class="headerlink" title="选型速查"></a>选型速查</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单元测试、Vue&#x2F;React 组件测试</td>
+<td><strong>happy-dom</strong>（Vitest 默认）</td>
+</tr>
+<tr>
+<td>单纯爬取网页文本、提取标签</td>
+<td><strong>cheerio</strong></td>
+</tr>
+<tr>
+<td>需要模拟完整浏览器环境执行 JS</td>
+<td><strong>linkedom</strong> &#x2F; <strong>happy-dom</strong></td>
+</tr>
+<tr>
+<td>需要真实渲染、Canvas、复杂交互</td>
+<td><strong>Playwright</strong></td>
+</tr>
+<tr>
+<td>老 Jest 项目不想迁移</td>
+<td>继续用内置 jsdom</td>
+</tr>
+</tbody></table>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/js%E9%80%86%E5%90%91/" class="category-chain-item">js逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Playwright/">#Playwright</a>
+      
+        <a href="/tags/JSDOM/">#JSDOM</a>
+      
+        <a href="/tags/Happy-DOM/">#Happy DOM</a>
+      
+        <a href="/tags/cheerio/">#cheerio</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JSDOM 替代方案：总结与比较</div>
+      <div>https://kingjem.github.io/2024/03/07/jsdom_alternatives_summary/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ruhai</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/22/jsrpc-%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E5%92%8C%E4%BB%A3%E7%A0%81%E4%BF%AE%E6%94%B9/" title="jsrpc 框架使用">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">jsrpc 框架使用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/05/linux/Mac%20%E5%B9%B3%E5%8F%B0%E4%B8%8B%E4%BD%BF%E7%94%A8orbstack%20%E4%B8%AD%E7%9A%84k8s%20%E9%83%A8%E7%BD%B2flask%20%E5%BA%94%E7%94%A8/" title="Mac 平台下使用orbstack 中的k8s 部署flask 应用">
+                        <span class="hidden-mobile">Mac 平台下使用orbstack 中的k8s 部署flask 应用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <br> <a href="https://github.com/KingJem" target="_blank" rel="noopener"><span>github.com/KingJem</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
